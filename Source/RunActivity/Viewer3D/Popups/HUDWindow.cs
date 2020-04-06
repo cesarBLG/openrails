@@ -1340,7 +1340,7 @@ namespace Orts.Viewer3D.Popups
                 TableSetCell(table, 0, "{0}", car.CarID);
                 if (hudWindowColumnsActualPage > 0)
                 {
-                    TableSetCell(table, 1, "{0} : {1}", car.HUDCouplerRigidIndication == 2 ? "F" : car.HUDCouplerRigidIndication == 1 ? "R" : "N", car.CouplerExceedBreakLimit ? "xxx" : car.CouplerOverloaded ? "O/L" : car.HUDCouplerForceIndication == 1 ? "Pull" : car.HUDCouplerForceIndication == 2 ? "Push" : "-");
+                    TableSetCell(table, 1, "{0} : {1}", car.GetCouplerRigidIndication() ? "R" : "F", car.CouplerExceedBreakLimit ? "xxx" + "!!!" : car.CouplerOverloaded ? "O/L" + "???" : car.HUDCouplerForceIndication == 1 ? "Pull" : car.HUDCouplerForceIndication == 2 ? "Push" : "-");
                     TableSetCell(table, 2, "{0}", FormatStrings.FormatVeryShortDistanceDisplay(car.CouplerSlackM, car.IsMetric));
                     TableSetCell(table, 3, "{0}", FormatStrings.FormatLargeMass(car.MassKG, car.IsMetric, car.IsUK));
                     TableSetCell(table, 4, "{0:F2}%", -car.CurrentElevationPercent);
