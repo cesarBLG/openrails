@@ -174,6 +174,7 @@ namespace Orts.Formats.Msts
         ORTS_HOURDIAL,
         ORTS_MINUTEDIAL,
         ORTS_SECONDDIAL,
+        ORTS_SIGNED_TRACTION_BRAKING,
 
         // TCS Controls
         ORTS_TCS1,
