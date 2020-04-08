@@ -486,11 +486,27 @@ namespace Orts.Simulation.RollingStocks.SubSystems
 
         T NextDistanceSignalItem<T>(ref T retval, Train.TrainObjectItem.TRAINOBJECTTYPE type)
         {
-            if (Locomotive.Train.ValidRoute[0] != null && Locomotive.Train.PresentPosition[0].RouteListIndex >= 0)
+            if (Locomotive.Train.MUDirection != Direction.Reverse && Locomotive.Train.ValidRoute[0] != null && Locomotive.Train.PresentPosition[0].RouteListIndex >= 0)
             {
                 TrackCircuitSignalItem nextSignal = Locomotive.Train.signalRef.Find_Next_Object_InRoute(Locomotive.Train.ValidRoute[0],
                     Locomotive.Train.PresentPosition[0].RouteListIndex, Locomotive.Train.PresentPosition[0].TCOffset,
                             400, Formats.Msts.MstsSignalFunction.DISTANCE, Locomotive.Train.routedForward);
+
+                if (nextSignal.SignalState == ObjectItemInfo.ObjectItemFindState.Object)
+                {
+                    Aspect distanceSignalAspect = (Aspect)Locomotive.Train.signalRef.TranslateToTCSAspect(nextSignal.SignalRef.this_sig_lr(Orts.Formats.Msts.MstsSignalFunction.DISTANCE));
+                    SignalAspect = distanceSignalAspect;
+                    SignalDistance = nextSignal.SignalLocation;
+                    return retval;
+                }
+            }
+            else if (Locomotive.Train.MUDirection == Direction.Reverse && Locomotive.Train.ValidRoute[1] != null && Locomotive.Train.PresentPosition[1].TCSectionIndex >= 0)
+            {
+                var rearRouteListIndex = Locomotive.Train.ValidRoute[1].GetRouteIndex(Locomotive.Train.PresentPosition[1].TCSectionIndex, 0);
+                TrackCircuitSignalItem nextSignal = Locomotive.Train.signalRef.Find_Next_Object_InRoute(Locomotive.Train.ValidRoute[1],
+                     rearRouteListIndex, -Locomotive.Train.PresentPosition[1].TCOffset +
+                     Locomotive.Train.signalRef.TrackCircuitList[Locomotive.Train.PresentPosition[1].TCSectionIndex].Length,
+                     400, Formats.Msts.MstsSignalFunction.DISTANCE, Locomotive.Train.routedForward);
 
                 if (nextSignal.SignalState == ObjectItemInfo.ObjectItemFindState.Object)
                 {
