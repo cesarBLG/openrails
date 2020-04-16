@@ -188,6 +188,8 @@ namespace ORTS.Settings
         public int WorldObjectDensity { get; set; }
         [Default("1024x768")]
         public string WindowSize { get; set; }
+        [Default(false)]
+        public bool Letterbox2DCab { get; set; }
         [Default(20)]
         public int DayAmbientLight { get; set; }
 

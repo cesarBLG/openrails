@@ -179,6 +179,7 @@ namespace ORTS
             trackDayAmbientLight.Value = Settings.DayAmbientLight;
             trackDayAmbientLight_ValueChanged(null, null);
             checkDoubleWire.Checked = Settings.DoubleWire;
+            checkLetterbox.Checked = Settings.Letterbox2DCab;
 
             // Simulation tab
             checkUseAdvancedAdhesion.Checked = Settings.UseAdvancedAdhesion;
@@ -482,6 +483,7 @@ private async void OptionsForm_Shown(object sender, EventArgs e)
             Settings.WindowSize = comboWindowSize.Text;
             Settings.DayAmbientLight = (int)trackDayAmbientLight.Value;
             Settings.DoubleWire = checkDoubleWire.Checked;
+            Settings.Letterbox2DCab = checkLetterbox.Checked;
 
             // Simulation tab
             Settings.UseAdvancedAdhesion = checkUseAdvancedAdhesion.Checked;
