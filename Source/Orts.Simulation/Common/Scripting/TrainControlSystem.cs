@@ -86,6 +86,14 @@ namespace ORTS.Scripting.Api
         /// </summary>
         public Func<float> NextDistanceSignalDistanceM;
         /// <summary>
+        /// Signal type of main head of hext INFO signal.
+        /// </summary>
+        public Func<string> NextInfoSignalSignalType;
+        /// <summary>
+        /// Distance to next INFO signal.
+        /// </summary>
+        public Func<float> NextInfoSignalDistanceM;
+        /// <summary>
         /// Next normal signal has a repeater head
         /// </summary>
         public Func<bool> DoesNextNormalSignalHaveRepeaterHead;
