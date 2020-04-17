@@ -1058,7 +1058,7 @@ namespace Orts.Viewer3D.RollingStock
 
                     if (firstOne)
                     {
-                        _Viewer.AdjustCabHeight(_Viewer.DisplaySize.X, _Viewer.DisplaySize.Y);
+                        _Viewer.AdjustCabHeight();
 
                         _Viewer.CabCamera.ScreenChanged();
                         DisplaySize.Y = _Viewer.CabHeightPixels;
@@ -1939,9 +1939,11 @@ namespace Orts.Viewer3D.RollingStock
                 * (ControlDiscrete.Direction > 0 ? -1 : 1);
         }
 
-        public bool IsMouseWithin()
+        public bool IsMouseWithin(Viewport vp)
         {
-            return ControlDiscrete.MouseControl & DestinationRectangle.Contains(UserInput.MouseX, UserInput.MouseY);
+            int inputX = UserInput.MouseX - vp.X;
+            int inputY = UserInput.MouseY - vp.Y;
+            return inputX <= vp.Width && inputY <= vp.Height && ControlDiscrete.MouseControl & DestinationRectangle.Contains(inputX, inputY);
         }
 
         /// <summary>
