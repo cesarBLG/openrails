@@ -151,6 +151,7 @@ namespace ORTS
             numericWebServerPort.Value = Settings.WebServerPort;
             checkEnableWatchdog.Checked = Settings.EnableWatchdog;
             checkRunAt32bit.Checked = Settings.RunAt32bit;
+            checkSaveCommands.Checked = Settings.SaveCommands;
 
             // Audio tab
             checkMSTSBINSound.Checked = Settings.MSTSBINSound;
@@ -457,6 +458,7 @@ private async void OptionsForm_Shown(object sender, EventArgs e)
             Settings.WebServer = checkEnableWebServer.Checked;
             Settings.EnableWatchdog = checkEnableWatchdog.Checked;
             Settings.RunAt32bit = checkRunAt32bit.Checked;
+            Settings.SaveCommands = checkSaveCommands.Checked;
 
             // Audio tab
             Settings.MSTSBINSound = checkMSTSBINSound.Checked;

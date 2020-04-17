@@ -61,8 +61,11 @@ namespace Orts.Common
         /// </summary>
         /// <param name="Command"></param>
         public void CommandAdd( ICommand command ) {
-            command.Time = Simulator.ClockTime; // Note time that command was issued
-            CommandList.Add( command );
+            if (Simulator.Settings.SaveCommands)
+            {
+                command.Time = Simulator.ClockTime; // Note time that command was issued
+                CommandList.Add(command);
+            }
         }
         
         /// <summary>

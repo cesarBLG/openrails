@@ -211,6 +211,7 @@
             this.ElevationText = new System.Windows.Forms.Label();
             this.checkPreferDDSTexture = new System.Windows.Forms.CheckBox();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.checkSaveCommands = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.numericBrakePipeChargingRate)).BeginInit();
             this.tabOptions.SuspendLayout();
             this.tabPageGeneral.SuspendLayout();
@@ -378,6 +379,7 @@
             // 
             // tabPageGeneral
             // 
+            this.tabPageGeneral.Controls.Add(this.checkSaveCommands);
             this.tabPageGeneral.Controls.Add(this.label29);
             this.tabPageGeneral.Controls.Add(this.numericWebServerPort);
             this.tabPageGeneral.Controls.Add(this.checkEnableWebServer);
@@ -1641,7 +1643,7 @@
             this.checkVerboseConfigurationMessages.AutoSize = true;
             this.checkVerboseConfigurationMessages.Location = new System.Drawing.Point(6, 236);
             this.checkVerboseConfigurationMessages.Name = "checkVerboseConfigurationMessages";
-            this.checkVerboseConfigurationMessages.Size = new System.Drawing.Size(163, 17);
+            this.checkVerboseConfigurationMessages.Size = new System.Drawing.Size(236, 17);
             this.checkVerboseConfigurationMessages.TabIndex = 6;
             this.checkVerboseConfigurationMessages.Text = "Verbose ENG/WAG configuration messages";
             this.checkVerboseConfigurationMessages.UseVisualStyleBackColor = true;
@@ -2563,6 +2565,18 @@
             this.checkPreferDDSTexture.Text = "Load DDS textures in preference to ACE";
             this.checkPreferDDSTexture.UseVisualStyleBackColor = true;
             // 
+            // checkSaveCommands
+            // 
+            this.checkSaveCommands.AutoSize = true;
+            this.checkSaveCommands.Checked = true;
+            this.checkSaveCommands.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.checkSaveCommands.Location = new System.Drawing.Point(304, 75);
+            this.checkSaveCommands.Name = "checkSaveCommands";
+            this.checkSaveCommands.Size = new System.Drawing.Size(151, 17);
+            this.checkSaveCommands.TabIndex = 18;
+            this.checkSaveCommands.Text = "Save commands for replay";
+            this.checkSaveCommands.UseVisualStyleBackColor = true;
+            // 
             // OptionsForm
             // 
             this.AcceptButton = this.buttonOK;
@@ -2823,5 +2837,6 @@
         private System.Windows.Forms.Label label28;
         private System.Windows.Forms.CheckBox checkEnableWatchdog;
         private System.Windows.Forms.CheckBox checkRunAt32bit;
+        private System.Windows.Forms.CheckBox checkSaveCommands;
     }
 }
