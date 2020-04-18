@@ -70,7 +70,6 @@
             this.label28 = new System.Windows.Forms.Label();
             this.checkShadowAllShapes = new System.Windows.Forms.CheckBox();
             this.checkDoubleWire = new System.Windows.Forms.CheckBox();
-            this.checkLetterbox = new System.Windows.Forms.CheckBox();
             this.label15 = new System.Windows.Forms.Label();
             this.labelDayAmbientLight = new System.Windows.Forms.Label();
             this.checkModelInstancing = new System.Windows.Forms.CheckBox();
@@ -688,7 +687,6 @@
             this.tabPageVideo.Controls.Add(this.label28);
             this.tabPageVideo.Controls.Add(this.checkShadowAllShapes);
             this.tabPageVideo.Controls.Add(this.checkDoubleWire);
-            this.tabPageVideo.Controls.Add(this.checkLetterbox);
             this.tabPageVideo.Controls.Add(this.label15);
             this.tabPageVideo.Controls.Add(this.labelDayAmbientLight);
             this.tabPageVideo.Controls.Add(this.checkModelInstancing);
@@ -827,15 +825,6 @@
             this.checkVerticalSync.TabIndex = 5;
             this.checkVerticalSync.Text = "Vertical sync";
             this.checkVerticalSync.UseVisualStyleBackColor = true;
-            //
-            // checkLetterbox
-            // 
-            this.checkLetterbox.AutoSize = true;
-            this.checkLetterbox.Location = new System.Drawing.Point(6, 144);
-            this.checkLetterbox.Name = "checkLetterbox";
-            this.checkLetterbox.TabIndex = 24;
-            this.checkLetterbox.Text = "Letterbox 2D cabs";
-            this.checkLetterbox.UseVisualStyleBackColor = true;
             // 
             // labelDistantMountainsViewingDistance
             // 
@@ -2814,7 +2803,6 @@
         private System.Windows.Forms.Label label11;
         private System.Windows.Forms.CheckBox checkAutopilot;
         private System.Windows.Forms.CheckBox checkDoubleWire;
-        private System.Windows.Forms.CheckBox checkLetterbox;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.CheckBox checkDoorsAITrains;
         private System.Windows.Forms.CheckBox checkForcedRedAtStationStops;
