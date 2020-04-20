@@ -190,7 +190,12 @@ namespace Orts.Viewer3D
         public void Sweep()
         {
             foreach (var path in TextureMarks.Where(kvp => !kvp.Value).Select(kvp => kvp.Key))
+            {
+                var texture = Textures[path];
                 Textures.Remove(path);
+                texture.Dispose();
+                texture = null;
+            }
         }
 
         [CallOnThread("Updater")]
@@ -427,7 +432,11 @@ namespace Orts.Viewer3D
         public void Sweep()
         {
             foreach (var path in MaterialMarks.Where(kvp => !kvp.Value).Select(kvp => kvp.Key))
+            {
+                var material = Materials[path];
                 Materials.Remove(path);
+                material = null;
+            }
 		}
 
         public void LoadPrep()

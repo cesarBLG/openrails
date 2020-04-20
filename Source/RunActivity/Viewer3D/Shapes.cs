@@ -101,7 +101,15 @@ namespace Orts.Viewer3D
         public void Sweep()
         {
             foreach (var path in ShapeMarks.Where(kvp => !kvp.Value).Select(kvp => kvp.Key))
+            {
+                var shape = Shapes[path];
                 Shapes.Remove(path);
+                foreach (var lod in shape.LodControls)
+                    for (var subObjectIndex = 0; subObjectIndex < lod.DistanceLevels[0].SubObjects.Length; subObjectIndex++)
+                        foreach (var prim in lod.DistanceLevels[0].SubObjects[subObjectIndex].ShapePrimitives)
+                            prim.VertexBuffer.Dispose();
+                shape = null;
+            }
         }
 
         [CallOnThread("Updater")]
@@ -1409,6 +1417,7 @@ namespace Orts.Viewer3D
         {
             Material.Mark();
         }
+
     }
 
     struct ShapeInstanceData
