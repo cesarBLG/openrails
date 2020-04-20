@@ -41,6 +41,7 @@
             this.checkViewDispatcher = new System.Windows.Forms.CheckBox();
             this.tabOptions = new System.Windows.Forms.TabControl();
             this.tabPageGeneral = new System.Windows.Forms.TabPage();
+            this.checkSaveCommands = new System.Windows.Forms.CheckBox();
             this.label29 = new System.Windows.Forms.Label();
             this.numericWebServerPort = new System.Windows.Forms.NumericUpDown();
             this.checkEnableWebServer = new System.Windows.Forms.CheckBox();
@@ -211,7 +212,7 @@
             this.ElevationText = new System.Windows.Forms.Label();
             this.checkPreferDDSTexture = new System.Windows.Forms.CheckBox();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
-            this.checkSaveCommands = new System.Windows.Forms.CheckBox();
+            this.checkReduceMemory = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.numericBrakePipeChargingRate)).BeginInit();
             this.tabOptions.SuspendLayout();
             this.tabPageGeneral.SuspendLayout();
@@ -379,6 +380,7 @@
             // 
             // tabPageGeneral
             // 
+            this.tabPageGeneral.Controls.Add(this.checkReduceMemory);
             this.tabPageGeneral.Controls.Add(this.checkSaveCommands);
             this.tabPageGeneral.Controls.Add(this.label29);
             this.tabPageGeneral.Controls.Add(this.numericWebServerPort);
@@ -408,6 +410,18 @@
             this.tabPageGeneral.TabIndex = 0;
             this.tabPageGeneral.Text = "General";
             this.tabPageGeneral.UseVisualStyleBackColor = true;
+            // 
+            // checkSaveCommands
+            // 
+            this.checkSaveCommands.AutoSize = true;
+            this.checkSaveCommands.Checked = true;
+            this.checkSaveCommands.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.checkSaveCommands.Location = new System.Drawing.Point(304, 75);
+            this.checkSaveCommands.Name = "checkSaveCommands";
+            this.checkSaveCommands.Size = new System.Drawing.Size(151, 17);
+            this.checkSaveCommands.TabIndex = 18;
+            this.checkSaveCommands.Text = "Save commands for replay";
+            this.checkSaveCommands.UseVisualStyleBackColor = true;
             // 
             // label29
             // 
@@ -2565,17 +2579,15 @@
             this.checkPreferDDSTexture.Text = "Load DDS textures in preference to ACE";
             this.checkPreferDDSTexture.UseVisualStyleBackColor = true;
             // 
-            // checkSaveCommands
+            // checkReduceMemory
             // 
-            this.checkSaveCommands.AutoSize = true;
-            this.checkSaveCommands.Checked = true;
-            this.checkSaveCommands.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkSaveCommands.Location = new System.Drawing.Point(304, 75);
-            this.checkSaveCommands.Name = "checkSaveCommands";
-            this.checkSaveCommands.Size = new System.Drawing.Size(151, 17);
-            this.checkSaveCommands.TabIndex = 18;
-            this.checkSaveCommands.Text = "Save commands for replay";
-            this.checkSaveCommands.UseVisualStyleBackColor = true;
+            this.checkReduceMemory.AutoSize = true;
+            this.checkReduceMemory.Location = new System.Drawing.Point(304, 98);
+            this.checkReduceMemory.Name = "checkReduceMemory";
+            this.checkReduceMemory.Size = new System.Drawing.Size(135, 17);
+            this.checkReduceMemory.TabIndex = 19;
+            this.checkReduceMemory.Text = "Reduce memory usage";
+            this.checkReduceMemory.UseVisualStyleBackColor = true;
             // 
             // OptionsForm
             // 
@@ -2838,5 +2850,6 @@
         private System.Windows.Forms.CheckBox checkEnableWatchdog;
         private System.Windows.Forms.CheckBox checkRunAt32bit;
         private System.Windows.Forms.CheckBox checkSaveCommands;
+        private System.Windows.Forms.CheckBox checkReduceMemory;
     }
 }

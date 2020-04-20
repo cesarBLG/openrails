@@ -104,11 +104,14 @@ namespace Orts.Viewer3D
             {
                 var shape = Shapes[path];
                 Shapes.Remove(path);
-                foreach (var lod in shape.LodControls)
-                    for (var subObjectIndex = 0; subObjectIndex < lod.DistanceLevels[0].SubObjects.Length; subObjectIndex++)
-                        foreach (var prim in lod.DistanceLevels[0].SubObjects[subObjectIndex].ShapePrimitives)
-                            prim.VertexBuffer.Dispose();
-                shape = null;
+                if (Viewer.Settings.ReduceMemory)
+                {
+                    foreach (var lod in shape.LodControls)
+                        for (var subObjectIndex = 0; subObjectIndex < lod.DistanceLevels[0].SubObjects.Length; subObjectIndex++)
+                            foreach (var prim in lod.DistanceLevels[0].SubObjects[subObjectIndex].ShapePrimitives)
+                                prim.VertexBuffer.Dispose();
+                    shape = null;
+                }
             }
         }
 
@@ -1417,7 +1420,6 @@ namespace Orts.Viewer3D
         {
             Material.Mark();
         }
-
     }
 
     struct ShapeInstanceData

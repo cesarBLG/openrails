@@ -152,6 +152,7 @@ namespace ORTS
             checkEnableWatchdog.Checked = Settings.EnableWatchdog;
             checkRunAt32bit.Checked = Settings.RunAt32bit;
             checkSaveCommands.Checked = Settings.SaveCommands;
+            checkReduceMemory.Checked = Settings.ReduceMemory;
 
             // Audio tab
             checkMSTSBINSound.Checked = Settings.MSTSBINSound;
@@ -459,6 +460,7 @@ private async void OptionsForm_Shown(object sender, EventArgs e)
             Settings.EnableWatchdog = checkEnableWatchdog.Checked;
             Settings.RunAt32bit = checkRunAt32bit.Checked;
             Settings.SaveCommands = checkSaveCommands.Checked;
+            Settings.ReduceMemory = checkReduceMemory.Checked;
 
             // Audio tab
             Settings.MSTSBINSound = checkMSTSBINSound.Checked;

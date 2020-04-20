@@ -193,8 +193,11 @@ namespace Orts.Viewer3D
             {
                 var texture = Textures[path];
                 Textures.Remove(path);
-                texture.Dispose();
-                texture = null;
+                if (Viewer.Settings.ReduceMemory)
+                {
+                    texture.Dispose();
+                    texture = null;
+                }
             }
         }
 
@@ -435,7 +438,7 @@ namespace Orts.Viewer3D
             {
                 var material = Materials[path];
                 Materials.Remove(path);
-                material = null;
+                if (Viewer.Settings.ReduceMemory) material = null;
             }
 		}
 

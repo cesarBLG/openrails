@@ -148,6 +148,8 @@ namespace ORTS.Settings
         public bool RunAt32bit { get; set; }
         [Default(true)]
         public bool SaveCommands { get; set; }
+        [Default(false)]
+        public bool ReduceMemory { get; set; }
 
         // Audio settings:
         [Default(true)]
