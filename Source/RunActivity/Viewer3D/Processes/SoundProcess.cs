@@ -351,5 +351,15 @@ namespace Orts.Viewer3D.Processes
             while (ASyncUpdatePending > 0)
                 j = Interlocked.CompareExchange(ref ASyncUpdatePending, 0, 1);
         }
+
+        /// <summary>
+        /// Returns a status string for the Debug HUD.
+        /// </summary>
+        [CallOnThread("Updater")]
+        public string GetStatus()
+        {
+            return Viewer.Catalog.GetPluralStringFmt("{0:F0} sound source", "{0:F0} sound sources", SoundSources.Count);
+        }
+
     }
 }

@@ -17,6 +17,7 @@
 
 // This file is the responsibility of the 3D & Environment Team. 
 
+using ORTS.Common;
 using Orts.Simulation.RollingStocks;
 using System;
 using System.Collections.Generic;
@@ -524,6 +525,17 @@ namespace Orts.Viewer3D
                 PlayState = PlayState.NOP;
             }
         }
+
+
+        /// <summary>
+        /// Returns a status string for the Debug HUD.
+        /// </summary>
+        [CallOnThread("Updater")]
+        public static string GetStatus()
+        {
+            return Viewer.Catalog.GetPluralStringFmt("{0:F0} wav", "{0:F0} wavs", SoundItem.AllPieces.Count);
+        }
+
     }
 
     /// <summary>
@@ -1258,6 +1270,15 @@ namespace Orts.Viewer3D
                 OpenAL.alDeleteSources(1, ref SoundSourceID);
                 ActiveCount--;
             }
+        }
+
+        /// <summary>
+        /// Returns a status string for the Debug HUD.
+        /// </summary>
+        [CallOnThread("Updater")]
+        public static string GetStatus()
+        {
+            return Viewer.Catalog.GetPluralStringFmt("{0:F0} AL sound sources", "{0:F0} AL sound sources", ALSoundSource.ActiveCount);
         }
     }
 }
