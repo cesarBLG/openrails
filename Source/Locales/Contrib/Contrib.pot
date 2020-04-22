@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2019-11-17 18:10:24+0100\n"
-"PO-Revision-Date: 2019-11-17 18:10:29+0100\n"
+"POT-Creation-Date: 2020-04-19 01:50:42+0200\n"
+"PO-Revision-Date: 2020-04-19 01:50:43+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -113,7 +113,7 @@ msgstr ""
 #: ../../Contrib/ActivityEditor/ActivityEditor/Activity/StartActivity.Designer.cs:111
 #: ../../Contrib/ActivityEditor/ActivityEditor/Activity/StartActivity.Designer.cs:339
 #: ../../Contrib/ActivityEditor/ActivityEditor/Wizard/ActivityDescr.cs:92
-#: ../../Contrib/ActivityEditor/AEWizard/ActivityDescr.cs:91
+#: ../../Contrib/ActivityEditor/AEWizard/ActivityDescr.cs:92
 msgid "Activity Description"
 msgstr ""
 
@@ -274,8 +274,8 @@ msgid "Status"
 msgstr ""
 
 #: ../../Contrib/ActivityEditor/ActivityEditor/Engine/ActEditor.Designer.cs:302
-#: ../../Contrib/ActivityEditor/ActivityEditor/Engine/Viewer2D.cs:2026
-#: ../../Contrib/ActivityEditor/ActivityEditor/Engine/Viewer2D.cs:2128
+#: ../../Contrib/ActivityEditor/ActivityEditor/Engine/Viewer2D.cs:2025
+#: ../../Contrib/ActivityEditor/ActivityEditor/Engine/Viewer2D.cs:2127
 msgid "v"
 msgstr ""
 
@@ -356,25 +356,25 @@ msgstr ""
 msgid "Form1"
 msgstr ""
 
-#: ../../Contrib/ActivityEditor/ActivityEditor/Engine/Viewer2D.cs:164
+#: ../../Contrib/ActivityEditor/ActivityEditor/Engine/Viewer2D.cs:163
 msgid "Route MetaData"
 msgstr ""
 
-#: ../../Contrib/ActivityEditor/ActivityEditor/Engine/Viewer2D.cs:2004
-#: ../../Contrib/ActivityEditor/ActivityEditor/Engine/Viewer2D.cs:2093
+#: ../../Contrib/ActivityEditor/ActivityEditor/Engine/Viewer2D.cs:2003
+#: ../../Contrib/ActivityEditor/ActivityEditor/Engine/Viewer2D.cs:2092
 msgid "Display"
 msgstr ""
 
-#: ../../Contrib/ActivityEditor/ActivityEditor/Engine/Viewer2D.cs:2015
-#: ../../Contrib/ActivityEditor/ActivityEditor/Engine/Viewer2D.cs:2117
+#: ../../Contrib/ActivityEditor/ActivityEditor/Engine/Viewer2D.cs:2014
+#: ../../Contrib/ActivityEditor/ActivityEditor/Engine/Viewer2D.cs:2116
 msgid "x"
 msgstr ""
 
-#: ../../Contrib/ActivityEditor/ActivityEditor/Engine/Viewer2D.cs:2041
+#: ../../Contrib/ActivityEditor/ActivityEditor/Engine/Viewer2D.cs:2040
 msgid "Tag"
 msgstr ""
 
-#: ../../Contrib/ActivityEditor/ActivityEditor/Engine/Viewer2D.cs:2107
+#: ../../Contrib/ActivityEditor/ActivityEditor/Engine/Viewer2D.cs:2106
 msgid "Station"
 msgstr ""
 
@@ -583,19 +583,19 @@ msgid "TrackSegmentInterface"
 msgstr ""
 
 #: ../../Contrib/ActivityEditor/ActivityEditor/Wizard/ActivityDescr.cs:108
-#: ../../Contrib/ActivityEditor/AEWizard/ActivityDescr.cs:107
+#: ../../Contrib/ActivityEditor/AEWizard/ActivityDescr.cs:108
 msgid "Activity Name"
 msgstr ""
 
 #: ../../Contrib/ActivityEditor/ActivityEditor/Wizard/ActivityDescr.cs:124
 #: ../../Contrib/ActivityEditor/ActivityEditor/Wizard/SelectRoute.cs:69
-#: ../../Contrib/ActivityEditor/AEWizard/ActivityDescr.cs:123
+#: ../../Contrib/ActivityEditor/AEWizard/ActivityDescr.cs:124
 #: ../../Contrib/ActivityEditor/AEWizard/SelectRoute.cs:69
 msgid "Route Path"
 msgstr ""
 
 #: ../../Contrib/ActivityEditor/ActivityEditor/Wizard/ActivityDescr.cs:141
-#: ../../Contrib/ActivityEditor/AEWizard/ActivityDescr.cs:140
+#: ../../Contrib/ActivityEditor/AEWizard/ActivityDescr.cs:141
 msgid "Activity Editor: Create new activity"
 msgstr ""
 
@@ -663,30 +663,30 @@ msgstr ""
 msgid "Open Rails Content Manager"
 msgstr ""
 
-#: ../../Contrib/TrackViewer/TrackViewer.cs:627
+#: ../../Contrib/TrackViewer/TrackViewer.cs:626
 msgid ""
 "The path you are working on has un-saved changes.\n"
 msgstr ""
 
-#: ../../Contrib/TrackViewer/TrackViewer.cs:629
+#: ../../Contrib/TrackViewer/TrackViewer.cs:628
 msgid "Do you really want to Quit?"
 msgstr ""
 
-#: ../../Contrib/TrackViewer/TrackViewer.cs:733
+#: ../../Contrib/TrackViewer/TrackViewer.cs:731
 #, csharp-format
 msgid ""
 "Route cannot be loaded.\n"
 "Extension {0} is not supported"
 msgstr ""
 
-#: ../../Contrib/TrackViewer/TrackViewer.cs:740
+#: ../../Contrib/TrackViewer/TrackViewer.cs:738
 #, csharp-format
 msgid ""
 "Route cannot be loaded.\n"
 "{0} does not exist"
 msgstr ""
 
-#: ../../Contrib/TrackViewer/TrackViewer.cs:746
+#: ../../Contrib/TrackViewer/TrackViewer.cs:744
 #, csharp-format
 msgid ""
 "Route cannot be loaded.\n"
@@ -694,158 +694,158 @@ msgid ""
 "install folder but does not contain expected files"
 msgstr ""
 
-#: ../../Contrib/TrackViewer/TrackViewer.cs:771
+#: ../../Contrib/TrackViewer/TrackViewer.cs:769
 #, csharp-format
 msgid ""
 "Route cannot be loaded.\n"
 "{0} somehow could not be translated into a loadable route"
 msgstr ""
 
-#: ../../Contrib/TrackViewer/TrackViewer.cs:812
+#: ../../Contrib/TrackViewer/TrackViewer.cs:810
 msgid ""
 "Directory is not a valid install directory.\n"
 "The install directory needs to contain ROUTES, GLOBAL, ..."
 msgstr ""
 
-#: ../../Contrib/TrackViewer/TrackViewer.cs:886
+#: ../../Contrib/TrackViewer/TrackViewer.cs:884
 msgid "Loading route..."
 msgstr ""
 
-#: ../../Contrib/TrackViewer/TrackViewer.cs:911
+#: ../../Contrib/TrackViewer/TrackViewer.cs:909
 msgid "Route cannot be loaded. Sorry"
 msgstr ""
 
-#: ../../Contrib/TrackViewer/TrackViewer.cs:982
+#: ../../Contrib/TrackViewer/TrackViewer.cs:980
 msgid "Loading .pat file ..."
 msgstr ""
 
-#: ../../Contrib/TrackViewer/TrackViewer.cs:985
+#: ../../Contrib/TrackViewer/TrackViewer.cs:983
 msgid "Processing .pat file ..."
 msgstr ""
 
-#: ../../Contrib/TrackViewer/TrackViewer.cs:1013
+#: ../../Contrib/TrackViewer/TrackViewer.cs:1011
 msgid "Path has been modified. Loading a new path will discard changes."
 msgstr ""
 
-#: ../../Contrib/TrackViewer/TrackViewer.cs:1014
-#: ../../Contrib/TrackViewer/TrackViewer.cs:1095
+#: ../../Contrib/TrackViewer/TrackViewer.cs:1012
+#: ../../Contrib/TrackViewer/TrackViewer.cs:1093
 #: ../../Contrib/TrackViewer/Editing/SavePatFile.cs:99
 msgid "Do you want to continue?"
 msgstr ""
 
-#: ../../Contrib/TrackViewer/TrackViewer.cs:1015
-#: ../../Contrib/TrackViewer/TrackViewer.cs:1096
+#: ../../Contrib/TrackViewer/TrackViewer.cs:1013
+#: ../../Contrib/TrackViewer/TrackViewer.cs:1094
 #: ../../Contrib/TrackViewer/Editing/SavePatFile.cs:85
 #: ../../Contrib/TrackViewer/Editing/SavePatFile.cs:102
 msgid "Trackviewer Path Editor"
 msgstr ""
 
-#: ../../Contrib/TrackViewer/TrackViewer.cs:1092
+#: ../../Contrib/TrackViewer/TrackViewer.cs:1090
 msgid ""
 "This will open every single .pat file for this route, (try to) fix all broken "
 "nodes, and save the modified path. "
 msgstr ""
 
-#: ../../Contrib/TrackViewer/TrackViewer.cs:1093
+#: ../../Contrib/TrackViewer/TrackViewer.cs:1091
 msgid "Potentially it will therefore change all .pat files on disc."
 msgstr ""
 
-#: ../../Contrib/TrackViewer/TrackViewer.cs:1094
+#: ../../Contrib/TrackViewer/TrackViewer.cs:1092
 msgid ""
 "This can be useful when a route has been changed and you want all paths to be "
 "corrected."
 msgstr ""
 
-#: ../../Contrib/TrackViewer/Drawing/DrawColors.cs:82
+#: ../../Contrib/TrackViewer/Drawing/DrawColors.cs:81
 msgid "Select broken path color"
 msgstr ""
 
-#: ../../Contrib/TrackViewer/Drawing/DrawColors.cs:88
+#: ../../Contrib/TrackViewer/Drawing/DrawColors.cs:87
 msgid "Select path color (main)"
 msgstr ""
 
-#: ../../Contrib/TrackViewer/Drawing/DrawColors.cs:100
+#: ../../Contrib/TrackViewer/Drawing/DrawColors.cs:99
 msgid "Select path color (siding)"
 msgstr ""
 
-#: ../../Contrib/TrackViewer/Drawing/DrawColors.cs:140
+#: ../../Contrib/TrackViewer/Drawing/DrawColors.cs:139
 msgid "Select color for multi-colored straight tracks"
 msgstr ""
 
-#: ../../Contrib/TrackViewer/Drawing/DrawColors.cs:141
+#: ../../Contrib/TrackViewer/Drawing/DrawColors.cs:140
 msgid "Select color for multi-colored curved tracks"
 msgstr ""
 
-#: ../../Contrib/TrackViewer/Drawing/DrawColors.cs:142
+#: ../../Contrib/TrackViewer/Drawing/DrawColors.cs:141
 msgid "Select color for mono-colored tracks"
 msgstr ""
 
-#: ../../Contrib/TrackViewer/Drawing/DrawColors.cs:143
+#: ../../Contrib/TrackViewer/Drawing/DrawColors.cs:142
 msgid "Select color for tracks on terrain"
 msgstr ""
 
-#: ../../Contrib/TrackViewer/Drawing/DrawColors.cs:145
+#: ../../Contrib/TrackViewer/Drawing/DrawColors.cs:144
 msgid "Select color for multi-colored straight roads"
 msgstr ""
 
-#: ../../Contrib/TrackViewer/Drawing/DrawColors.cs:146
+#: ../../Contrib/TrackViewer/Drawing/DrawColors.cs:145
 msgid "Select color for multi-colored curved roads"
 msgstr ""
 
-#: ../../Contrib/TrackViewer/Drawing/DrawColors.cs:147
+#: ../../Contrib/TrackViewer/Drawing/DrawColors.cs:146
 msgid "Select color for mono-colored roads"
 msgstr ""
 
-#: ../../Contrib/TrackViewer/Drawing/DrawColors.cs:148
+#: ../../Contrib/TrackViewer/Drawing/DrawColors.cs:147
 msgid "Select color for roads on terrain"
 msgstr ""
 
-#: ../../Contrib/TrackViewer/Drawing/DrawColors.cs:156
+#: ../../Contrib/TrackViewer/Drawing/DrawColors.cs:155
 msgid "Select background color"
 msgstr ""
 
-#: ../../Contrib/TrackViewer/Drawing/DrawColors.cs:171
+#: ../../Contrib/TrackViewer/Drawing/DrawColors.cs:170
 msgid "Select text color"
 msgstr ""
 
-#: ../../Contrib/TrackViewer/Drawing/DrawColors.cs:183
+#: ../../Contrib/TrackViewer/Drawing/DrawColors.cs:182
 msgid "Select item text color"
 msgstr ""
 
-#: ../../Contrib/TrackViewer/Drawing/DrawColors.cs:188
+#: ../../Contrib/TrackViewer/Drawing/DrawColors.cs:187
 msgid "Select junction color"
 msgstr ""
 
-#: ../../Contrib/TrackViewer/Drawing/DrawColors.cs:193
+#: ../../Contrib/TrackViewer/Drawing/DrawColors.cs:192
 msgid "Select endnode color"
 msgstr ""
 
-#: ../../Contrib/TrackViewer/Drawing/DrawColors.cs:198
+#: ../../Contrib/TrackViewer/Drawing/DrawColors.cs:197
 msgid "Select siding color"
 msgstr ""
 
-#: ../../Contrib/TrackViewer/Drawing/DrawColors.cs:203
+#: ../../Contrib/TrackViewer/Drawing/DrawColors.cs:202
 msgid "Select crossing color"
 msgstr ""
 
-#: ../../Contrib/TrackViewer/Drawing/DrawColors.cs:208
+#: ../../Contrib/TrackViewer/Drawing/DrawColors.cs:207
 msgid "Select road crossing color"
 msgstr ""
 
-#: ../../Contrib/TrackViewer/Drawing/DrawColors.cs:213
+#: ../../Contrib/TrackViewer/Drawing/DrawColors.cs:212
 msgid "Select speedpost color"
 msgstr ""
 
-#: ../../Contrib/TrackViewer/Drawing/DrawColors.cs:292
+#: ../../Contrib/TrackViewer/Drawing/DrawColors.cs:291
 msgid "Select other-paths color"
 msgstr ""
 
-#: ../../Contrib/TrackViewer/Drawing/DrawTerrain.cs:631
+#: ../../Contrib/TrackViewer/Drawing/DrawTerrain.cs:633
 #, csharp-format
 msgid "Loading terrain ace-files {0}-{1} (scaled down with a factor {2})"
 msgstr ""
 
-#: ../../Contrib/TrackViewer/Drawing/DrawTerrain.cs:657
+#: ../../Contrib/TrackViewer/Drawing/DrawTerrain.cs:659
 msgid "Rescaling previously loaded ace-files"
 msgstr ""
 
