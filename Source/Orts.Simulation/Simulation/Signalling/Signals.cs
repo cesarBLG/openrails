@@ -70,6 +70,7 @@ namespace Orts.Simulation.Signalling
         private Dictionary<uint, SignalObject> SignalHeadList;
         public static SIGSCRfile scrfile;
         public int ORTSSignalTypeCount { get; private set; }
+        public IList<string> ORTSSignalTypes;
 
         public int noSignals;
         private int foundSignals;
@@ -109,6 +110,7 @@ namespace Orts.Simulation.Signalling
             Dictionary<int, int> platformList = new Dictionary<int, int>();
 
             ORTSSignalTypeCount = sigcfg.ORTSFunctionTypes.Count;
+            ORTSSignalTypes = sigcfg.ORTSFunctionTypes;
 
             trackDB = simulator.TDB.TrackDB;
             tsectiondat = simulator.TSectionDat;

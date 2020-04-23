@@ -264,13 +264,13 @@ namespace Orts.Simulation.RollingStocks.SubSystems
             Script.NextNormalSignalDistanceHeadsAspect = () => NextNormalSignalDistanceHeadsAspect();
             Script.DoesNextNormalSignalHaveTwoAspects = () => DoesNextNormalSignalHaveTwoAspects();
             Script.NextDistanceSignalAspect = () =>
-                NextGenericSignalItem<Aspect>(ref SignalAspect, Train.TrainObjectItem.TRAINOBJECTTYPE.SIGNAL, Formats.Msts.MstsSignalFunction.DISTANCE);
+                NextGenericSignalItem<Aspect>(ref SignalAspect, Train.TrainObjectItem.TRAINOBJECTTYPE.SIGNAL, "DISTANCE");
             Script.NextDistanceSignalDistanceM = () =>
-                NextGenericSignalItem<float>(ref SignalDistance, Train.TrainObjectItem.TRAINOBJECTTYPE.SIGNAL, Formats.Msts.MstsSignalFunction.DISTANCE);
-            Script.NextInfoSignalSignalType = () =>
-                NextGenericSignalItem<string>(ref MainHeadSignalTypeName, Train.TrainObjectItem.TRAINOBJECTTYPE.SIGNAL, Formats.Msts.MstsSignalFunction.INFO);
-            Script.NextInfoSignalDistanceM = () =>
-                NextGenericSignalItem<float>(ref SignalDistance, Train.TrainObjectItem.TRAINOBJECTTYPE.SIGNAL, Formats.Msts.MstsSignalFunction.INFO);
+                NextGenericSignalItem<float>(ref SignalDistance, Train.TrainObjectItem.TRAINOBJECTTYPE.SIGNAL, "DISTANCE");
+            Script.NextGenericSignalAspect = (string type) =>
+                NextGenericSignalItem<Aspect>(ref SignalAspect, Train.TrainObjectItem.TRAINOBJECTTYPE.SIGNAL, type);
+            Script.NextGenericSignalDistanceM = (string type) =>
+                NextGenericSignalItem<float>(ref SignalDistance, Train.TrainObjectItem.TRAINOBJECTTYPE.SIGNAL, type);
             Script.DoesNextNormalSignalHaveRepeaterHead = () => DoesNextNormalSignalHaveRepeaterHead();
             Script.CurrentPostSpeedLimitMpS = () => Locomotive.Train.allowedMaxSpeedLimitMpS;
             Script.NextPostSpeedLimitMpS = (value) => NextSignalItem<float>(value, ref PostSpeedLimits, Train.TrainObjectItem.TRAINOBJECTTYPE.SPEEDPOST);
@@ -491,44 +491,53 @@ namespace Orts.Simulation.RollingStocks.SubSystems
             return true;
         }
 
-        T NextGenericSignalItem<T>(ref T retval, Train.TrainObjectItem.TRAINOBJECTTYPE type, Formats.Msts.MstsSignalFunction signalFunction)
+        T NextGenericSignalItem<T>(ref T retval, Train.TrainObjectItem.TRAINOBJECTTYPE type, string signalTypeName)
         {
-            if (Locomotive.Train.MUDirection != Direction.Reverse && Locomotive.Train.ValidRoute[0] != null && Locomotive.Train.PresentPosition[0].RouteListIndex >= 0)
-            {
-                TrackCircuitSignalItem nextSignal = Locomotive.Train.signalRef.Find_Next_Object_InRoute(Locomotive.Train.ValidRoute[0],
-                    Locomotive.Train.PresentPosition[0].RouteListIndex, Locomotive.Train.PresentPosition[0].TCOffset,
-                            400, signalFunction, Locomotive.Train.routedForward);
-
-                if (nextSignal.SignalState == ObjectItemInfo.ObjectItemFindState.Object)
-                {
-                    Aspect distanceSignalAspect = (Aspect)Locomotive.Train.signalRef.TranslateToTCSAspect(nextSignal.SignalRef.this_sig_lr(signalFunction));
-                    SignalAspect = distanceSignalAspect;
-                    SignalDistance = nextSignal.SignalLocation;
-                    MainHeadSignalTypeName = nextSignal.SignalRef.SignalHeads[0].SignalTypeName;
-                    return retval;
-                }
-            }
-            else if (Locomotive.Train.MUDirection == Direction.Reverse && Locomotive.Train.ValidRoute[1] != null && Locomotive.Train.PresentPosition[1].TCSectionIndex >= 0)
-            {
-                var rearRouteListIndex = Locomotive.Train.ValidRoute[1].GetRouteIndex(Locomotive.Train.PresentPosition[1].TCSectionIndex, 0);
-                TrackCircuitSignalItem nextSignal = Locomotive.Train.signalRef.Find_Next_Object_InRoute(Locomotive.Train.ValidRoute[1],
-                     rearRouteListIndex, -Locomotive.Train.PresentPosition[1].TCOffset +
-                     Locomotive.Train.signalRef.TrackCircuitList[Locomotive.Train.PresentPosition[1].TCSectionIndex].Length,
-                     400, signalFunction, Locomotive.Train.routedForward);
-
-                if (nextSignal.SignalState == ObjectItemInfo.ObjectItemFindState.Object)
-                {
-                    Aspect distanceSignalAspect = (Aspect)Locomotive.Train.signalRef.TranslateToTCSAspect(nextSignal.SignalRef.this_sig_lr(signalFunction));
-                    SignalAspect = distanceSignalAspect;
-                    SignalDistance = nextSignal.SignalLocation;                 
-                    MainHeadSignalTypeName = nextSignal.SignalRef.SignalHeads[0].SignalTypeName;
-                    return retval;
-                }
-            }
-
             SignalAspect = Aspect.None;
             SignalDistance = float.MaxValue;
             MainHeadSignalTypeName = "";
+
+            int fn_type = Locomotive.Train.signalRef.ORTSSignalTypes.IndexOf(signalTypeName);
+            if (fn_type <= 0) // Invalid value or NORMAL signal
+                return retval;
+
+            int dir = Locomotive.Train.MUDirection == Direction.Reverse ? 1 : 0;
+
+            if (Locomotive.Train.ValidRoute[dir] == null || Locomotive.Train.PresentPosition[dir].RouteListIndex < 0)
+                return retval;
+
+            int index = Locomotive.Train.ValidRoute[dir].GetRouteIndex(Locomotive.Train.PresentPosition[dir].TCSectionIndex, 0);
+            if (index < 0)
+                return retval;
+
+            float lengthOffset = (dir == 1) ? (-Locomotive.Train.PresentPosition[1].TCOffset +
+                     Locomotive.Train.signalRef.TrackCircuitList[Locomotive.Train.PresentPosition[1].TCSectionIndex].Length) : Locomotive.Train.PresentPosition[0].TCOffset;
+            float totalLength = 0;
+            var routePath = Locomotive.Train.ValidRoute[dir];
+            while (index < routePath.Count && totalLength < 400) // Check only first 400m
+            {
+                var thisElement = routePath[index];
+                TrackCircuitSection thisSection = Locomotive.Train.signalRef.TrackCircuitList[thisElement.TCSectionIndex];
+                TrackCircuitSignalList thisSignalList = thisSection.CircuitItems.TrackCircuitSignals[thisElement.Direction][fn_type];
+                foreach (TrackCircuitSignalItem thisSignal in thisSignalList.TrackCircuitItem)
+                {
+                    if (thisSignal.SignalLocation > lengthOffset)
+                    {
+                        SignalAspect = (Aspect)Locomotive.Train.signalRef.TranslateToTCSAspect(thisSignal.SignalRef.this_sig_lr(fn_type));
+                        SignalDistance = thisSignal.SignalLocation - lengthOffset + totalLength;
+                        MainHeadSignalTypeName = thisSignal.SignalRef.SignalHeads[0].SignalTypeName;
+                        return retval;
+                    }
+                }
+                totalLength += (thisSection.Length - lengthOffset);
+                lengthOffset = 0;
+
+                int setSection = thisSection.ActivePins[thisElement.OutPin[0], thisElement.OutPin[1]].Link;
+                index++;
+                if (setSection < 0)
+                    return retval;
+            }
+
             return retval;
         }
 
