@@ -2025,7 +2025,12 @@ namespace Orts.Viewer3D
 
         public void Initialize()
         {
-            if (Viewer.Settings.Cab2DStretch == 0 && Viewer.CabExceedsDisplayHorizontally <= 0)
+            if (Viewer.Settings.Letterbox2DCab)
+            {
+                float fovFactor = 1f - Math.Max((float)Viewer.CabXLetterboxPixels / Viewer.DisplaySize.X, (float)Viewer.CabYLetterboxPixels / Viewer.DisplaySize.Y);
+                FieldOfView = MathHelper.ToDegrees((float)(2 * Math.Atan(fovFactor * Math.Tan(MathHelper.ToRadians(Viewer.Settings.ViewingFOV / 2)))));
+            }
+            else if (Viewer.Settings.Cab2DStretch == 0 && Viewer.CabExceedsDisplayHorizontally <= 0)
             {
                 // We must modify FOV to get correct lookout
                     FieldOfView = MathHelper.ToDegrees((float)(2 * Math.Atan((float)Viewer.DisplaySize.Y / Viewer.DisplaySize.X / Viewer.CabTextureInverseRatio * Math.Tan(MathHelper.ToRadians(Viewer.Settings.ViewingFOV / 2)))));
@@ -2198,8 +2203,13 @@ namespace Orts.Viewer3D
                 ScrollRight(true, speed);
             if (UserInput.IsDown(UserCommand.CameraScrollLeft))
                 ScrollRight(false, speed);
-            if (UserInput.IsPressed(UserCommand.CameraLetterboxCab))
+            if (UserInput.IsPressed(UserCommand.CameraToggleLetterboxCab))
+            {
                 Viewer.Settings.Letterbox2DCab = !Viewer.Settings.Letterbox2DCab;
+                Viewer.AdjustCabHeight(Viewer.DisplaySize.X, Viewer.DisplaySize.Y);
+                if (attachedCar != null)
+                    Initialize();
+            }
         }
     }
 

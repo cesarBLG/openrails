@@ -192,8 +192,6 @@ namespace ORTS.Settings
         public int WorldObjectDensity { get; set; }
         [Default("1024x768")]
         public string WindowSize { get; set; }
-        [Default(false)]
-        public bool Letterbox2DCab { get; set; }
         [Default(20)]
         public int DayAmbientLight { get; set; }
 
@@ -352,6 +350,8 @@ namespace ORTS.Settings
         // Internal settings:
         [Default(false)]
         public bool DataLogger { get; set; }
+        [Default(false)]
+        public bool Letterbox2DCab { get; set; }
         [Default(false)]
         public bool Profiling { get; set; }
         [Default(0)]
