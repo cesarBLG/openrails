@@ -267,8 +267,8 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                 NextGenericSignalItem<Aspect>(ref SignalAspect, Train.TrainObjectItem.TRAINOBJECTTYPE.SIGNAL, "DISTANCE");
             Script.NextDistanceSignalDistanceM = () =>
                 NextGenericSignalItem<float>(ref SignalDistance, Train.TrainObjectItem.TRAINOBJECTTYPE.SIGNAL, "DISTANCE");
-            Script.NextInfoSignalSignalType = () =>
-                NextGenericSignalItem<string>(ref MainHeadSignalTypeName, Train.TrainObjectItem.TRAINOBJECTTYPE.SIGNAL, "INFO");
+            Script.NextGenericSignalMainHeadSignalType = (string type) =>
+                NextGenericSignalItem<string>(ref MainHeadSignalTypeName, Train.TrainObjectItem.TRAINOBJECTTYPE.SIGNAL, type);
             Script.NextGenericSignalAspect = (string type) =>
                 NextGenericSignalItem<Aspect>(ref SignalAspect, Train.TrainObjectItem.TRAINOBJECTTYPE.SIGNAL, type);
             Script.NextGenericSignalDistanceM = (string type) =>
