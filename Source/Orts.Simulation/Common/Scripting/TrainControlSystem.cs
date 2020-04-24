@@ -86,6 +86,10 @@ namespace ORTS.Scripting.Api
         /// </summary>
         public Func<float> NextDistanceSignalDistanceM;
         /// <summary>
+        /// Signal type of main head of hext INFO signal.
+        /// </summary>
+        public Func<string> NextInfoSignalSignalType;
+        /// <summary>
         /// Aspect of the next generic signal.
         /// </summary>
         public Func<string, Aspect> NextGenericSignalAspect;
