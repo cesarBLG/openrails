@@ -505,10 +505,11 @@ namespace Orts.Simulation.RollingStocks.SubSystems
 
             int dir = Locomotive.Train.MUDirection == Direction.Reverse ? 1 : 0;
 
-            if (Locomotive.Train.ValidRoute[dir] == null || Locomotive.Train.PresentPosition[dir].RouteListIndex < 0)
+            if (Locomotive.Train.ValidRoute[dir] == null || dir == 1 && Locomotive.Train.PresentPosition[dir].TCSectionIndex < 0)
                 return retval;
 
-            int index = Locomotive.Train.ValidRoute[dir].GetRouteIndex(Locomotive.Train.PresentPosition[dir].TCSectionIndex, 0);
+            int index = dir == 0 ? Locomotive.Train.PresentPosition[dir].RouteListIndex : 
+                Locomotive.Train.ValidRoute[dir].GetRouteIndex(Locomotive.Train.PresentPosition[dir].TCSectionIndex, 0);
             if (index < 0)
                 return retval;
 
