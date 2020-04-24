@@ -134,10 +134,10 @@ namespace Orts.Simulation.RollingStocks.SubSystems
         public bool TractionAuthorization { get; private set; }
         public bool FullDynamicBrakingOrder { get; private set; }
 
-        public float[] CabDisplayControls = new float[32];
+        public float[] CabDisplayControls = new float[48];
 
         // generic TCS commands
-        public bool[] TCSCommandButtonDown = new bool[16];
+        public bool[] TCSCommandButtonDown = new bool[32];
         // List of customized control strings;
         public List<string> CustomizedTCSControlStrings = new List<string>();
 
