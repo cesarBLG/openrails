@@ -2002,6 +2002,7 @@ namespace Orts.Simulation.Physics
                     float SteamFlowRateLbpHr = 0;
                     float ProgressiveHeatAlongTrainBTU = 0;
                     float ConnectSteamHoseLengthFt = 2.0f * 2.0f; // Assume two hoses on each car * 2 ft long
+                    float DesiredCompartmentTempSetpointC = C.FromF(55.0f); // This is the desired temperature for the passenger compartment
 
                     // Calculate total heat loss and car temperature along the train
                     for (int i = 0; i < Cars.Count; i++)
@@ -2011,7 +2012,7 @@ namespace Orts.Simulation.Physics
                         float BogieHeightM = 1.06f;
 
                         car.CarHeatVolumeM3 = car.CarWidthM * (car.CarLengthM) * (car.CarHeightM - BogieHeightM); // Check whether this needs to be same as compartment volume
-                        car.CarOutsideTempC = TrainOutsideTempC;  // Get Car Outside Temp from MSTSSteamLocomotive file
+                        car.CarOutsideTempC = TrainOutsideTempC;  // Update Outside temp
 
                         // Only initialise these values the first time around the loop
                         if (car.IsCarSteamHeatInitial)
@@ -2019,7 +2020,7 @@ namespace Orts.Simulation.Physics
                             // This section sets some arbitary default values the first time that this section is processed. Real values are set on subsequent loops, once steam heat is turned on in locomotive
                             if (TrainInsideTempC == 0)
                             {
-                                TrainInsideTempC = C.FromF(55.0f); // Set intial temp - will be set in Steam and Diesel Eng, but these are done after this step
+                                TrainInsideTempC = DesiredCompartmentTempSetpointC; // Set intial temp - will be set in Steam and Diesel Eng, but these are done after this step
                             }
 
                             if (TrainOutsideTempC == 0)
@@ -2030,12 +2031,17 @@ namespace Orts.Simulation.Physics
 
                             if (mstsLocomotive.EngineType == TrainCar.EngineTypes.Steam && Simulator.Settings.HotStart || mstsLocomotive.EngineType == TrainCar.EngineTypes.Diesel || mstsLocomotive.EngineType == TrainCar.EngineTypes.Electric)
                             {
-
-                                car.CarCurrentCarriageHeatTempC = C.FromF(55.0f); // Set intial temp
+                                if (TrainOutsideTempC < DesiredCompartmentTempSetpointC)
+                                {
+                                    car.CarCurrentCarriageHeatTempC = DesiredCompartmentTempSetpointC; // Set intial temp
+                                }
+                                else
+                                {
+                                    car.CarCurrentCarriageHeatTempC = TrainOutsideTempC;
+                                }
                             }
                             else
                             {
-
                                 car.CarCurrentCarriageHeatTempC = TrainOutsideTempC;
                             }
 
@@ -2166,9 +2172,7 @@ namespace Orts.Simulation.Physics
 
                             //                        Trace.TraceInformation("Pipe Heat - CarID {0} Total Heat {1} PipeArea {2} PipeTemp {3} CarTemp {4}", car.CarID, car.CarHeatCompartmentSteamPipeHeatW, car.CarHeatCompartmentPipeAreaM2, CompartmentSteamPipeTempC, car.CarCurrentCarriageHeatTempC);
 
-
                         }
-
 
                         //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
                         // Calculate heating loss in main supply pipe that runs under carriage
@@ -2220,7 +2224,7 @@ namespace Orts.Simulation.Physics
                             // If main pipe pressure is > 0 then heating will start to occur in comparment, so include compartment heat exchanger value
                             ProgressiveHeatAlongTrainBTU += (car.CarHeatSteamMainPipeHeatLossBTU + car.CarHeatConnectSteamHoseHeatLossBTU) + pS.TopH(W.ToBTUpS(car.CarHeatCompartmentSteamPipeHeatW));
                             CurrentComparmentSteamPipeHeatW = car.CarHeatCompartmentSteamPipeHeatW; // Car is being heated as main pipe pressure is high enough, and temperature increase is required
-                            car.SteamHeatingCompartmentSteamTrapOn = true; // turn on the steam traps
+                            car.SteamHeatingCompartmentSteamTrapOn = true; // turn on the compartment steam traps
                         }
                         else
                         {
@@ -2228,7 +2232,7 @@ namespace Orts.Simulation.Physics
                             // then no heating will occur in comparment, so leave compartment heat exchanger value out
                             ProgressiveHeatAlongTrainBTU += (car.CarHeatSteamMainPipeHeatLossBTU + car.CarHeatConnectSteamHoseHeatLossBTU);
                             CurrentComparmentSteamPipeHeatW = 0; // Car is not being heated as main pipe pressure is not high enough, or car temp is hot enough
-                            car.SteamHeatingCompartmentSteamTrapOn = false; // turn off the steam traps
+                            car.SteamHeatingCompartmentSteamTrapOn = false; // turn off the compartment steam traps
                         }
 
                         // Calculate steam flow rates and steam used
@@ -2255,16 +2259,17 @@ namespace Orts.Simulation.Physics
                         car.CarCurrentCarriageHeatTempC = W.ToKW(car.CarHeatCurrentCompartmentHeatW) / (SpecificHeatCapcityAirKJpKgK * DensityAirKgpM3 * car.CarHeatVolumeM3) + TrainOutsideTempC;
 
 
-                        if (car.CarCurrentCarriageHeatTempC > C.FromF(55.0f))
+                        if (car.CarCurrentCarriageHeatTempC > DesiredCompartmentTempSetpointC)
                         {
                             car.CarHeatCompartmentHeaterOn = false;
                         }
-                        else if (car.CarCurrentCarriageHeatTempC < C.FromF(50.0f))
+                        else if (car.CarCurrentCarriageHeatTempC < DesiredCompartmentTempSetpointC)
                         {
                             car.CarHeatCompartmentHeaterOn = true;
                         }
 
-                        if (car.CarCurrentCarriageHeatTempC < C.FromF(45.0f)) // If temp below 45of then alarm
+                        float DesiredCompartmentAlarmTempSetpointC = C.FromF(45.0f); // Alarm temperature
+                        if (car.CarCurrentCarriageHeatTempC < DesiredCompartmentAlarmTempSetpointC) // If temp below 45of then alarm
                         {
                             if (!IsSteamHeatLow)
                             {
@@ -14718,7 +14723,6 @@ namespace Orts.Simulation.Physics
             TCRoute = new TCRoutePath(aiPath, (int)FrontTDBTraveller.Direction, Length, signalRef, Number, Simulator.Settings);
             ValidRoute[0] = TCRoute.TCRouteSubpaths[TCRoute.activeSubpath];
         }
-
 
         //================================================================================================//
         /// <summary>
