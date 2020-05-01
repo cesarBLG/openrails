@@ -1,5 +1,5 @@
-﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.59
-April 20th, 2020
+﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.60
+April 30th, 2020
 
 Please note that the installation and use of Open Rails software, even of its unofficial versions, is governed by the Open Rails End User License Agreement. 
 
@@ -12,8 +12,9 @@ INSTALLATION
 you would return to the official OR version.
 
 RELEASE NOTES
-This unofficial version has been derived from the latest official Open Rails unstable revision U2020.04.19-2321 (which already includes Monogame)
-and from the latest official OpenRails testing revision X1.3.1-124.
+This unofficial version has been derived from the latest official Open Rails unstable revision U2020.04.30-1421 (which already includes Monogame)
+and from the latest official OpenRails testing revision X1.3.1-133, which have included a significant number of new features and bug fixes.
+TCS enhancement functions (except recent addition of 8 further generic sound events) are now available also in the Unstable release.
 It includes some features not (yet) available in the Open Rails unstable official version, that is:
 - addition of track sounds in the sound debug window (by dennisat)
 - F5 HUD scrolling (by mbm_or)
@@ -25,26 +26,20 @@ It includes some features not (yet) available in the Open Rails unstable officia
 - true 64-bit management, allowing to use more than 4 GB of memory, if available, in Win64 systems (mainly by perpetualKid)
 - general options checkbox for optional run at 32 bit on Win64 (consumes less memory, recommended for computers with 4 GB RAM)
 - translatable Train Driving Info window (see http://www.elvastower.com/forums/index.php?/topic/33401-f5-hud-scrolling/page__view__findpost__p__251671 and following posts), by mbm_OR
-- extended Raildriver setup, as present in OR Ultimate (by perpetualKid)
+- extended Raildriver setup (by perpetualKid)
 - analog clocks showing game time, see http://www.elvastower.com/forums/index.php?/topic/29546-station-clocks/ , by jonas
 - bug fix for bad mouse pointing in full screen mode and for issues with Fast full screen-Alt-Tab mode
-- operation as webserver, enabling HUD and Train Driving info on web clients like PCs, tablets or smartphones, by mbm_OR, cjakeman and BillC
-- support for AWS train control system
+- improved operation as webserver, enabling HUD and Train Driving info on web clients like PCs, tablets or smartphones, by mbm_OR, cjakeman and BillC
 - panto commands and animations now swapped when in rear cab
-- scripted TCS: support for Italian train control systems SCMT and TCS
 - improvements in Activity Evaluation of station stops, by mbm_OR
 - correction to reduce transfer flickering at short distance
-- ORTS_SIGNED_TRACTION_BRAKING control (see http://www.elvastower.com/forums/index.php?/topic/33883-signed-traction-braking-cabview-control/ )
-- water flickering reduced in many cases
 - allow passing a red signal for shunting through dispatcher window, see https://trello.com/c/I19VVKlz/450-manual-callon-from-dispatcher-window , by césarbl
 - Fix memory usage indication that was clamped to 4 GB, see http://www.elvastower.com/forums/index.php?/topic/33907-64-bit-openrails-consumes-more-memory/page__view__findpost__p__257699
 - option to skip saving commands (reduces save time on long activities), see http://www.elvastower.com/forums/index.php?/topic/33907-64-bit-openrails-consumes-more-memory/page__view__findpost__p__257687
 - skip warning messages related to ruler token, that is introduced by TSRE5
-- scripted TCS: added hooks to get data about INFO signals (to emulate beacons)
-- fixed bug about forced approach position control, see http://www.elvastower.com/forums/index.php?/forum/244-maybe-its-a-bug/ , by césarbl
-- NEW: optional letterbox cab2D (now with Ctrl-1 key command) + improved window shading, see http://www.elvastower.com/forums/index.php?/topic/33908-letterboxing-for-2d-cabs/page__view__findpost__p__257696 , byYoRyan
-- NEW: General Option to reduce memory usage
-- NEW: bug fix for https://bugs.launchpad.net/or/+bug/1873631 Level Crossing does not close when a multiplayer train passes
+- General Option to reduce memory usage
+- NEW: TCS extensions: add 8 further generic sound events.
+
 
 
 
