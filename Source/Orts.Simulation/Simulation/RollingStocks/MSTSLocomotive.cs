@@ -1020,6 +1020,8 @@ namespace Orts.Simulation.RollingStocks
             outf.Write(CurrentTrackSandBoxCapacityM3);
 
             base.Save(outf);
+
+            TrainControlSystem.Save(outf);
         }
 
         /// <summary>
@@ -1060,6 +1062,8 @@ namespace Orts.Simulation.RollingStocks
             AdhesionFilter.Reset(0.5f);
 
             base.Restore(inf);
+
+            TrainControlSystem.Restore(inf);
         }
 
         public bool IsLeadLocomotive()
