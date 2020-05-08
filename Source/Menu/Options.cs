@@ -195,9 +195,6 @@ namespace ORTS
             checkOverrideNonElectrifiedRoutes.Checked = Settings.OverrideNonElectrifiedRoutes;
             checkHotStart.Checked = Settings.HotStart;
             checkSimpleControlPhysics.Checked = Settings.SimpleControlPhysics;
-            checkAutopilot.Checked = Settings.Autopilot;
-            checkForcedRedAtStationStops.Checked = !Settings.NoForcedRedAtStationStops;
-            checkExtendedAIShunting.Checked = Settings.ExtendedAIShunting;
             checkDoorsAITrains.Checked = Settings.OpenDoorsInAITrains;
 
             // Keyboard tab
@@ -499,9 +496,7 @@ private async void OptionsForm_Shown(object sender, EventArgs e)
             Settings.OverrideNonElectrifiedRoutes = checkOverrideNonElectrifiedRoutes.Checked;
             Settings.HotStart = checkHotStart.Checked;
             Settings.SimpleControlPhysics = checkSimpleControlPhysics.Checked;
-            Settings.Autopilot = checkAutopilot.Checked;
             Settings.NoForcedRedAtStationStops = !checkForcedRedAtStationStops.Checked;
-            Settings.ExtendedAIShunting = checkExtendedAIShunting.Checked;
             Settings.OpenDoorsInAITrains = checkDoorsAITrains.Checked;
 
             // Keyboard tab

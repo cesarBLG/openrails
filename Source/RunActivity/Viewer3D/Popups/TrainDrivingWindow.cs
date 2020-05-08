@@ -437,7 +437,7 @@ namespace Orts.Viewer3D.Popups
                 if (this.Visible)// Avoids conflict with WebApi data updating
                 {
                     // Detect Autopilot is on to avoid flickering when slim window is displayed
-                    var AutopilotOn = Owner.Viewer.Settings.Autopilot && Owner.Viewer.PlayerLocomotive.Train.TrainType == Train.TRAINTYPE.AI_PLAYERHOSTING ? true : false;
+                    var AutopilotOn = Owner.Viewer.PlayerLocomotive.Train.TrainType == Train.TRAINTYPE.AI_PLAYERHOSTING ? true : false;
 
                     //ResizeWindow, when the string spans over the right boundary of the window
                     var maxFirstColWidth = ListToLabel.Max(x => x.FirstColWidth);
@@ -833,23 +833,20 @@ namespace Orts.Viewer3D.Popups
             // Messages
 			// Autopilot
             keyPressed = "";
-            if (Owner.Viewer.Settings.Autopilot)
+
+            if (Owner.Viewer.PlayerLocomotive.Train.TrainType == Train.TRAINTYPE.AI_PLAYERHOSTING)
             {
-                if (Owner.Viewer.PlayerLocomotive.Train.TrainType == Train.TRAINTYPE.AI_PLAYERHOSTING)
-                {
-                    keyPressed = UserInput.IsDown(UserCommand.GameAutopilotMode) ? arrowUp.ToString() + "???" : "";
-                    InfoToLabel(keyPressed, Viewer.Catalog.GetString("Autopilot"), Viewer.Catalog.GetString("On") + "???", "", false, keyPressed);
-                }
-                else if (Owner.Viewer.PlayerLocomotive.Train.TrainType != Train.TRAINTYPE.AI_PLAYERHOSTING)
-                {
-                    keyPressed = UserInput.IsDown(UserCommand.GameAutopilotMode) ? arrowDown.ToString() + "???" : "";
-                    InfoToLabel(keyPressed, Viewer.Catalog.GetString("Autopilot"), Viewer.Catalog.GetString("Off"), "", false, keyPressed);
-                }
-                else
-                    InfoToLabel("", Viewer.Catalog.GetString("Autopilot"), Viewer.Catalog.GetString("Off"), "", false, keyPressed);
+                keyPressed = UserInput.IsDown(UserCommand.GameAutopilotMode) ? arrowUp.ToString() + "???" : "";
+                InfoToLabel(keyPressed, Viewer.Catalog.GetString("Autopilot"), Viewer.Catalog.GetString("On") + "???", "", false, keyPressed);
+            }
+            else if (Owner.Viewer.PlayerLocomotive.Train.TrainType != Train.TRAINTYPE.AI_PLAYERHOSTING)
+            {
+                keyPressed = UserInput.IsDown(UserCommand.GameAutopilotMode) ? arrowDown.ToString() + "???" : "";
+                InfoToLabel(keyPressed, Viewer.Catalog.GetString("Autopilot"), Viewer.Catalog.GetString("Off"), "", false, keyPressed);
             }
             else
-                InfoToLabel("", Viewer.Catalog.GetString("Autopilot" + "?!?"), Viewer.Catalog.GetString("Off"), "", false, keyPressed);
+                InfoToLabel("", Viewer.Catalog.GetString("Autopilot"), Viewer.Catalog.GetString("Off"), "", false, keyPressed);
+
 
             // Grate limit
             keyPressed = "";

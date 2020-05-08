@@ -41,6 +41,7 @@
             this.checkViewDispatcher = new System.Windows.Forms.CheckBox();
             this.tabOptions = new System.Windows.Forms.TabControl();
             this.tabPageGeneral = new System.Windows.Forms.TabPage();
+            this.checkReduceMemory = new System.Windows.Forms.CheckBox();
             this.checkSaveCommands = new System.Windows.Forms.CheckBox();
             this.label29 = new System.Windows.Forms.Label();
             this.numericWebServerPort = new System.Windows.Forms.NumericUpDown();
@@ -98,8 +99,6 @@
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.checkDoorsAITrains = new System.Windows.Forms.CheckBox();
             this.checkForcedRedAtStationStops = new System.Windows.Forms.CheckBox();
-            this.checkExtendedAIShunting = new System.Windows.Forms.CheckBox();
-            this.checkAutopilot = new System.Windows.Forms.CheckBox();
             this.checkHotStart = new System.Windows.Forms.CheckBox();
             this.checkSimpleControlPhysics = new System.Windows.Forms.CheckBox();
             this.checkCurveSpeedDependent = new System.Windows.Forms.CheckBox();
@@ -197,7 +196,6 @@
             this.checkCircularSpeedGauge = new System.Windows.Forms.CheckBox();
             this.checkSignalLightGlow = new System.Windows.Forms.CheckBox();
             this.checkUseMSTSEnv = new System.Windows.Forms.CheckBox();
-            this.checkUseLocationPassingPaths = new System.Windows.Forms.CheckBox();
             this.labelPerformanceTunerTarget = new System.Windows.Forms.Label();
             this.numericPerformanceTunerTarget = new System.Windows.Forms.NumericUpDown();
             this.checkPerformanceTuner = new System.Windows.Forms.CheckBox();
@@ -212,7 +210,7 @@
             this.ElevationText = new System.Windows.Forms.Label();
             this.checkPreferDDSTexture = new System.Windows.Forms.CheckBox();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
-            this.checkReduceMemory = new System.Windows.Forms.CheckBox();
+            this.checkUseLocationPassingPaths = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.numericBrakePipeChargingRate)).BeginInit();
             this.tabOptions.SuspendLayout();
             this.tabPageGeneral.SuspendLayout();
@@ -410,6 +408,16 @@
             this.tabPageGeneral.TabIndex = 0;
             this.tabPageGeneral.Text = "General";
             this.tabPageGeneral.UseVisualStyleBackColor = true;
+            // 
+            // checkReduceMemory
+            // 
+            this.checkReduceMemory.AutoSize = true;
+            this.checkReduceMemory.Location = new System.Drawing.Point(304, 98);
+            this.checkReduceMemory.Name = "checkReduceMemory";
+            this.checkReduceMemory.Size = new System.Drawing.Size(135, 17);
+            this.checkReduceMemory.TabIndex = 19;
+            this.checkReduceMemory.Text = "Reduce memory usage";
+            this.checkReduceMemory.UseVisualStyleBackColor = true;
             // 
             // checkSaveCommands
             // 
@@ -1113,10 +1121,9 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.checkUseLocationPassingPaths);
             this.groupBox1.Controls.Add(this.checkDoorsAITrains);
             this.groupBox1.Controls.Add(this.checkForcedRedAtStationStops);
-            this.groupBox1.Controls.Add(this.checkExtendedAIShunting);
-            this.groupBox1.Controls.Add(this.checkAutopilot);
             this.groupBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.groupBox1.Location = new System.Drawing.Point(324, 6);
             this.groupBox1.Name = "groupBox1";
@@ -1129,7 +1136,7 @@
             // 
             this.checkDoorsAITrains.AutoSize = true;
             this.checkDoorsAITrains.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.checkDoorsAITrains.Location = new System.Drawing.Point(6, 94);
+            this.checkDoorsAITrains.Location = new System.Drawing.Point(6, 47);
             this.checkDoorsAITrains.Name = "checkDoorsAITrains";
             this.checkDoorsAITrains.Size = new System.Drawing.Size(163, 17);
             this.checkDoorsAITrains.TabIndex = 45;
@@ -1140,34 +1147,12 @@
             // 
             this.checkForcedRedAtStationStops.AutoSize = true;
             this.checkForcedRedAtStationStops.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.checkForcedRedAtStationStops.Location = new System.Drawing.Point(6, 71);
+            this.checkForcedRedAtStationStops.Location = new System.Drawing.Point(6, 24);
             this.checkForcedRedAtStationStops.Name = "checkForcedRedAtStationStops";
             this.checkForcedRedAtStationStops.Size = new System.Drawing.Size(151, 17);
             this.checkForcedRedAtStationStops.TabIndex = 23;
             this.checkForcedRedAtStationStops.Text = "Forced red at station stops";
             this.checkForcedRedAtStationStops.UseVisualStyleBackColor = true;
-            // 
-            // checkExtendedAIShunting
-            // 
-            this.checkExtendedAIShunting.AutoSize = true;
-            this.checkExtendedAIShunting.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.checkExtendedAIShunting.Location = new System.Drawing.Point(6, 48);
-            this.checkExtendedAIShunting.Name = "checkExtendedAIShunting";
-            this.checkExtendedAIShunting.Size = new System.Drawing.Size(150, 17);
-            this.checkExtendedAIShunting.TabIndex = 22;
-            this.checkExtendedAIShunting.Text = "Extended AI train shunting";
-            this.checkExtendedAIShunting.UseVisualStyleBackColor = true;
-            // 
-            // checkAutopilot
-            // 
-            this.checkAutopilot.AutoSize = true;
-            this.checkAutopilot.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.checkAutopilot.Location = new System.Drawing.Point(6, 26);
-            this.checkAutopilot.Name = "checkAutopilot";
-            this.checkAutopilot.Size = new System.Drawing.Size(67, 17);
-            this.checkAutopilot.TabIndex = 21;
-            this.checkAutopilot.Text = "Autopilot";
-            this.checkAutopilot.UseVisualStyleBackColor = true;
             // 
             // checkHotStart
             // 
@@ -1984,7 +1969,6 @@
             this.tabPageExperimental.Controls.Add(this.checkCircularSpeedGauge);
             this.tabPageExperimental.Controls.Add(this.checkSignalLightGlow);
             this.tabPageExperimental.Controls.Add(this.checkUseMSTSEnv);
-            this.tabPageExperimental.Controls.Add(this.checkUseLocationPassingPaths);
             this.tabPageExperimental.Controls.Add(this.labelPerformanceTunerTarget);
             this.tabPageExperimental.Controls.Add(this.numericPerformanceTunerTarget);
             this.tabPageExperimental.Controls.Add(this.checkPerformanceTuner);
@@ -2376,16 +2360,6 @@
             this.checkUseMSTSEnv.Text = "MSTS environments";
             this.checkUseMSTSEnv.UseVisualStyleBackColor = true;
             // 
-            // checkUseLocationPassingPaths
-            // 
-            this.checkUseLocationPassingPaths.AutoSize = true;
-            this.checkUseLocationPassingPaths.Location = new System.Drawing.Point(6, 166);
-            this.checkUseLocationPassingPaths.Name = "checkUseLocationPassingPaths";
-            this.checkUseLocationPassingPaths.Size = new System.Drawing.Size(215, 17);
-            this.checkUseLocationPassingPaths.TabIndex = 24;
-            this.checkUseLocationPassingPaths.Text = "Location-linked passing path processing";
-            this.checkUseLocationPassingPaths.UseVisualStyleBackColor = true;
-            // 
             // labelPerformanceTunerTarget
             // 
             this.labelPerformanceTunerTarget.AutoSize = true;
@@ -2579,15 +2553,16 @@
             this.checkPreferDDSTexture.Text = "Load DDS textures in preference to ACE";
             this.checkPreferDDSTexture.UseVisualStyleBackColor = true;
             // 
-            // checkReduceMemory
+            // checkUseLocationPassingPaths
             // 
-            this.checkReduceMemory.AutoSize = true;
-            this.checkReduceMemory.Location = new System.Drawing.Point(304, 98);
-            this.checkReduceMemory.Name = "checkReduceMemory";
-            this.checkReduceMemory.Size = new System.Drawing.Size(135, 17);
-            this.checkReduceMemory.TabIndex = 19;
-            this.checkReduceMemory.Text = "Reduce memory usage";
-            this.checkReduceMemory.UseVisualStyleBackColor = true;
+            this.checkUseLocationPassingPaths.AutoSize = true;
+            this.checkUseLocationPassingPaths.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.checkUseLocationPassingPaths.Location = new System.Drawing.Point(6, 71);
+            this.checkUseLocationPassingPaths.Name = "checkUseLocationPassingPaths";
+            this.checkUseLocationPassingPaths.Size = new System.Drawing.Size(215, 17);
+            this.checkUseLocationPassingPaths.TabIndex = 46;
+            this.checkUseLocationPassingPaths.Text = "Location-linked passing path processing";
+            this.checkUseLocationPassingPaths.UseVisualStyleBackColor = true;
             // 
             // OptionsForm
             // 
@@ -2737,7 +2712,6 @@
         private System.Windows.Forms.NumericUpDown numericPerformanceTunerTarget;
         private System.Windows.Forms.CheckBox checkPerformanceTuner;
         private System.Windows.Forms.CheckBox checkOverrideNonElectrifiedRoutes;
-        private System.Windows.Forms.CheckBox checkUseLocationPassingPaths;
         private System.Windows.Forms.TabPage tabPageEvaluate;
         private System.Windows.Forms.CheckedListBox checkListDataLogTSContents;
         private System.Windows.Forms.Label labelDataLogTSInterval;
@@ -2813,12 +2787,10 @@
         private System.Windows.Forms.CheckBox checkSpeedControl;
         private System.Windows.Forms.NumericUpDown numericExternalSoundPassThruPercent;
         private System.Windows.Forms.Label label11;
-        private System.Windows.Forms.CheckBox checkAutopilot;
         private System.Windows.Forms.CheckBox checkDoubleWire;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.CheckBox checkDoorsAITrains;
         private System.Windows.Forms.CheckBox checkForcedRedAtStationStops;
-        private System.Windows.Forms.CheckBox checkExtendedAIShunting;
         private System.Windows.Forms.Label label12;
         private System.Windows.Forms.NumericUpDown numericActRandomizationLevel;
         private System.Windows.Forms.Label label13;
@@ -2851,5 +2823,6 @@
         private System.Windows.Forms.CheckBox checkRunAt32bit;
         private System.Windows.Forms.CheckBox checkSaveCommands;
         private System.Windows.Forms.CheckBox checkReduceMemory;
+        private System.Windows.Forms.CheckBox checkUseLocationPassingPaths;
     }
 }

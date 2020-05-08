@@ -684,16 +684,6 @@ namespace Orts.Formats.Msts
 
 
                 // Simulation TAB
-                if (ORTSOptionsAutopilot == 1)
-                {
-                    setting.Autopilot = true;
-                    Trace.Write("\nAutopilot                        =   True");
-                }
-                else if (ORTSOptionsAutopilot == 0)
-                {
-                    setting.Autopilot = false;
-                    Trace.Write("\nAutopilot                        =   False");
-                }
 
                 if (ORTSOptionsForcedRedAtStationStops == 1)
                 {
@@ -704,18 +694,6 @@ namespace Orts.Formats.Msts
                 {
                     setting.NoForcedRedAtStationStops = true; // Note this parameter is reversed in its logic to others.
                     Trace.Write("\nForced Red at Station Stops      =   False");
-                }
-
-
-                if (ORTSOptionsExtendedAITrainShunting == 1)
-                {
-                    setting.ExtendedAIShunting = true;
-                    Trace.Write("\nExtended AI Train Shunting       =   True");
-                }
-                else if (ORTSOptionsExtendedAITrainShunting == 0)
-                {
-                    setting.ExtendedAIShunting = false;
-                    Trace.Write("\nExtended AI Train Shunting       =   False");
                 }
 
                 if (ORTSOptionsUseAdvancedAdhesion == 1)
