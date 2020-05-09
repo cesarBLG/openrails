@@ -5,19 +5,35 @@
 }
 
 /* Apply rounded border */
-.border{	
+.border{
 	border-spacing: 0;
 	border: gray 2px solid;
 	border-radius: 20px;
-
 }
 
 .button{
-	border: gray 2px solid;
+	border: gray 1px solid;
 	border-radius: 20px;
 	text-align: center;
 	width: 50px;
-	margin: 4px 2px;	
+	margin: 4px 2px;
+}
+
+#traindrivingdiv {
+	position: absolute;
+	z-index: 9;
+	touch-action: none;
+}
+
+#traindrivingheader {
+	cursor: move;
+	z-index: 10;
+}
+
+#traindrivingdiv:hover {
+	cursor: pointer;
+	border-width: 20px;
+	border-radius: 20px;
 }
 
 /* Allows to apply text color */
@@ -84,6 +100,5 @@ td[ColorCode= "$$$"]{
 /* Developper: Used as help for cells alignement*/
 td{
 	/*border: black 1px solid;*/
-	border-spacing: 0;
 	border-radius: 7px;
 }

@@ -1,4 +1,4 @@
-﻿// COPYRIGHT 2009, 2010, 2011, 2012, 2013, 2014 by the Open Rails project.
+// COPYRIGHT 2009, 2010, 2011, 2012, 2013, 2014 by the Open Rails project.
 //
 // This file is part of Open Rails.
 //
@@ -31,14 +31,14 @@ function poll(initialIdleMs) {
 	if (initialIdleMs != null){
 		idleMs = initialIdleMs; // Save it to use at end
 	}
-	api();
-	
+	apiTM();
+
 	// setTimeout() used instead of setInterval() to avoid overloading the browser's queue.
 	// (It's not true recursion, so it won't blow the stack.)
     setTimeout(poll, idleMs); // In this call, initialIdleMs == null
 }
 
-function api() {
+function apiTM() {
 	// If this file is located in folder /API/<API_name>/, then Open Rails will call the API with the signature "/API/<API_name"
 
 	// GET preferred over POST as Internet Explorer may then fail intermittently with network error 00002eff
@@ -46,7 +46,7 @@ function api() {
 	// hr.send(""");
 	hr.open("GET", "call_API", true);
 	hr.send();
-	
+
 	hr.onreadystatechange = function () {
 		if (this.readyState == xmlHttpRequestCodeDone && this.status == httpCodeSuccess) {
 			var obj = JSON.parse(hr.responseText);
@@ -242,7 +242,113 @@ function api() {
 				}
 				Str += "</table>";
 				TrackMonitor.innerHTML = Str;
-            }
+
+				Str = "<table>";
+				var endIndexFirst = 0,
+					endIndexLimit = 0,
+					endIndexKey = 0;
+
+				var keyPressedColor = "",
+					newDataFirst = "",
+					newDataLimit = "",
+					smallSymbolColor = "",
+					stringColorFirst = "",
+					stringColorLimit = "";
+				// Table title
+				Str += "<tr> <td colspan='5' style='text-align: center'>" + 'Train Driving Info' + "</td></tr>";
+				Str += "<tr> <td colspan='5' class='separator'></td></tr>";
+
+				// Customize data
+				for (var row = 0; row < obj.trainDrivingData.length; ++row) {
+					Str += "<tr>";
+					firstColor = false;
+					lastColor = false;
+					keyColor = false;
+					symbolColor = false;
+
+					// FirstCol
+					if (obj.trainDrivingData[row].FirstCol != null) {
+						endIndexFirst = obj.trainDrivingData[row].FirstCol.length;
+						newDataFirst = obj.trainDrivingData[row].FirstCol.slice(0, endIndexFirst -3);
+						stringColorFirst = obj.trainDrivingData[row].FirstCol.slice(-3);
+					}
+
+					// LastCol
+					if (obj.trainDrivingData[row].LastCol != null) {
+						endIndexLimit = obj.trainDrivingData[row].LastCol.length;
+						newDataLimit = obj.trainDrivingData[row].LastCol.slice(0, endIndexLimit -3);
+						stringColorLimit = obj.trainDrivingData[row].LastCol.slice(-3);
+					}
+
+					// keyPressed
+					if (obj.trainDrivingData[row].keyPressed != null) {
+						endIndexKey = obj.trainDrivingData[row].keyPressed.length;
+						newDataKey = obj.trainDrivingData[row].keyPressed.slice(0, endIndexKey -3);
+						keyPressedColor = obj.trainDrivingData[row].keyPressed.slice(-3);
+					}
+
+					// smallSymbol
+					if (obj.trainDrivingData[row].SymbolCol != null) {
+						endIndexSymbol = obj.trainDrivingData[row].SymbolCol.length;
+						newDataSymbol = obj.trainDrivingData[row].SymbolCol.slice(0, endIndexSymbol -3);
+						smallSymbolColor = obj.trainDrivingData[row].SymbolCol.slice(-3);
+					}
+
+					// detects color
+					if (codeColor.indexOf(stringColorFirst) != -1) { firstColor = true; }
+					if (codeColor.indexOf(stringColorLimit) != -1) { lastColor = true; }
+					if (codeColor.indexOf(keyPressedColor) != -1) { keyColor = true; }
+					if (codeColor.indexOf(smallSymbolColor) != -1) { symbolColor = true; }
+
+					if (obj.trainDrivingData[row].FirstCol == null) {
+						Str += "<td></td>";
+					}
+					else if (obj.trainDrivingData[row].FirstCol == "Sprtr"){
+						Str += "<td colspan='5' class='separator'></td>";
+					}
+					else{
+						// first col  = key symbol
+						if (keyColor == true){
+							Str += "<td ColorCode=" + keyPressedColor + ">" + newDataKey + "</td>";
+						}
+						else{
+							Str += "<td width='16'>" + obj.trainDrivingData[row].keyPressed + "</td>";
+						}
+
+						// second col = FirstCol data
+						if(firstColor == true){
+							Str += "<td ColorCode=" + stringColorFirst + ">" + newDataFirst + "</td>";
+						}
+						else{
+							Str += "<td>" + obj.trainDrivingData[row].FirstCol + "</td>";
+						}
+
+						// third col  = key symbol
+						if (keyColor == true){
+							Str += "<td ColorCode=" + keyPressedColor + ">" + newDataKey + "</td>";
+						}
+						else if (symbolColor == true){
+							Str += "<td ColorCode=" + smallSymbolColor + ">" + newDataSymbol + "</td>";
+						}
+						else{
+							Str += "<td width='16'>" + obj.trainDrivingData[row].keyPressed + "</td>";
+						}
+
+						// fourth col = LastCol data
+						if(lastColor == true){
+							Str += "<td ColorCode=" + stringColorLimit + ">" + newDataLimit + "</td>";
+						}
+						else{
+							Str += "<td>" + obj.trainDrivingData[row].LastCol + "</td>";
+						}
+					}
+					Str += "</tr>";
+				}
+				// space at bottom
+				Str += "<tr> <td colspan='5' style='text-align: center'>" + '.' + "</td> </tr>";
+				Str += "</table>";
+				TrainDriving.innerHTML = Str;
+			}
 		}
 	}
 }
@@ -262,3 +368,106 @@ function changePageColor() {
 		bodyColor.style.color =	"black";
 	}
 };
+
+// Make the DIV element draggable:
+var gap = 20;
+var active = false;
+var collision = false;
+var dragging = false;
+var pos1=0, pos2=0, pos3=0, pos4=0;
+var tdDrag = document.getElementById("traindrivingdiv");
+	tdDrag.ontouchstart = dragMouseElement(document.getElementById("traindrivingdiv"));
+	tdDrag.onclick = dragMouseElement(document.getElementById("traindrivingdiv"));
+
+function dragMouseElement(tdDrag) {
+	var offsetX = 0, offsetY = 0, initX = 0, initY = 0;
+	tdDrag.ontouchstart = touchStart;
+	tdDrag.onmousedown = initDrag;
+
+	function touchStart(event) {
+		event.preventDefault();
+		var touch = event.touches[0];
+		initX = touch.clientX;
+		initY = touch.clientY;
+		document.ontouchend = closeDrag;
+		document.ontouchmove = touchMove;
+	}
+
+	function initDrag(event) {
+		event.preventDefault();
+		initX = event.clientX;
+		initY = event.clientY;
+		document.onmouseup = closeDrag;
+		document.onmousemove = moveDrag;
+	}
+
+	function touchMove(event){
+		event.preventDefault();
+		dragging = true;
+		var touch = event.touches[0];
+		var tm = document.getElementById("TrackMonitor").getBoundingClientRect();
+		var td = document.getElementById("TrainDriving").getBoundingClientRect();
+		collision = isCollide(tm, td);
+		if (collision){
+			tdDrag.style.border = "2px solid gray";
+			tdDrag.style.borderRadius = "24px";
+		}else{
+			tdDrag.style.border = "0px solid gray";
+		}
+		offsetX = initX - touch.clientX;
+		offsetY = initY - touch.clientY;
+		initX = touch.clientX;
+		initY = touch.clientY;
+		// avoids to overlap the trackmonitor div
+		tdDrag.style.left = (collision && offsetX > 0 ? tdDrag.offsetLeft : tdDrag.offsetLeft - offsetX) + "px";// X
+		tdDrag.style.top = (collision && offsetY > 0 ? tdDrag.offsetTop : tdDrag.offsetTop - offsetY) + "px";   // Y
+		dragging = false;
+	}
+
+	function moveDrag(event) {
+		event.preventDefault();
+		dragging = true;
+		var tm = document.getElementById("TrackMonitor").getBoundingClientRect();
+		var td = document.getElementById("TrainDriving").getBoundingClientRect();
+		collision = isCollide(tm, td);
+		if (collision){ // detect collision
+			tdDrag.style.border = "2px solid gray";
+			tdDrag.style.borderRadius = "24px";
+		}else{
+			tdDrag.style.border = "0px solid gray";
+		}
+	offsetX = initX - event.clientX;
+	offsetY = initY - event.clientY;
+	initX = event.clientX;
+		initY = event.clientY;
+		// avoids to overlap the trackmonitor window
+		tdDrag.style.left = (collision && offsetX > 0 ? tdDrag.offsetLeft : tdDrag.offsetLeft - offsetX) + "px";// X
+		tdDrag.style.top = (collision && offsetY > 0 ? tdDrag.offsetTop : tdDrag.offsetTop - offsetY) + "px";   // Y
+		dragging = false;
+	}
+
+	function closeDrag(event) {
+		if(event.type === "touchcancel" || event.type === "touchend" ){
+			if (dragging){
+				return;
+			}
+			document.ontouchstart = null;
+			document.ontouchmove = null;
+		}else{
+			if (dragging){
+				return;
+			}
+			document.onmouseup = null;
+			document.onmousemove = null;
+		}
+	}
+}
+
+function isCollide(a, b) {
+	return !(
+		((a.y + a.height + gap) < (b.y)) ||
+		(a.y + gap > (b.y + b.height)) ||
+		((a.x + a.width + gap) < b.x) ||
+		(a.x + gap > (b.x + b.width))
+	);
+}

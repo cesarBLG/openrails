@@ -322,6 +322,10 @@ namespace Orts.Viewer3D.WebServices
             if (requestParts.Length > 1)
                 parameters = requestParts[1];
 
+            // Detect if API/TRACKMONITOR was selected
+            var trackMonitorWindow = Program.Viewer.TrackMonitorWindow;
+            trackMonitorWindow.TMWebApi = uri.Contains("TRACKMONITOR") ? true : false;
+
             // For efficiency, check for API first
             if (uri.StartsWith("/API/") && uri.EndsWith("/CALL_API"))
             {
@@ -337,6 +341,7 @@ namespace Orts.Viewer3D.WebServices
             SendFileContents(response, uri);
         }
 
+
         private static void ExecuteAPI(string uri, string parameters, HttpResponse response)
         {
             // Trim off the final "CALL_API"
@@ -350,6 +355,7 @@ namespace Orts.Viewer3D.WebServices
             }
 
             object result = apiMethod(parameters);
+
             response.strContent = JsonConvert.SerializeObject(result, Formatting.Indented);
             response.ContentType = "application/json";
             SendOkResponse(response);
@@ -363,7 +369,7 @@ namespace Orts.Viewer3D.WebServices
             var fullFilePath = ContentPath + filePath;
             var extension = Path.GetExtension(fullFilePath).ToUpper();
 
-            if ( ! File.Exists(fullFilePath))
+            if (!File.Exists(fullFilePath))
             {
                 // Perhaps it's a folder
                 if (extension == "")

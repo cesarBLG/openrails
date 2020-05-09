@@ -49,6 +49,7 @@ namespace Orts.Viewer3D.WebServices
             ApiDict.Add("/API/TEMPLATE/", ApiTemplate);
             ApiDict.Add("/API/TRACKMONITOR/", ApiTrackMonitor);
             ApiDict.Add("/API/TRAINDRIVING/", ApiTrainDriving);
+            ApiDict.Add("/API/TRACKMONITORTRAINDRIVING/", ApiTrackMonitorTrainDriving);
         }
 
         #region /API/Template/
@@ -184,29 +185,16 @@ namespace Orts.Viewer3D.WebServices
         // Provides most of the data in the Track Monitor F4
         public class TrackMonitorInfo
         {
-            public Train.TRAIN_CONTROL controlMode;          // present control mode 
-            public float speedMpS;                           // present speed
-            public float projectedSpeedMpS;                  // projected speed
-            public float allowedSpeedMpS;                    // max allowed speed
-            public float currentElevationPercent;            // elevation %
-            public int direction;                            // present direction (0=forward, 1=backward)
-            public int cabOrientation;                       // present cab orientation (0=forward, 1=backward)
-            public bool isOnPath;                            // train is on defined path (valid in Manual mode only)
+            public List<Popups.TrackMonitorWindow.ListLabel> trackMonitorData = new List<Popups.TrackMonitorWindow.ListLabel>();
         }
 
         public object ApiTrackMonitor(string Parameters)
         {
-            var trainInfo = Viewer.PlayerTrain.GetTrainInfo();
+            List<Popups.TrackMonitorWindow.ListLabel> trackMonitorInfo = Viewer.TrackMonitorWindow.TrackMonitorWebApiData();
 
             return new TrackMonitorInfo
-            { controlMode = trainInfo.ControlMode
-            , speedMpS = trainInfo.speedMpS
-            , projectedSpeedMpS = trainInfo.projectedSpeedMpS
-            , allowedSpeedMpS = trainInfo.allowedSpeedMpS
-            , currentElevationPercent = trainInfo.currentElevationPercent
-            , direction = trainInfo.direction
-            , cabOrientation = trainInfo.cabOrientation
-            , isOnPath = trainInfo.isOnPath
+            {
+                trackMonitorData = trackMonitorInfo,
             };
         }
         #endregion
@@ -223,6 +211,27 @@ namespace Orts.Viewer3D.WebServices
             List<Popups.TrainDrivingWindow.ListLabel> trainDrivingInfo = Viewer.TrainDrivingWindow.TrainDrivingWebApiData();
             return new TrainDrivingInfo
             { trainDrivingData = trainDrivingInfo };
+        }
+        #endregion
+
+        #region /API/ApiTrackMonitorTrainDrivingInfo/
+        // Provides most of the data in the Track Monitor F4
+        // Provides most of the data in the Train Driving Ctrl+F5
+        public class TrackMonitorTrainDrivingInfo
+        {
+            public List<Popups.TrackMonitorWindow.ListLabel> trackMonitorData = new List<Popups.TrackMonitorWindow.ListLabel>();
+            public List<Popups.TrainDrivingWindow.ListLabel> trainDrivingData = new List<Popups.TrainDrivingWindow.ListLabel>();
+        }
+
+        public object ApiTrackMonitorTrainDriving(string Parameters)
+        {
+            List<Popups.TrackMonitorWindow.ListLabel> trackMonitorInfo = Viewer.TrackMonitorWindow.TrackMonitorWebApiData();
+            List<Popups.TrainDrivingWindow.ListLabel> trainDrivingInfo = Viewer.TrainDrivingWindow.TrainDrivingWebApiData();
+            return new TrackMonitorTrainDrivingInfo
+            {
+                trackMonitorData = trackMonitorInfo,
+                trainDrivingData = trainDrivingInfo
+            };
         }
         #endregion
     }

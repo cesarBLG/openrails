@@ -124,7 +124,7 @@ namespace Orts.Viewer3D.Popups
             {Viewer.Catalog.GetString("Throttle"), Viewer.Catalog.GetString("THRO")},
             {Viewer.Catalog.GetString("Time"), Viewer.Catalog.GetString("TIME")},
             {Viewer.Catalog.GetString("Train brake"), Viewer.Catalog.GetString("BTRN")},
-            {Viewer.Catalog.GetString("Wheel"), Viewer.Catalog.GetString("WHEL")},    
+            {Viewer.Catalog.GetString("Wheel"), Viewer.Catalog.GetString("WHEL")},
         };
 
         readonly Dictionary<string, string> LastColToAbbreviated = new Dictionary<string, string>()
@@ -665,7 +665,7 @@ namespace Orts.Viewer3D.Popups
             }
             else if (BrakeStatus.Contains(Viewer.Catalog.GetString("Lead")))
             {
-                var IndexOffset  = Viewer.Catalog.GetString("Lead").Length + 1;
+                var IndexOffset = Viewer.Catalog.GetString("Lead").Length + 1;
                 brakeInfoValue = BrakeStatus.Substring(0, BrakeStatus.IndexOf(Viewer.Catalog.GetString("Lead"))).TrimEnd();
                 InfoToLabel(keyPressed, Viewer.Catalog.GetString("Train brake"), brakeInfoValue + "%%%", "", false, keyPressed);
 
@@ -724,7 +724,7 @@ namespace Orts.Viewer3D.Popups
             keyPressed = "";
             if (DynamicBrakeStatus != null && Locomotive.IsLeadLocomotive())
             {
-                if (!DynBrakeSetup && ( UserInput.IsDown(UserCommand.ControlDynamicBrakeIncrease) && DynamicBrakePercent == 0)
+                if (!DynBrakeSetup && (UserInput.IsDown(UserCommand.ControlDynamicBrakeIncrease) && DynamicBrakePercent == 0)
                     || (CombinedCT && UserInput.IsDown(UserCommand.ControlThrottleDecrease) && Owner.Viewer.PlayerLocomotive.ThrottlePercent == 0 && DynamicBrakeStatus == "0%"))
                 {
                     StartTime = Locomotive.DynamicBrakeCommandStartTime + Locomotive.DynamicBrakeDelayS;
@@ -817,7 +817,7 @@ namespace Orts.Viewer3D.Popups
                         }
                         else
                         {
-                            InfoToLabel("", parts[0].EndsWith("?") || parts[0].EndsWith("!") ? Viewer.Catalog.GetString( parts[0].Substring(0, parts[0].Length - 3)) : Viewer.Catalog.GetString(parts[0]), (parts.Length > 1 ? Viewer.Catalog.GetString(parts[1]) : ""), "", false, keyPressed);
+                            InfoToLabel("", parts[0].EndsWith("?") || parts[0].EndsWith("!") ? Viewer.Catalog.GetString(parts[0].Substring(0, parts[0].Length - 3)) : Viewer.Catalog.GetString(parts[0]), (parts.Length > 1 ? Viewer.Catalog.GetString(parts[1]) : ""), "", false, keyPressed);
                         }
                     }
                 }
@@ -864,7 +864,7 @@ namespace Orts.Viewer3D.Popups
             else
                 InfoToLabel("", Viewer.Catalog.GetString("Grate limit") + "?!?", Viewer.Catalog.GetString("-") + "?!?", "", false, keyPressed);
 
-			// Wheel
+            // Wheel
             keyPressed = "";
             if (Owner.Viewer.PlayerTrain.IsWheelSlip)
                 InfoToLabel("", Viewer.Catalog.GetString("Wheel"), Viewer.Catalog.GetString("slip") + "!!!", "", false, keyPressed);
@@ -919,16 +919,16 @@ namespace Orts.Viewer3D.Popups
                 UpdateData();
                 TrainDrivingUpdating = false;
 
-               // Ctrl + F (FiringIsManual)
-               if (ResizeWindow || LinesCount != ListToLabel.Count())
-               {
+                // Ctrl + F (FiringIsManual)
+                if (ResizeWindow || LinesCount != ListToLabel.Count())
+                {
                     ResizeWindow = false;
                     UpdateWindowSize();
                     LinesCount = ListToLabel.Count();
-               }
+                }
 
-               //Update Layout
-               Layout();
+                //Update Layout
+                Layout();
             }
         }
 
@@ -940,7 +940,7 @@ namespace Orts.Viewer3D.Popups
         public List<ListLabel> TrainDrivingWebApiData()
         {
             if (!TrainDrivingUpdating)
-            {               
+            {
                 TrainDrivingUpdating = true;
                 UpdateData();
                 TrainDrivingUpdating = false;

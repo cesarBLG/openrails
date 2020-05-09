@@ -152,6 +152,9 @@ function api() {
 					Str += "</tr>";
 				}
 				Str += "</table>";
+				// space at bottom
+				Str += "<tr> <td colspan='5' style='text-align: center'>" + '.' + "</td> </tr>";
+				Str += "</table>";
 				TrainDriving.innerHTML = Str;
 			}
 		}

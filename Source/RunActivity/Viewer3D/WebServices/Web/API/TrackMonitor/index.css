@@ -1,23 +1,24 @@
 #table {
+	/*border-collapse: collapse;*/
 	padding: 20px;
 	border: 2px;
 	border-spacing: 2px;
+	/*border-spacing: 0;*/
 }
 
 /* Apply rounded border */
-.border{	
+.border{
 	border-spacing: 0;
 	border: gray 2px solid;
 	border-radius: 20px;
-
 }
 
 .button{
-	border: gray 2px solid;
+	border: gray 1px solid;
 	border-radius: 20px;
 	text-align: center;
 	width: 50px;
-	margin: 4px 2px;	
+	margin: 4px 2px;
 }
 
 /* Allows to apply text color */
