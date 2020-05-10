@@ -1,5 +1,5 @@
-﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.60
-April 30th, 2020
+﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.61
+May 10th, 2020
 
 Please note that the installation and use of Open Rails software, even of its unofficial versions, is governed by the Open Rails End User License Agreement. 
 
@@ -12,9 +12,9 @@ INSTALLATION
 you would return to the official OR version.
 
 RELEASE NOTES
-This unofficial version has been derived from the latest official Open Rails unstable revision U2020.04.30-1421 (which already includes Monogame)
-and from the latest official OpenRails testing revision X1.3.1-133, which have included a significant number of new features and bug fixes.
-TCS enhancement functions (except recent addition of 8 further generic sound events) are now available also in the Unstable release.
+This unofficial version has been derived from the latest official Open Rails unstable revision U2020.05.09-0436 (which already includes Monogame)
+and from the latest official OpenRails testing revision X1.3.1-147.
+TCS enhancement functions are now available also in the Unstable release.
 It includes some features not (yet) available in the Open Rails unstable official version, that is:
 - addition of track sounds in the sound debug window (by dennisat)
 - F5 HUD scrolling (by mbm_or)
@@ -38,8 +38,12 @@ It includes some features not (yet) available in the Open Rails unstable officia
 - option to skip saving commands (reduces save time on long activities), see http://www.elvastower.com/forums/index.php?/topic/33907-64-bit-openrails-consumes-more-memory/page__view__findpost__p__257687
 - skip warning messages related to ruler token, that is introduced by TSRE5
 - General Option to reduce memory usage
-- NEW: TCS extensions: add 8 further generic sound events.
-
+- TCS extensions: add save/restore feature accordingly to ORTS standards as suggested by Serana
+- NEW: Autopilot and Extended AI shunting now always on: checkbox deleted
+- NEW: TCS Extensions: managed case of dynamic brake not engaged, by cesarbl
+- NEW: Bug fix for https://bugs.launchpad.net/or/+bug/1877644 SPEED signals not being updated in multiplayer clients. By cesarbl
+- NEW: Web server: web TrackViewer added, by mbm_OR
+- NEW: Avoid 3D cab stuttering by a mutable shape primitive, by YoRyan. 
 
 
 
