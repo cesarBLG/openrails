@@ -324,7 +324,7 @@ namespace Orts.Viewer3D.WebServices
 
             // Detect if API/TRACKMONITOR was selected
             var trackMonitorWindow = Program.Viewer.TrackMonitorWindow;
-            trackMonitorWindow.TMWebApi = uri.Contains("TRACKMONITOR") ? true : false;
+            trackMonitorWindow.WebServerEnabled = uri.Contains("TRACKMONITOR") ? true : false;
 
             // For efficiency, check for API first
             if (uri.StartsWith("/API/") && uri.EndsWith("/CALL_API"))

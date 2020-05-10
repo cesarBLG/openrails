@@ -74,7 +74,7 @@ namespace Orts.Viewer3D.Popups
         // Web Api
         public bool DataUpdating = false;
         public bool itemLocationWSChanged = false;
-        public bool TMWebApi = false;
+        public bool WebServerEnabled = false;
         int BottomLabelRow;
         bool itemLocationWSBusy = false;
         int PointBottomRow;
@@ -247,6 +247,9 @@ namespace Orts.Viewer3D.Popups
 
             // Required
             metric = Owner.Viewer.MilepostUnitsMetric;
+
+            // WebServer status
+            WebServerEnabled = owner.Viewer.Settings.WebServer;
         }
 
         protected override ControlLayout Layout(ControlLayout layout)
@@ -353,58 +356,59 @@ namespace Orts.Viewer3D.Popups
             InfoToLabel(Viewer.Catalog.GetString("Sprtr"), "", "", "", "", "", "", "");
 
             // Text version
-            bool metric = Owner.Viewer.MilepostUnitsMetric;
-            // track
-            var verticalDraw = '\u2502'; // ▏
-            var Track = verticalDraw.ToString() + verticalDraw.ToString();
-
-            Point offset = new Point(0, 0);
-            if (thisInfo == null)
+            if (WebServerEnabled)
             {
-                TMCdrawTrack("", offset, 0f, 1f);
-                return;
-            }
+                bool metric = Owner.Viewer.MilepostUnitsMetric;
+                // track
+                var verticalDraw = '\u2502'; // ▏
+                var Track = verticalDraw.ToString() + verticalDraw.ToString();
 
-            TMCdrawTrack("", offset, thisInfo.speedMpS, thisInfo.allowedSpeedMpS);
-
-            if (Orts.MultiPlayer.MPManager.IsMultiPlayer())
-            {
-                TMCdrawMPInfo("", offset);
-            }
-            else if (thisInfo.ControlMode == Train.TRAIN_CONTROL.AUTO_NODE || thisInfo.ControlMode == Train.TRAIN_CONTROL.AUTO_SIGNAL)
-            {
-                TMCdrawAutoInfo("", offset);
-            }
-            else if (thisInfo.ControlMode == Train.TRAIN_CONTROL.TURNTABLE) return;
-            else
-            {
-                TMCdrawManualInfo("", offset);
-            }
-
-            // OwnTrain row position
-            rowOffset = (Orts.MultiPlayer.MPManager.IsMultiPlayer() ? 1 : 2);
-
-            InfoToLabel(Viewer.Catalog.GetString("Milepost"), "", "", "", "", Viewer.Catalog.GetString("Limit"), "", Viewer.Catalog.GetString("Dist"));
-            InfoToLabel(Viewer.Catalog.GetString("Sprtr"), "", "", "", "", "", "", "");
-
-            var absoluteSpeedMpS = Math.Abs(thisInfo.speedMpS);
-
-            Track = Track + (absoluteSpeedMpS < thisInfo.allowedSpeedMpS - 1.0f ? "??!" : // Green
-            absoluteSpeedMpS < thisInfo.allowedSpeedMpS + 0.0f ? "?!!" : // PaleGreen
-            absoluteSpeedMpS < thisInfo.allowedSpeedMpS + 5.0f ? "!!?" : "!!!"); // Orange : Red
-
-            if (TrackControlList.Count > 0)
-            {
-                var item = 0;
-                foreach (var data in TrackControlList)
+                Point offset = new Point(0, 0);
+                if (thisInfo == null)
                 {
-                    InfoToLabel(data.FirstCol, data.SymbolCol, data.TrackColLeft, data.TrackCol, data.TrackColRight, data.LimitCol, data.SignalCol, data.DistCol);
+                    TMCdrawTrack("", offset, 0f, 1f);
+                    return;
+                }
 
-                    item += 1;
+                TMCdrawTrack("", offset, thisInfo.speedMpS, thisInfo.allowedSpeedMpS);
+
+                if (Orts.MultiPlayer.MPManager.IsMultiPlayer())
+                {
+                    TMCdrawMPInfo("", offset);
+                }
+                else if (thisInfo.ControlMode == Train.TRAIN_CONTROL.AUTO_NODE || thisInfo.ControlMode == Train.TRAIN_CONTROL.AUTO_SIGNAL)
+                {
+                    TMCdrawAutoInfo("", offset);
+                }
+                else if (thisInfo.ControlMode == Train.TRAIN_CONTROL.TURNTABLE) return;
+                else
+                {
+                    TMCdrawManualInfo("", offset);
+                }
+
+                // OwnTrain row position
+                rowOffset = (Orts.MultiPlayer.MPManager.IsMultiPlayer() ? 1 : 2);
+
+                InfoToLabel(Viewer.Catalog.GetString("Milepost"), "", "", "", "", Viewer.Catalog.GetString("Limit"), "", Viewer.Catalog.GetString("Dist"));
+                InfoToLabel(Viewer.Catalog.GetString("Sprtr"), "", "", "", "", "", "", "");
+
+                var absoluteSpeedMpS = Math.Abs(thisInfo.speedMpS);
+
+                Track = Track + (absoluteSpeedMpS < thisInfo.allowedSpeedMpS - 1.0f ? "??!" : // Green
+                absoluteSpeedMpS < thisInfo.allowedSpeedMpS + 0.0f ? "?!!" : // PaleGreen
+                absoluteSpeedMpS < thisInfo.allowedSpeedMpS + 5.0f ? "!!?" : "!!!"); // Orange : Red
+
+                if (TrackControlList.Count > 0)
+                {
+                    var item = 0;
+                    foreach (var data in TrackControlList)
+                    {
+                        InfoToLabel(data.FirstCol, data.SymbolCol, data.TrackColLeft, data.TrackCol, data.TrackColRight, data.LimitCol, data.SignalCol, data.DistCol);
+
+                        item += 1;
+                    }
                 }
             }
-
-            var TDWUpdating = Owner.Viewer.TrainDrivingWindow.TrainDrivingUpdating;
             DataUpdating = false;
         }
 
@@ -413,7 +417,7 @@ namespace Orts.Viewer3D.Popups
             base.PrepareFrame(elapsedTime, updateFull);
 
             // Update text fields on full update only.
-            if (!TMWebApi && updateFull && !DataUpdating)
+            if (updateFull && !DataUpdating)
             {   //Reset data for WebsAPI
                 TrackMonitorListLabel.Clear();
                 UpdateData();
@@ -427,7 +431,7 @@ namespace Orts.Viewer3D.Popups
         // ==========================================================================================================================================
         public List<ListLabel> TrackMonitorWebApiData()
         {
-            var TDWUpdating = Owner.Viewer.TrainDrivingWindow.TrainDrivingUpdating;
+            //var TDWUpdating = Owner.Viewer.TrainDrivingWindow.TrainDrivingUpdating;
 
             if (!DataUpdating)// Avoids refresh when data are updated by other
             {
@@ -1450,7 +1454,7 @@ namespace Orts.Viewer3D.Popups
 
                 if (itemLocationWS == (zeroPoint == 108 ? 6 : 11))
                 {
-                    if (thisInfo.speedMpS > 0 && at.DisplayMessage.Length == 0)
+                    if (thisInfo.speedMpS > 0 && at != null && at.DisplayMessage.Length == 0)
                     {
                         DataCol.TrackColLeft = stationLeftWS;
                         DataCol.TrackColRight = stationRightWS;
@@ -1476,12 +1480,15 @@ namespace Orts.Viewer3D.Popups
                         DataCol.TrackColLeft = DataCol.TrackColRight = " ";
 
                         // decodes displaycolor
-                        var color = (at.DisplayColor.R == 144 && at.DisplayColor.G == 238 && at.DisplayColor.B == 144) ? "%%$" ://Color.LightGreen
+                        if (at != null)
+                        {
+                            var color = (at.DisplayColor.R == 144 && at.DisplayColor.G == 238 && at.DisplayColor.B == 144) ? "%%$" ://Color.LightGreen
                             (at.DisplayColor.R == 255 && at.DisplayColor.G == 255 && at.DisplayColor.B == 255) ? "!??" ://Color.White
                             (at.DisplayColor.R == 255 && at.DisplayColor.G == 255 && at.DisplayColor.B == 128) ? "???" : "";//Color.Yellow
 
-                        // show the time left to boarding and the station name.
-                        DataColTemp.FirstCol = at.DisplayMessage.Any(char.IsDigit) ? at.DisplayMessage.Substring(at.DisplayMessage.Length - 5) + color : Viewer.Catalog.GetString("Completed.") + "%%$";
+                            // show the time left to boarding and the station name.
+                            DataColTemp.FirstCol = at.DisplayMessage.Any(char.IsDigit) ? at.DisplayMessage.Substring(at.DisplayMessage.Length - 5) + color : Viewer.Catalog.GetString("Completed.") + "%%$";
+                        }
                         TrackControlList[itemLocationWS + rowOffset] = DataColTemp;
                     }
                 }
