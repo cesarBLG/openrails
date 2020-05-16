@@ -1,5 +1,5 @@
-﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.61
-May 10th, 2020
+﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.62
+May 16th, 2020
 
 Please note that the installation and use of Open Rails software, even of its unofficial versions, is governed by the Open Rails End User License Agreement. 
 
@@ -12,8 +12,8 @@ INSTALLATION
 you would return to the official OR version.
 
 RELEASE NOTES
-This unofficial version has been derived from the latest official Open Rails unstable revision U2020.05.09-0436 (which already includes Monogame)
-and from the latest official OpenRails testing revision X1.3.1-147.
+This unofficial version has been derived from the latest official Open Rails unstable revision U2020.05.16-0521 (which already includes Monogame)
+and from the latest official OpenRails testing revision X1.3.1-152.
 TCS enhancement functions are now available also in the Unstable release.
 It includes some features not (yet) available in the Open Rails unstable official version, that is:
 - addition of track sounds in the sound debug window (by dennisat)
@@ -39,11 +39,13 @@ It includes some features not (yet) available in the Open Rails unstable officia
 - skip warning messages related to ruler token, that is introduced by TSRE5
 - General Option to reduce memory usage
 - TCS extensions: add save/restore feature accordingly to ORTS standards as suggested by Serana
-- NEW: Autopilot and Extended AI shunting now always on: checkbox deleted
-- NEW: TCS Extensions: managed case of dynamic brake not engaged, by cesarbl
-- NEW: Bug fix for https://bugs.launchpad.net/or/+bug/1877644 SPEED signals not being updated in multiplayer clients. By cesarbl
-- NEW: Web server: web TrackViewer added, by mbm_OR
-- NEW: Avoid 3D cab stuttering by a mutable shape primitive, by YoRyan. 
+- Autopilot and Extended AI shunting now always on: checkbox deleted
+- Bug fix for https://bugs.launchpad.net/or/+bug/1877644 SPEED signals not being updated in multiplayer clients. By cesarbl
+- Web server: web TrackViewer added, by mbm_OR
+- Avoid 3D cab stuttering by a mutable shape primitive, by YoRyan
+- bug fix for https://bugs.launchpad.net/or/+bug/1878687 Maximum gauge allowed smaller than Iberian gauge
+- NEW: bug fix for crash using 3D cabs with reduce memory option selected
+- NEW: ORTS_SIGNED_TRACTION_TOTAL_BRAKING cab control https://trello.com/c/sHS9ZfNL/463-traction-braking-control-considering-train-brake , by Paolo
 
 
 
@@ -62,6 +64,7 @@ This unofficial version couldn't have been created without following contributio
 - jonas
 - YoRyan
 - césarbl
+- Paolo
 - Carlo Santucci
 
 - all those who contributed with ideas and provided contents for testing and pointed to malfunctions.
