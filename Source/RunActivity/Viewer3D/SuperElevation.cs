@@ -70,14 +70,14 @@ namespace Orts.Viewer3D
                     count++;
                     uint sid = id.TrackSections[i];
                     TrackSection section = viewer.Simulator.TSectionDat.TrackSections.Get(sid);
-                    if (Math.Abs(section.SectionSize.Width - viewer.Simulator.SuperElevationGauge) > 0.2) continue;//the main route has a gauge different than mine
-                    if (section.SectionCurve == null)
+                    if (Math.Abs(section.SectionSize.Width - viewer.Simulator.SuperElevationGauge) > 0.2 && !viewer.Simulator.TRK.Tr_RouteFile.ChangeTrackGauge) continue;//the main route has a gauge different than mine
+                    if (section.SectionCurve == null && !viewer.Simulator.TRK.Tr_RouteFile.ChangeTrackGauge)
                     {
                         continue;
                         //with strait track, will remove all related sections later
                     }
                     TrVectorSection tmp = null;
-                    if (section.SectionCurve != null) tmp = FindSectionValue(shape, viewer.Simulator, section, TileX, TileZ, trackObj.UID);
+                    if (section.SectionCurve != null || viewer.Simulator.TRK.Tr_RouteFile.ChangeTrackGauge) tmp = FindSectionValue(shape, viewer.Simulator, section, TileX, TileZ, trackObj.UID);
 
                     if (tmp == null) //cannot find the track for super elevation, will return 0;
                     {
@@ -160,7 +160,7 @@ namespace Orts.Viewer3D
             return 1;
         }
 
-        //no use anymore
+        //used
         public static int DecomposeStaticSuperElevation(Viewer viewer, List<DynamicTrackViewer> dTrackList, int TileX, int TileZ)
         {
             var key = (int)(Math.Abs(TileX) + Math.Abs(TileZ));
@@ -174,7 +174,7 @@ namespace Orts.Viewer3D
             foreach (var ts in sections)
             {
                 var tss = viewer.Simulator.TSectionDat.TrackSections.Get(ts.SectionIndex);
-                if (tss == null || tss.SectionCurve == null || ts.WFNameX != TileX || ts.WFNameZ != TileZ)
+                if (tss == null || (tss.SectionCurve == null && !viewer.Simulator.TRK.Tr_RouteFile.ChangeTrackGauge) || ts.WFNameX != TileX || ts.WFNameZ != TileZ)
                     continue;
                 location.TileX = ts.TileX;
                 location.TileZ = ts.TileZ;
@@ -185,18 +185,33 @@ namespace Orts.Viewer3D
                 directionVector.Y = ts.AY;
                 directionVector.Z = ts.AZ;
                 Vector3 trackLoc = new Vector3(ts.X, ts.Y, -ts.Z);
+                Vector3 displacement = new Vector3(0, 0, 0);
+                Vector3 heading = Vector3.Forward; // Local heading (unit vector)
+                float radius = 0;
+                float length = 0;
                 WorldPosition root = new WorldPosition(); root.TileX = ts.TileX; root.TileZ = ts.TileZ;
                 root.XNAMatrix = Matrix.CreateFromYawPitchRoll(-ts.AY, -ts.AX, ts.AZ);// CreateRotationX(-ts.AY) * Matrix.CreateRotationY(-ts.AX) * Matrix.CreateRotationZ(ts.AZ);
 
                 root.XNAMatrix.Translation = Vector3.Zero;
-                root.XNAMatrix.Translation += Vector3.Transform(trackLoc, Matrix.Identity);
-
-                var sign = -Math.Sign(tss.SectionCurve.Angle); var to = Math.Abs(tss.SectionCurve.Angle * 0.0174f);
-                var vectorCurveStartToCenter = Vector3.Left * tss.SectionCurve.Radius * sign;
-                var curveRotation = Matrix.CreateRotationY(to * sign);
                 Vector3 dummy;
-                var displacement = Traveller.MSTSInterpolateAlongCurve(Vector3.Zero, vectorCurveStartToCenter, curveRotation, root.XNAMatrix, out dummy);
-
+                root.XNAMatrix.Translation += Vector3.Transform(trackLoc, Matrix.Identity);
+                if (tss.SectionCurve != null)
+                {
+                    var sign = -Math.Sign(tss.SectionCurve.Angle); var to = Math.Abs(tss.SectionCurve.Angle * 0.0174f);
+                    var vectorCurveStartToCenter = Vector3.Left * tss.SectionCurve.Radius * sign;
+                    var curveRotation = Matrix.CreateRotationY(to * sign);
+                    displacement = Traveller.MSTSInterpolateAlongCurve(Vector3.Zero, vectorCurveStartToCenter, curveRotation, root.XNAMatrix, out dummy);
+                    radius = tss.SectionCurve.Radius;
+                    length = tss.SectionCurve.Angle * 3.14f / 180;
+                    heading = Vector3.Transform(heading, curveRotation); // Heading change
+                }
+                else
+                {
+                    radius = -1;
+                    length = tss.SectionSize.Length;
+                    displacement = Traveller.MSTSInterpolateAlongStraight(Vector3.Zero, heading, length,
+                                                            root.XNAMatrix, out dummy);
+                }
                 WorldPosition nextRoot = new WorldPosition(root);
                 nextRoot.XNAMatrix.Translation = displacement;
 
@@ -204,7 +219,8 @@ namespace Orts.Viewer3D
                 sv = ts.StartElev; ev = ts.EndElev; mv = ts.MaxElev;
 
                 //nextRoot.XNAMatrix.Translation += Vector3.Transform(trackLoc, worldMatrix.XNAMatrix);
-                dTrackList.Add(new SuperElevationViewer(viewer, root, nextRoot, tss.SectionCurve.Radius, tss.SectionCurve.Angle * 3.14f / 180, sv, ev, mv, dir));
+                dTrackList.Add(new SuperElevationViewer(viewer, root, nextRoot, radius, length, sv, ev, mv, dir));
+
             }
             return 1;
         }
@@ -213,7 +229,7 @@ namespace Orts.Viewer3D
         //a function to find the elevation of a section ,by searching the TDB database
         public static TrVectorSection FindSectionValue(TrackShape shape, Simulator simulator, TrackSection section, int TileX, int TileZ, uint UID)
         {
-            if (section.SectionCurve == null) return null;
+            if (section.SectionCurve == null && !simulator.TRK.Tr_RouteFile.ChangeTrackGauge) return null;
             sv = ev = mv = 0f; dir = 1f;
             var key = (int)(Math.Abs(TileX) + Math.Abs(TileZ));
             if (!simulator.SuperElevation.Sections.ContainsKey(key)) return null;//we do not have the maps of sections on the given tile, will not bother to search
@@ -230,10 +246,14 @@ namespace Orts.Viewer3D
             foreach (var s in tileSections)
             {
                 var sec = simulator.TSectionDat.TrackSections.Get(s.SectionIndex);
-                if (s.WFNameX == TileX && s.WFNameZ == TileZ && s.WorldFileUiD == UID && section.SectionCurve.Radius == sec.SectionCurve.Radius
-                    && section.SectionCurve.Angle == -sec.SectionCurve.Angle)
+                if (s.WFNameX == TileX && s.WFNameZ == TileZ && s.WorldFileUiD == UID)
                 {
-                    return s;
+                    if (section.SectionCurve?.Radius == sec.SectionCurve?.Radius
+                    && section.SectionCurve.Angle == -sec.SectionCurve.Angle ||
+                    section.SectionCurve == null && simulator.TRK.Tr_RouteFile.ChangeTrackGauge && section.SectionSize?.Length == sec.SectionSize?.Length)
+                    {
+                        return s;
+                    }
                 }
             }
             return null;
