@@ -931,6 +931,18 @@ namespace Orts.Simulation.RollingStocks.SubSystems.PowerSupplies
             if (DieselPowerTab != null)
             {
 
+            // Make sure apparent throttle value stays in range between 0 and 100.
+            if (ApparentThrottleSetting < 0)
+            {
+                ApparentThrottleSetting = 0;
+            }
+            else if (ApparentThrottleSetting > 100)
+            {
+                ApparentThrottleSetting = 100.0f;
+            }
+
+            if (DieselPowerTab != null)
+            {
                 CurrentDieselOutputPowerW = (DieselPowerTab[RealRPM] * (1 - locomotive.PowerReduction) <= MaximumDieselPowerW * (1 - locomotive.PowerReduction) ? DieselPowerTab[RealRPM] * (1 - locomotive.PowerReduction) : MaximumDieselPowerW * (1 - locomotive.PowerReduction));
                 CurrentDieselOutputPowerW = CurrentDieselOutputPowerW < 0f ? 0f : CurrentDieselOutputPowerW;
                 // Rail output power will never be the same as the diesel prime mover output power it will always have some level of loss of efficiency

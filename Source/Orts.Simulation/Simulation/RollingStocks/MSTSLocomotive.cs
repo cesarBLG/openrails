@@ -191,10 +191,7 @@ namespace Orts.Simulation.RollingStocks
         public Interpolator SteamHeatPressureToTemperaturePSItoF;
         public Interpolator SteamDensityPSItoLBpFT3;   // saturated steam density given pressure
         public Interpolator SteamHeatPSItoBTUpLB;      // total heat in saturated steam given pressure
-        public float SteamHeatFuelTankCapacityL = 1500.0f; // Capacity of the fuel tank for the steam heating boiler
-        public float SteamHeatBoilerFuelUsageLpH = 31.0f; // Usage rate of fuel for steam heating boiler
-        public float CurrentSteamHeatFuelCapacityL;  // Current fuel level
-        public bool TrainFittedSteamHeat = false;       // Flag to determine train fitted with steam heating
+        public bool IsSteamHeatingBoilerFitted = false;   // Flag to indicate when steam heat boiler van is fitted
         public float CalculatedCarHeaterSteamUsageLBpS;
 
         // Adhesion Debug
@@ -1137,6 +1134,7 @@ namespace Orts.Simulation.RollingStocks
         /// </summary>
         public override void Initialize()
         {
+            
             TrainBrakeController.Initialize();
             EngineBrakeController.Initialize();
             TrainControlSystem.Initialize();
@@ -1144,13 +1142,10 @@ namespace Orts.Simulation.RollingStocks
             if (MaxSteamHeatPressurePSI == 0)       // Check to see if steam heating is fitted to locomotive
             {
                 IsSteamHeatFitted = false;
-                TrainFittedSteamHeat = false;
             }
             else
             {
                 IsSteamHeatFitted = true;
-                TrainFittedSteamHeat = true;
-                CurrentSteamHeatFuelCapacityL = SteamHeatFuelTankCapacityL;
             }
 
             SteamHeatPressureToTemperaturePSItoF = SteamTable.SteamHeatPressureToTemperatureInterpolatorPSItoF();
@@ -4036,6 +4031,34 @@ namespace Orts.Simulation.RollingStocks
                         }
  //                       if (direction == 1 && !(cvc is CVCGauge))
  //                           data = -data;
+                        break;
+                    }
+                    // this considers both the dynamic as well as the train braking
+                case CABViewControlTypes.ORTS_SIGNED_TRACTION_TOTAL_BRAKING:
+                    {
+                        var direction = 0; // Forwards
+                        if (cvc is CVCGauge && ((CVCGauge)cvc).Orientation == 0)
+                            direction = ((CVCGauge)cvc).Direction;
+                        data = 0.0f;
+                        if (Math.Abs(SpeedMpS) == 0.0f)
+                            data = 0.0f;
+                        else if (Math.Abs(FilteredMotiveForceN) - Math.Abs(BrakeForceN + DynamicBrakeForceN) > 0)
+                            data = Math.Abs(this.FilteredMotiveForceN);
+                        else if (Math.Abs(FilteredMotiveForceN) - Math.Abs(BrakeForceN + DynamicBrakeForceN) < 0)
+                            data = -Math.Abs(BrakeForceN + DynamicBrakeForceN);
+                        switch (cvc.Units)
+                        {
+                            case CABViewControlUnits.NEWTONS:
+                                break;
+
+                            case CABViewControlUnits.KILO_NEWTONS:
+                                data = data / 1000.0f;
+                                break;
+
+                            case CABViewControlUnits.KILO_LBS:
+                                data = data / 4448.22162f;
+                                break;
+                        }
                         break;
                     }
                 case CABViewControlTypes.DYNAMIC_BRAKE_FORCE:

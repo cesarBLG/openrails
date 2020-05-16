@@ -326,6 +326,8 @@ namespace Orts.Viewer3D.RollingStock
                     pd.Mark();
             if (_CabRenderer != null)
                 _CabRenderer.Mark();
+            if (ThreeDimentionCabViewer != null && Locomotive.CabView3D != null)
+                ThreeDimentionCabViewer.Mark();
             base.Mark();
         }
 
@@ -2654,7 +2656,8 @@ namespace Orts.Viewer3D.RollingStock
 
         internal override void Mark()
         {
-            // TODO: This is likely wrong; we should mark textures, shapes and other graphical resources here.
+            if (TrainCarShape != null)
+                TrainCarShape.Mark();
         }
     } // Class ThreeDimentionCabViewer
 
