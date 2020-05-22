@@ -139,8 +139,9 @@ namespace Orts.Viewer3D
             {
                 // First to need a track profile creates it
                 Trace.Write(" TRP");
+                viewer.TRP = new TRPFile();
                 // Creates profile and loads materials into SceneryMaterials
-                TRPFile.CreateTrackProfile(viewer, viewer.Simulator.RoutePath, out viewer.TRP);
+                viewer.TRP.CreateTrackProfile(viewer, viewer.Simulator.RoutePath);
             }
 
             // Instantiate classes
@@ -234,7 +235,13 @@ namespace Orts.Viewer3D
     public class TRPFile
     {
         public TrProfile TrackProfile; // Represents the track profile
+        public TrProfile TrackProfileTun; // Track profile for tunnel
         //public RenderProcess RenderProcess; // TODO: Pass this along in function calls
+
+        public TRPFile()
+        {
+
+        }
 
         /// <summary>
         /// Creates a TRPFile instance from a track profile file (XML or STF) or canned.
@@ -243,27 +250,55 @@ namespace Orts.Viewer3D
         /// <param name="viewer">Viewer.</param>
         /// <param name="routePath">Path to route.</param>
         /// <param name="trpFile">TRPFile created (out).</param>
-        public static void CreateTrackProfile(Viewer viewer, string routePath, out TRPFile trpFile)
+        public void CreateTrackProfile(Viewer viewer, string routePath)
         {
             string path = routePath + @"\TrackProfiles";
             //Establish default track profile
             if (Directory.Exists(path) && File.Exists(path + @"\TrProfile.xml"))
             {
                 // XML-style
-                trpFile = new TRPFile(viewer, path + @"\TrProfile.xml");
+                TrackProfile = CreateGenericTrackProfile(viewer, path + @"\TrProfile.xml");
             }
             else if (Directory.Exists(path) && File.Exists(path + @"\TrProfile.stf"))
             {
                 // MSTS-style
-                trpFile = new TRPFile(viewer, path + @"\TrProfile.stf");
+                TrackProfile = CreateGenericTrackProfile(viewer, path + @"\TrProfile.stf");
             }
             else
             {
                 // default
-                trpFile = new TRPFile(viewer, "");
+                TrackProfile = CreateGenericTrackProfile(viewer, "");
             }
             // FOR DEBUGGING: Writes XML file from current TRP
             //TRP.TrackProfile.SaveAsXML(@"C:/Users/Walt/Desktop/TrProfile.xml");
+        }
+
+        /// <summary>
+        /// Creates a TRPFile tunnel instance from a track profile file (XML or STF) or canned.
+        /// (Precedence is XML [.XML], STF [.DAT], default [canned]).
+        /// </summary>
+        /// <param name="viewer">Viewer.</param>
+        /// <param name="routePath">Path to route.</param>
+        /// <param name="trpFile">TRPFile created (out).</param>
+        public void CreateTrackProfileTun(Viewer viewer, string routePath)
+        {
+            string path = routePath + @"\TrackProfiles";
+            //Establish default track profile
+            if (Directory.Exists(path) && File.Exists(path + @"\TrProfileTun.xml"))
+            {
+                // XML-style
+                TrackProfileTun = CreateGenericTrackProfile(viewer, path + @"\TrProfileTun.xml");
+            }
+            else if (Directory.Exists(path) && File.Exists(path + @"\TrProfileTun.stf"))
+            {
+                // MSTS-style
+                TrackProfileTun = CreateGenericTrackProfile(viewer, path + @"\TrProfileTun.stf");
+            }
+            else
+            {
+                // specific tunnel profile missing, using the standard one
+                TrackProfileTun = TrackProfile;
+            }
         }
 
         /// <summary>
@@ -272,19 +307,20 @@ namespace Orts.Viewer3D
         /// </summary>
         /// <param name="viewer">Viewer 3D.</param>
         /// <param name="filespec">Complete filepath string to track profile file.</param>
-        public TRPFile(Viewer viewer, string filespec)
+        public TrProfile CreateGenericTrackProfile(Viewer viewer, string filespec)
         {
+            TrProfile trackProfile = new TrProfile();
             if (filespec == "")
             {
                 // No track profile provided, use default
-                TrackProfile = new TrProfile(viewer);
+                trackProfile = new TrProfile(viewer);
                 Trace.Write("(default)");
-                return;
+                return trackProfile;
             }
             FileInfo fileInfo = new FileInfo(filespec);
             if (!fileInfo.Exists)
             {
-                TrackProfile = new TrProfile(viewer); // Default profile if no file
+                trackProfile = new TrProfile(viewer); // Default profile if no file
                 Trace.Write("(default)");
             }
             else
@@ -300,27 +336,19 @@ namespace Orts.Viewer3D
                             if (stf.SimisSignature != "SIMISA@@@@@@@@@@JINX0p0t______")
                             {
                                 STFException.TraceWarning(stf, "Invalid header - file will not be processed. Using DEFAULT profile.");
-                                TrackProfile = new TrProfile(viewer); // Default profile if no file
+                                trackProfile = new TrProfile(viewer); // Default profile if no file
                             }
                             else
                                 try
                                 {
                                     stf.ParseBlock(new STFReader.TokenProcessor[] {
-                                        new STFReader.TokenProcessor("trprofile", ()=>{ TrackProfile = new TrProfile(viewer, stf); }),
+                                        new STFReader.TokenProcessor("trprofile", ()=>{ trackProfile = new TrProfile(viewer, stf); }),
                                     });
                                 }
                                 catch (Exception e)
                                 {
                                     STFException.TraceWarning(stf, "Track profile STF constructor failed because " + e.Message + ". Using DEFAULT profile.");
-                                    TrackProfile = new TrProfile(viewer); // Default profile if no file
-                                }
-                                finally
-                                {
-                                    if (TrackProfile == null)
-                                    {
-                                        STFException.TraceWarning(stf, "Track profile STF constructor failed. Using DEFAULT profile.");
-                                        TrackProfile = new TrProfile(viewer); // Default profile if no file
-                                    }
+                                    trackProfile = new TrProfile(viewer); // Default profile if no file
                                 }
                         }
                         Trace.Write("(.STF)");
@@ -345,18 +373,19 @@ namespace Orts.Viewer3D
                         // Create an XML reader for the .xml file
                         using (XmlReader reader = XmlReader.Create(filespec, settings))
                         {
-                            TrackProfile = new TrProfile(viewer, reader);
+                            trackProfile = new TrProfile(viewer, reader);
                         }
                         Trace.Write("(.XML)");
                         break;
 
                     default:
                         // File extension not supported; create a default track profile
-                        TrackProfile = new TrProfile(viewer);
+                        trackProfile = new TrProfile(viewer);
                         Trace.Write("(default)");
                         break;
                 }
             }
+            return trackProfile;
         }
 
         // ValidationEventHandler callback function
@@ -432,6 +461,12 @@ namespace Orts.Viewer3D
             /// </summary>
             ChordDisplacement
         }
+
+        /// <summary>
+        /// Empty TrProfile constructor
+        /// </summary>
+        public TrProfile()
+        { }
 
         /// <summary>
         /// TrProfile constructor (default - builds from self-contained data)

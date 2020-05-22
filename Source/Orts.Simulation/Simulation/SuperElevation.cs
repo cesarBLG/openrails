@@ -52,6 +52,15 @@ namespace Orts.Simulation
                     i++;
                     var sec = simulator.TSectionDat.TrackSections.Get(section.SectionIndex);
                     if (sec == null) continue;
+                    if (simulator.TRK.Tr_RouteFile.ChangeTrackGauge)
+                    {
+                        TrackShape sha;
+                        if (simulator.TSectionDat.TrackShapes.TryGetValue(section.ShapeIndex, out sha) && sha.MainRoute != int.MaxValue)
+                            continue;
+                        if ((i == 1 && simulator.TDB.TrackDB.TrackNodes[node.TrPins[0].Link].TrEndNode == true) ||
+                            ( i == count && simulator.TDB.TrackDB.TrackNodes[node.TrPins[1].Link].TrEndNode == true))
+                            continue;
+                    }
                     theCurve = sec.SectionCurve;
                     theStraight = sec.SectionSize;
                     if (sec.SectionSize != null && Math.Abs(sec.SectionSize.Width - simulator.SuperElevationGauge) > 0.2
@@ -97,12 +106,11 @@ namespace Orts.Simulation
                             {
                                 StartCurve = true; CurveDir = 0;
                             }
-                            else
+//                            if (i != count && i != 1)
                             {
-                                var pippo = 1;
+                                Len += theStraight.Length;
+                                SectionList.Add(section);
                             }
-                            Len += theStraight.Length;
-                            SectionList.Add(section);
                         }
                             
                     }
