@@ -183,6 +183,8 @@ namespace ORTS
             checkDoubleWire.Checked = Settings.DoubleWire;
 
             // Simulation tab
+
+            checkSimpleControlPhysics.Checked = Settings.SimpleControlPhysics;
             checkUseAdvancedAdhesion.Checked = Settings.UseAdvancedAdhesion;
             labelAdhesionMovingAverageFilterSize.Enabled = checkUseAdvancedAdhesion.Checked;
             numericAdhesionMovingAverageFilterSize.Enabled = checkUseAdvancedAdhesion.Checked; 
@@ -194,7 +196,6 @@ namespace ORTS
             checkWindResistanceDependent.Checked = Settings.WindResistanceDependent;
             checkOverrideNonElectrifiedRoutes.Checked = Settings.OverrideNonElectrifiedRoutes;
             checkHotStart.Checked = Settings.HotStart;
-            checkSimpleControlPhysics.Checked = Settings.SimpleControlPhysics;
             checkForcedRedAtStationStops.Checked = !Settings.NoForcedRedAtStationStops;
             checkDoorsAITrains.Checked = Settings.OpenDoorsInAITrains;
 
@@ -487,6 +488,7 @@ private async void OptionsForm_Shown(object sender, EventArgs e)
             Settings.DoubleWire = checkDoubleWire.Checked;
 
             // Simulation tab
+            Settings.SimpleControlPhysics = checkSimpleControlPhysics.Checked;
             Settings.UseAdvancedAdhesion = checkUseAdvancedAdhesion.Checked;
             Settings.AdhesionMovingAverageFilterSize = (int)numericAdhesionMovingAverageFilterSize.Value;
             Settings.BreakCouplers = checkBreakCouplers.Checked;
@@ -496,7 +498,6 @@ private async void OptionsForm_Shown(object sender, EventArgs e)
             Settings.WindResistanceDependent = checkWindResistanceDependent.Checked;
             Settings.OverrideNonElectrifiedRoutes = checkOverrideNonElectrifiedRoutes.Checked;
             Settings.HotStart = checkHotStart.Checked;
-            Settings.SimpleControlPhysics = checkSimpleControlPhysics.Checked;
             Settings.NoForcedRedAtStationStops = !checkForcedRedAtStationStops.Checked;
             Settings.OpenDoorsInAITrains = checkDoorsAITrains.Checked;
 

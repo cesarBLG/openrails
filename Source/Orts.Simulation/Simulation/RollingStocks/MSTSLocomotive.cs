@@ -129,6 +129,7 @@ namespace Orts.Simulation.RollingStocks
         public float TractiveForceN = 0f; // Raw tractive force for electric sound variable2
         public float MaxCurrentA = 0;
         public float MaxSpeedMpS = 1e3f;
+        public float UnloadingSpeedMpS;
         public float MainResPressurePSI = 130;
         public bool CompressorIsOn;
         public float AverageForceN;
@@ -174,6 +175,12 @@ namespace Orts.Simulation.RollingStocks
             set { WaterController.CurrentValue = value / MaxTotalCombinedWaterVolumeUKG; }
         }
 
+        public float CurrentLocomotiveSteamHeatBoilerWaterCapacityL
+        {
+            get { return WaterController.CurrentValue * MaximumSteamHeatBoilerWaterTankCapacityL; }
+            set { WaterController.CurrentValue = value / MaximumSteamHeatBoilerWaterTankCapacityL; }
+        }
+        public float RestoredCurrentLocomotiveSteamHeatBoilerWaterCapacityL;
         public float IsTenderRequired = 1.0f;  // Flag indicates that a tender is required for operation of the locomotive. Typically tank locomotives do not require a tender. Assume by default that tender is required.
 
         // Vacuum Reservoir and Exhauster Settings
@@ -712,7 +719,7 @@ namespace Orts.Simulation.RollingStocks
                 case "engine(ortsspeedofmaxcontinuousforce": SpeedOfMaxContinuousForceMpS = stf.ReadFloatBlock(STFReader.UNITS.Speed, null); break;
                 case "engine(dieselenginespeedofmaxtractiveeffort": MSTSSpeedOfMaxContinuousForceMpS = stf.ReadFloatBlock(STFReader.UNITS.Speed, null); break;
                 case "engine(maxvelocity": MaxSpeedMpS = stf.ReadFloatBlock(STFReader.UNITS.Speed, null); break;
-
+                case "engine(ortsunloadingspeed": UnloadingSpeedMpS = stf.ReadFloatBlock(STFReader.UNITS.Speed, null); break;
                 case "engine(type":
                     stf.MustMatch("(");
                     var engineType = stf.ReadString();
@@ -889,6 +896,7 @@ namespace Orts.Simulation.RollingStocks
             MaxForceN = locoCopy.MaxForceN;
             MaxCurrentA = locoCopy.MaxCurrentA;
             MaxSpeedMpS = locoCopy.MaxSpeedMpS;
+            UnloadingSpeedMpS = locoCopy.UnloadingSpeedMpS;
             EngineType = locoCopy.EngineType;
             TractiveForceCurves = locoCopy.TractiveForceCurves;
             MaxContinuousForceN = locoCopy.MaxContinuousForceN;
@@ -1055,7 +1063,7 @@ namespace Orts.Simulation.RollingStocks
             ScoopIsBroken = inf.ReadBoolean();
             IsWaterScoopDown = inf.ReadBoolean();
             CurrentTrackSandBoxCapacityM3 = inf.ReadSingle();
-
+            
             AdhesionFilter.Reset(0.5f);
 
             base.Restore(inf);
@@ -2381,11 +2389,19 @@ namespace Orts.Simulation.RollingStocks
 
                 // Max sure that water level can't exceed maximum tender water level. Assume that water will be vented out of tender if maximum value exceeded. 
                 // If filling from water trough this will be done with force
-                const float NominalExtraWaterVolumeFactor = 1.0001f;
-                CombinedTenderWaterVolumeUKG += L.ToGUK(WaterScoopInputAmountL); // add the amouunt of water added by scoop
-                WaterScoopTotalWaterL += WaterScoopInputAmountL;
-
-                CombinedTenderWaterVolumeUKG = MathHelper.Clamp(CombinedTenderWaterVolumeUKG, 0.0f, MaxTotalCombinedWaterVolumeUKG * NominalExtraWaterVolumeFactor);
+                // The water controller can only be used by one stock item at a time.
+                if (EngineType == EngineTypes.Steam)
+                {
+                    const float NominalExtraWaterVolumeFactor = 1.0001f;
+                    CombinedTenderWaterVolumeUKG += L.ToGUK(WaterScoopInputAmountL); // add the amouunt of water added by scoop
+                    WaterScoopTotalWaterL += WaterScoopInputAmountL;
+                    CombinedTenderWaterVolumeUKG = MathHelper.Clamp(CombinedTenderWaterVolumeUKG, 0.0f, MaxTotalCombinedWaterVolumeUKG * NominalExtraWaterVolumeFactor);
+                }
+                else
+                {
+                    CurrentLocomotiveSteamHeatBoilerWaterCapacityL += WaterScoopInputAmountL; // add water if it is a steam heat boiler
+                    CurrentLocomotiveSteamHeatBoilerWaterCapacityL = MathHelper.Clamp(CurrentLocomotiveSteamHeatBoilerWaterCapacityL, 0.0f, MaximumSteamHeatBoilerWaterTankCapacityL);
+                }
 
                 // Calculate drag force
                 float ScoopDragCoeff = 1.05f;
