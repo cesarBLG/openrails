@@ -52,9 +52,8 @@ function apiTM() {
 			var obj = JSON.parse(hr.responseText);
 			if (obj != null) // Can happen using IEv11
 			{
-                Str = "<table>";
+				Str = "<table>";
 				var endIndexFirst = 0,
-					endIndexSymbol = 0,
 					endIndexTrackLeft = 0,
 					endIndexTrack = 0,
 					endIndexTrackRight = 0,
@@ -63,13 +62,11 @@ function apiTM() {
 					endIndexDist = 0;
 
 				var newDataFirst = "",
-					newDataSymbol = "",
 					newDataTrack = "",
 					newDataLimit = "",
 					newDataSignal = "",
 					newDataDist = "",
 					stringColorFirst = "",
-					stringColorSymbol = "",
 					stringColorTrackLeft = "",
 					stringColorTrack = "",
 					stringColorTrackRight = "",
@@ -77,8 +74,14 @@ function apiTM() {
 					stringColorSignal = "";
 					stringColorDist = "";
 
+				var	autoMode = false;
+
 				// Color codes
 				var codeColor = ['???','??!','?!?','?!!','!??','!!?','!!!','%%%','%$$','%%$','$%$','$$$'];
+
+				//controlMode
+				var modes = ["AUTO_SIGNAL", "AUTO_NODE", "MANUAL", "EXPLORER", "OUT_OF_CONTROL", "INACTIVE", "TURNTABLE", "UNDEFINED"];
+				var controlMode = modes[obj.controlMode];
 
 				// Table title
 				Str += "<tr> <td colspan='9' style='text-align: center'>" + 'Track Monitor' + "</td></tr>";
@@ -87,7 +90,6 @@ function apiTM() {
 				for (var row = 0; row < obj.trackMonitorData.length; ++row) {
 					Str += "<tr>";
 					firstColor = false;
-					symbolColor = false;
 					trackColorLeft = false;
 					trackColor = false;
 					trackColorRight = false;
@@ -100,12 +102,6 @@ function apiTM() {
 						endIndexFirst = obj.trackMonitorData[row].FirstCol.length;
 						newDataFirst = obj.trackMonitorData[row].FirstCol.slice(0, endIndexFirst -3);
 						stringColorFirst = obj.trackMonitorData[row].FirstCol.slice(-3);
-					}
-					// SymbolCol
-					if (obj.trackMonitorData[row].SymbolCol.length > 0) {
-						endIndexSymbol = obj.trackMonitorData[row].SymbolCol.length;
-						newDataSymbol = obj.trackMonitorData[row].SymbolCol.slice(0, endIndexSymbol -3);
-						stringColorSymbol = obj.trackMonitorData[row].SymbolCol.slice(-3);
 					}
 					// TrackColLeft
 					if (obj.trackMonitorData[row].TrackColLeft.length > 0) {
@@ -146,7 +142,6 @@ function apiTM() {
 
 					// detects color
 					if (codeColor.indexOf(stringColorFirst) != -1) { firstColor = true; }
-					if (codeColor.indexOf(stringColorSymbol) != -1) { symbolColor = true; }
 					if (codeColor.indexOf(stringColorTrackLeft) != -1) { trackColorLeft = true; }
 					if (codeColor.indexOf(stringColorTrack) != -1) { trackColor = true; }
 					if (codeColor.indexOf(stringColorTrackRight) != -1) { trackColorRight = true; }
@@ -166,76 +161,47 @@ function apiTM() {
 					else if (obj.trackMonitorData[row].FirstCol == "SprtrDarkGray"){
 						Str += "<td colspan='9' class='separatordarkgray'></td>";
 					}
-					else if (obj.trackMonitorData[row].FirstCol.indexOf("Manual") != -1 || obj.trackMonitorData[row].FirstCol.indexOf("Auto") != -1 ){
+					else if (row == 9 ){
 						Str += "<td colspan='9' align='center' >" + obj.trackMonitorData[row].FirstCol + "</td>";
 					}
 					else{
-						// first col = FirstCol data
-						if(firstColor == true){
-							Str += "<td colspan='2' ColorCode=" + stringColorFirst + ">" + newDataFirst + "</td>";
-						}
-						else{
-							Str += "<td colspan='2'>" + obj.trackMonitorData[row].FirstCol + "</td>";
-						}
-						// second col = SymbolCol data
-						if(symbolColor == true){
-							Str += "<td align='center' ColorCode=" + stringColorSymbol + "><b>" + newDataSymbol + "</b></td>";
-						}
-						else{
-							Str += "<td align='center' ><b>" + obj.trackMonitorData[row].SymbolCol + "</b></td>";
-						}
-						// third col = TrackColLeft data
-						if(trackColorLeft == true){
-							Str += "<td  align='right' ColorCode=" + stringColorTrackLeft + "><b>" + newDataTrackLeft + "</b></td>";
-						}
-						else{
-							Str += "<td align='right' ><b>" + obj.trackMonitorData[row].TrackColLeft + "</b></td>";
-						}
-						// fourth col = TrackCol data
-						if(trackColor == true){
-							Str += "<td  align='center' ColorCode=" + stringColorTrack + "><b>" + newDataTrack + "</b></td>";
-						}
-						else{
-							Str += "<td align='center' ><b>" + obj.trackMonitorData[row].TrackCol + "</b></td>";
-						}
-						// fifth col = TrackColRight data
-						if(trackColorRight == true){
-							Str += "<td  align='left' ColorCode=" + stringColorTrackRight + "><b>" + newDataTrackRight + "</b></td>";
-						}
-						else{
-							Str += "<td align='left' ><b>" + obj.trackMonitorData[row].TrackColRight + "</b></td>";
-						}
-						// sixth col = LimitCol data
 						if (row < 8){
-							alignement = "right";
-							colspanvalue = 2;
+							// first col = FirstCol data
+							DisplayItem('left', 3, firstColor, stringColorFirst, firstColor? newDataFirst : obj.trackMonitorData[row].FirstCol, false);
+							Str += "<td></td>";
+							Str += "<td></td>";
+
+							// third col = TrackCol data
+							DisplayItem('right', 3, trackColor, stringColorTrack, trackColor? newDataTrack : obj.trackMonitorData[row].TrackCol, false);
 						}
 						else{
-							alignement = "left";
-							colspanvalue = 1;
-						}
-						if(limitColor == true){
-							Str += "<td colspan='" + colspanvalue + "' align='" + alignement + "' ColorCode=" + stringColorLimit + ">" + newDataLimit + "</td>";
-						}
-						else if (obj.trackMonitorData[row].LimitCol.indexOf("Limit") != -1) {
-							Str += "<td colspan='" + colspanvalue + "'  align='" + alignement + "' >" + obj.trackMonitorData[row].LimitCol + "</td>";
-						}
-						else{
-							Str += "<td colspan='" + colspanvalue + "'  align='" + alignement + "' >" + obj.trackMonitorData[row].LimitCol + "</td>";
-						}
-						// seventh col = SignalCol data
-						if(signalColor == true){
-							Str += "<td align='center' ColorCode=" + stringColorSignal + ">" + newDataSignal + "</td>";
-						}
-						else{
-							Str += "<td align='center' >" + obj.trackMonitorData[row].SignalCol + "</td>";
-						}
-						// eighth col = DistCol data
-						if(distColor == true){
-							Str += "<td align='right' ColorCode=" + stringColorDist + ">" + newDataDist + "</td>";
-						}
-						else{
-							Str += "<td align='right'>" + obj.trackMonitorData[row].DistCol + "</td>";
+							// first col = FirstCol data
+							DisplayItem(row >25?'center':'left', 1, firstColor, stringColorFirst, firstColor? newDataFirst : obj.trackMonitorData[row].FirstCol, row >25? true: false );
+
+							// second col = TrackColLeft data
+							DisplayItem('right', 1, trackColorLeft, stringColorTrackLeft, trackColorLeft? newDataTrackLeft : obj.trackMonitorData[row].TrackColLeft, false);
+
+							// third col = TrackCol data
+							DisplayItem('center', 2, trackColor, stringColorTrack, trackColor? newDataTrack : obj.trackMonitorData[row].TrackCol, row);
+
+							// fourth col = TrackColRight data
+							DisplayItem('left', 1, trackColorRight, stringColorTrackRight, trackColorRight? newDataTrackRight : obj.trackMonitorData[row].TrackColRight, false);
+
+							// station zone
+							if (row > 25 && controlMode.indexOf("AUTO") != -1){
+								// fifth col = LimitCol data
+								DisplayItem('left', 3, limitColor, stringColorLimit, limitColor? newDataLimit : obj.trackMonitorData[row].LimitCol, true);
+							}
+							else{
+								// fifth col = LimitCol data
+								DisplayItem('left', 1, limitColor, stringColorLimit, limitColor? newDataLimit : obj.trackMonitorData[row].LimitCol, false);
+
+								// sixth col = SignalCol data
+								DisplayItem('center', 1, signalColor, stringColorSignal, signalColor? newDataSignal : obj.trackMonitorData[row].SignalCol, false);
+
+								// seventh col = DistCol data
+								DisplayItem('right', 1, distColor, stringColorDist, distColor? newDataDist:obj.trackMonitorData[row].DistCol, false);
+							}
 						}
 					}
 					Str += "</tr>";
@@ -351,6 +317,10 @@ function apiTM() {
 			}
 		}
 	}
+}
+
+function DisplayItem(alignement, colspanvalue, isColor, colorCode, item, small){
+	Str += "<td align='" + alignement + "' colspan='" + colspanvalue + "' ColorCode=" + (isColor? colorCode : '') + ">"  + (small? item.small() : item) + "</td>";
 }
 
 function changePageColor() {

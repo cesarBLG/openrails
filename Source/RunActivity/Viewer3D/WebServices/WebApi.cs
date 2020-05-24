@@ -186,15 +186,18 @@ namespace Orts.Viewer3D.WebServices
         public class TrackMonitorInfo
         {
             public List<Popups.TrackMonitorWindow.ListLabel> trackMonitorData = new List<Popups.TrackMonitorWindow.ListLabel>();
+            public Train.TRAIN_CONTROL controlMode;// present control mode
         }
 
         public object ApiTrackMonitor(string Parameters)
         {
             List<Popups.TrackMonitorWindow.ListLabel> trackMonitorInfo = Viewer.TrackMonitorWindow.TrackMonitorWebApiData();
+            var trainInfo = Viewer.PlayerTrain.GetTrainInfo();
 
             return new TrackMonitorInfo
             {
                 trackMonitorData = trackMonitorInfo,
+                controlMode = trainInfo.ControlMode
             };
         }
         #endregion
@@ -221,16 +224,20 @@ namespace Orts.Viewer3D.WebServices
         {
             public List<Popups.TrackMonitorWindow.ListLabel> trackMonitorData = new List<Popups.TrackMonitorWindow.ListLabel>();
             public List<Popups.TrainDrivingWindow.ListLabel> trainDrivingData = new List<Popups.TrainDrivingWindow.ListLabel>();
+            public Train.TRAIN_CONTROL controlMode;// present control mode
         }
 
         public object ApiTrackMonitorTrainDriving(string Parameters)
         {
             List<Popups.TrackMonitorWindow.ListLabel> trackMonitorInfo = Viewer.TrackMonitorWindow.TrackMonitorWebApiData();
             List<Popups.TrainDrivingWindow.ListLabel> trainDrivingInfo = Viewer.TrainDrivingWindow.TrainDrivingWebApiData();
+            var trainInfo = Viewer.PlayerTrain.GetTrainInfo();
+
             return new TrackMonitorTrainDrivingInfo
             {
                 trackMonitorData = trackMonitorInfo,
-                trainDrivingData = trainDrivingInfo
+                trainDrivingData = trainDrivingInfo,
+                controlMode = trainInfo.ControlMode
             };
         }
         #endregion

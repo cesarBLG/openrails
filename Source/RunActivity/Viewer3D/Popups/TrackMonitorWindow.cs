@@ -75,8 +75,11 @@ namespace Orts.Viewer3D.Popups
         public bool DataUpdating = false;
         public bool itemLocationWSChanged = false;
         public bool WebServerEnabled = false;
+
         int BottomLabelRow;
+        int BottomMaxDistanceMarker = 0;
         bool itemLocationWSBusy = false;
+        float MaxDistanceMarker = 0.0f;
         int PointBottomRow;
         int PointTopRow;
         int rowOffset;
@@ -85,7 +88,6 @@ namespace Orts.Viewer3D.Popups
         public struct ListLabel
         {
             public string FirstCol { get; set; }
-            public string SymbolCol { get; set; }
             public string TrackColLeft { get; set; }
             public string TrackCol { get; set; }
             public string TrackColRight { get; set; }
@@ -98,7 +100,6 @@ namespace Orts.Viewer3D.Popups
         public struct ListTrackControl
         {
             public string FirstCol { get; set; }
-            public string SymbolCol { get; set; }
             public string TrackColLeft { get; set; }
             public string TrackCol { get; set; }
             public string TrackColRight { get; set; }
@@ -138,7 +139,7 @@ namespace Orts.Viewer3D.Popups
         string stationLeftWS = '\u2590'.ToString() + "$%$"; //▐ RIGHT HALF BLOCK Color.Blue
         string stationRightWS = '\u258C'.ToString() + "$%$";// ▌ LEFT HALF BLOCK Color.Blue
         string trackWS = '\u2502'.ToString() + '\u2502'.ToString();
-        string reversalWS = '\u21B6'.ToString();
+        string reversalWS = '\u21B6'.ToString();// ↶ ANTICLOCKWISE TOP SEMICIRCLE ARROW
         string waitingPointWS = '\u270B'.ToString();// ✋ RAISED HAND
         string forwardArrowWS = '\u25B2'.ToString() + "?!!";  //▲
         string backwardArrowWS = '\u25BC'.ToString() + "?!!"; //▼
@@ -157,8 +158,6 @@ namespace Orts.Viewer3D.Popups
         bool istrackColorRed = false;//Debrief eval
         public static double DbfEvalOverSpeedTimeS = 0;//Debrief eval
         public static double DbfEvalIniOverSpeedTimeS = 0;//Debrief eval
-
-        Train.TrainInfo validInfo;
 
         // position constants
         readonly int additionalInfoHeight = 16; // vertical offset on window for additional out-of-range info at top and bottom
@@ -292,23 +291,34 @@ namespace Orts.Viewer3D.Popups
         {
             DataUpdating = true;
 
+            // Reset webApi data
+            if (WebServerEnabled)
+            {
+                TrackMonitorListLabel.Clear();
+            }
+            TrackControlList.Clear();
+
             // Always get train details to pass on to TrackMonitor.
             var thisInfo = Owner.Viewer.PlayerTrain.GetTrainInfo();
             Monitor.StoreInfo(thisInfo);
 
+            // Speed
             SpeedCurrent.Text = FormatStrings.FormatSpeedDisplay(Math.Abs(thisInfo.speedMpS), Owner.Viewer.MilepostUnitsMetric);
-            InfoToLabel(Viewer.Catalog.GetString("Speed"), "", "", "", "", SpeedCurrent.Text +
+            InfoToLabel(Viewer.Catalog.GetString("Speed"), "", SpeedCurrent.Text +
                 (thisInfo.speedMpS < thisInfo.allowedSpeedMpS - 1.0f ? "!??" :// White
                 thisInfo.speedMpS < thisInfo.allowedSpeedMpS + 0.0f ? "?!!" :// PaleGreen
-                thisInfo.speedMpS < thisInfo.allowedSpeedMpS + 5.0f ? "!!?" : "!!!"), "", "");// Orange : Red, "")
+                thisInfo.speedMpS < thisInfo.allowedSpeedMpS + 5.0f ? "!!?" : "!!!"), "", "", "", "");// Orange : Red, "")
 
+            //Projected
             SpeedProjected.Text = FormatStrings.FormatSpeedDisplay(Math.Abs(thisInfo.projectedSpeedMpS), Owner.Viewer.MilepostUnitsMetric);
-            InfoToLabel(Viewer.Catalog.GetString("Projected"), "", "", "", "", SpeedProjected.Text, "", "");
+            InfoToLabel(Viewer.Catalog.GetString("Projected"), "", SpeedProjected.Text, "", "", "", "");
 
+            //SpeedAllowed
             SpeedAllowed.Text = FormatStrings.FormatSpeedLimit(thisInfo.allowedSpeedMpS, Owner.Viewer.MilepostUnitsMetric);
-            InfoToLabel(Viewer.Catalog.GetString("Limit"), "", "", "", "", SpeedAllowed.Text, "", "");
-            InfoToLabel(Viewer.Catalog.GetString("Sprtr"), "", "", "", "", "", "", "");
+            InfoToLabel(Viewer.Catalog.GetString("Limit"), "", SpeedAllowed.Text, "", "", "", "");
+            InfoToLabel(Viewer.Catalog.GetString("Sprtr"), "", "", "", "", "", "");
 
+            //Control Mode
             var ControlText = ControlModeLabels[thisInfo.ControlMode];
             if (thisInfo.ControlMode == Train.TRAIN_CONTROL.AUTO_NODE)
             {
@@ -320,58 +330,58 @@ namespace Orts.Viewer3D.Popups
             }
             ControlMode.Text = String.Copy(ControlText);
 
+            //Gradient
             if (-thisInfo.currentElevationPercent < -0.00015)
             {
                 var c = '\u2198';
                 Gradient.Text = String.Format("|  {0:F1}%{1} ", -thisInfo.currentElevationPercent, c);
                 Gradient.Color = Color.LightSkyBlue;
-                InfoToLabel(Viewer.Catalog.GetString("Gradient"), "", "", "", "", Gradient.Text.Replace("|", "") + "$$$", "", "");
+                InfoToLabel(Viewer.Catalog.GetString("Gradient"), "", Gradient.Text.Replace("|", "") + "$$$", "", "", "", "");
             }
             else if (-thisInfo.currentElevationPercent > 0.00015)
             {
                 var c = '\u2197';
                 Gradient.Text = String.Format("|  {0:F1}%{1} ", -thisInfo.currentElevationPercent, c);
                 Gradient.Color = Color.Yellow;
-                InfoToLabel(Viewer.Catalog.GetString("Gradient"), "", "", "", "", Gradient.Text.Replace("|", "") + " ???", "", "");
+                InfoToLabel(Viewer.Catalog.GetString("Gradient"), "", Gradient.Text.Replace("|", "") + " ???", "", "", "", "");
             }
             else
             {
                 Gradient.Text = "-";
-                InfoToLabel(Viewer.Catalog.GetString("Gradient"), "", "", "", "", Gradient.Text, "", "");
+                InfoToLabel(Viewer.Catalog.GetString("Gradient"), "", "", "", Gradient.Text, "", "");
             }
-            InfoToLabel(Viewer.Catalog.GetString("Sprtr"), "", "", "", "", "", "", "");
+            InfoToLabel(Viewer.Catalog.GetString("Sprtr"), "", "", "", "", "", "");
 
             // Direction
             var PlayerTrain = Owner.Viewer.PlayerLocomotive.Train;
             var ShowMUReverser = Math.Abs(PlayerTrain.MUReverserPercent) != 100;
-            InfoToLabel(Owner.Viewer.PlayerLocomotive.EngineType == TrainCar.EngineTypes.Steam ? Viewer.Catalog.GetString("Reverser") : Viewer.Catalog.GetString("Direction"), "", "", "", "",
-                (ShowMUReverser ? Math.Abs(PlayerTrain.MUReverserPercent).ToString("0") + "% " : "") + FormatStrings.Catalog.GetParticularString("Reverser", GetStringAttribute.GetPrettyName(Owner.Viewer.PlayerLocomotive.Direction)), "", "");
+            InfoToLabel(Owner.Viewer.PlayerLocomotive.EngineType == TrainCar.EngineTypes.Steam ? Viewer.Catalog.GetString("Reverser") : Viewer.Catalog.GetString("Direction"), "",
+                (ShowMUReverser ? Math.Abs(PlayerTrain.MUReverserPercent).ToString("0") + "% " : "") + FormatStrings.Catalog.GetParticularString("Reverser", GetStringAttribute.GetPrettyName(Owner.Viewer.PlayerLocomotive.Direction)), "", "", "", "");
 
             // Present cab orientation (0=forward, 1=backward)
-            InfoToLabel(Viewer.Catalog.GetString("Cab ORIEN"), "", "", "", "", thisInfo.cabOrientation == 0 ? Viewer.Catalog.GetString("Forward") : Viewer.Catalog.GetString("Backward"), "", "");
+            InfoToLabel(Viewer.Catalog.GetString("Cab ORIEN"), "", thisInfo.cabOrientation == 0 ? Viewer.Catalog.GetString("Forward") : Viewer.Catalog.GetString("Backward"), "", "", "", "");
 
-            //Control Mode
-            InfoToLabel(Viewer.Catalog.GetString("Sprtr"), "", "", "", "", "", "", "");
-            InfoToLabel(ControlText, "", "", "", "", "", "", "");
-            InfoToLabel(Viewer.Catalog.GetString("Sprtr"), "", "", "", "", "", "", "");
+            //Control Mode for webApi
+            InfoToLabel(Viewer.Catalog.GetString("Sprtr"), "", "", "", "", "", "");
+            InfoToLabel(ControlText, "", "", "", "", "", "");
+            InfoToLabel(Viewer.Catalog.GetString("Sprtr"), "", "", "", "", "", "");
 
-            // Text version
+            // TrackMonitor:Control text emulation
             if (WebServerEnabled)
             {
                 bool metric = Owner.Viewer.MilepostUnitsMetric;
                 // track
                 var verticalDraw = '\u2502'; // ▏
                 var Track = verticalDraw.ToString() + verticalDraw.ToString();
-
                 Point offset = new Point(0, 0);
                 if (thisInfo == null)
                 {
                     TMCdrawTrack("", offset, 0f, 1f);
                     return;
                 }
-
                 TMCdrawTrack("", offset, thisInfo.speedMpS, thisInfo.allowedSpeedMpS);
 
+                // Simulator mode
                 if (Orts.MultiPlayer.MPManager.IsMultiPlayer())
                 {
                     TMCdrawMPInfo("", offset);
@@ -389,21 +399,23 @@ namespace Orts.Viewer3D.Popups
                 // OwnTrain row position
                 rowOffset = (Orts.MultiPlayer.MPManager.IsMultiPlayer() ? 1 : 2);
 
-                InfoToLabel(Viewer.Catalog.GetString("Milepost"), "", "", "", "", Viewer.Catalog.GetString("Limit"), "", Viewer.Catalog.GetString("Dist"));
-                InfoToLabel(Viewer.Catalog.GetString("Sprtr"), "", "", "", "", "", "", "");
+                //Milepost Limit Dist
+                InfoToLabel(Viewer.Catalog.GetString("Milepost"), "", "", "", Viewer.Catalog.GetString("Limit"), "", Viewer.Catalog.GetString("Dist"));
+                InfoToLabel(Viewer.Catalog.GetString("Sprtr"), "", "", "", "", "", "");
 
+                //Track color
                 var absoluteSpeedMpS = Math.Abs(thisInfo.speedMpS);
-
                 Track = Track + (absoluteSpeedMpS < thisInfo.allowedSpeedMpS - 1.0f ? "??!" : // Green
                 absoluteSpeedMpS < thisInfo.allowedSpeedMpS + 0.0f ? "?!!" : // PaleGreen
                 absoluteSpeedMpS < thisInfo.allowedSpeedMpS + 5.0f ? "!!?" : "!!!"); // Orange : Red
 
+                //Update data to webApi
                 if (TrackControlList.Count > 0)
                 {
                     var item = 0;
                     foreach (var data in TrackControlList)
                     {
-                        InfoToLabel(data.FirstCol, data.SymbolCol, data.TrackColLeft, data.TrackCol, data.TrackColRight, data.LimitCol, data.SignalCol, data.DistCol);
+                        InfoToLabel(data.FirstCol, data.TrackColLeft, data.TrackCol, data.TrackColRight, data.LimitCol, data.SignalCol, data.DistCol);
 
                         item += 1;
                     }
@@ -416,10 +428,11 @@ namespace Orts.Viewer3D.Popups
         {
             base.PrepareFrame(elapsedTime, updateFull);
 
+            var TDWUpdating = Owner.Viewer.TrainDrivingWindow.TrainDrivingUpdating;
+
             // Update text fields on full update only.
-            if (updateFull && !DataUpdating)
-            {   //Reset data for WebsAPI
-                TrackMonitorListLabel.Clear();
+            if (updateFull && !DataUpdating && !TDWUpdating)// Avoid updating data when others are doing it
+            {
                 UpdateData();
             }
         }
@@ -431,12 +444,10 @@ namespace Orts.Viewer3D.Popups
         // ==========================================================================================================================================
         public List<ListLabel> TrackMonitorWebApiData()
         {
-            //var TDWUpdating = Owner.Viewer.TrainDrivingWindow.TrainDrivingUpdating;
+            var TDWUpdating = Owner.Viewer.TrainDrivingWindow.TrainDrivingUpdating;
 
-            if (!DataUpdating)// Avoids refresh when data are updated by other
+            if (!DataUpdating && !TDWUpdating)// Avoid updating data when others are doing it
             {
-                TrackMonitorListLabel.Clear();
-                TrackControlList.Clear();
                 UpdateData();
             }
             return TrackMonitorListLabel.ToList(); // try to avoid crash in the JsonConvert.SerializeObject
@@ -457,7 +468,7 @@ namespace Orts.Viewer3D.Popups
 
         // Text version - WebApi
         /// <summary>
-        /// Translate itemLocation graphic value to equivalent row text value
+        /// Translate itemLocation graphic value to equivalent row text position
         /// </summary>
         /// <param name="zeroPoint"></param>
         /// <param name="itemLocation"></param>
@@ -505,13 +516,19 @@ namespace Orts.Viewer3D.Popups
                 return;
             }
 
-            var Condition = DataColOver.SignalCol.Length > 1 || DataColOver.LimitCol.Length > 1 || DataColOver.TrackColLeft.Length > 1 || DataColOver.TrackColRight.Length > 1 || (!DataColOver.TrackCol.Contains('\u2502'.ToString()) && itemLocationWS <= BottomLabelRow);
-
-            if (Condition)
+            if (itemLocationWS <= BottomLabelRow
+                && DataColOver.TrackCol != SymbolItemOne
+                && ((DataColOver.FirstCol.Length > 1 && itemLocationWS != PointTopRow)
+                || DataColOver.TrackColLeft.Length > 1
+                || DataColOver.TrackColRight.Length > 1
+                || DataColOver.SignalCol.Length > 1
+                || DataColOver.LimitCol.Length > 1
+                || (!DataColOver.TrackCol.Contains('\u2502'.ToString())
+                )))
             {
-                // Further to the train
                 ListTrackControl DataColTemp = TrackControlList[itemLocationWS];
                 var n = itemLocationWS;
+
                 if (BottomLabelRow > 11)
                 {
                     for (n = itemLocationWS; n < BottomLabelRow; n++)
@@ -523,7 +540,7 @@ namespace Orts.Viewer3D.Popups
                             TrackControlList[n + 1] = DataColTemp;
                             break;
                         }
-                        else if (DataColTemp.LimitCol.Length < 2 && DataColTemp.SignalCol.Length < 2 && DataColTemp.TrackColLeft.ToString().Length < 2 && DataColTemp.TrackColRight.ToString().Length < 2 && DataColTemp.SymbolCol.Length < 2 && DataColTemp.TrackCol.Contains('\u2502'.ToString()))
+                        else if (EmptyRowItems(n))
                         {
                             break;
                         }
@@ -540,14 +557,14 @@ namespace Orts.Viewer3D.Popups
                             TrackControlList[n - 1] = DataColTemp;
                             break;
                         }
-                        else if (DataColTemp.LimitCol.Length < 2 && DataColTemp.SignalCol.Length < 2 && DataColTemp.TrackColLeft.ToString().Length < 2 && DataColTemp.TrackColRight.ToString().Length < 2 && DataColTemp.SymbolCol.Length < 2 && DataColTemp.TrackCol.Contains('\u2502'.ToString()))
+                        else if (EmptyRowItems(n))
                         {
                             break;
                         }
                     }
                 }
 
-                if (n == 0 && (itemLocationWSBusy || Condition))
+                if (n == 0)
                 {
                     return;
                 }
@@ -556,38 +573,8 @@ namespace Orts.Viewer3D.Popups
                 {
                     DataColTemp.TrackCol = SymbolItemOne;
                 }
-                else if (thisItem.ItemType == Train.TrainObjectItem.TRAINOBJECTTYPE.SIGNAL)
-                {
-                    DataColTemp.TrackColLeft = DataColOver.DistanceToTrainM < thisItem.DistanceToTrainM ? "" : DataColTemp.TrackColLeft;
-                    DataColTemp.TrackColRight = DataColOver.DistanceToTrainM < thisItem.DistanceToTrainM ? "" : DataColTemp.TrackColRight;
-                    DataColTemp.SignalCol = SymbolItemOne;
-                    DataColTemp.LimitCol = SymbolItemTwo.Length > 1 ? SymbolItemTwo : "";
-
-                }
-                else if (thisItem.ItemType == Train.TrainObjectItem.TRAINOBJECTTYPE.SPEEDPOST)
-                {
-                    DataColTemp.LimitCol = SymbolItemOne;
-                    DataColTemp.TrackColLeft = DataColOver.DistanceToTrainM < thisItem.DistanceToTrainM ? "" : DataColTemp.TrackColLeft;
-                    DataColTemp.TrackColRight = DataColOver.DistanceToTrainM < thisItem.DistanceToTrainM ? "" : DataColTemp.TrackColRight;
-
-                }
-                else if (thisItem.ItemType == Train.TrainObjectItem.TRAINOBJECTTYPE.STATION)
-                {
-                    //OK
-                    DataColTemp.TrackColLeft = SymbolItemOne;
-                    DataColTemp.TrackColRight = SymbolItemTwo;
-                }
-                else if (thisItem.ItemType == Train.TrainObjectItem.TRAINOBJECTTYPE.WAITING_POINT)
-                {
-                    DataColTemp.TrackCol = SymbolItemOne;
-                }
-                else if (thisItem.ItemType == Train.TrainObjectItem.TRAINOBJECTTYPE.MILEPOST)
-                {
-                    DataColTemp.FirstCol = SymbolItemOne;
-                }
                 else if (thisItem.ItemType == Train.TrainObjectItem.TRAINOBJECTTYPE.FACING_SWITCH)
-                {
-                    // See TOP
+                {   // See TOP
                     itemLocationWSBusy = n == 0 ? true : false;
                     if (!itemLocationWSBusy)
                     {
@@ -602,59 +589,71 @@ namespace Orts.Viewer3D.Popups
                     DataColTemp.LimitCol = DataColOver.Row == n && DataColOver.DistanceToTrainM < thisItem.DistanceToTrainM ? DataColOver.LimitCol : "";
                     DataColTemp.SignalCol = DataColOver.Row == n && DataColOver.DistanceToTrainM < thisItem.DistanceToTrainM ? DataColOver.SignalCol : "";
                 }
+                else if (thisItem.ItemType == Train.TrainObjectItem.TRAINOBJECTTYPE.MILEPOST)
+                {
+                    DataColTemp.FirstCol = SymbolItemOne;
+                }
                 else if (thisItem.ItemType == Train.TrainObjectItem.TRAINOBJECTTYPE.REVERSAL)
+                {
+                    DataColTemp.TrackCol = SymbolItemOne;
+                }
+                else if (thisItem.ItemType == Train.TrainObjectItem.TRAINOBJECTTYPE.SIGNAL)
+                {
+                    DataColTemp.TrackColLeft = DataColOver.DistanceToTrainM < thisItem.DistanceToTrainM ? "" : DataColTemp.TrackColLeft;
+                    DataColTemp.TrackColRight = DataColOver.DistanceToTrainM < thisItem.DistanceToTrainM ? "" : DataColTemp.TrackColRight;
+                    DataColTemp.SignalCol = SymbolItemOne;
+                    DataColTemp.LimitCol = SymbolItemTwo.Length > 1 ? SymbolItemTwo : "";
+                }
+                else if (thisItem.ItemType == Train.TrainObjectItem.TRAINOBJECTTYPE.SPEEDPOST)
+                {
+                    DataColTemp.LimitCol = SymbolItemOne;
+                    DataColTemp.TrackColLeft = DataColOver.DistanceToTrainM < thisItem.DistanceToTrainM ? "" : DataColTemp.TrackColLeft;
+                    DataColTemp.TrackColRight = DataColOver.DistanceToTrainM < thisItem.DistanceToTrainM ? "" : DataColTemp.TrackColRight;
+                }
+                else if (thisItem.ItemType == Train.TrainObjectItem.TRAINOBJECTTYPE.STATION)
+                {
+                    DataColTemp.TrackColLeft = SymbolItemOne;
+                    DataColTemp.TrackColRight = SymbolItemTwo;
+                }
+                else if (thisItem.ItemType == Train.TrainObjectItem.TRAINOBJECTTYPE.WAITING_POINT)
                 {
                     DataColTemp.TrackCol = SymbolItemOne;
                 }
 
                 DataColTemp.DistanceToTrainM = thisItem.DistanceToTrainM;
 
-                if (n == 1)
+                if (n < BottomMaxDistanceMarker && thisItem.DistanceToTrainM < MaxDistanceMarker)
                 {
-                    DataColTemp.DistCol = FormatStrings.FormatDistanceDisplay(thisItem.DistanceToTrainM, metric);
+                    ListTrackControl DataTemp = TrackControlList[BottomMaxDistanceMarker];
+                    DataTemp.DistCol = "";
+                    TrackControlList[BottomMaxDistanceMarker] = DataTemp;
                 }
                 else if (!firstLabelShown && (n == PointTopRow || n == PointBottomRow))
                 {
                     DataColTemp.DistCol = FormatStrings.FormatDistanceDisplay(thisItem.DistanceToTrainM, metric);
                 }
-                else if (DataCol.TrackColRight.Contains('\u258C'.ToString()) && TopLabelRow <= n)
+                else if (DataCol.TrackColRight.Contains('\u258C'.ToString()) && TopLabelRow < n)
                 {
                     DataColTemp.DistCol = FormatStrings.FormatDistanceDisplay(thisItem.DistanceToTrainM, metric);
                 }
                 else
-                {
-                    DataColTemp.DistCol = "";
+                {  // Erases distanceMarker when overlapping
+                    DataColTemp.DistCol = TopLabelRow > n ? ""
+                        : !firstLabelShown && TopLabelRow < n && DataColTemp.TrackColLeft != stationLeftWS ? FormatStrings.FormatDistanceDisplay(thisItem.DistanceToTrainM, metric)
+                        : DataColTemp.DistCol;
                 }
 
                 DataColTemp.Row = n;
-
                 TrackControlList[n] = DataColTemp;
+
                 itemLocationWSChanged = true;// Row value less than the initial ItemLocationWS value.
             }
             else
             {
-                if (thisItem.ItemType == Train.TrainObjectItem.TRAINOBJECTTYPE.AUTHORITY || thisItem.ItemType == Train.TrainObjectItem.TRAINOBJECTTYPE.REVERSAL)
+                if (thisItem.ItemType == Train.TrainObjectItem.TRAINOBJECTTYPE.AUTHORITY
+                    || thisItem.ItemType == Train.TrainObjectItem.TRAINOBJECTTYPE.REVERSAL)
                 {
                     DataColOver.TrackCol = SymbolItemOne;
-                }
-                else if (thisItem.ItemType == Train.TrainObjectItem.TRAINOBJECTTYPE.SPEEDPOST)
-                {
-                    DataColOver.LimitCol = SymbolItemOne;
-                }
-                else if (thisItem.ItemType == Train.TrainObjectItem.TRAINOBJECTTYPE.STATION)
-                {
-                    //OK
-                    DataColOver.TrackColLeft = SymbolItemOne;
-                    DataColOver.TrackColRight = SymbolItemTwo;
-                }
-                else if (thisItem.ItemType == Train.TrainObjectItem.TRAINOBJECTTYPE.SIGNAL)
-                {
-                    DataColOver.TrackColLeft = DataColOver.DistanceToTrainM < thisItem.DistanceToTrainM ? "" : DataColOver.TrackColLeft;
-                    DataColOver.TrackColRight = DataColOver.DistanceToTrainM < thisItem.DistanceToTrainM ? "" : DataColOver.TrackColRight;
-
-                    //OK
-                    DataColOver.SignalCol = SymbolItemOne;
-                    DataColOver.LimitCol = SymbolItemTwo;
                 }
                 else if (thisItem.ItemType == Train.TrainObjectItem.TRAINOBJECTTYPE.FACING_SWITCH)
                 {
@@ -667,20 +666,54 @@ namespace Orts.Viewer3D.Popups
                         DataColOver.TrackColLeft = SymbolItemOne;
                     }
                 }
+                else if (thisItem.ItemType == Train.TrainObjectItem.TRAINOBJECTTYPE.MILEPOST)
+                {
+                    DataColOver.FirstCol = SymbolItemOne;
+                }
+                else if (thisItem.ItemType == Train.TrainObjectItem.TRAINOBJECTTYPE.SIGNAL)
+                {
+                    DataColOver.TrackColLeft = DataColOver.DistanceToTrainM < thisItem.DistanceToTrainM ? "" : DataColOver.TrackColLeft;
+                    DataColOver.TrackColRight = DataColOver.DistanceToTrainM < thisItem.DistanceToTrainM ? "" : DataColOver.TrackColRight;
+
+                    //OK
+                    DataColOver.SignalCol = SymbolItemOne;
+                    DataColOver.LimitCol = SymbolItemTwo;
+                }
+                else if (thisItem.ItemType == Train.TrainObjectItem.TRAINOBJECTTYPE.SPEEDPOST)
+                {
+                    DataColOver.LimitCol = SymbolItemOne;
+                }
+                else if (thisItem.ItemType == Train.TrainObjectItem.TRAINOBJECTTYPE.STATION)
+                {
+                    DataColOver.TrackColLeft = SymbolItemOne;
+                    DataColOver.TrackColRight = SymbolItemTwo;
+                }
+                else if (thisItem.ItemType == Train.TrainObjectItem.TRAINOBJECTTYPE.WAITING_POINT)
+                {
+                    DataColOver.TrackCol = SymbolItemOne;
+                }
                 DataColOver.DistanceToTrainM = thisItem.DistanceToTrainM;
-                DataColOver.DistCol = itemLocationWS == PointTopRow || itemLocationWS == PointBottomRow ? FormatStrings.FormatDistanceDisplay(thisItem.DistanceToTrainM, metric) : DataColOver.DistCol;
+                DataColOver.DistCol = !firstLabelShown && thisItem.ItemType != Train.TrainObjectItem.TRAINOBJECTTYPE.MILEPOST && (itemLocationWS == PointTopRow || itemLocationWS == PointBottomRow) ? FormatStrings.FormatDistanceDisplay(thisItem.DistanceToTrainM, metric) : DataColOver.DistCol;
                 DataColOver.Row = itemLocationWS;
 
                 TrackControlList[itemLocationWS] = DataColOver;
                 DataCol = DataColOver;
+
                 itemLocationWSChanged = false;
             }
         }
 
-        public void InfoToLabel(string firstcol, string symbolcol, string trackcolleft, string trackcol, string trackcolright, string limitcol, string signalcol, string distcol)
+        private bool EmptyRowItems(int currentrow)
+        {
+            ListTrackControl DataColTemp = TrackControlList[currentrow];
+            // Check if some items are empty
+            var RowEmpty = DataColTemp.FirstCol.Length < 2 && DataColTemp.TrackColLeft.ToString().Length < 2 && DataColTemp.TrackCol.Contains('\u2502'.ToString()) && DataColTemp.TrackColRight.ToString().Length < 2 && DataColTemp.LimitCol.Length < 2 && DataColTemp.SignalCol.Length < 2;
+            return RowEmpty;
+        }
+
+        public void InfoToLabel(string firstcol, string trackcolleft, string trackcol, string trackcolright, string limitcol, string signalcol, string distcol)
         {
             firstcol = firstcol == null || firstcol == "" ? " " : firstcol;
-            symbolcol = symbolcol == null || symbolcol == "" ? " " : symbolcol;
             trackcolleft = trackcolleft == null || trackcolleft == "" ? " " : trackcolleft;
             trackcol = trackcol == null || trackcol == "" ? " " : trackcol;
             trackcolright = trackcolright == null || trackcolright == "" ? " " : trackcolright;
@@ -691,7 +724,6 @@ namespace Orts.Viewer3D.Popups
             TrackMonitorListLabel.Add(new ListLabel
             {
                 FirstCol = firstcol,
-                SymbolCol = symbolcol,
                 TrackColLeft = trackcolleft,
                 TrackCol = trackcol,
                 TrackColRight = trackcolright,
@@ -757,7 +789,6 @@ namespace Orts.Viewer3D.Popups
                         TrackControlList.Add(new ListTrackControl()
                         {
                             FirstCol = "",
-                            SymbolCol = "",
                             TrackColLeft = " ",
                             TrackCol = trackWS + trackColor,
                             TrackColRight = "",
@@ -804,7 +835,6 @@ namespace Orts.Viewer3D.Popups
                 //lineColor = Color.Red;
                 DataCol.FirstCol = Viewer.Catalog.GetString("SprtrRed");
             }
-            DataCol.SymbolCol = "";
             DataCol.TrackColLeft = "";
             DataCol.TrackCol = "";
             DataCol.TrackColRight = "";
@@ -933,7 +963,6 @@ namespace Orts.Viewer3D.Popups
             // Points to current row
             DataCol = TrackControlList[itemLocationWS];
             DataCol.FirstCol = Viewer.Catalog.GetString("SprtrDarkGray");
-            DataCol.SymbolCol = "";
             DataCol.TrackColLeft = "";
             DataCol.TrackCol = "";
             DataCol.TrackColRight = "";
@@ -950,7 +979,6 @@ namespace Orts.Viewer3D.Popups
             // Reset SignalCol value
             DataCol = TrackControlList[itemLocationWS];
             DataCol.FirstCol = Viewer.Catalog.GetString("SprtrDarkGray");
-            DataCol.SymbolCol = "";
             DataCol.TrackColLeft = "";
             DataCol.TrackCol = "";
             DataCol.TrackColRight = "";
@@ -1018,7 +1046,7 @@ namespace Orts.Viewer3D.Popups
             var itemLocationWS = itemLocationToRow(position, position) + rowOffset;
 
             DataCol = TrackControlList[itemLocationWS];
-            DataCol.SymbolCol = arrowDirection;
+            DataCol.TrackColLeft = arrowDirection;
             TrackControlList[itemLocationWS] = DataCol;
             //spriteBatch.Draw(TrackMonitorImages, new Rectangle(offset.X + arrowPosition[0], offset.Y + position, arrowPosition[3], arrowPosition[4]), sprite, Color.White);
         }
@@ -1079,6 +1107,11 @@ namespace Orts.Viewer3D.Popups
                     if (ipos == 1)
                     {
                         TopLabelRow = itemLocationWS;
+                    }
+                    else if (ipos == numberOfMarkers)
+                    {   // Useful when overlapping
+                        BottomMaxDistanceMarker = itemLocationWS;
+                        MaxDistanceMarker = actDistanceM;
                     }
 
                     DataCol = TrackControlList[itemLocationWS];
@@ -1278,19 +1311,22 @@ namespace Orts.Viewer3D.Popups
                 // Avoids overlapping
                 Overlapping(itemLocationWS, DataCol, thisItem, SignalStateItem, speedString, firstLabelShown);
 
-                if ((itemOffset < firstLabelPosition && !firstLabelShown && !itemLocationWSChanged && itemLocationWS > TopLabelRow) || thisItem.DistanceToTrainM > maxDisplayDistance)
+                if ((itemOffset < firstLabelPosition && !firstLabelShown && itemLocationWS > TopLabelRow) || thisItem.DistanceToTrainM > maxDisplayDistance)
                 {
-                    var labelPoint = new Point(offset.X + distanceTextOffset, offset.Y + itemLocation + textOffset[forward ? 0 : 1]);
-                    var distanceString = FormatStrings.FormatDistanceDisplay(thisItem.DistanceToTrainM, metric);
-                    //Font.Draw(spriteBatch, labelPoint, distanceString, Color.White);
-                    firstLabelShown = true;
+                    if (!itemLocationWSChanged)
+                    {
+                        var labelPoint = new Point(offset.X + distanceTextOffset, offset.Y + itemLocation + textOffset[forward ? 0 : 1]);
+                        var distanceString = FormatStrings.FormatDistanceDisplay(thisItem.DistanceToTrainM, metric);
+                        //Font.Draw(spriteBatch, labelPoint, distanceString, Color.White);
 
-                    DataCol.DistanceToTrainM = thisItem.DistanceToTrainM;
-                    DataCol.DistCol = distanceString;
-                    DataCol.LimitCol = speedString;
-                    DataCol.Row = itemLocationWS;
-                    DataCol.SignalCol = SignalStateItem;
-                    TrackControlList[itemLocationWS] = DataCol;
+                        DataCol.DistanceToTrainM = thisItem.DistanceToTrainM;
+                        DataCol.DistCol = distanceString;
+                        DataCol.LimitCol = speedString;
+                        DataCol.Row = itemLocationWS;
+                        DataCol.SignalCol = SignalStateItem;
+                        TrackControlList[itemLocationWS] = DataCol;
+                    }
+                    firstLabelShown = true;
                 }
             }
             return newLabelPosition;
@@ -1381,16 +1417,19 @@ namespace Orts.Viewer3D.Popups
 
                 if (itemOffset < firstLabelPosition && !firstLabelShown && itemLocationWS > TopLabelRow)
                 {
-                    labelPoint = new Point(offset.X + distanceTextOffset, offset.Y + newLabelPosition + textOffset[forward ? 0 : 1]);
-                    var distanceString = FormatStrings.FormatDistanceDisplay(thisItem.DistanceToTrainM, metric);
-                    //Font.Draw(spriteBatch, labelPoint, distanceString, Color.White);
-                    firstLabelShown = true;
+                    if (!itemLocationWSChanged)
+                    {
+                        labelPoint = new Point(offset.X + distanceTextOffset, offset.Y + newLabelPosition + textOffset[forward ? 0 : 1]);
+                        var distanceString = FormatStrings.FormatDistanceDisplay(thisItem.DistanceToTrainM, metric);
+                        //Font.Draw(spriteBatch, labelPoint, distanceString, Color.White);
 
-                    DataCol.DistanceToTrainM = thisItem.DistanceToTrainM;
-                    DataCol.DistCol = distanceString;
-                    DataCol.LimitCol = speedString;
-                    DataCol.Row = itemLocationWS;
-                    TrackControlList[itemLocationWS] = DataCol;
+                        DataCol.DistanceToTrainM = thisItem.DistanceToTrainM;
+                        DataCol.DistCol = distanceString;
+                        DataCol.LimitCol = speedString;
+                        DataCol.Row = itemLocationWS;
+                        TrackControlList[itemLocationWS] = DataCol;
+                    }
+                    firstLabelShown = true;
                 }
             }
             return newLabelPosition;
@@ -1399,29 +1438,43 @@ namespace Orts.Viewer3D.Popups
         // draw station stop information
         int TMCdrawStation(string a, Point offset, int startObjectArea, int endObjectArea, int zeroPoint, float maxDistance, float distanceFactor, float firstLabelDistance, bool forward, int lastLabelPosition, Train.TrainObjectItem thisItem)
         {
-            // activity information
             var CurrentTime = FormatStrings.FormatTime(Owner.Viewer.Simulator.ClockTime);
-            Train playerTrain = Owner.Viewer.Simulator.PlayerLocomotive.Train;
-            Simulation.Activity act = Owner.Viewer.Simulator.ActivityRun;
-            Simulation.ActivityTaskPassengerStopAt Current = null;
-            Simulation.ActivityTaskPassengerStopAt at = null;
-            if (act != null && playerTrain == Owner.Viewer.Simulator.OriginalPlayerTrain)
-            {
-                Current = act.Current == null ? act.Last as Simulation.ActivityTaskPassengerStopAt : act.Current as Simulation.ActivityTaskPassengerStopAt;
-                at = Current != null ? Current.PrevTask as Simulation.ActivityTaskPassengerStopAt : null;
-            }
-
-            // Train name
             var StationPlatform = "";
-            at = Current;
-            if (at != null)
+            var StationCurrentDepartScheduled = "";
+            var MessageText = "";
+            var MessageColor = Color.White;
+
+            Train playerTrain = Owner.Viewer.Simulator.PlayerLocomotive.Train;
+            Simulation.ActivityTaskPassengerStopAt atask = null;
+
+            Simulation.Timetables.TTTrain playerTimetableTrain = playerTrain as Simulation.Timetables.TTTrain;
+            if (playerTimetableTrain != null && playerTimetableTrain.TrainType == Train.TRAINTYPE.PLAYER && playerTimetableTrain.StationStops[0].ActualStopType == Train.StationStop.STOPTYPE.STATION_STOP)
             {
-                StationPlatform = at.PlatformEnd1.ItemName;
+                StationPlatform = playerTimetableTrain.StationStops[0].PlatformItem.Name;
+                StationCurrentDepartScheduled = playerTimetableTrain.StationStops[0].departureDT.ToString("HH:mm:ss");
+                MessageText = playerTimetableTrain.DisplayMessage;
+                MessageColor = playerTimetableTrain.DisplayColor;
+            }
+            else
+            {
+                Simulation.Activity act = Owner.Viewer.Simulator.ActivityRun;
+                Simulation.ActivityTaskPassengerStopAt Current = null;
+                if (act != null && playerTrain == Owner.Viewer.Simulator.OriginalPlayerTrain)
+                {
+                    Current = act.Current == null ? act.Last as Simulation.ActivityTaskPassengerStopAt : act.Current as Simulation.ActivityTaskPassengerStopAt;
+                    atask = Current != null ? Current.PrevTask as Simulation.ActivityTaskPassengerStopAt : null;
+                }
+                atask = Current;
+                if (atask != null)
+                {
+                    StationPlatform = atask.PlatformEnd1.ItemName;
+                }
             }
 
-            var displayItem = stationSprite;
+            //var displayItem = stationSprite;
             var newLabelPosition = lastLabelPosition;
-            var itemOffset = Convert.ToInt32(thisItem.DistanceToTrainM * distanceFactor);
+            var itemOffset = Convert.ToInt32((thisItem.DistanceToTrainM - thisItem.StationPlatformLength) * distanceFactor);
+
             var itemLocation = forward ? zeroPoint - itemOffset : zeroPoint + itemOffset;
 
             // Translate itemLocation value to row value
@@ -1444,27 +1497,42 @@ namespace Orts.Viewer3D.Popups
                 //var markerPlacement = new Rectangle(offset.X + stationPosition[0], offset.Y + itemLocation + stationPosition[forward ? 1 : 2], stationPosition[3], startOfPlatform);
                 //spriteBatch.Draw(TrackMonitorImages, markerPlacement, displayItem, Color.White);
 
-                var distanceString = FormatStrings.FormatDistanceDisplay(thisItem.DistanceToTrainM, metric);
-
                 // Update info
+                DataCol.DistanceToTrainM = thisItem.DistanceToTrainM;
                 DataCol.TrackColLeft = stationLeftWS;
                 DataCol.TrackColRight = stationRightWS;
-                DataCol.DistCol = thisItem.DistanceToTrainM <= 0 ? " " : distanceString;
-                DataCol.DistanceToTrainM = thisItem.DistanceToTrainM;
 
                 if (itemLocationWS == (zeroPoint == 108 ? 6 : 11))
                 {
-                    if (thisInfo.speedMpS > 0 && at != null && at.DisplayMessage.Length == 0)
-                    {
-                        DataCol.TrackColLeft = stationLeftWS;
-                        DataCol.TrackColRight = stationRightWS;
+                    DataCol.DistCol = "";// Station does not show the distance
 
+                    if (thisInfo.speedMpS > 0 && ((atask != null && atask.DisplayMessage.Length == 0) || (MessageText != null && MessageText.Length == 0)))
+                    {
                         ListTrackControl DataColTemp = TrackControlList[itemLocationWS + rowOffset];
-                        DataColTemp.TrackColLeft = DataCol.TrackColLeft;
-                        DataColTemp.TrackColRight = DataCol.TrackColRight;
-                        TrackControlList[itemLocationWS + rowOffset] = DataColTemp;
+                        if (thisItem.DistanceToTrainM < thisItem.StationPlatformLength)
+                        {   // draw station symbol when inside station platform
+                            DataColTemp.TrackColLeft = DataCol.TrackColLeft;
+                            DataColTemp.TrackColRight = DataCol.TrackColRight;
+                            TrackControlList[itemLocationWS + rowOffset] = DataColTemp;
+                        }
+
+                        if (thisItem.DistanceToTrainM > 0)
+                        {   // arriving at station
+                            DataCol.TrackColLeft = stationLeftWS;
+                            DataCol.TrackColRight = stationRightWS;
+                        }
+                        else
+                        {   // missing the station
+                            DataCol.TrackColLeft = "";
+                            DataCol.TrackColRight = "";
+
+                            DataColTemp = TrackControlList[itemLocationWS + rowOffset + 1];
+                            DataColTemp.TrackColLeft = DataColTemp.TrackColLeft + stationLeftWS;
+                            DataColTemp.TrackColRight = stationRightWS;
+                            TrackControlList[itemLocationWS + rowOffset + 1] = DataColTemp;
+                        }
                     }
-                    else if (thisInfo.speedMpS < 1)
+                    else if (thisInfo.speedMpS < 1 && thisItem.DistanceToTrainM < thisItem.StationPlatformLength)
                     {
                         // Further to the train
                         ListTrackControl DataColTemp = TrackControlList[itemLocationWS > 0 ? itemLocationWS - 1 : 0];
@@ -1472,28 +1540,79 @@ namespace Orts.Viewer3D.Popups
                         DataColTemp.DistanceToTrainM = DataCol.DistanceToTrainM;
                         TrackControlList[itemLocationWS > 0 ? itemLocationWS - 1 : 0] = DataColTemp;
 
-                        DataCol.TrackCol = trackWS + trackColor;
                         DataColTemp = TrackControlList[itemLocationWS + rowOffset];
                         DataColTemp.TrackColLeft = DataCol.TrackColLeft;
                         DataColTemp.TrackColRight = DataCol.TrackColRight;
-                        DataColTemp.LimitCol = StationPlatform;
+
+                        // Split Stationplatform
+                        if (StationPlatform.Length > 0)
+                        {
+                            var maxCharCell = 12;
+                            var stationSplit = StationPlatform.Split(' ');
+                            System.Text.StringBuilder cellData = new System.Text.StringBuilder();
+                            var rowStation = itemLocationWS + rowOffset;
+                            foreach (var station in stationSplit)
+                            {
+                                if (station.Length + cellData.Length > maxCharCell || station == stationSplit[stationSplit.Count() - 1])
+                                {
+                                    if (station == stationSplit[stationSplit.Count() - 1])
+                                    {
+                                        cellData.Append(station);// last item
+                                    }
+
+                                    if (rowStation == itemLocationWS + rowOffset)
+                                    {
+                                        DataColTemp.LimitCol = cellData.ToString();
+                                    }
+                                    else
+                                    {
+                                        ListTrackControl DataColStation = TrackControlList[rowStation];
+                                        DataColStation.LimitCol = cellData.ToString();
+                                        TrackControlList[rowStation] = DataColStation;
+                                    }
+
+                                    rowStation += 1;
+                                    if (rowStation > 15) { break; }
+
+                                    cellData = new System.Text.StringBuilder();
+                                    cellData.Append(station + " ");
+                                }
+                                else if (station.Length + cellData.Length <= maxCharCell)
+                                {
+                                    cellData.Append(station + " ");
+                                }
+                            }
+                        }
+
+                        DataCol.TrackCol = trackWS + trackColor;
                         DataCol.TrackColLeft = DataCol.TrackColRight = " ";
 
                         // decodes displaycolor
-                        if (at != null)
+                        if (atask != null)
                         {
-                            var color = (at.DisplayColor.R == 144 && at.DisplayColor.G == 238 && at.DisplayColor.B == 144) ? "%%$" ://Color.LightGreen
-                            (at.DisplayColor.R == 255 && at.DisplayColor.G == 255 && at.DisplayColor.B == 255) ? "!??" ://Color.White
-                            (at.DisplayColor.R == 255 && at.DisplayColor.G == 255 && at.DisplayColor.B == 128) ? "???" : "";//Color.Yellow
+                            var color = (atask.DisplayColor.R == 144 && atask.DisplayColor.G == 238 && atask.DisplayColor.B == 144) ? "%%$" ://Color.LightGreen
+                            (atask.DisplayColor.R == 255 && atask.DisplayColor.G == 255 && atask.DisplayColor.B == 255) ? "!??" ://Color.White
+                            (atask.DisplayColor.R == 255 && atask.DisplayColor.G == 255 && atask.DisplayColor.B == 128) ? "???" : "";//Color.Yellow
 
                             // show the time left to boarding and the station name.
-                            DataColTemp.FirstCol = at.DisplayMessage.Any(char.IsDigit) ? at.DisplayMessage.Substring(at.DisplayMessage.Length - 5) + color : Viewer.Catalog.GetString("Completed.") + "%%$";
+                            DataColTemp.FirstCol = atask.DisplayMessage.Any(char.IsDigit) ? atask.DisplayMessage.Substring(atask.DisplayMessage.Length - 5) + color : Viewer.Catalog.GetString("Completed.") + "%%$";
+                        }
+                        else if (MessageText != null)
+                        {
+                            var color = (MessageColor.R == 144 && MessageColor.G == 238 && MessageColor.B == 144) ? "%%$" ://Color.LightGreen
+                               (MessageColor.R == 255 && MessageColor.G == 255 && MessageColor.B == 255) ? "!??" ://Color.White
+                               (MessageColor.R == 255 && MessageColor.G == 255 && MessageColor.B == 128) ? "???" : "";//Color.Yellow
+
+                            // show the time left to boarding and the station name.
+                            DataColTemp.FirstCol = MessageText.Any(char.IsDigit) ? MessageText.Substring(MessageText.Length - 5) + color : Viewer.Catalog.GetString("Completed.") + "%%$";
                         }
                         TrackControlList[itemLocationWS + rowOffset] = DataColTemp;
                     }
                 }
                 TrackControlList[itemLocationWS] = DataCol;
             }
+            TrackControlList[itemLocationWS] = DataCol;
+
             return newLabelPosition;
         }
 
@@ -1542,7 +1661,6 @@ namespace Orts.Viewer3D.Popups
                     var distanceString = FormatStrings.FormatDistanceDisplay(thisItem.DistanceToTrainM, metric);
                     //Font.Draw(spriteBatch, labelPoint, distanceString, Color.White);
 
-                    DataCol.FirstCol = itemLocationWS.ToString() + " " + thisItem.DistanceToTrainM;
                     if (itemLocationWS > TopLabelRow)
                     {
                         DataCol.DistCol = distanceString;
@@ -1588,14 +1706,16 @@ namespace Orts.Viewer3D.Popups
                 // Avoids overlapping
                 Overlapping(itemLocationWS, DataCol, thisItem, waitingPointWS, "", firstLabelShown);
 
-                if (itemOffset < firstLabelDistance && !firstLabelShown && !itemLocationWSChanged)
+                if (itemOffset < firstLabelDistance && !firstLabelShown)
                 {
-                    var labelPoint = new Point(offset.X + distanceTextOffset, offset.Y + newLabelPosition + textOffset[forward ? 0 : 1]);
-                    distanceString = FormatStrings.FormatDistanceDisplay(thisItem.DistanceToTrainM, metric);
-                    //Font.Draw(spriteBatch, labelPoint, distanceString, Color.White);
-                    DataCol.TrackCol = waitingPointWS + "!??";
-                    TrackControlList[itemLocationWS] = DataCol;
-
+                    if (!itemLocationWSChanged)
+                    {
+                        var labelPoint = new Point(offset.X + distanceTextOffset, offset.Y + newLabelPosition + textOffset[forward ? 0 : 1]);
+                        distanceString = FormatStrings.FormatDistanceDisplay(thisItem.DistanceToTrainM, metric);
+                        //Font.Draw(spriteBatch, labelPoint, distanceString, Color.White);
+                        DataCol.TrackCol = waitingPointWS + "!??";
+                        TrackControlList[itemLocationWS] = DataCol;
+                    }
                     firstLabelShown = true;
                 }
             }
@@ -1619,10 +1739,6 @@ namespace Orts.Viewer3D.Popups
                 // Translate itemLocation value to row value
                 var itemLocationWS = itemLocationToRow(zeroPoint, itemLocation);
                 DataCol = TrackControlList[itemLocationWS];
-
-                // Update info
-                DataCol.FirstCol = milepostString;
-                DataCol.DistanceToTrainM = thisItem.DistanceToTrainM;
 
                 // Avoids overlapping
                 Overlapping(itemLocationWS, DataCol, thisItem, milepostString, "", firstLabelShown);
@@ -1658,17 +1774,19 @@ namespace Orts.Viewer3D.Popups
                 // Only show distance for enhanced MSTS compatibility (this is the only time the position is controlled by the author).
                 if (itemOffset < firstLabelDistance && !firstLabelShown && !Program.Simulator.TimetableMode)
                 {
-                    var labelPoint = new Point(offset.X + distanceTextOffset, offset.Y + newLabelPosition + textOffset[forward ? 0 : 1]);
-                    var distanceString = FormatStrings.FormatDistanceDisplay(thisItem.DistanceToTrainM, metric);
-                    //Font.Draw(spriteBatch, labelPoint, distanceString, Color.White);
+                    if (!itemLocationWSChanged)
+                    {
+                        var labelPoint = new Point(offset.X + distanceTextOffset, offset.Y + newLabelPosition + textOffset[forward ? 0 : 1]);
+                        var distanceString = FormatStrings.FormatDistanceDisplay(thisItem.DistanceToTrainM, metric);
+                        //Font.Draw(spriteBatch, labelPoint, distanceString, Color.White);
 
-                    DataCol.DistCol = thisItem.DistanceToTrainM == 0 ? " " : distanceString;
-                    DataCol.DistanceToTrainM = thisItem.DistanceToTrainM;
-                    DataCol.Row = itemLocationWS;
-                    DataCol.TrackColLeft = DataCol.TrackColLeft;
-                    DataCol.TrackColRight = DataCol.TrackColRight;
-                    TrackControlList[itemLocationWS] = DataCol;
-
+                        DataCol.DistCol = thisItem.DistanceToTrainM == 0 ? " " : distanceString;
+                        DataCol.DistanceToTrainM = thisItem.DistanceToTrainM;
+                        DataCol.Row = itemLocationWS;
+                        DataCol.TrackColLeft = DataCol.TrackColLeft;
+                        DataCol.TrackColRight = DataCol.TrackColRight;
+                        TrackControlList[itemLocationWS] = DataCol;
+                    }
                     firstLabelShown = true;
                 }
             }
@@ -2450,7 +2568,6 @@ namespace Orts.Viewer3D.Popups
                 var labelPoint = new Point(offset.X + milepostTextOffset, offset.Y + newLabelPosition + textOffset[forward ? 0 : 1]);
                 var milepostString = thisItem.ThisMile;
                 Font.Draw(spriteBatch, labelPoint, milepostString, Color.White);
-
             }
 
             return newLabelPosition;
