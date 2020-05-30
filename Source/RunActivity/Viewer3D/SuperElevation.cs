@@ -530,11 +530,13 @@ namespace Orts.Viewer3D
     public class SuperElevationPrimitive : DynamicTrackPrimitive
     {
         float StartElev, MaxElev, EndElv;
+        bool InTunnel;
         public SuperElevationPrimitive(Viewer viewer, WorldPosition worldPosition,
         WorldPosition endPosition, float radius, float angle, float s, float e, float m, float dir, bool inTunnel)
             : base()
         {
             StartElev = s; EndElv = e; MaxElev = m;
+            InTunnel = inTunnel;
             // SuperElevationPrimitive is responsible for creating a mesh for a section with a single subsection.
             // It also must update worldPosition to reflect the end of this subsection, subsequently to
             // serve as the beginning of the next subsection.
@@ -570,7 +572,7 @@ namespace Orts.Viewer3D
                 viewer.TRP.CreateTrackProfile(viewer, viewer.Simulator.RoutePath);
                 if (viewer.Simulator.TRK.Tr_RouteFile.ChangeTrackGauge) viewer.TRP.CreateTrackProfileTun(viewer, viewer.Simulator.RoutePath);
             }
-            TrProfile = !viewer.Simulator.TRK.Tr_RouteFile.ChangeTrackGauge || viewer.TRP.TrackProfileTun == null || !inTunnel ?
+            TrProfile = !viewer.Simulator.TRK.Tr_RouteFile.ChangeTrackGauge || viewer.TRP.TrackProfileTun == null || !InTunnel ?
                 viewer.TRP.TrackProfile : viewer.TRP.TrackProfileTun;
 
             XNAEnd = endPosition.XNAMatrix.Translation;
@@ -776,7 +778,8 @@ namespace Orts.Viewer3D
             // rotated into its position on the curve and vertically displaced if on grade.
             // The local center for the curve lies to the left or right of the local origin and ON THE BASE PLANE
             center = DTrackData.param2 * (DTrackData.param1 < 0 ? Vector3.Left : Vector3.Right);
-            sectionRotation = Matrix.CreateRotationY(-SegmentLength); // Rotation per iteration (constant)
+            // correction is needed to avoid hairline cracks in the outer wall within tunnel curves
+            sectionRotation = Matrix.CreateRotationY(-SegmentLength - (InTunnel ? 0.0005f * Math.Sign(SegmentLength) : 0f)); // Rotation per iteration (constant)
         }
 
         /// <summary>
