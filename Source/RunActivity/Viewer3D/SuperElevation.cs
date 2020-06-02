@@ -40,10 +40,9 @@ namespace Orts.Viewer3D
         /// <param name="TileX">TileX coordinates.</param>
         /// <param name="TileZ">TileZ coordinates.</param>
         /// <param name="shapeFilePath">Path to the shape file.</param>
-        public static bool DecomposeStaticSuperElevation(Viewer viewer, List<DynamicTrackViewer> trackList, TrackObj trackObj, WorldPosition worldMatrixInput, int TileX, int TileZ, string shapeFilePath, out bool isTunnel)
+        public static bool DecomposeStaticSuperElevation(Viewer viewer, List<DynamicTrackViewer> trackList, TrackObj trackObj, WorldPosition worldMatrixInput, int TileX, int TileZ, string shapeFilePath)
         {
             TrackShape shape = null;
-            isTunnel = false;
             try
             {
                 shape = viewer.Simulator.TSectionDat.TrackShapes.Get(trackObj.SectionIdx);
@@ -58,7 +57,7 @@ namespace Orts.Viewer3D
 
             int count = -1;
             int drawn = 0;
-            isTunnel = shape.TunnelShape;
+            bool isTunnel = shape.TunnelShape;
 
             List<TrVectorSection> sectionsinShape = new List<TrVectorSection>();
             //List<DynamicTrackViewer> tmpTrackList = new List<DynamicTrackViewer>();
