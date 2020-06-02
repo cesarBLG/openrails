@@ -215,7 +215,7 @@ namespace Orts.Formats.Msts
 		public uint ShapeIndex;
 		public string FileName;
         public uint NumPaths;
-        public uint MainRoute;
+        public uint MainRoute = int.MaxValue;
 		public double ClearanceDistance = 0.0;
 		public SectionIdx[] SectionIdxs;
         public bool TunnelShape;

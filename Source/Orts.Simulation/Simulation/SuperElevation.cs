@@ -45,16 +45,29 @@ namespace Orts.Simulation
                 var StartCurve = false; var CurveDir = 0; var Len = 0.0f;
                 SectionList.Clear();
                 SectionCurve theCurve = null;
+                SectionSize theStraight = null;
                 int i = 0; int count = node.TrVectorNode.TrVectorSections.Length;
                 foreach (var section in node.TrVectorNode.TrVectorSections)//loop all curves
                 {
                     i++;
                     var sec = simulator.TSectionDat.TrackSections.Get(section.SectionIndex);
                     if (sec == null) continue;
+                    if (simulator.TRK.Tr_RouteFile.ChangeTrackGauge)
+                    {
+                        TrackShape sha;
+                        if (simulator.TSectionDat.TrackShapes.TryGetValue(section.ShapeIndex, out sha) && sha.MainRoute != int.MaxValue)
+                            continue;
+                        if ((i == 1 && simulator.TDB.TrackDB.TrackNodes[node.TrPins[0].Link].TrEndNode == true) ||
+                            ( i == count && simulator.TDB.TrackDB.TrackNodes[node.TrPins[1].Link].TrEndNode == true))
+                            continue;
+                    }
                     theCurve = sec.SectionCurve;
-                    if (sec.SectionSize != null && Math.Abs(sec.SectionSize.Width - simulator.SuperElevationGauge) > 0.2) continue;//the main route has a gauge different than mine
+                    theStraight = sec.SectionSize;
+                    if (sec.SectionSize != null && Math.Abs(sec.SectionSize.Width - simulator.SuperElevationGauge) > 0.2
+                        && !simulator.TRK.Tr_RouteFile.ChangeTrackGauge)
+                        continue;//the main route has a gauge different than mine
 
-                    if (theCurve != null && !theCurve.Angle.AlmostEqual(0f, 0.01f)) //a good curve
+                    if (theCurve != null && ( !theCurve.Angle.AlmostEqual(0f, 0.01f) || simulator.TRK.Tr_RouteFile.ChangeTrackGauge)) //a good curve
                     {
                         if (i == 1 || i == count)
                         {
@@ -79,11 +92,27 @@ namespace Orts.Simulation
                     {
                         if (StartCurve == true) //we are in a curve, need to finish
                         {
-                            MarkSections(simulator, SectionList, Len);
-                            Len = 0f;
-                            SectionList.Clear();
+                            if (!simulator.TRK.Tr_RouteFile.ChangeTrackGauge || CurveDir != 0)
+                            {
+                                MarkSections(simulator, SectionList, Len);
+                                Len = 0f;
+                                SectionList.Clear();
+                                StartCurve = false;
+                            }
                         }
-                        StartCurve = false;
+                        if (simulator.TRK.Tr_RouteFile.ChangeTrackGauge)
+                        {
+                            if (StartCurve == false) //we are beginning a straight 
+                            {
+                                StartCurve = true; CurveDir = 0;
+                            }
+//                            if (i != count && i != 1)
+                            {
+                                Len += theStraight.Length;
+                                SectionList.Add(section);
+                            }
+                        }
+                            
                     }
                 }
                 if (StartCurve == true) // we are in a curve after looking at every section
@@ -97,19 +126,22 @@ namespace Orts.Simulation
 
         void MarkSections(Simulator simulator, List<TrVectorSection> SectionList, float Len)
         {
-            if (Len < simulator.SuperElevationMinLen || SectionList.Count == 0) return;//too short a curve or the list is empty
+            if (Len < simulator.SuperElevationMinLen && !simulator.TRK.Tr_RouteFile.ChangeTrackGauge || SectionList.Count == 0) return;//too short a curve or the list is empty
             var tSection = simulator.TSectionDat.TrackSections;
             var sectionData = tSection.Get(SectionList[0].SectionIndex);
             if (sectionData == null) return;
             //loop all section to determine the max elevation for the whole track
-            double Curvature = sectionData.SectionCurve.Angle * SectionList.Count * 33 / Len;//average radius in degree/100feet
-            var Max = (float)(Math.Pow(simulator.TRK.Tr_RouteFile.SpeedLimit * 2.25, 2) * 0.0007 * Math.Abs(Curvature) - 3); //in inch
-            Max = Max * 2.5f;//change to cm
-            Max = (float)Math.Round(Max * 2, MidpointRounding.AwayFromZero) / 200f;//closest to 5 mm increase;
-            if (Max < 0.01f) return;
-            if (Max > MaximumAllowedM) Max = MaximumAllowedM;//max
-            Max = (float)Math.Atan(Max / 1.44f); //now change to rotation in radius by quick estimation as the angle is small
-
+            var Max = 0f;
+            if (!simulator.TRK.Tr_RouteFile.ChangeTrackGauge || sectionData.SectionCurve != null)
+            {
+                double Curvature = sectionData.SectionCurve.Angle * SectionList.Count * 33 / Len;//average radius in degree/100feet
+                Max = (float)(Math.Pow(simulator.TRK.Tr_RouteFile.SpeedLimit * 2.25, 2) * 0.0007 * Math.Abs(Curvature) - 3); //in inch
+                Max = Max * 2.5f;//change to cm
+                Max = (float)Math.Round(Max * 2, MidpointRounding.AwayFromZero) / 200f;//closest to 5 mm increase;
+                if (Max < 0.01f && !simulator.TRK.Tr_RouteFile.ChangeTrackGauge) return;
+                if (Max > MaximumAllowedM) Max = MaximumAllowedM;//max
+                Max = (float)Math.Atan(Max / 1.44f); //now change to rotation in radius by quick estimation as the angle is small
+            }
             Curves.Add(new List<TrVectorSection>(SectionList)); //add the curve
             MapWFiles2Sections(SectionList);//map these sections to tiles, so we can compute it quicker later
             if (SectionList.Count == 1)//only one section in the curve

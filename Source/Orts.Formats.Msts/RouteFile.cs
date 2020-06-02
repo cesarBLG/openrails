@@ -107,6 +107,8 @@ namespace Orts.Formats.Msts
 				new STFReader.TokenProcessor("ortsuserpreferenceremoveforesttreesfromroads", ()=>{ RemoveForestTreesFromRoads = stf.ReadBoolBlock(false); }),
                 // values for superelevation
                 new STFReader.TokenProcessor("ortstracksuperelevation", ()=>{ SuperElevationHgtpRadiusM = new Interpolator(stf); }),
+                // change track gauge
+                new STFReader.TokenProcessor("ortschangetrackgauge", ()=>{ ChangeTrackGauge = stf.ReadBoolBlock(false); }),
                 // images
                 new STFReader.TokenProcessor("graphic", ()=>{ Thumbnail = stf.ReadStringBlock(null); }),
                 new STFReader.TokenProcessor("loadingscreen", ()=>{ LoadingScreen = stf.ReadStringBlock(null); }),
@@ -151,6 +153,7 @@ namespace Orts.Formats.Msts
         public string DefaultSignalSMS;
 		public float TempRestrictedSpeed = -1f;
         public Interpolator SuperElevationHgtpRadiusM; // Superelevation of tracks
+        public bool ChangeTrackGauge = false; //Changes gauge of all tracks
 
         // Values for calculating Tunnel Resistance - will override default values.
         public float SingleTunnelAreaM2; 
