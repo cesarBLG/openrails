@@ -1,5 +1,5 @@
-﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.63
-May 24th, 2020
+﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.64
+June 2nd, 2020
 
 Please note that the installation and use of Open Rails software, even of its unofficial versions, is governed by the Open Rails End User License Agreement. 
 
@@ -12,8 +12,8 @@ INSTALLATION
 you would return to the official OR version.
 
 RELEASE NOTES
-This unofficial version has been derived from the latest official Open Rails unstable revision U2020.05.24-1706 (which already includes Monogame)
-and from the latest official OpenRails testing revision X1.3.1-162.
+This unofficial version has been derived from the latest official Open Rails unstable build dated 2020.06.02-7:06 (which already includes Monogame)
+and from the latest official OpenRails testing revision X1.3.1-163.
 TCS enhancement functions are now available also in the Unstable release.
 It includes some features not (yet) available in the Open Rails unstable official version, that is:
 - addition of track sounds in the sound debug window (by dennisat)
@@ -40,10 +40,11 @@ It includes some features not (yet) available in the Open Rails unstable officia
 - Bug fix for https://bugs.launchpad.net/or/+bug/1877644 SPEED signals not being updated in multiplayer clients. By cesarbl
 - Web server: web TrackViewer added, by mbm_OR
 - Avoid 3D cab stuttering by a mutable shape primitive, by YoRyan
-- bug fix for crash using 3D cabs with reduce memory option selected
 - ORTS_SIGNED_TRACTION_TOTAL_BRAKING cab control https://trello.com/c/sHS9ZfNL/463-traction-braking-control-considering-train-brake , by Paolo
-- NEW: some bug fixes in web server when in timetable mode, by mbm_OR
-- NEW: enable rotation of digital controls in 2D cabs, from an idea of Paolo, see http://www.elvastower.com/forums/index.php?/topic/34052-rotation-of-digital-instrument-in-cvf-files/ .
+- NEW: bug fix for memory leak, see http://www.elvastower.com/forums/index.php?/topic/34069-potential-memory-leak/
+- NEW: bug fix for misaligned diesel engines HUD, see http://www.elvastower.com/forums/index.php?/topic/32640-or-newyear-mg/page__view__findpost__p__259340
+- NEW: track gauge can be changed over the whole route, see http://www.elvastower.com/forums/index.php?/topic/34022-adjusting-track-gauge/
+
 
 
 
