@@ -1023,6 +1023,7 @@ namespace Orts.Viewer3D.RollingStock
         private Texture2D _CabTexture;
         private CabShader _Shader;  // Shaders must have unique Keys - below
         private int ShaderKey = 1;  // Shader Key must refer to only o
+        private Texture2D _LetterboxTexture;
 
         private Point _PrevScreenSize;
 
@@ -1335,22 +1336,27 @@ namespace Orts.Viewer3D.RollingStock
             _SpriteShader2DCabView.SpriteBatch.Draw(_CabTexture, drawPos, cabRect, Color.White, 0f, drawOrigin, cabScale, SpriteEffects.None, 0f);
 
             // Draw letterboxing.
-            Texture2D letterboxTexture = new Texture2D(graphicsDevice, 1, 1);
-            letterboxTexture.SetData<Color>(new Color[] { Color.Black });
-            void drawLetterbox(int x, int y, int w, int h)
+            if (_Viewer.Settings.Letterbox2DCab && _LetterboxTexture == null)
             {
-                _SpriteShader2DCabView.SpriteBatch.Draw(letterboxTexture, new Rectangle(x, y, w, h), Color.White);
+                _LetterboxTexture = new Texture2D(graphicsDevice, 1, 1);
+                _LetterboxTexture.SetData<Color>(new Color[] { Color.Black });
             }
+
             if (_Viewer.CabXLetterboxPixels > 0)
             {
-                drawLetterbox(0, 0, _Viewer.CabXLetterboxPixels, _Viewer.DisplaySize.Y);
-                drawLetterbox(_Viewer.CabXLetterboxPixels + _Viewer.CabWidthPixels, 0, _Viewer.DisplaySize.X - _Viewer.CabWidthPixels - _Viewer.CabXLetterboxPixels, _Viewer.DisplaySize.Y);
+                DrawLetterbox(0, 0, _Viewer.CabXLetterboxPixels, _Viewer.DisplaySize.Y);
+                DrawLetterbox(_Viewer.CabXLetterboxPixels + _Viewer.CabWidthPixels, 0, _Viewer.DisplaySize.X - _Viewer.CabWidthPixels - _Viewer.CabXLetterboxPixels, _Viewer.DisplaySize.Y);
             }
             if (_Viewer.CabYLetterboxPixels > 0)
             {
-                drawLetterbox(0, 0, _Viewer.DisplaySize.X, _Viewer.CabYLetterboxPixels);
-                drawLetterbox(0, _Viewer.CabYLetterboxPixels + _Viewer.CabHeightPixels, _Viewer.DisplaySize.X, _Viewer.DisplaySize.Y - _Viewer.CabHeightPixels - _Viewer.CabYLetterboxPixels);
+                DrawLetterbox(0, 0, _Viewer.DisplaySize.X, _Viewer.CabYLetterboxPixels);
+                DrawLetterbox(0, _Viewer.CabYLetterboxPixels + _Viewer.CabHeightPixels, _Viewer.DisplaySize.X, _Viewer.DisplaySize.Y - _Viewer.CabHeightPixels - _Viewer.CabYLetterboxPixels);
             }
+        }
+
+        internal void DrawLetterbox(int x, int y, int w, int h)
+        {
+            _SpriteShader2DCabView.SpriteBatch.Draw(_LetterboxTexture, new Rectangle(x, y, w, h), Color.White);
         }
 
         internal void Mark()
