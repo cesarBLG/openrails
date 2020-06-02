@@ -12,7 +12,7 @@ INSTALLATION
 you would return to the official OR version.
 
 RELEASE NOTES
-This unofficial version has been derived from the latest official Open Rails unstable build dated 2020.06.02-7:06 (which already includes Monogame)
+This unofficial version has been derived from the latest official Open Rails Unstable release U2020.06.02-0706 (which already includes Monogame)
 and from the latest official OpenRails testing revision X1.3.1-163.
 TCS enhancement functions are now available also in the Unstable release.
 It includes some features not (yet) available in the Open Rails unstable official version, that is:
