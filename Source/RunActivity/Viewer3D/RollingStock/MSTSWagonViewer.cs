@@ -939,6 +939,9 @@ namespace Orts.Viewer3D.RollingStock
                 FreightShape.Mark();
             if (InteriorShape != null)
                 InteriorShape.Mark();
+            if (FreightAnimations?.Animations != null)
+                foreach (var freightAnimation in FreightAnimations.Animations)
+                    freightAnimation.FreightShape?.Mark();
         }
     }
 }
