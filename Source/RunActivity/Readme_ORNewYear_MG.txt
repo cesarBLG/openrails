@@ -1,5 +1,5 @@
-﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.64
-June 2nd, 2020
+﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.65
+June 10th, 2020
 
 Please note that the installation and use of Open Rails software, even of its unofficial versions, is governed by the Open Rails End User License Agreement. 
 
@@ -13,7 +13,7 @@ you would return to the official OR version.
 
 RELEASE NOTES
 This unofficial version has been derived from the latest official Open Rails Unstable release U2020.06.02-0706 (which already includes Monogame)
-and from the latest official OpenRails testing revision X1.3.1-163.
+and from the latest official OpenRails testing revision X1.3.1-166.
 TCS enhancement functions are now available also in the Unstable release.
 It includes some features not (yet) available in the Open Rails unstable official version, that is:
 - addition of track sounds in the sound debug window (by dennisat)
@@ -38,12 +38,16 @@ It includes some features not (yet) available in the Open Rails unstable officia
 - skip warning messages related to ruler token, that is introduced by TSRE5
 - General Option to reduce memory usage
 - Bug fix for https://bugs.launchpad.net/or/+bug/1877644 SPEED signals not being updated in multiplayer clients. By cesarbl
-- Web server: web TrackViewer added, by mbm_OR
+- Web server: web TrackMonitor added, by mbm_OR
 - Avoid 3D cab stuttering by a mutable shape primitive, by YoRyan
 - ORTS_SIGNED_TRACTION_TOTAL_BRAKING cab control https://trello.com/c/sHS9ZfNL/463-traction-braking-control-considering-train-brake , by Paolo
-- NEW: bug fix for memory leak, see http://www.elvastower.com/forums/index.php?/topic/34069-potential-memory-leak/
-- NEW: bug fix for misaligned diesel engines HUD, see http://www.elvastower.com/forums/index.php?/topic/32640-or-newyear-mg/page__view__findpost__p__259340
-- NEW: track gauge can be changed over the whole route, see http://www.elvastower.com/forums/index.php?/topic/34022-adjusting-track-gauge/
+- bug fix for memory leak, see http://www.elvastower.com/forums/index.php?/topic/34069-potential-memory-leak/
+- track gauge can be changed over the whole route, see http://www.elvastower.com/forums/index.php?/topic/34022-adjusting-track-gauge/
+- NEW: Russian locales, by Weter
+- NEW: bug corrections, by mbm_OR
+- NEW: correction of bug of diesel engines with zero force, see http://www.elvastower.com/forums/index.php?/topic/34090-idle-rpm-notch1-identical-zero-powerforce/
+- NEW: correction of bug that didn't animate shapes with only two frames, see http://www.elvastower.com/forums/index.php?/topic/34087-problem-with-object-animations-in-tsreor/
+- NEW: first edition of management of ORTS_POWERKEY and ORTS_BATTERY cab controls, by Paolo
 
 
 
@@ -64,6 +68,7 @@ This unofficial version couldn't have been created without following contributio
 - YoRyan
 - césarbl
 - Paolo
+- Weter
 - Carlo Santucci
 
 - all those who contributed with ideas and provided contents for testing and pointed to malfunctions.
