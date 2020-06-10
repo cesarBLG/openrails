@@ -486,6 +486,11 @@ namespace Orts.Viewer3D.Popups
                 row = (int)Math.Round(MathHelper.Clamp(itemLocation * (12.0f / 200.0f), 0, 12));
                 BottomLabelRow = 12;
             }
+            else if (zeroPoint == 240 || zeroPoint == 0) // forwardsY  backwardsY
+            {
+                row = (int)Math.Round(MathHelper.Clamp(itemLocation * (16.0f / 240.0f), 0, 16));
+                BottomLabelRow = 16;
+            }
             else if (zeroPoint == 108) // Manual mode upper zone
             {
                 row = (int)(MathHelper.Clamp(itemLocation * (6.0f / 93.0f), 0, 6));
@@ -1067,7 +1072,7 @@ namespace Orts.Viewer3D.Popups
             {
                 DataCol = TrackControlList[itemLocationToRow(backwardsY, backwardsY)];
                 DataCol.TrackCol = eyeWS;
-                TrackControlList[itemLocationToRow(forwardsY, forwardsY)] = DataCol;
+                TrackControlList[itemLocationToRow(backwardsY, backwardsY)] = DataCol;
                 //spriteBatch.Draw(TrackMonitorImages, new Rectangle(offset.X + eyePosition[0], offset.Y + backwardsY + eyePosition[2], eyePosition[3], eyePosition[4]), eyeSprite, Color.White);
             }
         }

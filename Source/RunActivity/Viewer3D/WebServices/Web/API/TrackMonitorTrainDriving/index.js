@@ -182,7 +182,7 @@ function apiTM() {
 							DisplayItem('right', 1, trackColorLeft, stringColorTrackLeft, trackColorLeft? newDataTrackLeft : obj.trackMonitorData[row].TrackColLeft, false);
 
 							// third col = TrackCol data
-							DisplayItem('center', 2, trackColor, stringColorTrack, trackColor? newDataTrack : obj.trackMonitorData[row].TrackCol, row);
+							DisplayItem('center', 2, trackColor, stringColorTrack, trackColor? newDataTrack : obj.trackMonitorData[row].TrackCol, false);
 
 							// fourth col = TrackColRight data
 							DisplayItem('left', 1, trackColorRight, stringColorTrackRight, trackColorRight? newDataTrackRight : obj.trackMonitorData[row].TrackColRight, false);
