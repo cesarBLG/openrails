@@ -2478,7 +2478,6 @@ msgstr ""
 #~ msgstr "Ventil"
 
 #, fuzzy
-#~| msgid "GrLimit"
 #~ msgid "Gr Limit"
 #~ msgstr "RostLimit"
 
