@@ -186,6 +186,7 @@ namespace Orts.Common
 
         BoilerBlowdownOn,
         BoilerBlowdownOff,
+
         SteamGearLeverToggle,
         AIFiremanSoundOn,
         AIFiremanSoundOff
