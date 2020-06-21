@@ -546,7 +546,8 @@ namespace Orts.Viewer3D
             UseCameraCommand.Receiver = this;
             MoveCameraCommand.Receiver = this;
             ToggleHelpersEngineCommand.Receiver = (MSTSLocomotive)PlayerLocomotive;
-            TCSCommand.Receiver = ((MSTSLocomotive)PlayerLocomotive).TrainControlSystem;
+            TCSButtonCommand.Receiver = ((MSTSLocomotive)PlayerLocomotive).TrainControlSystem;
+            TCSSwitchCommand.Receiver = ((MSTSLocomotive)PlayerLocomotive).TrainControlSystem;
             ToggleBatteryCommand.Receiver = (MSTSLocomotive)PlayerLocomotive;
             TogglePowerKeyCommand.Receiver = (MSTSLocomotive)PlayerLocomotive;
         }
