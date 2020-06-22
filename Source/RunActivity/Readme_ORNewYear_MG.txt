@@ -1,5 +1,5 @@
-﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.65
-June 10th, 2020
+﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.66
+June 22nd, 2020
 
 Please note that the installation and use of Open Rails software, even of its unofficial versions, is governed by the Open Rails End User License Agreement. 
 
@@ -12,8 +12,8 @@ INSTALLATION
 you would return to the official OR version.
 
 RELEASE NOTES
-This unofficial version has been derived from the latest official Open Rails Unstable release U2020.06.02-0706 (which already includes Monogame)
-and from the latest official OpenRails testing revision X1.3.1-166.
+This unofficial version has been derived from the latest official Open Rails Unstable release U2020.06.21-1736 (which already includes Monogame)
+and from the latest official OpenRails testing revision X1.3.1-185.
 TCS enhancement functions are now available also in the Unstable release.
 It includes some features not (yet) available in the Open Rails unstable official version, that is:
 - addition of track sounds in the sound debug window (by dennisat)
@@ -43,11 +43,8 @@ It includes some features not (yet) available in the Open Rails unstable officia
 - ORTS_SIGNED_TRACTION_TOTAL_BRAKING cab control https://trello.com/c/sHS9ZfNL/463-traction-braking-control-considering-train-brake , by Paolo
 - bug fix for memory leak, see http://www.elvastower.com/forums/index.php?/topic/34069-potential-memory-leak/
 - track gauge can be changed over the whole route, see http://www.elvastower.com/forums/index.php?/topic/34022-adjusting-track-gauge/
-- NEW: Russian locales, by Weter
-- NEW: bug corrections, by mbm_OR
-- NEW: correction of bug of diesel engines with zero force, see http://www.elvastower.com/forums/index.php?/topic/34090-idle-rpm-notch1-identical-zero-powerforce/
-- NEW: correction of bug that didn't animate shapes with only two frames, see http://www.elvastower.com/forums/index.php?/topic/34087-problem-with-object-animations-in-tsreor/
-- NEW: first edition of management of ORTS_POWERKEY and ORTS_BATTERY cab controls, by Paolo
+- first edition of management of ORTS_POWERKEY and ORTS_BATTERY cab controls, by Paolo
+- re-introduced advanced coupling, by steamer_ctn
 
 
 
