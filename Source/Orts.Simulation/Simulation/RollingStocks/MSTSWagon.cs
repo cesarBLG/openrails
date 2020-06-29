@@ -3408,36 +3408,90 @@ namespace Orts.Simulation.RollingStocks
             {
                 Coupler2MTemporary = 0.1f; // make sure that SlackBM is always > 0
             }
-            return Coupler.Rigid ? 0.0002f : GetMaximumCouplerCompressionSlack2M() + Coupler2MTemporary; //  GetMaximumCouplerSlack3M > GetMaximumCouplerSlack2M
+            return Coupler.Rigid ? 0.0002f : Coupler.CompressionR0Y + GetCouplerCompressionSlackAM() + Coupler2MTemporary; //  GetMaximumCouplerSlack3M > GetMaximumCouplerSlack2M
+        }              
+
+        public override float GetCouplerBreak1N() 
+        {
+            if (Coupler == null)
+            {
+                return base.GetCouplerBreak1N();
+            }
+            return Coupler.Break1N;
         }
-               
+
+        public override float GetCouplerBreak2N() 
+        {
+            if (Coupler == null)
+            {
+                return base.GetCouplerBreak2N();
+            }
+            return Coupler.Break2N;
+        }
+
+        public override float GetCouplerTensionR0Y() 
+        {
+            if (Coupler == null)
+            {
+                return base.GetCouplerTensionR0Y();
+            }
+            return Coupler.TensionR0Y;
+        }
+
+        public override float GetCouplerCompressionR0Y()
+        {
+            if (Coupler == null)
+            {
+                return base.GetCouplerCompressionR0Y();
+            }
+            return Coupler.CompressionR0Y;
+        }
         // TODO: This code appears to be being called by ReverseCars (in Trains.cs). 
         // Reverse cars moves the couplers along by one car, however this may be encountering a null coupler at end of train. 
         // Thus all coupler parameters need to be tested for null coupler and defasult values inserted (To be confirmed)
         public override void CopyCoupler(TrainCar other)
-        {
-
-            // To be checked
+        {						
             base.CopyCoupler(other);
             MSTSCoupling coupler = new MSTSCoupling();
+            // Simple Coupler parameters
             coupler.R0X = other.GetCouplerZeroLengthM();
             coupler.R0Y = other.GetCouplerZeroLengthM();
-            coupler.R0Diff = other.GetMaximumSimpleCouplerSlack1M();
-            coupler.Rigid = coupler.R0Diff < 0.0002f;
+            coupler.R0Diff = other.GetMaximumSimpleCouplerSlack1M();													 
             coupler.Stiffness1NpM = other.GetSimpleCouplerStiffnessNpM() / 7;
             coupler.Stiffness2NpM = 0;
             coupler.CouplerSlackAM = other.GetCouplerSlackAM();
             coupler.CouplerSlackBM = other.GetCouplerSlackBM();
+
+            // Common simple and advanced parameters
+            coupler.Rigid = other.GetCouplerRigidIndication();
+            coupler.Break1N = other.GetCouplerBreak1N();
+            coupler.Break2N = other.GetCouplerBreak2N();
+
+            // ADvanced coupler parameters
+            IsAdvancedCoupler = other.GetAdvancedCouplerFlag();
+
+            coupler.TensionR0X = other.GetCouplerZeroLengthM();
+            coupler.TensionR0Y = other.GetCouplerTensionR0Y();
             coupler.CouplerTensionSlackAM = other.GetCouplerTensionSlackAM();
             coupler.CouplerTensionSlackBM = other.GetCouplerTensionSlackBM();
+            coupler.TensionStiffness1N = other.GetCouplerTensionStiffness1N();
+            coupler.TensionStiffness2N = other.GetCouplerTensionStiffness2N();
+
+            coupler.CompressionR0X = GetCouplerZeroLengthM();
+            coupler.CompressionR0Y = other.GetCouplerCompressionR0Y();
             coupler.CouplerCompressionSlackAM = other.GetCouplerCompressionSlackAM();
             coupler.CouplerCompressionSlackBM = other.GetCouplerCompressionSlackBM();
+            coupler.CompressionStiffness1N = other.GetCouplerCompressionStiffness1N();
+            coupler.CompressionStiffness2N = other.GetCouplerCompressionStiffness2N();
+
+
             if (Couplers.Count == 0)
                 Couplers.Add(coupler);
             else
                 Couplers[0] = coupler;
             if (Couplers.Count > 1)
                 Couplers.RemoveAt(1);
+
         }
 
         public void SetWagonHandbrake(bool ToState)
