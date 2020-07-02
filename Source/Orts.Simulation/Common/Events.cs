@@ -189,7 +189,11 @@ namespace Orts.Common
 
         SteamGearLeverToggle,
         AIFiremanSoundOn,
-        AIFiremanSoundOff
+        AIFiremanSoundOff,
+
+        GearPosition0,
+        GearPosition1,
+        GearPosition2,
     }
 
     public static class Events
@@ -396,6 +400,11 @@ namespace Orts.Common
                         case 187: return Event.GenericEvent7;
                         case 188: return Event.GenericEvent8;
                         //
+
+
+                        case 200: return Event.GearPosition0;
+                        case 201: return Event.GearPosition1;
+                        case 202: return Event.GearPosition2;
 
                         default: return 0;
                     }
