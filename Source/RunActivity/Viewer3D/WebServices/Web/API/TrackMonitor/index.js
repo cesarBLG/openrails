@@ -174,7 +174,12 @@ function api() {
 						}
 						else{
 							// first col = FirstCol data
-							DisplayItem(row >25?'center':'left', 1, firstColor, stringColorFirst, firstColor? newDataFirst : obj.trackMonitorData[row].FirstCol, row >25? true: false );
+							if (row > 25 && controlMode.indexOf("AUTO") != -1){
+								DisplayItem('center', 1, firstColor, stringColorFirst, firstColor? newDataFirst : obj.trackMonitorData[row].FirstCol, true );
+							}
+							else{
+								DisplayItem('left', 1, firstColor, stringColorFirst, firstColor? newDataFirst : obj.trackMonitorData[row].FirstCol, false );
+							}
 
 							// second col = TrackColLeft data
 							DisplayItem('right', 1, trackColorLeft, stringColorTrackLeft, trackColorLeft? newDataTrackLeft : obj.trackMonitorData[row].TrackColLeft, false);

@@ -153,6 +153,8 @@ namespace Orts.Viewer3D.Popups
         public float markerIntervalD = 0;
 
         bool metric;
+        double Scale = 1;// scaling reference
+        const int DesignWidth = 150; // All Width/X values are relative to this width.
 
         public static int DbfEvalOverSpeed;//Debrief eval
         bool istrackColorRed = false;//Debrief eval
@@ -295,6 +297,7 @@ namespace Orts.Viewer3D.Popups
             if (WebServerEnabled)
             {
                 TrackMonitorListLabel.Clear();
+                Scale = (Double)Monitor.Position.Width / DesignWidth;
             }
             TrackControlList.Clear();
 
@@ -814,7 +817,7 @@ namespace Orts.Viewer3D.Popups
 
             // set area details
             var startObjectArea = additionalInfoHeight;
-            var endObjectArea = Monitor.Position.Height - additionalInfoHeight - trainPosition[4];
+            var endObjectArea = Monitor.Position.Height - (Monitor.Position.Height - (int)Math.Ceiling((Monitor.Position.Height / Scale))) - additionalInfoHeight - trainPosition[4];
             var zeroObjectPointTop = endObjectArea;
             var zeroObjectPointMiddle = zeroObjectPointTop - trainPosition[1];
             var zeroObjectPointBottom = zeroObjectPointMiddle - trainPosition[2];
@@ -882,7 +885,7 @@ namespace Orts.Viewer3D.Popups
 
             // set area details
             var startObjectArea = additionalInfoHeight;
-            var endObjectArea = Monitor.Position.Height - additionalInfoHeight;
+            var endObjectArea = Monitor.Position.Height - (Monitor.Position.Height - (int)Math.Ceiling((Monitor.Position.Height / Scale))) - additionalInfoHeight;
             var zeroObjectPointTop = 0;
             var zeroObjectPointMiddle = 0;
             var zeroObjectPointBottom = 0;
@@ -951,7 +954,7 @@ namespace Orts.Viewer3D.Popups
 
             // set area details
             var startObjectArea = additionalInfoHeight;
-            var endObjectArea = Monitor.Position.Height - additionalInfoHeight;
+            var endObjectArea = Monitor.Position.Height - (Monitor.Position.Height - (int)Math.Ceiling((Monitor.Position.Height / Scale))) - additionalInfoHeight;
             var zeroObjectPointMiddle = startObjectArea + (endObjectArea - startObjectArea) / 2;
             var zeroObjectPointTop = zeroObjectPointMiddle + trainPosition[1];
             var zeroObjectPointBottom = zeroObjectPointMiddle - trainPosition[2];
@@ -1063,16 +1066,18 @@ namespace Orts.Viewer3D.Popups
             // draw eye
             if (validInfo.cabOrientation == 0)
             {
-                DataCol = TrackControlList[itemLocationToRow(forwardsY, forwardsY)];
+                forwardsY = forwardsY - (forwardsY - (int)Math.Ceiling((forwardsY / Scale)));// scaling
+                DataCol = TrackControlList[itemLocationToRow(forwardsY , forwardsY )];
                 DataCol.TrackCol = eyeWS;
-                TrackControlList[itemLocationToRow(forwardsY, forwardsY)] = DataCol;
+                TrackControlList[itemLocationToRow(forwardsY , forwardsY )] = DataCol;
                 //spriteBatch.Draw(TrackMonitorImages, new Rectangle(offset.X + eyePosition[0], offset.Y + forwardsY + eyePosition[1], eyePosition[3], eyePosition[4]), eyeSprite, Color.White);
             }
             else
             {
-                DataCol = TrackControlList[itemLocationToRow(backwardsY, backwardsY)];
+                backwardsY = backwardsY - (backwardsY - (int)Math.Ceiling((backwardsY / Scale)));// scaling
+                DataCol = TrackControlList[itemLocationToRow(backwardsY , backwardsY )];
                 DataCol.TrackCol = eyeWS;
-                TrackControlList[itemLocationToRow(backwardsY, backwardsY)] = DataCol;
+                TrackControlList[itemLocationToRow(backwardsY , backwardsY )] = DataCol;
                 //spriteBatch.Draw(TrackMonitorImages, new Rectangle(offset.X + eyePosition[0], offset.Y + backwardsY + eyePosition[2], eyePosition[3], eyePosition[4]), eyeSprite, Color.White);
             }
         }
