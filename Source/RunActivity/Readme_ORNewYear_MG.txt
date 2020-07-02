@@ -1,5 +1,5 @@
-﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.66
-June 22nd, 2020
+﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.67
+July 2nd, 2020
 
 Please note that the installation and use of Open Rails software, even of its unofficial versions, is governed by the Open Rails End User License Agreement. 
 
@@ -12,7 +12,7 @@ INSTALLATION
 you would return to the official OR version.
 
 RELEASE NOTES
-This unofficial version has been derived from the latest official Open Rails Unstable release U2020.06.21-1736 (which already includes Monogame)
+This unofficial version has been derived from the latest official Open Rails Unstable release U2020.07.02-0621 (which already includes Monogame)
 and from the latest official OpenRails testing revision X1.3.1-185.
 TCS enhancement functions are now available also in the Unstable release.
 It includes some features not (yet) available in the Open Rails unstable official version, that is:
@@ -40,11 +40,11 @@ It includes some features not (yet) available in the Open Rails unstable officia
 - Bug fix for https://bugs.launchpad.net/or/+bug/1877644 SPEED signals not being updated in multiplayer clients. By cesarbl
 - Web server: web TrackMonitor added, by mbm_OR
 - Avoid 3D cab stuttering by a mutable shape primitive, by YoRyan
-- ORTS_SIGNED_TRACTION_TOTAL_BRAKING cab control https://trello.com/c/sHS9ZfNL/463-traction-braking-control-considering-train-brake , by Paolo
 - bug fix for memory leak, see http://www.elvastower.com/forums/index.php?/topic/34069-potential-memory-leak/
 - track gauge can be changed over the whole route, see http://www.elvastower.com/forums/index.php?/topic/34022-adjusting-track-gauge/
 - first edition of management of ORTS_POWERKEY and ORTS_BATTERY cab controls, by Paolo
 - re-introduced advanced coupling, by steamer_ctn
+- NEW: fixes in local and web TrackMonitor, by mbm_OR
 
 
 
