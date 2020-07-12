@@ -121,7 +121,10 @@ namespace Orts.Simulation.RollingStocks
         bool FullBoilerHeat = false;    // Boiler heat has exceeded max possible heat in boiler (max operating steam pressure)
         bool FullMaxPressBoilerHeat = false; // Boiler heat has exceed the max total possible heat in boiler (max safety valve pressure)
         bool ShovelAnyway = false; // Predicts when the AI fireman should be increasing the fire burn rate despite the heat in the boiler
-        public bool IsGrateLimit = false; // Grate limit of locomotive exceeded
+        /// <summary>
+        /// Grate limit of locomotive exceedeed?
+        /// </summary>
+        public bool IsGrateLimit { get; protected set; } = false;
         bool HasSuperheater = false;  // Flag to indicate whether locomotive is superheated steam type
         bool IsSuperSet = false;    // Flag to indicate whether superheating is reducing cylinder condenstation
         bool IsSaturated = false;     // Flag to indicate locomotive is saturated steam type
@@ -222,9 +225,15 @@ namespace Orts.Simulation.RollingStocks
         float IdealFireMassKG;      // Target fire mass
         float MaxFireMassKG;        // Max possible fire mass
         float MaxFiringRateKGpS;              // Max rate at which fireman or stoker can can feed coal into fire
-        public float GrateLimitLBpFt2 = 150.0f;       // Max combustion rate of the grate, once this is reached, no more steam is produced.
+        /// <summary>
+        /// Max combustion rate of the grate; once this is reached, no more steam is produced.
+        /// </summary>
+        public float GrateLimitLBpFt2 { get; protected set; } = 150.0f;
         float MaxFuelBurnGrateKGpS;            // Maximum rate of fuel burnt depending upon grate limit
-        public float GrateCombustionRateLBpFt2;     // Grate combustion rate, ie how many lbs coal burnt per sq ft grate area.
+        /// <summary>
+        /// Grate combustion rate, i.e. how many lbs coal burnt per sq ft grate area.
+        /// </summary>
+        public float GrateCombustionRateLBpFt2 { get; protected set; }
         float ORTSMaxFiringRateKGpS;          // OR equivalent of above
         float DisplayMaxFiringRateKGpS;     // Display value of MaxFiringRate
         public float SafetyValveUsageLBpS;
@@ -395,14 +404,17 @@ namespace Orts.Simulation.RollingStocks
         float BkW_Diff;                 // Net Energy into boiler after steam loads taken.
         float WaterVolL;                // Actual volume of water in bolier (litres)
         float BoilerHeatOutBTUpS = 0.0f;// heat out of boiler in BTU
-        public float BoilerHeatInBTUpS = 0.0f; // heat into boiler in BTU
+        /// <summary>
+        /// Heat into boiler in BTU
+        /// </summary>
+        public float BoilerHeatInBTUpS { get; protected set; } = 0.0f;
         float BoilerHeatExcess;         // Vlaue of excess boiler heat
         float InjCylEquivSizeIN;        // Calculate the equivalent cylinder size for purpose of sizing the injector.
         float InjectorSize;             // size of injector installed on boiler
 
         // Values from previous iteration to use in UpdateFiring() and show in HUD
-        public float PreviousBoilerHeatOutBTUpS = 0.0f;
-        public float PreviousTotalSteamUsageLBpS;
+        public float PreviousBoilerHeatOutBTUpS { get; protected set; } = 0.0f;
+        public float PreviousTotalSteamUsageLBpS { get; protected set; }
         float Injector1WaterDelTempF = 65f;   // Injector 1 water delivery temperature - F
         float Injector2WaterDelTempF = 65f;   // Injector 1 water delivery temperature - F
         float Injector1TempFraction;    // Find the fraction above the min temp of water delivery
@@ -5441,10 +5453,8 @@ namespace Orts.Simulation.RollingStocks
                     Injector1Fraction = 0.0f;
                     Injector2IsOn = false;
                     Injector2Fraction = 0.0f;
-                    SignalEvent(Event.WaterInjector1Off);
-                    SignalEvent(Event.WaterInjector2Off);
-                    Injector1SoundIsOn = false;
-                    Injector2SoundIsOn = false;
+                    StopInjector1Sound();
+                    StopInjector2Sound();
                 }
                 else if (WaterGlassLevelIN <= 7.0 && WaterGlassLevelIN > 6.875 && !InjectorLockedOut)  // turn injector 1 on 20% if water level in boiler drops below 7.0
                 {
@@ -5690,6 +5700,31 @@ namespace Orts.Simulation.RollingStocks
             }
         }
 
+        /// <summary>
+        /// Turn off the injector 1 sound only when the injector stops.
+        /// </summary>
+        private void StopInjector1Sound()
+        {
+            if (Injector1SoundIsOn)
+            {
+                Injector1SoundIsOn = false;
+                SignalEvent(Event.WaterInjector1Off);
+            }
+        }
+
+        /// <summary>
+        /// Turn off the injector 2 sound only when the injector stops.
+        /// </summary>
+        private void StopInjector2Sound()
+        {
+            if (Injector2SoundIsOn)
+            {
+                Injector2SoundIsOn = false;
+                SignalEvent(Event.WaterInjector2Off);
+            }
+        }
+
+
         protected override void UpdateCarSteamHeat(float elapsedClockSeconds)
         {
             // Update Steam Heating System
@@ -5860,7 +5895,7 @@ namespace Orts.Simulation.RollingStocks
         {
             var status = new StringBuilder(base.GetDebugStatus());
 
-            status.AppendFormat("\n\t\t === {0} === \t\t\n", Simulator.Catalog.GetString("Key Inputs"));
+            status.AppendFormat("\n\n\t\t === {0} === \t\t\n", Simulator.Catalog.GetString("Key Inputs"));
 
             status.AppendFormat("{0}\t\t{1}\n", Simulator.Catalog.GetString("Locomotive Type:"),
                 SteamLocoType);
@@ -6506,12 +6541,12 @@ namespace Orts.Simulation.RollingStocks
             if ((BrakeSystem is VacuumSinglePipe))
             {
 
-                status.AppendFormat("\n\t\t === {0} === \t\t{1}/{2}\n",
+                status.AppendFormat("\n\t\t\t === {0} === \t\t{1}/{2}\n",
                 Simulator.Catalog.GetString("Ejector / Vacuum Pump"),
                 FormatStrings.FormatMass(pS.TopH(Kg.FromLb(EjectorTotalSteamConsumptionLbpS)), IsMetric),
                 FormatStrings.h);
 
-                status.AppendFormat("{0}\t{1}\t{2:N2}\t{3}\t{4:N2}/{5}\t{6}\t{7:N2}\t{8}\t{9}",
+                status.AppendFormat("\t{0}\t{1}\t{2:N2}\t{3}\t{4:N2}/{5}\t{6}\t{7:N2}\t{8}\t{9}",
                 Simulator.Catalog.GetString("Large:"),
                 Simulator.Catalog.GetString("Press"),
                 FormatStrings.FormatPressure(SteamEjectorLargePressurePSI, PressureUnit.PSI, MainPressureUnit, true),
