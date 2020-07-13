@@ -1,5 +1,5 @@
-﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.67
-July 2nd, 2020
+﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.68
+July 13th, 2020
 
 Please note that the installation and use of Open Rails software, even of its unofficial versions, is governed by the Open Rails End User License Agreement. 
 
@@ -12,8 +12,8 @@ INSTALLATION
 you would return to the official OR version.
 
 RELEASE NOTES
-This unofficial version has been derived from the latest official Open Rails Unstable release U2020.07.02-0621 (which already includes Monogame)
-and from the latest official OpenRails testing revision X1.3.1-185.
+This unofficial version has been derived from the latest official Open Rails Unstable release U2020.07.12-2351 (which already includes Monogame)
+and from the latest official OpenRails testing revision X1.3.1-189.
 TCS enhancement functions are now available also in the Unstable release.
 It includes some features not (yet) available in the Open Rails unstable official version, that is:
 - addition of track sounds in the sound debug window (by dennisat)
@@ -29,7 +29,7 @@ It includes some features not (yet) available in the Open Rails unstable officia
 - extended Raildriver setup (by perpetualKid)
 - analog clocks showing game time, see http://www.elvastower.com/forums/index.php?/topic/29546-station-clocks/ , by jonas
 - bug fix for bad mouse pointing in full screen mode and for issues with Fast full screen-Alt-Tab mode
-- improved operation as webserver, enabling HUD and Train Driving info on web clients like PCs, tablets or smartphones, by mbm_OR, cjakeman and BillC
+- Webserver operating also with IPv4 addresses, that is on external devices, by mbm_OR, cjakeman and BillC
 - panto commands and animations now swapped when in rear cab
 - correction to reduce transfer flickering at short distance
 - allow passing a red signal for shunting through dispatcher window, see https://trello.com/c/I19VVKlz/450-manual-callon-from-dispatcher-window , by césarbl
@@ -38,13 +38,12 @@ It includes some features not (yet) available in the Open Rails unstable officia
 - skip warning messages related to ruler token, that is introduced by TSRE5
 - General Option to reduce memory usage
 - Bug fix for https://bugs.launchpad.net/or/+bug/1877644 SPEED signals not being updated in multiplayer clients. By cesarbl
-- Web server: web TrackMonitor added, by mbm_OR
 - Avoid 3D cab stuttering by a mutable shape primitive, by YoRyan
 - bug fix for memory leak, see http://www.elvastower.com/forums/index.php?/topic/34069-potential-memory-leak/
 - track gauge can be changed over the whole route, see http://www.elvastower.com/forums/index.php?/topic/34022-adjusting-track-gauge/
 - first edition of management of ORTS_POWERKEY and ORTS_BATTERY cab controls, by Paolo
 - re-introduced advanced coupling, by steamer_ctn
-- NEW: fixes in local and web TrackMonitor, by mbm_OR
+
 
 
 
