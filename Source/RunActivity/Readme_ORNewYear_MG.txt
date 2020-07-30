@@ -43,6 +43,7 @@ It includes some features not (yet) available in the Open Rails unstable officia
 - track gauge can be changed over the whole route, see http://www.elvastower.com/forums/index.php?/topic/34022-adjusting-track-gauge/
 - first edition of management of ORTS_POWERKEY and ORTS_BATTERY cab controls, by Paolo
 - re-introduced advanced coupling, by steamer_ctn
+- NEW: improvements to webserver, by mbm_OR
 
 
 
