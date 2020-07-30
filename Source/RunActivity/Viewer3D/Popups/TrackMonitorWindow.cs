@@ -1120,7 +1120,7 @@ namespace Orts.Viewer3D.Popups
                     }
                     else if (ipos == numberOfMarkers)
                     {   // Useful when overlapping
-                        BottomMaxDistanceMarker = itemLocationWS;
+                        BottomMaxDistanceMarker = itemLocationWS + 1;
                         MaxDistanceMarker = actDistanceM;
                     }
 
