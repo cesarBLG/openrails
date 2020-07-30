@@ -470,7 +470,6 @@ namespace Orts.Simulation.RollingStocks
             MaxHandbrakeForceN = InitialMaxHandbrakeForceN;
             MaxBrakeForceN = InitialMaxBrakeForceN;
             CentreOfGravityM = InitialCentreOfGravityM;
-            IsDavisFriction = DavisAN != 0 && DavisBNSpM != 0 && DavisCNSSpMM != 0; // test to see if OR thinks that Davis Values have been entered in WG file.
 
             if (FreightAnimations != null)
             {
@@ -818,6 +817,9 @@ namespace Orts.Simulation.RollingStocks
 #endif
 
             }
+
+            // Determine whether or not to use the Davis friction model. Must come after freight animations are initialized.
+            IsDavisFriction = DavisAN != 0 && DavisBNSpM != 0 && DavisCNSSpMM != 0;
 
             if (BrakeSystem == null)
                 BrakeSystem = MSTSBrakeSystem.Create(CarBrakeSystemType, this);
@@ -3409,7 +3411,7 @@ namespace Orts.Simulation.RollingStocks
                 Coupler2MTemporary = 0.1f; // make sure that SlackBM is always > 0
             }
             return Coupler.Rigid ? 0.0002f : Coupler.CompressionR0Y + GetCouplerCompressionSlackAM() + Coupler2MTemporary; //  GetMaximumCouplerSlack3M > GetMaximumCouplerSlack2M
-        }              
+        }
 
         public override float GetCouplerBreak1N() 
         {
@@ -3446,9 +3448,11 @@ namespace Orts.Simulation.RollingStocks
             }
             return Coupler.CompressionR0Y;
         }
+
+
         // TODO: This code appears to be being called by ReverseCars (in Trains.cs). 
         // Reverse cars moves the couplers along by one car, however this may be encountering a null coupler at end of train. 
-        // Thus all coupler parameters need to be tested for null coupler and defasult values inserted (To be confirmed)
+        // Thus all coupler parameters need to be tested for null coupler and default values inserted (To be confirmed)
         public override void CopyCoupler(TrainCar other)
         {						
             base.CopyCoupler(other);
@@ -3456,7 +3460,7 @@ namespace Orts.Simulation.RollingStocks
             // Simple Coupler parameters
             coupler.R0X = other.GetCouplerZeroLengthM();
             coupler.R0Y = other.GetCouplerZeroLengthM();
-            coupler.R0Diff = other.GetMaximumSimpleCouplerSlack1M();													 
+            coupler.R0Diff = other.GetMaximumSimpleCouplerSlack1M();
             coupler.Stiffness1NpM = other.GetSimpleCouplerStiffnessNpM() / 7;
             coupler.Stiffness2NpM = 0;
             coupler.CouplerSlackAM = other.GetCouplerSlackAM();

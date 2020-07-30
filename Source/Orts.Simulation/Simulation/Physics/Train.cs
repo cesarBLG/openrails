@@ -248,6 +248,7 @@ namespace Orts.Simulation.Physics
         public float maxTimeS = 120;                     // check ahead for distance covered in 2 mins.
         public float minCheckDistanceM = 5000;           // minimum distance to check ahead
         public float minCheckDistanceManualM = 3000;     // minimum distance to check ahead in manual mode
+        public float CheckDistanceM => Math.Max(AllowedMaxSpeedMpS * maxTimeS, minCheckDistanceM);
 
         public float standardOverlapM = 15.0f;           // standard overlap on clearing sections
         public float junctionOverlapM = 75.0f;           // standard overlap on clearing sections
@@ -3028,10 +3029,6 @@ namespace Orts.Simulation.Physics
 
             // get next items within max distance
 
-            float maxDistance = Math.Max(AllowedMaxSpeedMpS * maxTimeS, minCheckDistanceM);
-
-            // look maxTimeS or minCheckDistance ahead
-
             ObjectItemInfo nextObject;
             ObjectItemInfo prevObject = firstObject;
 
@@ -3040,7 +3037,7 @@ namespace Orts.Simulation.Physics
             int nextIndex = routeListIndex;
 
             while (returnState == ObjectItemInfo.ObjectItemFindState.Object &&
-                distanceToLastObject < maxDistance &&
+                distanceToLastObject < CheckDistanceM &&
                 nextAspect != MstsSignalAspect.STOP)
             {
                 int foundSection = -1;
@@ -3479,15 +3476,13 @@ namespace Orts.Simulation.Physics
                 // read next items if last item within max distance
                 //
 
-                float maxDistance = Math.Max(AllowedMaxSpeedMpS * maxTimeS, minCheckDistanceM);
-
                 int routeListIndex = PresentPosition[0].RouteListIndex;
                 int lastIndex = routeListIndex;
                 float offset = PresentPosition[0].TCOffset;
 
                 prevObject = SignalObjectItems[SignalObjectItems.Count - 1];  // last object
 
-                while (lastDistance < maxDistance &&
+                while (lastDistance < CheckDistanceM &&
                           returnState == ObjectItemInfo.ObjectItemFindState.Object &&
                           nextAspect != MstsSignalAspect.STOP)
                 {
@@ -4694,7 +4689,10 @@ namespace Orts.Simulation.Physics
         /// forwards due to the action of the spring, #3 - where the coupler is fully extended against the friction brake, and the full force of the 
         /// following wagons will be applied to the coupler.
         /// 
+        /// Coupler Force (CouplerForceU) : Fwd = -ve, Rev = +ve,  Total Force (TotalForceN): Fwd = -ve, Rev = +ve
+        /// 
         /// <\summary>
+
         public void ComputeCouplerForces(float elapsedTime)
         {
 
@@ -4758,6 +4756,7 @@ namespace Orts.Simulation.Physics
                 SolveCouplerForceEquations();
             while (FixCouplerForceEquations());
 
+           
 
             for (int i = 0; i < Cars.Count - 1; i++)
             {
@@ -4765,7 +4764,7 @@ namespace Orts.Simulation.Physics
                 TrainCar car = Cars[i];
 
                 // Check to make sure that last car does not have any coulpler force on its coupler (no cars connected). When cars reversed, there is sometimes a "residual" coupler force.
-                if (i == Cars.Count - 1 && Cars[i + 1].CouplerForceU != 0)
+                if (i == Cars.Count-1 && Cars[i+1].CouplerForceU != 0)
                 {
                     Cars[i].CouplerForceU = 0;
                 }
@@ -4774,8 +4773,8 @@ namespace Orts.Simulation.Physics
                 car.SmoothedCouplerForceUN = car.CouplerForceUSmoothed.SmoothedValue;
 
                 // Total force acting on each car is adjusted depending upon the calculated coupler forces
-                car.TotalForceN += car.CouplerForceU;
-                Cars[i + 1].TotalForceN -= car.CouplerForceU;
+                    car.TotalForceN += car.CouplerForceU;
+                    Cars[i + 1].TotalForceN -= car.CouplerForceU;
 
                 // Find max coupler force on the car - currently doesn't appear to be used anywhere
                 if (MaximumCouplerForceN < Math.Abs(car.CouplerForceU))
@@ -5333,18 +5332,23 @@ namespace Orts.Simulation.Physics
             if (n == 0)
                 return;
 
-            // start cars moving forward when it is stationary, once it is moving it skips this whole section
-
+            //
+            // start a car moving forward when it is stationary, once it is moving this whole section is skipped
+            //
             for (int i = 0; i < Cars.Count; i++)
             {
                 TrainCar car = Cars[i];
                 if (car.SpeedMpS != 0 || car.TotalForceN <= (car.FrictionForceN + car.BrakeForceN + car.CurveForceN + car.WindForceN + car.TunnelForceN + car.DynamicBrakeForceN))
+                {
+                    // Skip this section to start car if car is already moving, or force not sufficient to start it moving
                     continue;
+                }
                 int j = i;
                 float f = 0;
                 float m = 0;
                 for (;;)
                 {
+                    // Cycle down the train consist until the first stationary car is found that has its leading couplers starting to pull it. The next car is then started by allowing its speed to increase above 0.
                     f += car.TotalForceN - (car.FrictionForceN + car.BrakeForceN + car.CurveForceN + car.WindForceN + car.TunnelForceN + car.DynamicBrakeForceN);
                     m += car.MassKG;
                     if (car.IsPlayerTrain && Simulator.UseAdvancedAdhesion && car.IsAdvancedCoupler) // "Advanced coupler" - operates in three extension zones
@@ -5385,17 +5389,23 @@ namespace Orts.Simulation.Physics
             if (n == 0)
                 return;
 
+            //
             // start cars moving backward when it is stationary, once it is moving it skips this whole section
+            //
             for (int i = Cars.Count - 1; i >= 0; i--)
             {
                 TrainCar car = Cars[i];
                 if (car.SpeedMpS != 0 || car.TotalForceN > (-1.0f * (car.FrictionForceN + car.BrakeForceN + car.CurveForceN + car.WindForceN + car.TunnelForceN + car.DynamicBrakeForceN)))
+                {
+                    // Skip this section to start car if car is already moving, or force not sufficient to start it moving
                     continue;
+                }
                 int j = i;
                 float f = 0;
                 float m = 0;
                 for (;;)
                 {
+                    // Cycle up the train consist until the first stationary car is found that has its leading couplers starting to pull it. The next car is then started by allowing its speed to increase above 0.
                     f += car.TotalForceN + car.FrictionForceN + car.BrakeForceN + car.CurveForceN + car.WindForceN + car.TunnelForceN + car.DynamicBrakeForceN;
                     m += car.MassKG;
                     if (car.IsPlayerTrain && Simulator.UseAdvancedAdhesion && car.IsAdvancedCoupler) // "Advanced coupler" - operates in three extension zones
@@ -7701,8 +7711,7 @@ namespace Orts.Simulation.Physics
             //            }
 
             // look maxTimeS or minCheckDistance ahead
-            float maxDistance = Math.Max(AllowedMaxSpeedMpS * maxTimeS, minCheckDistanceM);
-            if (EndAuthorityType[0] == END_AUTHORITY.MAX_DISTANCE && DistanceToEndNodeAuthorityM[0] > maxDistance)
+            if (EndAuthorityType[0] == END_AUTHORITY.MAX_DISTANCE && DistanceToEndNodeAuthorityM[0] > CheckDistanceM)
             {
                 return;   // no update required //
             }
@@ -9068,7 +9077,7 @@ namespace Orts.Simulation.Physics
                 List<int> tempSections = new List<int>();
 
                 tempSections = signalRef.ScanRoute(this, requiredPosition.TCSectionIndex, requiredPosition.TCOffset,
-                        requiredPosition.TCDirection, forward, minCheckDistanceM, true, false,
+                        requiredPosition.TCDirection, forward, CheckDistanceM, true, false,
                         false, false, true, false, false, false, false, IsFreight);
 
                 if (tempSections.Count > 0)
@@ -9152,10 +9161,10 @@ namespace Orts.Simulation.Physics
 
             // if route does not end with signal and is too short, extend
 
-            if (!endWithSignal && totalLengthM < minCheckDistanceM)
+            if (!endWithSignal && totalLengthM < CheckDistanceM)
             {
 
-                float extendedDistanceM = minCheckDistanceM - totalLengthM;
+                float extendedDistanceM = CheckDistanceM - totalLengthM;
                 TCRouteElement lastElement = newRoute[newRoute.Count - 1];
 
                 int lastSectionIndex = lastElement.TCSectionIndex;
@@ -9210,17 +9219,17 @@ namespace Orts.Simulation.Physics
 
             // if route is too long, remove sections at end
 
-            else if (totalLengthM > minCheckDistanceM)
+            else if (totalLengthM > CheckDistanceM)
             {
                 float remainingLengthM = totalLengthM - signalRef.TrackCircuitList[newRoute[0].TCSectionIndex].Length; // do not count first section
-                bool lengthExceeded = remainingLengthM > minCheckDistanceM;
+                bool lengthExceeded = remainingLengthM > CheckDistanceM;
 
                 for (int iindex = newRoute.Count - 1; iindex > 1 && lengthExceeded; iindex--)
                 {
                     thisElement = newRoute[iindex];
                     thisSection = signalRef.TrackCircuitList[thisElement.TCSectionIndex];
 
-                    if ((remainingLengthM - thisSection.Length) > minCheckDistanceM)
+                    if ((remainingLengthM - thisSection.Length) > CheckDistanceM)
                     {
                         remainingLengthM -= thisSection.Length;
                         newRoute.RemoveAt(iindex);
@@ -9401,7 +9410,7 @@ namespace Orts.Simulation.Physics
                     int lastDirection = newRoute[newRoute.Count - 1].Direction;
                     if (lastSection.EndSignals[lastDirection] != null && lastSection.EndSignals[lastDirection].thisRef == nextUnclearSignalIndex)
                     {
-                        float remainingDistance = minCheckDistanceM - endAuthorityDistanceM;
+                        float remainingDistance = CheckDistanceM - endAuthorityDistanceM;
                         SignalObject reqSignal = signalRef.SignalObjects[nextUnclearSignalIndex];
                         newRoute = reqSignal.requestClearSignalExplorer(newRoute, remainingDistance, forward ? routedForward : routedBackward, false, 0);
                     }
@@ -9896,7 +9905,6 @@ namespace Orts.Simulation.Physics
             }
 
             // use direction forward only
-            float maxDistance = Math.Max(AllowedMaxSpeedMpS * maxTimeS, minCheckDistanceM);
             float clearedDistanceM = 0.0f;
 
             int activeSectionIndex = thisSectionIndex;
@@ -9927,7 +9935,7 @@ namespace Orts.Simulation.Physics
                     TrackCircuitSection thisSection = signalRef.TrackCircuitList[activeSectionIndex];
                     clearedDistanceM = GetDistanceToTrain(activeSectionIndex, thisSection.Length);
 
-                    if (clearedDistanceM > maxDistance)
+                    if (clearedDistanceM > CheckDistanceM)
                     {
                         EndAuthorityType[0] = END_AUTHORITY.MAX_DISTANCE;
                         LastReservedSection[0] = thisSection.Index;
