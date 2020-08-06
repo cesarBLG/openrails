@@ -51,7 +51,7 @@ namespace ORTS.Content
     /// <summary>
     /// A generic formation of wagons and engines. Its composition may be nondeterministc.
     /// </summary>
-    public interface ITrainFile
+    public interface IVehicleList
     {
         string DisplayName { get; }
         float? MaxVelocityMpS { get; }
@@ -84,7 +84,7 @@ namespace ORTS.Content
         IEnumerable<WagonReference> GetReverseWagonList(string basePath, IDictionary<string, string> folders, PreferredLocomotive preference = null);
 
         /// <summary>
-        /// Get the head-end locomotives that this train can spawn with.
+        /// Get the head-end locomotives that this vehicle list can spawn with.
         /// </summary>
         /// <remarks>
         /// trains without locomotives should return <see cref="PreferredLocomotive.NoLocomotiveSet"/>.
@@ -95,7 +95,7 @@ namespace ORTS.Content
         ISet<PreferredLocomotive> GetLeadLocomotiveChoices(string basePath, IDictionary<string, string> folders);
 
         /// <summary>
-        /// Get the head-end locomotives that this train can spawn with if reversed.
+        /// Get the head-end locomotives that this vehicle list can spawn with if reversed.
         /// </summary>
         /// <remarks>
         /// trains without locomotives should return <see cref="PreferredLocomotive.NoLocomotiveSet"/>.
@@ -141,15 +141,15 @@ namespace ORTS.Content
         public override int GetHashCode() => FilePath.ToLowerInvariant().GetHashCode();
     }
 
-    public static class TrainFileUtilities
+    public static class VehicleListUtilities
     {
         /// <summary>
         /// Locate a train or consist by filename. Prioritize the native (.train-or) train format if available.
         /// </summary>
         /// <param name="basePath">The current content directory.</param>
-        /// <param name="filename">The filename of the train.</param>
-        /// <returns>The train path with the preferred extension, or null if no matching file is found.</returns>
-        public static string ResolveTrainFile(string basePath, string filename)
+        /// <param name="filename">The filename of the vehicle list.</param>
+        /// <returns>The vehicle list path with the preferred extension, or null if no matching file is found.</returns>
+        public static string ResolveVehicleList(string basePath, string filename)
         {
             string ortsList = ResolveOrtsTrainFile(basePath, filename);
             string mstsConsist = ResolveMstsConsist(basePath, filename);
@@ -220,11 +220,11 @@ namespace ORTS.Content
         }
 
         /// <summary>
-        /// Enumerate all train files in a content directory. Native (.train-or) files will shadow legacy (.con) ones.
+        /// Enumerate all vehicle list files in a content directory. Native (.train-or) files will shadow legacy (.con) ones.
         /// </summary>
         /// <param name="basePath">The current content directory.</param>
-        /// <returns>All files with known train or consist file extensions.</returns>
-        public static IEnumerable<string> AllTrainFiles(string basePath)
+        /// <returns>All files with known vehicle list file extensions.</returns>
+        public static IEnumerable<string> AllVehicleLists(string basePath)
         {
             ISet<string> BaseNames(string directory, string pattern)
             {

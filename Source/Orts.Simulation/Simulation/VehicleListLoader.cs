@@ -25,28 +25,28 @@ using System.IO;
 
 namespace Orts.Simulation.Simulation
 {
-    public static class GenericTrain
+    public static class VehicleListLoader
     {
         /// <summary>
-        /// Load a train file by name.
+        /// Load a vehicle list by name.
         /// </summary>
         /// <param name="basePath">The content directory.</param>
-        /// <param name="name">The train filename (without an extension) to search for.</param>
-        /// <returns>The loaded train.</returns>
-        public static ITrainFile LoadFile(string basePath, string name)
+        /// <param name="name">The vehicle list filename (without an extension) to search for.</param>
+        /// <returns>The loaded vehicle list.</returns>
+        public static IVehicleList LoadFile(string basePath, string name)
         {
-            string filePath = TrainFileUtilities.ResolveTrainFile(basePath, name);
+            string filePath = VehicleListUtilities.ResolveVehicleList(basePath, name);
             if (!File.Exists(filePath))
-                throw new FileNotFoundException($"Could not locate train: {name}");
+                throw new FileNotFoundException($"Could not locate vehicle list: {name}");
             return LoadFile(filePath);
         }
 
         /// <summary>
-        /// Load a train file by path.
+        /// Load a vehicle list file by path.
         /// </summary>
-        /// <param name="filePath">The path to the train.</param>
-        /// <returns>The loaded train.</returns>
-        public static ITrainFile LoadFile(string filePath)
+        /// <param name="filePath">The path to the vehicle list.</param>
+        /// <returns>The loaded vehicle list.</returns>
+        public static IVehicleList LoadFile(string filePath)
         {
             switch (Path.GetExtension(filePath).ToLower())
             {
@@ -55,20 +55,20 @@ namespace Orts.Simulation.Simulation
                 case ".con":
                     return new Formats.Msts.ConsistFile(filePath);
                 default:
-                    throw new InvalidDataException("Unknown train format");
+                    throw new InvalidDataException("Unknown vehicle list format");
             }
         }
 
         /// <summary>
-        /// Load the wagons of a train into the simulator.
+        /// Load the wagons of a vehicle list into the simulator.
         /// </summary>
-        /// <param name="train">The train file to load.</param>
+        /// <param name="vehicleList">The vehicle list file to load.</param>
         /// <param name="simulator">The game instance.</param>
-        /// <param name="flip">If set, reverse the train.</param>
+        /// <param name="flip">If set, reverse the formation.</param>
         /// <param name="playerTrain">If set, errors that affect the first wagon are fatal.</param>
         /// <param name="preference">Request a formation with a particular lead locomotive, identified by a filesystem path.</param>
         /// <returns>The list of loaded <see cref="TrainCar"/>s.</returns>
-        public static IEnumerable<TrainCar> LoadCars(this ITrainFile train, Simulator simulator, bool flip = false, bool playerTrain = false, PreferredLocomotive preference = null)
+        public static IEnumerable<TrainCar> LoadCars(this IVehicleList vehicleList, Simulator simulator, bool flip = false, bool playerTrain = false, PreferredLocomotive preference = null)
         {
             UserSettings settings = simulator.Settings;
             bool first = true;
@@ -76,9 +76,9 @@ namespace Orts.Simulation.Simulation
             {
                 IEnumerable<WagonReference> list;
                 if (flip)
-                    list = train.GetReverseWagonList(simulator.BasePath, settings.Folders.Folders, preference);
+                    list = vehicleList.GetReverseWagonList(simulator.BasePath, settings.Folders.Folders, preference);
                 else
-                    list = train.GetForwardWagonList(simulator.BasePath, settings.Folders.Folders, preference);
+                    list = vehicleList.GetForwardWagonList(simulator.BasePath, settings.Folders.Folders, preference);
                 foreach (WagonReference wagonRef in list)
                 {
                     yield return wagonRef;
@@ -89,7 +89,7 @@ namespace Orts.Simulation.Simulation
             {
                 if (!File.Exists(wagonRef.FilePath))
                 {
-                    Trace.TraceWarning("Ignored missing wagon {0} in train {1}", wagonRef.FilePath, train.DisplayName);
+                    Trace.TraceWarning("Ignored missing wagon {0} in train {1}", wagonRef.FilePath, vehicleList.DisplayName);
                     continue;
                 }
 
