@@ -1,5 +1,5 @@
-﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.70
-August 1st, 2020
+﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.71
+August 10th, 2020
 
 Please note that the installation and use of Open Rails software, even of its unofficial versions, is governed by the Open Rails End User License Agreement. 
 
@@ -12,8 +12,8 @@ INSTALLATION
 you would return to the official OR version.
 
 RELEASE NOTES
-This unofficial version has been derived from the latest official Open Rails Unstable release U2020.08.01-1821 (which does NOT include Monogame)
-and from the latest official OpenRails testing revision X1.3.1-195.
+This unofficial version has been derived from the latest official Open Rails Unstable release U2020.08.09-0036 (which does NOT include Monogame)
+and from the latest official OpenRails testing revision X1.3.1-201.
 It includes some features not (yet) available in the Open Rails unstable official version, that is:
 - MONOGAME
 - addition of track sounds in the sound debug window (by dennisat)
@@ -43,6 +43,7 @@ It includes some features not (yet) available in the Open Rails unstable officia
 - track gauge can be changed over the whole route, see http://www.elvastower.com/forums/index.php?/topic/34022-adjusting-track-gauge/
 - first edition of management of ORTS_POWERKEY and ORTS_BATTERY cab controls, by Paolo
 - re-introduced advanced coupling, by steamer_ctn
+- NEW: Multiplayer: temporary solution to restore tsimserver compatibility
 
 
 
