@@ -1400,7 +1400,7 @@ namespace Orts.Viewer3D.Popups
                 }
             }
 
-            TextPageHeading(table, Viewer.Catalog.GetString("DISPATCHER INFORMATION : active trains : " + totalactive));
+            TextPageHeading(table, $"{Viewer.Catalog.GetString("DISPATCHER INFORMATION : active trains : ")}{totalactive}");
 
             ResetHudScroll();//Reset HudScroll
 

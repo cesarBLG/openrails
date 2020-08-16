@@ -264,7 +264,7 @@ namespace Orts.MultiPlayer
         public string code = "";
         public int num; //train number
         public string con; //consist
-        public bool Tilting { get; }
+        public bool Tilting { get; } = false;
         public string path; //path consist and path will always be double quoted
         public string route;
         public int dir; //direction
@@ -287,6 +287,7 @@ namespace Orts.MultiPlayer
         public MSGPlayer() { }
         public MSGPlayer(string m)
         {
+            // To preserve backwards compatibility with the public server at tsimserver.com, it is important not to change the beginning of this message.
             string[] areas = m.Split('\r');
             if (areas.Length <= 6)
             {
@@ -336,6 +337,13 @@ namespace Orts.MultiPlayer
                     {
                         MPManager.Instance().GetMD5HashFromTDBFile();
                     }
+                }
+
+                // We can introduce new fields beyond this point.
+                if (version >= 16)
+                {
+                    if (areas.Length >= 11)
+                        Tilting = bool.Parse(areas[10]);
                 }
             }
             catch (Exception e)
@@ -424,9 +432,10 @@ namespace Orts.MultiPlayer
         }
         public override string ToString()
         {
+            // To preserve backwards compatibility with the public server at tsimserver.com, it is important not to change the beginning of this message.
             string tmp = "PLAYER " + user + " " + code + " " + num + " " + TileX + " " + TileZ + " " + X.ToString(CultureInfo.InvariantCulture) + " " + Z.ToString(CultureInfo.InvariantCulture)
                 + " " + Travelled.ToString(CultureInfo.InvariantCulture) + " " + trainmaxspeed.ToString(CultureInfo.InvariantCulture) + " " + seconds.ToString(CultureInfo.InvariantCulture) + " " + season + " " + weather + " " + pantofirst + " " + pantosecond + " " + pantothird + " " + pantofourth + " " + frontorrearcab + " " + headlight + " \r" +
-                $"{leadingID}\r{con}\r{route}\r{path}\r{dir}\r{url}\r";
+                leadingID + "\r" + con + "\r" + route + "\r" + path + "\r" + dir + "\r" + url + "\r";
             for (var i = 0; i < cars.Length; i++)
             {
                 var c = cars[i];
@@ -440,6 +449,10 @@ namespace Orts.MultiPlayer
             }
 
             tmp += "\r" + MPManager.Instance().version + "\r" + MD5;
+
+            // We can introduce new fields beyond this point.
+            tmp += $"\r{string.Join("\r", Tilting)}";
+
             return " " + tmp.Length + ": " + tmp;
         }
 
