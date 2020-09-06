@@ -312,6 +312,12 @@ namespace Orts.Simulation
             if (File.Exists(RoutePath + @"\TSECTION.DAT"))
                 TSectionDat.AddRouteTSectionDatFile(RoutePath + @"\TSECTION.DAT");
 
+            // fix to accept track section file with switch entries without MainRoute defined
+            if (!TRK.Tr_RouteFile.ChangeTrackGauge)
+                foreach (var trackShape in TSectionDat.TrackShapes)
+                    if (trackShape.Value.MainRoute == int.MaxValue) trackShape.Value.MainRoute = 0;
+
+
             SuperElevation = new SuperElevation(this);
 
 #if ACTIVITY_EDITOR
