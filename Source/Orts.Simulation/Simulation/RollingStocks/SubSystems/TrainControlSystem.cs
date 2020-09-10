@@ -115,7 +115,18 @@ namespace Orts.Simulation.RollingStocks.SubSystems
 
         public bool Activated = false;
 
-        Train.TrainInfo TrainInfo = new Train.TrainInfo();
+
+        Train.TrainInfo TrainInfo
+        {
+            get
+            {
+                if (!TrainInfoUpdatedFlag) _trainInfo = Locomotive.Train.GetTrainInfo();
+                TrainInfoUpdatedFlag = true;
+                return _trainInfo;
+            }
+        }
+        Train.TrainInfo _trainInfo = new Train.TrainInfo();
+        bool TrainInfoUpdatedFlag;
 
         readonly MSTSLocomotive Locomotive;
         readonly Simulator Simulator;
@@ -435,9 +446,6 @@ namespace Orts.Simulation.RollingStocks.SubSystems
 
         void SearchTrainInfo(float forsight, Train.TrainObjectItem.TRAINOBJECTTYPE searchFor)
         {
-            if (SignalSpeedLimits.Count == 0)
-                TrainInfo = Locomotive.Train.GetTrainInfo();
-
             var signalsFound = 0;
             var postsFound = 0;
 
@@ -625,7 +633,6 @@ namespace Orts.Simulation.RollingStocks.SubSystems
 
         T NextDivergingSwitchItem<T>(float maxDistanceM, ref T retval, Train.TrainObjectItem.TRAINOBJECTTYPE type)
         {
-            var LocalTrainInfo = Locomotive.Train.GetTrainInfo();
             SignalDistance = float.MaxValue;
             foreach (var foundItem in Locomotive.Train.MUDirection == Direction.Reverse ? TrainInfo.ObjectInfoBackward : TrainInfo.ObjectInfoForward)
             {
@@ -715,6 +722,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
 
         public void ClearParams()
         {
+            TrainInfoUpdatedFlag = false;
             SignalSpeedLimits.Clear();
             SignalAspects.Clear();
             SignalDistances.Clear();
