@@ -71,6 +71,18 @@ namespace Orts.Menu
         private void EnableEditButtons(bool enable)
         {
             edit = enable;
+            if (enable)
+            {
+                buttonOK.Click += ButtonOK_Click;
+                buttonCancel.Click += ButtonCancel_Click;
+                buttonDefault.Click += ButtonDefault_Click;
+            }
+            else
+            {
+                buttonOK.Click -= ButtonOK_Click;
+                buttonCancel.Click -= ButtonCancel_Click;
+                buttonDefault.Click -= ButtonDefault_Click;
+            }
             buttonCancel.Visible = enable;
             buttonOK.Visible = enable;
             buttonDefault.Visible = enable;
@@ -141,7 +153,7 @@ namespace Orts.Menu
         private void ButtonClick()
         {
             EnableEditButtons(false);
-            railDriver.ClearDisplay();
+            railDriver?.ClearDisplay();
             UpdateText();
             Parent.Focus();
         }
