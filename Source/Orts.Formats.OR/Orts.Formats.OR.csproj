@@ -65,7 +65,6 @@
     <Compile Include="AEStationPath.cs" />
     <Compile Include="AETraveller.cs" />
     <Compile Include="AuxActionRef.cs" />
-    <Compile Include="TrainFile.cs" />
     <Compile Include="DrawUtility.cs" />
     <Compile Include="ExtCarSpawnerFile.cs" />
     <Compile Include="ExtClocksFile.cs" />

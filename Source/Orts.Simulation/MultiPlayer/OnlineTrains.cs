@@ -19,8 +19,6 @@ using Orts.Simulation;
 using Orts.Simulation.AIs;
 using Orts.Simulation.Physics;
 using Orts.Simulation.RollingStocks;
-using Orts.Simulation.Simulation;
-using ORTS.Content;
 using ORTS.Scripting.Api;
 using System;
 using System.Collections.Generic;

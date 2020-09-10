@@ -1,4 +1,21 @@
-﻿using Orts.Common;
+﻿// COPYRIGHT 2009, 2010, 2011, 2012, 2013, 2014 by the Open Rails project.
+// 
+// This file is part of Open Rails.
+// 
+// Open Rails is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// Open Rails is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with Open Rails.  If not, see <http://www.gnu.org/licenses/>.
+
+using Orts.Common;
 using Orts.Parsers.Msts;
 using Orts.Simulation.Physics;
 using ORTS.Common;
@@ -27,7 +44,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Brakes.MSTS
         float ManualMaxApplicationRateValuepS;
         float ManualBrakingDesiredFraction;
         float ManualBrakingCurrentFraction;
-        float ManualMaxBrakeForceN;
+        float SteamBrakeCompensation;
 
         public override bool GetHandbrakeStatus()
         {
@@ -67,40 +84,91 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Brakes.MSTS
                 DebugType = "M";
             else
                 DebugType = "-";
+
+            // Changes brake type if locomotive fitted with steam brakes
+            if (Car is MSTSSteamLocomotive)
+            {
+                var locoident = Car as MSTSSteamLocomotive;
+                if (locoident.SteamEngineBrakeFitted)
+                {
+                    DebugType = "S";
+                }
+            }
+
         }
 
         public override void Update(float elapsedClockSeconds)
         {
             MSTSLocomotive lead = (MSTSLocomotive)Car.Train.LeadLocomotive;
-            float BrakemanBrakeSettingValue = lead.BrakemanBrakeController.CurrentValue;
+            float BrakemanBrakeSettingValue = 0;
+            float EngineBrakeSettingValue = 0;
+            ManualBrakingDesiredFraction = 0;
+            SteamBrakeCompensation = 1.0f;
 
-            ManualBrakingDesiredFraction = BrakemanBrakeSettingValue * ManualMaxBrakeValue;
-
-            if (ManualBrakingCurrentFraction < ManualBrakingDesiredFraction)
+            if (Car.WagonType == MSTSWagon.WagonTypes.Freight || Car.WagonType == MSTSWagon.WagonTypes.Passenger) // Car brakes
             {
-                ManualBrakingCurrentFraction += ManualMaxApplicationRateValuepS;
-                if (ManualBrakingCurrentFraction > ManualBrakingDesiredFraction)
+                if (lead != null)
                 {
-                    ManualBrakingCurrentFraction = ManualBrakingDesiredFraction;
+                    BrakemanBrakeSettingValue = lead.BrakemanBrakeController.CurrentValue;
                 }
 
-            }
-            else if (ManualBrakingCurrentFraction > ManualBrakingDesiredFraction)
-            {
-                ManualBrakingCurrentFraction -= ManualReleaseRateValuepS;
-                if (ManualBrakingCurrentFraction < 0)
+                ManualBrakingDesiredFraction = BrakemanBrakeSettingValue * ManualMaxBrakeValue;
+
+                if (ManualBrakingCurrentFraction < ManualBrakingDesiredFraction)
                 {
-                    ManualBrakingCurrentFraction = 0;
+                    ManualBrakingCurrentFraction += ManualMaxApplicationRateValuepS;
+                    if (ManualBrakingCurrentFraction > ManualBrakingDesiredFraction)
+                    {
+                        ManualBrakingCurrentFraction = ManualBrakingDesiredFraction;
+                    }
+
+                }
+                else if (ManualBrakingCurrentFraction > ManualBrakingDesiredFraction)
+                {
+                    ManualBrakingCurrentFraction -= ManualReleaseRateValuepS;
+                    if (ManualBrakingCurrentFraction < 0)
+                    {
+                        ManualBrakingCurrentFraction = 0;
+                    }
+
+                }
+            }
+            else if (Car.WagonType == MSTSWagon.WagonTypes.Engine || Car.WagonType == MSTSWagon.WagonTypes.Tender) // Engine brake
+            {
+                if (lead != null)
+                {
+                    EngineBrakeSettingValue = lead.EngineBrakeController.CurrentValue;
+                    if(lead.SteamEngineBrakeFitted)
+                    {
+                        SteamBrakeCompensation = lead.BoilerPressurePSI / lead.MaxBoilerPressurePSI;
+                    }
                 }
 
+                ManualBrakingDesiredFraction = EngineBrakeSettingValue * ManualMaxBrakeValue;
+
+                if (ManualBrakingCurrentFraction < ManualBrakingDesiredFraction)
+                {
+                    ManualBrakingCurrentFraction += ManualMaxApplicationRateValuepS;
+                    if (ManualBrakingCurrentFraction > ManualBrakingDesiredFraction)
+                    {
+                        ManualBrakingCurrentFraction = ManualBrakingDesiredFraction;
+                    }
+
+                }
+                else if (ManualBrakingCurrentFraction > ManualBrakingDesiredFraction)
+                {
+                    ManualBrakingCurrentFraction -= ManualReleaseRateValuepS;
+                    if (ManualBrakingCurrentFraction < 0)
+                    {
+                        ManualBrakingCurrentFraction = 0;
+                    }
+                }
             }
 
-            // Trace.TraceInformation("Manual Braking - CarId {0} BrakeSetting {1} MaxBrakeValue {2} DesiredFraction {3} CurrentFraction {4} MaxBrakeForce {5}", Car.CarID, ManualBrakeSettingValue, ManualMaxBrakeValue, ManualBrakingDesiredFraction, ManualBrakingCurrentFraction, Car.MaxBrakeForceN);
-
-            float f;
+                float f;
             if (!Car.BrakesStuck)
             {
-                f = Car.MaxBrakeForceN * Math.Min(ManualBrakingCurrentFraction / ManualMaxBrakeValue, 1);
+                f = Car.MaxBrakeForceN * Math.Min((ManualBrakingCurrentFraction * SteamBrakeCompensation) / ManualMaxBrakeValue, 1);
                 if (f < Car.MaxHandbrakeForceN * HandbrakePercent / 100)
                     f = Car.MaxHandbrakeForceN * HandbrakePercent / 100;
             }
@@ -142,7 +210,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Brakes.MSTS
             {
                 return new string[] {
                 DebugType,
-                string.Format("{0:F0} %", ManualBrakingCurrentFraction),
+                string.Format("{0:F0} %", ManualBrakingCurrentFraction * SteamBrakeCompensation),
                 string.Empty,
                 string.Empty,
                 string.Empty,
