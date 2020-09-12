@@ -4542,6 +4542,12 @@ namespace Orts.Simulation.AIs
             if (MPManager.IsMultiPlayer()) MPManager.BroadCast((new MSGCouple(this, attachTrain, false)).ToString());
             UpdateOccupancies();
             AddTrackSections();
+            if (TCRoute != null && (ControlMode == TRAIN_CONTROL.AUTO_SIGNAL || ControlMode == TRAIN_CONTROL.AUTO_NODE))
+            {
+                PresentPosition[0].RouteListIndex = ValidRoute[0].GetRouteIndex(PresentPosition[0].TCSectionIndex, 0);
+                PresentPosition[1].RouteListIndex = ValidRoute[0].GetRouteIndex(PresentPosition[1].TCSectionIndex, 0);
+                TCRoute.SetReversalOffset(Length, Simulator.TimetableMode);
+            }
             ResetActions(true);
             physicsUpdate(0);
 

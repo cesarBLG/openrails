@@ -6171,26 +6171,47 @@ namespace Orts.Simulation.Physics
         {
             float lengthToGoM = -PresentPosition[0].TCOffset;
             TrackCircuitSection thisSection;
-            if (PresentPosition[0].RouteListIndex == -1)
+            int routeListIndex = PresentPosition[0].RouteListIndex;
+            bool computeFromFront = true;
+            if (routeListIndex == -1)
             {
-                Trace.TraceWarning("Train {0} service {1} off path; distance to reversal point set to -1", Number, Name);
-                return -1;
+                if (PresentPosition[1].RouteListIndex == -1)
+                {
+                    Trace.TraceWarning("Train {0} service {1} off path; distance to reversal point set to -1", Number, Name);
+                    return -1;
+                }
+                else
+                {
+                    routeListIndex = PresentPosition[1].RouteListIndex;
+                    lengthToGoM = -PresentPosition[1].TCOffset;
+                    computeFromFront = false;
+                }
             }
             // in case the AI train is out of its original path the reversal info is simulated to point to the end of the last route section
             int reversalRouteIndex = ValidRoute[0].Count - 1;
             TrackCircuitSection reversalSection = signalRef.TrackCircuitList[ValidRoute[0][reversalRouteIndex].TCSectionIndex];
             float reverseReversalOffset = reversalSection.Length;
-            reversalRouteIndex = ValidRoute[0].GetRouteIndex(TCRoute.ReversalInfo[TCRoute.activeSubpath].ReversalSectionIndex, PresentPosition[0].RouteListIndex);
+            reversalRouteIndex = ValidRoute[0].GetRouteIndex(TCRoute.ReversalInfo[TCRoute.activeSubpath].ReversalSectionIndex, routeListIndex);
             if (reversalRouteIndex == -1)
             {
-                Trace.TraceWarning("Train {0} service {1}, reversal or end point off path; distance to reversal point set to -1", Number, Name);
-                return -1;
+                if (routeListIndex != PresentPosition[1].RouteListIndex && PresentPosition[1].RouteListIndex != -1)
+                {
+                    routeListIndex = PresentPosition[1].RouteListIndex;
+                    lengthToGoM = -PresentPosition[1].TCOffset;
+                    reversalRouteIndex = ValidRoute[0].GetRouteIndex(TCRoute.ReversalInfo[TCRoute.activeSubpath].ReversalSectionIndex, routeListIndex);
+                    computeFromFront = false;
+                }
+                if (reversalRouteIndex == -1)
+                {
+                    Trace.TraceWarning("Train {0} service {1}, reversal or end point off path; distance to reversal point set to -1", Number, Name);
+                    return -1;
+                }
             }
             reversalSection = signalRef.TrackCircuitList[TCRoute.ReversalInfo[TCRoute.activeSubpath].ReversalSectionIndex];
             reverseReversalOffset = TCRoute.ReversalInfo[TCRoute.activeSubpath].ReverseReversalOffset;
-            if (PresentPosition[0].RouteListIndex <= reversalRouteIndex)
+            if (routeListIndex <= reversalRouteIndex)
             {
-                for (int iElement = PresentPosition[0].RouteListIndex; iElement < ValidRoute[0].Count; iElement++)
+                for (int iElement = routeListIndex; iElement < ValidRoute[0].Count; iElement++)
                 {
                     TCRouteElement thisElement = ValidRoute[0][iElement];
                     thisSection = signalRef.TrackCircuitList[thisElement.TCSectionIndex];
@@ -6200,11 +6221,11 @@ namespace Orts.Simulation.Physics
                     }
                     else lengthToGoM += thisSection.Length;
                 }
-                return lengthToGoM += reverseReversalOffset;
+                return lengthToGoM += reverseReversalOffset - (computeFromFront ? 0 : Length);
             }
             else
             {
-                for (int iElement = PresentPosition[0].RouteListIndex - 1; iElement >= 0; iElement--)
+                for (int iElement = routeListIndex - 1; iElement >= 0; iElement--)
                 {
                     TCRouteElement thisElement = ValidRoute[0][iElement];
                     thisSection = signalRef.TrackCircuitList[thisElement.TCSectionIndex];
@@ -6214,7 +6235,7 @@ namespace Orts.Simulation.Physics
                     }
                     else lengthToGoM -= thisSection.Length;
                 }
-                return lengthToGoM += reverseReversalOffset - reversalSection.Length;
+                return lengthToGoM += reverseReversalOffset - reversalSection.Length - (computeFromFront ? 0 : Length);
             }
         }
 
@@ -11153,14 +11174,14 @@ namespace Orts.Simulation.Physics
                         }
                         else
                         {
-                            ValidRoute[0].Add(new TCRouteElement(OccupiedTrack[isection], thisDirection, signalRef, lastSectionIndex));
+                            ValidRoute[0].Add(new TCRouteElement(OccupiedTrack[isection], thisDirection == 1 ? 0  : 1, signalRef, lastSectionIndex));
                         }
                     }
                     else
                     {
                         lastIndex = nextIndex;
-                        lastSectionIndex = nextSectionIndex;
                     }
+                    lastSectionIndex = nextSectionIndex;
                 }
             }
             // else start from last section
