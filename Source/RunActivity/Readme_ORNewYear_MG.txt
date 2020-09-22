@@ -1,5 +1,5 @@
-﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.75
-September 10th, 2020
+﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.76
+September 22nd, 2020
 
 Please note that the installation and use of Open Rails software, even of its unofficial versions, is governed by the Open Rails End User License Agreement. 
 
@@ -12,7 +12,7 @@ INSTALLATION
 you would return to the official OR version.
 
 RELEASE NOTES
-This unofficial version has been derived from the latest official Open Rails Unstable release U2020.09.10-1951 (which does NOT include Monogame)
+This unofficial version has been derived from the latest official Open Rails Unstable release U2020.09.22-0736 (which does NOT include Monogame)
 and from the latest official OpenRails testing revision X1.3.1-220.
 It includes some features not (yet) available in the Open Rails unstable official version, that is:
 - MONOGAME
@@ -43,8 +43,8 @@ It includes some features not (yet) available in the Open Rails unstable officia
 - track gauge can be changed over the whole route, see http://www.elvastower.com/forums/index.php?/topic/34022-adjusting-track-gauge/
 - first edition of management of ORTS_POWERKEY and ORTS_BATTERY cab controls, by Paolo
 - re-introduced advanced coupling, by steamer_ctn
-- faster loading of Raildriver options page, by perpetualKid
-- improved TrainInfo management for TCS, hints by gpz.
+- improved TrainInfo management for TCS, hints by gpz
+- bug fix for https://bugs.launchpad.net/or/+bug/1895391 Calculation of reversal point distance failing.
 
 
 
