@@ -140,7 +140,7 @@ namespace ORTS
             checkAlerterExternal.Checked = Settings.Alerter && !Settings.AlerterDisableExternal;
             checkSpeedControl.Checked = Settings.SpeedControl;
             checkConfirmations.Checked = !Settings.SuppressConfirmations;
-            checkViewDispatcher.Checked = Settings.ViewDispatcher;
+            checkViewMapWindow.Checked = Settings.ViewDispatcher;
             checkRetainers.Checked = Settings.RetainersOnAllCars;
             checkGraduatedRelease.Checked = Settings.GraduatedRelease;
             numericBrakePipeChargingRate.Value = Settings.BrakePipeChargingRate;
@@ -448,7 +448,7 @@ private async void OptionsForm_Shown(object sender, EventArgs e)
             Settings.AlerterDisableExternal = !checkAlerterExternal.Checked;
             Settings.SpeedControl = checkSpeedControl.Checked;
             Settings.SuppressConfirmations = !checkConfirmations.Checked;
-            Settings.ViewDispatcher = checkViewDispatcher.Checked;
+            Settings.ViewDispatcher = checkViewMapWindow.Checked;
             Settings.RetainersOnAllCars = checkRetainers.Checked;
             Settings.GraduatedRelease = checkGraduatedRelease.Checked;
             Settings.BrakePipeChargingRate = (int)numericBrakePipeChargingRate.Value;

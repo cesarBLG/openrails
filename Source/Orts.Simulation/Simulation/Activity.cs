@@ -1320,9 +1320,8 @@ namespace Orts.Simulation
                 case EventType.AssembleTrainAtLocation:
                     if (atSiding(OriginalPlayerTrain.FrontTDBTraveller, OriginalPlayerTrain.RearTDBTraveller, this.SidingEnd1, this.SidingEnd2))
                     {
-                        consistTrain = null;
                         consistTrain = matchesConsist(ChangeWagonIdList);
-                        triggered = (consistTrain != null ? true : false);
+                        triggered = consistTrain != null;
                     }
                     break;
                 case EventType.DropOffWagonsAtLocation:
@@ -1331,9 +1330,8 @@ namespace Orts.Simulation
                     // To recognize the dropping off of the cars before the event is activated, this method is used.
                     if (atSiding(OriginalPlayerTrain.FrontTDBTraveller, OriginalPlayerTrain.RearTDBTraveller, this.SidingEnd1, this.SidingEnd2))
                     {
-                        consistTrain = null;
                         consistTrain = matchesConsistNoOrder(ChangeWagonIdList);
-                        triggered = (consistTrain != null ? true : false);
+                        triggered = consistTrain != null;
                     }
                     break;
                 case EventType.PickUpPassengers:
@@ -1387,7 +1385,6 @@ namespace Orts.Simulation
         {
             foreach (var trainItem in Simulator.Trains)
             {
-                //bool lEngine = false;
                 int nCars = 0;//all cars other than WagonIdList.
                 int nWagonListCars = 0;//individual wagon drop.
                 foreach (var item in trainItem.Cars)
@@ -1434,19 +1431,11 @@ namespace Orts.Simulation
         /// <returns>True if all listed wagons are not part of the given train.</returns>
         static bool excludesWagons(Train train, List<string> wagonIdList)
         {
-            bool lNotFound = true;
             // The Cars list is a global list that includes STATIC cars.  We need to make sure that the active train/car is processed only.
-            for (int i = 0; i < train.Cars.Count; i++)
-            {
-                var car = train.Cars[i];
-                if (car.Train.TrainType == Train.TRAINTYPE.STATIC)
-                {
-                    lNotFound = true;
-                    return lNotFound;
-                }
+            if (train.TrainType == Train.TRAINTYPE.STATIC)
+                return true;
 
-            }
-
+            bool lNotFound = false;
             foreach (var item in wagonIdList)
             {
                 //take in count each item in wagonIdList 
