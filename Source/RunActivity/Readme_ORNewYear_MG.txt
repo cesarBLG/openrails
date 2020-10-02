@@ -1,5 +1,5 @@
-﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.76
-September 22nd, 2020
+﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.77
+October 2nd, 2020
 
 Please note that the installation and use of Open Rails software, even of its unofficial versions, is governed by the Open Rails End User License Agreement. 
 
@@ -12,7 +12,7 @@ INSTALLATION
 you would return to the official OR version.
 
 RELEASE NOTES
-This unofficial version has been derived from the latest official Open Rails Unstable release U2020.09.22-0736 (which does NOT include Monogame)
+This unofficial version has been derived from the latest official Open Rails Unstable release U2020.10.01-2006 (which does NOT include Monogame)
 and from the latest official OpenRails testing revision X1.3.1-220.
 It includes some features not (yet) available in the Open Rails unstable official version, that is:
 - MONOGAME
