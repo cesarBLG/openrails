@@ -2,15 +2,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "POT-Creation-Date: 2020-04-03 18:27:11+0100\n"
-"PO-Revision-Date: 2020-04-22 12:38+0100\n"
+"PO-Revision-Date: 2020-10-12 16:25+0100\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 2.3\n"
+"X-Generator: Poedit 2.4.1\n"
 "Last-Translator: Rui Fonseca <ryfonseca77@gmail.com>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"Language: pt_PT\n"
+"Language: pt-PT\n"
 
 #: ../../Menu/ImportExportSaveForm.cs:52
 msgid "Save Packs"
@@ -278,7 +278,7 @@ msgstr "Servidor/porta:"
 
 #: ../../Menu/MainForm.Designer.cs:257
 msgid "User name:"
-msgstr "Nome de Utilizador:"
+msgstr "Utilizador:"
 
 #: ../../Menu/MainForm.Designer.cs:284
 msgid "Multiplayer"
@@ -534,7 +534,7 @@ msgid ""
 "Infrequent updates to official, hand-picked versions. Recommended for most "
 "users."
 msgstr ""
-"Actualizações oficiais não-frequentes a versões seleccionadas. Recomendado "
+"Actualizações oficiais, esporádicas, a versões seleccionadas. Recomendado "
 "para a maioria dos utilizadores."
 
 #: ../../Menu/Options.cs:273
@@ -562,7 +562,7 @@ msgstr "Clique para mudar esta tecla"
 msgid ""
 "Continue with conflicting key assignments?\n"
 "\n"
-msgstr "Continuar com este conflito na atribuição de teclas?\n"
+msgstr "Continuar com este conflito de atribuição de teclas?\n"
 
 #: ../../Menu/Options.cs:538
 msgid "Remove all custom key assignments?"
@@ -573,8 +573,7 @@ msgid ""
 "A listing of all keyboard commands and keys has been placed here:\n"
 "\n"
 msgstr ""
-"Aqui pode encontrar uma listagem de todos os comandos e teclas:\n"
-"\n"
+"Listagem de todos os comandos e teclas:\n"
 "\n"
 
 #: ../../Menu/Options.cs:558
@@ -653,7 +652,7 @@ msgstr "OK"
 
 #: ../../Menu/Options.Designer.cs:273
 msgid "Brake pipe charging rate (PSI/s)"
-msgstr "Caudal de enchimento da conduta de freio (PSI/s)"
+msgstr "Caudal de ar na conduta de freio (PSI/s)"
 
 #: ../../Menu/Options.Designer.cs:282
 msgid "Graduated release air brakes"
@@ -718,7 +717,7 @@ msgstr "Audio"
 
 #: ../../Menu/Options.Designer.cs:526
 msgid "% external sound heard internally"
-msgstr "% de sons exteriores ouvidos em interiores"
+msgstr "% de sons exteriores ouvidos no interior"
 
 #: ../../Menu/Options.Designer.cs:559
 msgid "% sound volume"
