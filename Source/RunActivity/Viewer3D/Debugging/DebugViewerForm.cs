@@ -75,10 +75,10 @@ namespace Orts.Viewer3D.Debugging
 		/// </summary>
 		public bool Dragging;
 	  private WorldPosition worldPos;
-      public float xScale = 1; 
-      public float yScale = 1; 
+      public float xScale = 1; // pixels / metre
+      public float yScale = 1; // pixels / metre 
 
-	  string name = "";
+		string name = "";
 	  public List<SwitchWidget> switchItemsDrawn;
 	  public List<SignalWidget> signalItemsDrawn;
 
@@ -333,9 +333,8 @@ namespace Orts.Viewer3D.Debugging
 			if (simulator.TDB == null || simulator.TDB.TrackDB == null || simulator.TDB.TrackDB.TrItemTable == null) 
 				return;
 
-			foreach (var item in simulator.TDB.TrackDB.TrItemTable)
-                TimetableWindow.AddToTimetableItemList(item);
-        }
+			TimetableWindow.PopulateItemLists();
+		}
 
       bool Inited;
 		public List<LineSegment> segments = new List<LineSegment>();
@@ -639,9 +638,7 @@ namespace Orts.Viewer3D.Debugging
 			PointF[] points = new PointF[3];
 			Pen p = grayPen;
 
-			p.Width = (int) xScale;
-			if (p.Width < 1) p.Width = 1;
-			else if (p.Width > 3) p.Width = 3;
+			p.Width = MathHelper.Clamp(xScale, 1, 3);
 			greenPen.Width = orangePen.Width = redPen.Width = p.Width; pathPen.Width = 2 * p.Width;
 			trainPen.Width = p.Width*6;
 			var forwardDist = 100 / xScale; if (forwardDist < 5) forwardDist = 5;
@@ -755,17 +752,12 @@ namespace Orts.Viewer3D.Debugging
             if (true/*showPlayerTrain.Checked*/)
             {
 
-				CleanVerticalCells();//clean the drawing area for text of sidings
-				foreach (var s in sidings)
-				{
-					scaledItem.X = (s.Location.X - subX) * xScale;
-					scaledItem.Y = DetermineSidingLocation(scaledItem.X, pbCanvas.Height - (s.Location.Y - subY) * yScale, s.Name);
-					if (scaledItem.Y >= 0f) //if we need to draw the siding names
-					{
+				CleanVerticalCells();//clean the drawing area for text of sidings and platforms
+				foreach (var sw in sidings)
+	                scaledItem = DrawSiding(g, scaledItem, sw);
+                foreach (var pw in platforms)
+					scaledItem = DrawPlatform(g, scaledItem, pw);
 
-						g.DrawString(s.Name, sidingFont, sidingBrush, scaledItem);
-					}
-				}
 				var margin = 30 * xScale;//margins to determine if we want to draw a train
 				var margin2 = 5000 * xScale;
 
@@ -932,6 +924,29 @@ namespace Orts.Viewer3D.Debugging
 
          pbCanvas.Invalidate();
       }
+
+        private PointF DrawSiding(Graphics g, PointF scaledItem, SidingWidget s)
+        {
+            scaledItem.X = (s.Location.X - subX) * xScale;
+            scaledItem.Y = DetermineSidingLocation(scaledItem.X, pbCanvas.Height - (s.Location.Y - subY) * yScale, s.Name);
+            if (scaledItem.Y >= 0f) //if we need to draw the siding names
+            {
+
+                g.DrawString(s.Name, sidingFont, sidingBrush, scaledItem);
+            }
+            return scaledItem;
+        }
+		private PointF DrawPlatform(Graphics g, PointF scaledItem, PlatformWidget s)
+		{
+			scaledItem.X = (s.Location.X - subX) * xScale;
+			scaledItem.Y = DetermineSidingLocation(scaledItem.X, pbCanvas.Height - (s.Location.Y - subY) * yScale, s.Name);
+			if (scaledItem.Y >= 0f) //if we need to draw the siding names
+			{
+
+				g.DrawString(s.Name, sidingFont, sidingBrush, scaledItem);
+			}
+			return scaledItem;
+		}
 
 		public Vector2[][] alignedTextY;
 	  public int[] alignedTextNum;
@@ -2198,12 +2213,27 @@ namespace Orts.Viewer3D.Debugging
             TimetableWindow.SetControls();
         }
 
-        /// <summary>
-        /// Provides a clip zone to stop user from pushing track fully out of window
-        /// </summary>
-        /// <param name="diffX"></param>
-        /// <param name="diffY"></param>
-        private void ClipDrag(int diffX, int diffY)
+		/// <summary>
+		/// Loads a relevant page from the manual maintained by James Ross's automatic build
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+        private void bTrainKey_Click(object sender, EventArgs e)
+        {
+			// This method is also compatible with .NET Core 3
+			var psi = new ProcessStartInfo
+				{ FileName = "https://open-rails.readthedocs.io/en/latest/driving.html#extended-hud-for-dispatcher-information"
+				, UseShellExecute = true
+				};
+			Process.Start(psi);
+		}
+
+		/// <summary>
+		/// Provides a clip zone to stop user from pushing track fully out of window
+		/// </summary>
+		/// <param name="diffX"></param>
+		/// <param name="diffY"></param>
+		private void ClipDrag(int diffX, int diffY)
         {
 			// Moving the mouse right means moving the ViewWindow left.
             var changeXm = -(float)(diffX / xScale);
@@ -2488,21 +2518,25 @@ namespace Orts.Viewer3D.Debugging
    /// </summary>
    public struct SidingWidget
    {
-	   public PointF Location;
-	   public string Name;
+		public uint Id;
+		public PointF Location;
+	    public string Name;
+		public uint LinkId;
 
 		/// <summary>
 		/// The underlying track item.
 		/// </summary>
-		private TrItem Item;
+		public SidingItem Item;
 
 		/// <summary>
 		/// 
 		/// </summary>
 		/// <param name="item"></param>
 		/// <param name="signal"></param>
-		public SidingWidget(TrItem item)
+		public SidingWidget(SidingItem item)
 		{
+			Id = item.TrItemId;
+			LinkId = item.LinkedSidingId;
 			Item = item;
 			Name = item.ItemName;
 			Location = new PointF(item.TileX * 2048 + item.X, item.TileZ * 2048 + item.Z);
@@ -2511,33 +2545,36 @@ namespace Orts.Viewer3D.Debugging
 
 #endregion
 
-	/// <summary>
-	/// Defines a platform name being drawn in a 2D view.
-	/// </summary>
 	public struct PlatformWidget
 	{
+		public uint Id;
 		public PointF Location;
 		public string Name;
 		public PointF Extent1;
 		public PointF Extent2;
+		public uint LinkId;
+		public string Station;
 
 		/// <summary>
 		/// The underlying track item.
 		/// </summary>
-		private TrItem Item;
+		public PlatformItem Item;
 
 		/// <summary>
 		/// 
 		/// </summary>
 		/// <param name="item"></param>
 		/// <param name="signal"></param>
-		public PlatformWidget(TrItem item)
+		public PlatformWidget(PlatformItem item)
 		{
+			Id = item.TrItemId;
+			LinkId = item.LinkedPlatformItemId;
 			Item = item;
 			Name = item.ItemName;
+			Station = item.Station;
 			Location = new PointF(item.TileX * 2048 + item.X, item.TileZ * 2048 + item.Z);
-			Extent1 = new PointF(0, 0);
-			Extent2 = new PointF(0, 0);
+			Extent1 = default(PointF);
+			Extent2 = default(PointF);
 		}
 	}
 
