@@ -445,6 +445,13 @@ namespace Orts.Formats.Msts
             stf.SkipRestOfBlock();
             return switchVal;
         }
+        protected virtual float ParseRotation(STFReader stf)
+        {
+            stf.MustMatch("(");
+            var rotation = -MathHelper.ToRadians((float)stf.ReadDouble(0));
+            stf.SkipRestOfBlock();
+            return rotation;
+        }
     }
     #endregion
 
@@ -515,6 +522,7 @@ namespace Orts.Formats.Msts
         public int NumPositiveColors { get; set; }
         public int NumNegativeColors { get; set; }
         public color DecreaseColor { get; set; }
+        public float Rotation { get; set; }
 
         public CVCGauge() { }
 
@@ -575,7 +583,8 @@ namespace Orts.Formats.Msts
                         stf.ParseBlock(new STFReader.TokenProcessor[] {
                             new STFReader.TokenProcessor("controlcolour", ()=>{ DecreaseColor = ParseControlColor(stf); }) });
                     }
-                })
+                }),
+                new STFReader.TokenProcessor("ortsangle", () =>{ Rotation = ParseRotation(stf); })
             });
         }
     }
@@ -696,7 +705,7 @@ namespace Orts.Formats.Msts
                     }
                 }),
                 new STFReader.TokenProcessor("ortsfont", ()=>{ParseFont(stf); }),
-                new STFReader.TokenProcessor("ortsangle", () => { ParseRotation(stf); }),              
+                new STFReader.TokenProcessor("ortsangle", () => {Rotation = ParseRotation(stf); }),              
             });
         }
 
@@ -737,14 +746,6 @@ namespace Orts.Formats.Msts
             if (fontFamily != null) FontFamily = fontFamily;
             stf.SkipRestOfBlock();
          }
-
-        protected virtual void ParseRotation(STFReader stf)
-        {
-            stf.MustMatch("(");
-            Rotation = - MathHelper.ToRadians((float)stf.ReadDouble(0));
-            stf.SkipRestOfBlock();
-        }
-
     }
 
     public class CVCDigitalClock : CVCDigital
