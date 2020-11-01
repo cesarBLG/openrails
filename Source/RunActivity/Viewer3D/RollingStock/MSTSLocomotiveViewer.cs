@@ -1620,21 +1620,21 @@ namespace Orts.Viewer3D.RollingStock
                 {
                     if (Gauge.Orientation == 0)
                     {
-                        destX = (int)(xratio * (Control.PositionX + (zeropos < xpos ? zeropos : xpos)));
+                        destX = (int)(xratio * (Control.PositionX)) + (int)(xratio * (zeropos < xpos ? zeropos : xpos));
 //                        destY = (int)(yratio * Control.PositionY);
-                        destY = (int)(yratio * (Control.PositionY + (Gauge.Direction == 0 && zeropos > xpos ? (zeropos - xpos) * Math.Sin(DrawRotation) : 0)));
-                        destW = (int)(xratio * (xpos > zeropos ? xpos - zeropos : zeropos - xpos));
+                        destY = (int)(yratio * (Control.PositionY) - (int)(yratio * (Gauge.Direction == 0 && zeropos > xpos ? (zeropos - xpos) * Math.Sin(DrawRotation) : 0)));
+                        destW = ((int)(xratio * xpos) - (int)(xratio * zeropos)) * (xpos >= zeropos ? 1 : -1);
                         destH = (int)(yratio * ypos);
                     }
                     else
                     {
-                        destX = (int)(xratio * Control.PositionX + (Gauge.Direction == 0 && ypos > zeropos ? (ypos - zeropos) * Math.Sin(DrawRotation) : 0));
+                        destX = (int)(xratio * Control.PositionX) +(int)(xratio * (Gauge.Direction == 0 && ypos > zeropos ? (ypos - zeropos) * Math.Sin(DrawRotation) : 0));
                         if (Gauge.Direction != 1 && !IsFire)
-                            destY = (int)(yratio * (Control.PositionY + (zeropos > ypos ? zeropos : 2 * zeropos - ypos)));
+                            destY = (int)(yratio * (Control.PositionY + zeropos)) + (ypos > zeropos ? (int)(yratio * (zeropos - ypos)) : 0);
                         else
                             destY = (int)(yratio * (Control.PositionY + (zeropos < ypos ? zeropos : ypos)));
                         destW = (int)(xratio * xpos);
-                        destH = (int)(yratio * (ypos > zeropos ? ypos - zeropos : zeropos - ypos));
+                        destH = ((int)(yratio * (ypos - zeropos))) * (ypos > zeropos ? 1 : -1);
                     }
                 }
                 else
@@ -1688,7 +1688,7 @@ namespace Orts.Viewer3D.RollingStock
                         destX = (int)(xratio * (Control.PositionX - ypos * Math.Sin(DrawRotation)));
                     else  // column grows from bottom
                     {
-                        topY += Gauge.Height - 2 * ypos;
+                        topY += Gauge.Height - 2.0f * ypos;
                         destX = (int)(xratio * (Control.PositionX + ypos * Math.Sin(DrawRotation)));
                     }
                 }
