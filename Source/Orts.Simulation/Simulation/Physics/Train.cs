@@ -14391,7 +14391,7 @@ namespace Orts.Simulation.Physics
             }
             foreach (TrainObjectItem thisTrainItem in PlayerTrainSpeedposts[0])
             {
-                if (thisTrainItem.DistanceToTrainM <= maxDistanceM) thisInfo.ObjectInfoBackward.Add(thisTrainItem);
+                if (thisTrainItem.DistanceToTrainM <= maxDistanceM) thisInfo.ObjectInfoForward.Add(thisTrainItem);
                 else break;
             }
 
@@ -14572,7 +14572,7 @@ namespace Orts.Simulation.Physics
                 }
                 foreach (TrainObjectItem thisTrainItem in PlayerTrainSpeedposts[0])
                 {
-                    if (thisTrainItem.DistanceToTrainM <= maxDistanceM) thisInfo.ObjectInfoBackward.Add(thisTrainItem);
+                    if (thisTrainItem.DistanceToTrainM <= maxDistanceM) thisInfo.ObjectInfoForward.Add(thisTrainItem);
                     else break;
                 }
                 foreach (TrainObjectItem thisTrainItem in PlayerTrainMileposts[0])
