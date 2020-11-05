@@ -1,5 +1,5 @@
-﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.79
-October 25th, 2020
+﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.80
+November 5th, 2020
 
 Please note that the installation and use of Open Rails software, even of its unofficial versions, is governed by the Open Rails End User License Agreement. 
 
@@ -13,9 +13,10 @@ you would return to the official OR version.
 
 RELEASE NOTES
 This unofficial version has been derived from the official OpenRails Unstable release U2020.10.16-1021 (which does NOT include Monogame),
-from the latest official OpenRails testing revision X1.3.1-236 and from the latest OpenRails master release dated Oct. 20th 05:19.
+from the latest official OpenRails testing revision X1.3.1-236 and from the latest OpenRails master release dated Nov. 4th 17:48.
+No more recent Unstable release is used to preserve the Monogame version of OR NewYear MG
 It includes some features not (yet) available in the Open Rails unstable official version, that is:
-- MONOGAME
+- Monogame, OR NewYear MG version
 - addition of track sounds in the sound debug window (by dennisat)
 - F5 HUD scrolling (by mbm_or)
 - checkbox in General Options tab to enable or disable watchdog
@@ -43,8 +44,9 @@ It includes some features not (yet) available in the Open Rails unstable officia
 - track gauge can be changed over the whole route, see http://www.elvastower.com/forums/index.php?/topic/34022-adjusting-track-gauge/
 - first edition of management of ORTS_POWERKEY and ORTS_BATTERY cab controls, by Paolo
 - re-introduced advanced coupling, by steamer_ctn
-- improved TrainInfo management for TCS, hints by gpz
-- bug fix for https://bugs.launchpad.net/or/+bug/1895391 Calculation of reversal point distance failing.
+- bug fix for https://bugs.launchpad.net/or/+bug/1895391 Calculation of reversal point distance failing
+- NEW: rework of preparation of player train data for use by the TCS script management
+- NEW: support for inclined gauges in 2Dcabs, see http://www.elvastower.com/forums/index.php?/topic/34517-enable-inclined-gauges-in-2d-cabs/ .
 
 
 
