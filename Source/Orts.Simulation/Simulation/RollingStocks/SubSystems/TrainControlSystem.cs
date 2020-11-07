@@ -475,7 +475,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
             MainHeadSignalTypeName = ItemFeatures.MainHeadSignalTypeName;
             ItemAspect = ItemFeatures.Aspect;
             ItemDistance = ItemFeatures.DistanceM;
-            ItemSpeedLimit = ItemFeatures.SpeedLimitM;
+            ItemSpeedLimit = ItemFeatures.SpeedLimitMpS;
             return retval;
         }
 
@@ -484,7 +484,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
             ItemFeatures.MainHeadSignalTypeName = "";
             ItemFeatures.Aspect = Aspect.None;
             ItemFeatures.DistanceM = float.MaxValue;
-            ItemFeatures.SpeedLimitM = -1.0f;
+            ItemFeatures.SpeedLimitMpS = -1.0f;
 
             int dir = Locomotive.Train.MUDirection == Direction.Reverse ? 1 : 0;
 
@@ -511,7 +511,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                 if (signalTypeName == "NORMAL")
                 {
                     ItemFeatures.Aspect = (Aspect)trainSignal.SignalState;
-                    ItemFeatures.SpeedLimitM = trainSignal.AllowedSpeedMpS;
+                    ItemFeatures.SpeedLimitMpS = trainSignal.AllowedSpeedMpS;
                 }
                 else
                 {
@@ -529,7 +529,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
 
                 // All OK, we can retrieve the data for the required speedpost;
                 ItemFeatures.DistanceM = trainSpeedpost.DistanceToTrainM;
-                ItemFeatures.SpeedLimitM = trainSpeedpost.AllowedSpeedMpS;
+                ItemFeatures.SpeedLimitMpS = trainSpeedpost.AllowedSpeedMpS;
             }
 
             return ItemFeatures;
