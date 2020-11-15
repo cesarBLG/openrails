@@ -1654,10 +1654,6 @@ namespace Orts.Simulation.Physics
             // check position of train wrt tunnels
             ProcessTunnels();
 
-            // prepare train data for Train Control System
-            if (IsActualPlayerTrain)
-                UpdatePlayerTrainData();
-
             // log train details
 
             if (DatalogTrainSpeed)
@@ -14318,6 +14314,8 @@ namespace Orts.Simulation.Physics
 
         public TrainInfo GetTrainInfo()
         {
+            if (IsActualPlayerTrain && PlayerTrainSignals == null)
+                UpdatePlayerTrainData();
             TrainInfo thisInfo = new TrainInfo();
 
             if (ControlMode == TRAIN_CONTROL.AUTO_NODE || ControlMode == TRAIN_CONTROL.AUTO_SIGNAL)
