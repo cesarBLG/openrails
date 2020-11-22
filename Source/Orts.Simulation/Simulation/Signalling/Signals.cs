@@ -10295,6 +10295,10 @@ namespace Orts.Simulation.Signalling
             // build output route from input route
             Train.TCSubpathRoute newRoute = new Train.TCSubpathRoute(thisRoute);
 
+            // don't clear if enabled for another train
+            if (enabledTrain != null && enabledTrain != thisTrain)
+                return newRoute;
+
             // if signal has fixed route, use that else build route
             if (fixedRoute != null && fixedRoute.Count > 0)
             {
@@ -10350,30 +10354,7 @@ namespace Orts.Simulation.Signalling
             if (extendRoute && fullRoute)
             {
                 isPropagated = propagated;
-                int ReqNumClearAhead = 0;
-
-                if (SignalNumClearAhead_MSTS > -2)
-                {
-                    ReqNumClearAhead = propagated ?
-                        signalNumClearAhead - SignalNumNormalHeads : SignalNumClearAhead_MSTS - SignalNumNormalHeads;
-                }
-                else
-                {
-                    if (SignalNumClearAheadActive == -1)
-                    {
-                        ReqNumClearAhead = propagated ? signalNumClearAhead : 1;
-                    }
-                    else if (SignalNumClearAheadActive == 0)
-                    {
-                        ReqNumClearAhead = 0;
-                    }
-                    else
-                    {
-                        ReqNumClearAhead = isPropagated ? signalNumClearAhead - 1 : SignalNumClearAheadActive - 1;
-                    }
-                }
-
-
+                int ReqNumClearAhead = GetReqNumClearAheadExplorer(isPropagated, signalNumClearAhead);
                 if (ReqNumClearAhead > 0)
                 {
                     int nextSignalIndex = sigfound[(int)MstsSignalFunction.NORMAL];
@@ -10386,6 +10367,23 @@ namespace Orts.Simulation.Signalling
             }
 
             return (newRoute);
+        }
+
+        //================================================================================================//
+        /// <summary>
+        /// number of remaining signals to clear
+        /// </summary>
+
+        public int GetReqNumClearAheadExplorer(bool isPropagated, int signalNumClearAhead)
+        {
+            if (SignalNumClearAhead_MSTS > -2)
+                return propagated ? signalNumClearAhead - SignalNumNormalHeads : SignalNumClearAhead_MSTS - SignalNumNormalHeads;
+            else if (SignalNumClearAheadActive == -1)
+                return propagated ? signalNumClearAhead : 1;
+            else if (SignalNumClearAheadActive == 0)
+                return 0;
+            else
+                return isPropagated ? signalNumClearAhead - 1 : SignalNumClearAheadActive - 1;
         }
         //================================================================================================//
         /// <summary>
