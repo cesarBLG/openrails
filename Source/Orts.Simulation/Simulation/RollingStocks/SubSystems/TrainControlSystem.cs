@@ -486,6 +486,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
             ItemFeatures.Aspect = Aspect.None;
             ItemFeatures.DistanceM = float.MaxValue;
             ItemFeatures.SpeedLimitMpS = -1.0f;
+            ItemFeatures.AltitudeOrLengthM = -float.MaxValue;
 
             int dir = Locomotive.Train.MUDirection == Direction.Reverse ? 1 : 0;
 
@@ -513,6 +514,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                 {
                     ItemFeatures.Aspect = (Aspect)trainSignal.SignalState;
                     ItemFeatures.SpeedLimitMpS = trainSignal.AllowedSpeedMpS;
+                    ItemFeatures.AltitudeOrLengthM = trainSignal.SignalObject.tdbtraveller.Y;
                 }
                 else
                 {
