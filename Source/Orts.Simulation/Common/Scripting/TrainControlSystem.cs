@@ -593,6 +593,6 @@ namespace ORTS.Scripting.Api
         public Aspect Aspect;
         public float DistanceM;
         public float SpeedLimitMpS;
-        public float AltitudeOrLengthM;
+        public float AltitudeM;
     }
 }
