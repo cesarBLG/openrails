@@ -23,16 +23,21 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Orts.Viewer3D.Popups;
 using ORTS.Common;
-using ORTS.Scripting.Api;
 using ORTS.Scripting.Api.ETCS;
 using static Orts.Viewer3D.RollingStock.Subsystems.ETCS.DriverMachineInterface;
 
 namespace Orts.Viewer3D.RollingStock.Subsystems.ETCS
 {
     // Compliant with ERA_ERTMS_015560 version 3.6.0 (ETCS DRIVER MACHINE INTERFACE)
-    public class PlanningWindow
+    public class PlanningWindow : DMIWindow
     {
+        /// <summary>
+        /// Target with the lowest distance to indication. It will be shown in yellow
+        /// </summary>
         PlanningTarget? IndicationMarkerTarget;
+        /// <summary>
+        /// Distance to the point where the TSM or RSM monitors will be activated. It is shown as a yellow line.
+        /// </summary>
         float? IndicationMarkerDistanceM;
 
         int MaxViewingDistanceM = 8000;
@@ -42,8 +47,6 @@ namespace Orts.Viewer3D.RollingStock.Subsystems.ETCS
         bool Visible;
 
         readonly Viewer Viewer;
-
-        readonly DriverMachineInterface DMI;
 
         Texture2D ColorTexture;
 
@@ -93,18 +96,11 @@ namespace Orts.Viewer3D.RollingStock.Subsystems.ETCS
         readonly int[] LinePositions = { 283, 250, 206, 182, 164, 150, 107, 64, 21 };
         readonly int[] LineDistances = { 0, 25, 50, 75, 100, 125, 250, 500, 1000 };
 
-        readonly int[] TrackConditionPositions = { 55, 80, 105 };
+        readonly int[] TrackConditionPositions = { 45, 70, 95 };
 
-        /*readonly Point TrackConditionLocation = new Point(0, 15);
-        readonly Point GradientLocation = new Point(115, 15);
-        readonly Point PASPLocation = new Point(133, 15);*/
-
-        public float Scale = 1;
-
-        public PlanningWindow(DriverMachineInterface dmi, Viewer viewer, Point planningLocation)
+        public PlanningWindow(DriverMachineInterface dmi, Viewer viewer, Point planningLocation) : base(dmi)
         {
             Viewer = viewer;
-            DMI = dmi;
 
             SpeedIncreaseTexture = SharedTextureManager.Get(Viewer.RenderProcess.GraphicsDevice, System.IO.Path.Combine(Viewer.ContentPath, "ETCS", "symbols","Planning", "PL_21.png"));
             SpeedReductionTexture = SharedTextureManager.Get(Viewer.RenderProcess.GraphicsDevice, System.IO.Path.Combine(Viewer.ContentPath, "ETCS", "symbols", "Planning","PL_22.png"));
@@ -149,11 +145,7 @@ namespace Orts.Viewer3D.RollingStock.Subsystems.ETCS
             }
             if (MaxViewingDistanceM >= MaxZoomDistanceM) ButtonScaleDown.Enabled = false;
         }
-        Rectangle ScaledRectangle(Point origin, int x, int y, int width, int height)
-        {
-            return new Rectangle(origin.X + (int)(x * Scale), origin.Y + (int)(y * Scale), Math.Max((int)(width * Scale), 1), Math.Max((int)(height * Scale), 1));
-        }
-        public void Draw(SpriteBatch spriteBatch, Point position)
+        public override void Draw(SpriteBatch spriteBatch, Point position)
         {
             if (ColorTexture == null)
             {
@@ -407,22 +399,22 @@ namespace Orts.Viewer3D.RollingStock.Subsystems.ETCS
                         switch(condition.TractionSystem)
                         {
                             case TractionSystem.NonFitted:
-                                tex = TrackConditionTextureData[condition.YellowColour ? 24 : 23];
-                                break;
-                            case TractionSystem.AC25kV:
                                 tex = TrackConditionTextureData[condition.YellowColour ? 26 : 25];
                                 break;
-                            case TractionSystem.AC15kV:
+                            case TractionSystem.AC25kV:
                                 tex = TrackConditionTextureData[condition.YellowColour ? 28 : 27];
                                 break;
-                            case TractionSystem.DC3000V:
+                            case TractionSystem.AC15kV:
                                 tex = TrackConditionTextureData[condition.YellowColour ? 30 : 29];
                                 break;
-                            case TractionSystem.DC1500V:
+                            case TractionSystem.DC3000V:
                                 tex = TrackConditionTextureData[condition.YellowColour ? 32 : 31];
                                 break;
-                            case TractionSystem.DC750V:
+                            case TractionSystem.DC1500V:
                                 tex = TrackConditionTextureData[condition.YellowColour ? 34 : 33];
+                                break;
+                            case TractionSystem.DC750V:
+                                tex = TrackConditionTextureData[condition.YellowColour ? 36 : 35];
                                 break;
                             default:
                                 continue;
@@ -436,7 +428,7 @@ namespace Orts.Viewer3D.RollingStock.Subsystems.ETCS
             TrackConditionTextures = trackConditionTextures;
         }
 
-        public void PrepareFrame(ETCSStatus status)
+        public override void PrepareFrame(ETCSStatus status)
         {
             if (Visible != status.PlanningAreaShown)
             {
