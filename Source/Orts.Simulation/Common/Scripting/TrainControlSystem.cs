@@ -27,6 +27,8 @@ namespace ORTS.Scripting.Api
     {
         public bool Activated { get; set; }
 
+        public readonly ETCSStatus ETCSStatus = new ETCSStatus();
+
         /// <summary>
         /// True if train control is switched on (the locomotive is the lead locomotive and the train is not autopiloted).
         /// </summary>
