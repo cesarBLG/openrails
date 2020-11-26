@@ -829,7 +829,8 @@ namespace Orts.Simulation.RollingStocks
                 case "engine(ortsdynamicbrakeshasautobailoff": DynamicBrakeAutoBailOff = stf.ReadBoolBlock(true); break;
                 case "engine(dynamicbrakesdelaytimebeforeengaging": DynamicBrakeDelayS = stf.ReadFloatBlock(STFReader.UNITS.Time, null); break;
                 case "engine(dynamicbrakesresistorcurrentlimit": DynamicBrakeMaxCurrentA = stf.ReadFloatBlock(STFReader.UNITS.Current, null); break;
-                case "engine(numwheels": LocoNumDrvWheels = stf.ReadFloatBlock(STFReader.UNITS.None, 4.0f); if (LocoNumDrvWheels < 1) STFException.TraceWarning(stf, "Engine:NumWheels is less than 1, parts of the simulation may not function correctly"); break;
+                case "engine(numwheels": MSTSLocoNumDrvWheels = stf.ReadFloatBlock(STFReader.UNITS.None, 4.0f); if (MSTSLocoNumDrvWheels < 1) STFException.TraceWarning(stf, "Engine:NumWheels is less than 1, parts of the simulation may not function correctly"); break;
+                case "engine(ortsnumberdriveaxles": LocoNumDrvAxles = stf.ReadIntBlock(null); if (LocoNumDrvAxles < 1) STFException.TraceWarning(stf, "Engine:ORTSNumberDriveAxles is less than 1, parts of the simulation may not function correctly"); break;
                 case "engine(antislip": AntiSlip = stf.ReadBoolBlock(false); break;
                 case "engine(ortsdrivewheelweight": InitialDrvWheelWeightKg = stf.ReadFloatBlock(STFReader.UNITS.Mass, null); break;
                 case "engine(engineoperatingprocedures": EngineOperatingProcedures = stf.ReadStringBlock(""); break;
@@ -944,7 +945,8 @@ namespace Orts.Simulation.RollingStocks
             DynamicBrakeDelayS = locoCopy.DynamicBrakeDelayS;
             MaxDynamicBrakeForceN = locoCopy.MaxDynamicBrakeForceN;
             HasSmoothStruc = locoCopy.HasSmoothStruc;
-            LocoNumDrvWheels = locoCopy.LocoNumDrvWheels;
+            LocoNumDrvAxles = locoCopy.LocoNumDrvAxles;
+            MSTSLocoNumDrvWheels = locoCopy.MSTSLocoNumDrvWheels;
             AntiSlip = locoCopy.AntiSlip;
             VacuumPumpFitted = locoCopy.VacuumPumpFitted;
             FastVacuumExhausterFitted = locoCopy.FastVacuumExhausterFitted;
@@ -1232,6 +1234,25 @@ namespace Orts.Simulation.RollingStocks
                 CurrentTrackSandBoxCapacityM3 = MaxTrackSandBoxCapacityM3;
             }
             
+            // Ensure Drive Axles is set with a default value if user doesn't supply an OR value in ENG file
+            if (LocoNumDrvAxles == 0)
+            {
+                if (MSTSLocoNumDrvWheels != 0 && MSTSLocoNumDrvWheels < 6)
+                {
+                    LocoNumDrvAxles = (int) MSTSLocoNumDrvWheels;
+                }
+                else
+                {
+                    LocoNumDrvAxles = 4; // Set 4 axles as default
+                }
+
+                if (Simulator.Settings.VerboseConfigurationMessages)
+                {
+                    Trace.TraceInformation("Number of Locomotive Drive Axles set to default value of {0}", LocoNumDrvAxles);
+                }
+            }
+               
+
             // Calculate minimum speed to pickup water
             const float Aconst = 2;
             WaterScoopMinSpeedMpS = Me.FromFt((float)Math.Sqrt(Aconst * GravitationalAccelerationFtpSpS * Me.ToFt(WaterScoopFillElevationM)));
@@ -2193,7 +2214,7 @@ namespace Orts.Simulation.RollingStocks
         public void AdvancedAdhesion(float elapsedClockSeconds)
         {
 
-            if (LocoNumDrvWheels <= 0)
+            if (LocoNumDrvAxles <= 0)
             {
                 WheelSpeedMpS = AbsSpeedMpS;
                 return;
@@ -2260,13 +2281,13 @@ namespace Orts.Simulation.RollingStocks
         {
 
             // Check if the following few lines are required???
-            if (LocoNumDrvWheels <= 0)
+            if (LocoNumDrvAxles <= 0)
             {
                 WheelSpeedMpS = AbsSpeedMpS;
                 return;
             }
             
-            if (LocoNumDrvWheels <= 0)
+            if (LocoNumDrvAxles <= 0)
                 return;
 
             //Curtius-Kniffler computation
