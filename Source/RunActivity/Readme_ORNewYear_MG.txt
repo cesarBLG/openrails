@@ -1,5 +1,5 @@
-﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.81
-November 15th, 2020
+﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.82
+November 27th, 2020
 
 Please note that the installation and use of Open Rails software, even of its unofficial versions, is governed by the Open Rails End User License Agreement. 
 
@@ -13,8 +13,8 @@ you would return to the official OR version.
 
 RELEASE NOTES
 This unofficial version has been derived from the official OpenRails Unstable release U2020.10.16-1021 (which does NOT include Monogame),
-from the latest official OpenRails testing revision X1.3.1-236 and from the latest OpenRails master release dated Nov. 13th 20:51.
-No more recent Unstable release is used to preserve the Monogame version of OR NewYear MG
+from the latest official OpenRails testing revision X1.3.1-263.
+No more recent Unstable releases are in general used to preserve the Monogame version of OR NewYear MG. However all TCS hook pull requests present in the Unstable release U2020.11.27-1806 are included.
 It includes some features not (yet) available in the Open Rails unstable official version, that is:
 - Monogame, OR NewYear MG version
 - addition of track sounds in the sound debug window (by dennisat)
@@ -46,8 +46,11 @@ It includes some features not (yet) available in the Open Rails unstable officia
 - re-introduced advanced coupling, by steamer_ctn
 - bug fix for https://bugs.launchpad.net/or/+bug/1895391 Calculation of reversal point distance failing
 - support for inclined gauges in 2Dcabs, see http://www.elvastower.com/forums/index.php?/topic/34517-enable-inclined-gauges-in-2d-cabs/
-- NEW: bug fix for http://www.elvastower.com/forums/index.php?/topic/34572-new-player-trains-dont-show-train-brakes-in-hud/
-- NEW: bug fix for http://www.elvastower.com/forums/index.php?/topic/34565-tt-crash-when-forming-new-train-player/ .
+- bug fix for http://www.elvastower.com/forums/index.php?/topic/34572-new-player-trains-dont-show-train-brakes-in-hud/
+- bug fix for http://www.elvastower.com/forums/index.php?/topic/34565-tt-crash-when-forming-new-train-player/ 
+- NEW: support for ETCS L2 planning area, by césarbl, see http://www.elvastower.com/forums/index.php?/topic/34577-planning-area-of-the-etcs-dmi/ 
+- NEW: support for animation of pantographs in 2D cabs, see http://www.elvastower.com/forums/index.php?/topic/34604-2d-cabs-wipers-animation/page__view__findpost__p__265101 ,
+with the contribution of Paolo.
 
 
 
