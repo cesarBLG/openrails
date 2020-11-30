@@ -114,8 +114,8 @@ namespace Orts.Viewer3D.RollingStock.Subsystems.ETCS
             ScaleDownTexture[0] = SharedTextureManager.Get(Viewer.RenderProcess.GraphicsDevice, System.IO.Path.Combine(Viewer.ContentPath, "ETCS", "symbols", "Navigation", "NA_06.bmp"));
             ScaleDownTexture[1] = SharedTextureManager.Get(Viewer.RenderProcess.GraphicsDevice, System.IO.Path.Combine(Viewer.ContentPath, "ETCS", "symbols", "Navigation", "NA_04.bmp"));
 
-            ButtonScaleUp = new Button("Scale Up", true, new Rectangle(planningLocation.X, planningLocation.Y + 285, 40, 30));
-            ButtonScaleDown = new Button("Scale Down", true, new Rectangle(planningLocation.X, planningLocation.Y - 15, 40, 30));
+            ButtonScaleUp = new Button(Viewer.Catalog.GetString("Scale Up"), true, new Rectangle(planningLocation.X, planningLocation.Y + 285, 40, 30));
+            ButtonScaleDown = new Button(Viewer.Catalog.GetString("Scale Down"), true, new Rectangle(planningLocation.X, planningLocation.Y - 15, 40, 30));
             DMI.SensitiveButtons.Add(ButtonScaleUp);
             DMI.SensitiveButtons.Add(ButtonScaleDown);
 
@@ -230,7 +230,7 @@ namespace Orts.Viewer3D.RollingStock.Subsystems.ETCS
                 int maxp = GetPlanningHeight(e.DistanceToTrainM) - 15;
                 if (max > MaxViewingDistanceM) minp = 0;
                 int size = maxp - minp;
-                gradientRectangles.Add(new Point(minp, maxp), e.GradientPerMille < 0);
+                gradientRectangles[new Point(minp, maxp)] = e.GradientPerMille < 0;
                 Color textColor = e.GradientPerMille < 0 ? Color.Black : Color.White;
                 string sign = e.GradientPerMille < 0 ? "-" : "+";
                 var signWidth = FontGradient.MeasureString(sign) / Scale;
@@ -322,7 +322,7 @@ namespace Orts.Viewer3D.RollingStock.Subsystems.ETCS
                 PlanningTarget prev = speedTargets[ld];
                 if (cur.DistanceToTrainM < 0) continue;
                 ld = i;
-                bool im = (IndicationMarkerDistanceM??-1) > 0 && IndicationMarkerTarget.Value.Equals(cur);
+                bool im = cur.Equals(IndicationMarkerTarget);
                 if (cur.DistanceToTrainM > MaxViewingDistanceM) break;
                 int a = GetPlanningHeight(cur.DistanceToTrainM) - 15;
                 string text = ((int)MpS.ToKpH(cur.TargetSpeedMpS)).ToString();
@@ -463,9 +463,9 @@ namespace Orts.Viewer3D.RollingStock.Subsystems.ETCS
         /// </summary>
         public void SetFont()
         {
-            FontDistance = Viewer.WindowManager.TextManager.GetExact("Arial", FontHeightDistance * Scale, System.Drawing.FontStyle.Regular);
-            FontTargetSpeed = Viewer.WindowManager.TextManager.GetExact("Arial", FontHeightTargetSpeed * Scale, System.Drawing.FontStyle.Regular);
-            FontGradient = Viewer.WindowManager.TextManager.GetExact("Arial", FontHeightGradient * Scale, System.Drawing.FontStyle.Regular);
+            FontDistance = Viewer.WindowManager.TextManager.GetExact("Arial", GetScaledFontSize(FontHeightDistance), System.Drawing.FontStyle.Regular);
+            FontTargetSpeed = Viewer.WindowManager.TextManager.GetExact("Arial", GetScaledFontSize(FontHeightTargetSpeed), System.Drawing.FontStyle.Regular);
+            FontGradient = Viewer.WindowManager.TextManager.GetExact("Arial", GetScaledFontSize(FontHeightGradient), System.Drawing.FontStyle.Regular);
 
             SetDistanceText();
         }
