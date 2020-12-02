@@ -552,11 +552,11 @@ namespace Orts.Simulation.RollingStocks.SubSystems
 
         T NextGenericSignalItem<T>(int itemSequenceIndex, ref T retval, float maxDistanceM, Train.TrainObjectItem.TRAINOBJECTTYPE type, string signalTypeName = "UNKNOWN")
         {
-            var itemFeatures = NextGenericSignalFeatures(signalTypeName, itemSequenceIndex, maxDistanceM, type);
-            MainHeadSignalTypeName = itemFeatures.MainHeadSignalTypeName;
-            ItemAspect = itemFeatures.Aspect;
-            ItemDistance = itemFeatures.DistanceM;
-            ItemSpeedLimit = itemFeatures.SpeedLimitMpS;
+            var item = NextGenericSignalFeatures(signalTypeName, itemSequenceIndex, maxDistanceM, type);
+            MainHeadSignalTypeName = item.MainHeadSignalTypeName;
+            ItemAspect = item.Aspect;
+            ItemDistance = item.DistanceM;
+            ItemSpeedLimit = item.SpeedLimitMpS;
             return retval;
         }
 
