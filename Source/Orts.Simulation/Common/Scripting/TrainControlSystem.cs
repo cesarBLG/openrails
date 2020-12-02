@@ -96,15 +96,15 @@ namespace ORTS.Scripting.Api
         /// </summary>
         public Func<float> NextDistanceSignalDistanceM;
         /// <summary>
-        /// Signal type of main head of hext generic signal. Not for NORMAL signals
+        /// Signal type of main head of hext generic signal.
         /// </summary>
         public Func<string, string> NextGenericSignalMainHeadSignalType;
         /// <summary>
-        /// Aspect of the next generic signal. Not for NORMAL signals
+        /// Aspect of the next generic signal.
         /// </summary>
         public Func<string, Aspect> NextGenericSignalAspect;
         /// <summary>
-        /// Distance to next generic signal. Not for NORMAL signals
+        /// Distance to next generic signal.
         /// </summary>
         public Func<string, float> NextGenericSignalDistanceM;
         /// <summary>
@@ -175,6 +175,14 @@ namespace ORTS.Scripting.Api
         /// </summary>
         public Func<Direction> CurrentTrainMUDirection;
         /// <summary>
+        /// True if locomotive is flipped.
+        /// </summary>
+        public Func<bool> IsFlipped;
+        /// <summary>
+        /// True if player is in rear cab.
+        /// </summary>
+        public Func<bool> IsRearCab;
+        /// <summary>
         /// True if train brake controller is in emergency position, otherwise false.
         /// </summary>
         public Func<bool> IsBrakeEmergency;
@@ -194,6 +202,10 @@ namespace ORTS.Scripting.Api
         /// True if circuit breaker or power contactor opening order is true.
         /// </summary>
         public Func<bool> CircuitBreakerOpeningOrder;
+        /// <summary>
+        /// Returns the number of pantographs on the locomotive.
+        /// </summary>
+        public Func<int> PantographCount;
         /// <summary>
         /// Checks the state of any pantograph
         /// int: pantograph ID (1 for first pantograph)
@@ -232,7 +244,7 @@ namespace ORTS.Scripting.Api
         /// </summary>
         public Func<float> BrakeCutsPowerAtBrakeCylinderPressureBar;
         /// <summary>
-        /// Track slope percent at the locomotive's location.
+        /// State of the train brake controller.
         /// </summary>
         public Func<ControllerState> TrainBrakeControllerState;
         /// <summary>
@@ -244,9 +256,9 @@ namespace ORTS.Scripting.Api
         /// </summary>
         public Func<float> AltitudeM;
         /// <summary>
-        /// Track gradient percent at the locomotive's location.
+        /// Track gradient percent at the locomotive's location (positive = uphill).
         /// </summary>
-        public Func<float> CurrentElevationPercent;
+        public Func<float> CurrentGradientPercent;
         /// <summary>
         /// Line speed taken from .trk file.
         /// </summary>
@@ -646,11 +658,20 @@ namespace ORTS.Scripting.Api
 
     public struct SignalFeatures
     {
-        public string MainHeadSignalTypeName;
-        public Aspect Aspect;
-        public float DistanceM;
-        public float SpeedLimitMpS;
-        public float AltitudeM;
+        public readonly string MainHeadSignalTypeName;
+        public readonly Aspect Aspect;
+        public readonly float DistanceM;
+        public readonly float SpeedLimitMpS;
+        public readonly float AltitudeM;
+
+        public SignalFeatures(string mainHeadSignalTypeName, Aspect aspect, float distanceM, float speedLimitMpS, float altitudeM)
+        {
+            MainHeadSignalTypeName = mainHeadSignalTypeName;
+            Aspect = aspect;
+            DistanceM = distanceM;
+            SpeedLimitMpS = speedLimitMpS;
+            AltitudeM = altitudeM;
+        }
     }
 
     public struct TunnelInfo
