@@ -578,6 +578,11 @@ namespace Orts.Simulation.RollingStocks.SubSystems
             int fn_type = Locomotive.Train.signalRef.ORTSSignalTypes.IndexOf(signalTypeName);
             if (index < 0)
                 goto Exit;
+            if (fn_type == -1)
+            {
+                distanceM = -1;
+                goto Exit;
+            }
             if (type == Train.TrainObjectItem.TRAINOBJECTTYPE.SIGNAL)
             {
                 var playerTrainSignalList = Locomotive.Train.PlayerTrainSignals[dir, fn_type];
