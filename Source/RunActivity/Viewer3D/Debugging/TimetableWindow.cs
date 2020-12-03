@@ -447,7 +447,7 @@ namespace Orts.Viewer3D.Debugging
 					|| (scaledA.Y < 0 && scaledB.Y < 0))
 					continue;
 
-				if (line.isCurved == true)
+				if (line.isCurved == true && line.C != null)
 				{
 					scaledC.X = ((float)line.C.X - F.subX) * F.xScale; scaledC.Y = F.pbCanvas.Height - ((float)line.C.Z - F.subY) * F.yScale;
 					points[0] = scaledA; points[1] = scaledC; points[2] = scaledB;
