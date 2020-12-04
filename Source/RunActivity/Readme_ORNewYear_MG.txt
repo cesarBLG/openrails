@@ -1,5 +1,5 @@
-﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.82
-November 27th, 2020
+﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.83beta
+December 5hh, 2020
 
 Please note that the installation and use of Open Rails software, even of its unofficial versions, is governed by the Open Rails End User License Agreement. 
 
@@ -13,7 +13,7 @@ you would return to the official OR version.
 
 RELEASE NOTES
 This unofficial version has been derived from the official OpenRails Unstable release U2020.10.16-1021 (which does NOT include Monogame),
-from the latest official OpenRails testing revision X1.3.1-263.
+from the latest official OpenRails testing revision X1.3.1-265.
 No more recent Unstable releases are in general used to preserve the Monogame version of OR NewYear MG. However all TCS hook pull requests present in the Unstable release U2020.11.27-1806 are included.
 It includes some features not (yet) available in the Open Rails unstable official version, that is:
 - Monogame, OR NewYear MG version
@@ -48,9 +48,12 @@ It includes some features not (yet) available in the Open Rails unstable officia
 - support for inclined gauges in 2Dcabs, see http://www.elvastower.com/forums/index.php?/topic/34517-enable-inclined-gauges-in-2d-cabs/
 - bug fix for http://www.elvastower.com/forums/index.php?/topic/34572-new-player-trains-dont-show-train-brakes-in-hud/
 - bug fix for http://www.elvastower.com/forums/index.php?/topic/34565-tt-crash-when-forming-new-train-player/ 
-- NEW: support for ETCS L2 planning area, by césarbl, see http://www.elvastower.com/forums/index.php?/topic/34577-planning-area-of-the-etcs-dmi/ 
-- NEW: support for animation of pantographs in 2D cabs, see http://www.elvastower.com/forums/index.php?/topic/34604-2d-cabs-wipers-animation/page__view__findpost__p__265101 ,
+- support for ETCS L2 planning area, by césarbl, see http://www.elvastower.com/forums/index.php?/topic/34577-planning-area-of-the-etcs-dmi/ 
+- support for animation of pantographs in 2D cabs, see http://www.elvastower.com/forums/index.php?/topic/34604-2d-cabs-wipers-animation/page__view__findpost__p__265101 ,
 with the contribution of Paolo.
+- NEW: extended support for ETCS L2 planning area, and introduced support for braking distance and text area, by césar BL
+- NEW: bug fix for http://www.elvastower.com/forums/index.php?/topic/34633-unhandled-exception-overflow-in-win7/page__view__findpost__p__265463 , by mbm_OR
+- NEW: added specific check existence of requested signal type in TCS hook. 
 
 
 
