@@ -44,6 +44,7 @@ namespace Orts.Viewer3D.RollingStock.Subsystems.ETCS
 
         public bool ShowDistanceAndSpeedInformation;
         public float Scale { get; private set; }
+        public float MipMapScale { get; private set; }
         readonly int Height = 480;
         readonly int Width = 640;
 
@@ -66,6 +67,10 @@ namespace Orts.Viewer3D.RollingStock.Subsystems.ETCS
         public Texture2D ColorTexture { get; private set; }
 
         bool DisplayBackground = false;
+
+        public bool Blinker2Hz;
+        public bool Blinker4Hz;
+        float BlinkerTime;
 
         /// <summary>
         /// True if the screen is sensitive
@@ -134,11 +139,24 @@ namespace Orts.Viewer3D.RollingStock.Subsystems.ETCS
             MessageArea = new MessageArea(this, Viewer, MessageAreaLocation);
         }
 
-        public void PrepareFrame()
+        public Texture2D LoadTexture(string name)
+        {
+//            if (MipMapScale == 2)
+                return SharedTextureManager.Get(Viewer.RenderProcess.GraphicsDevice, System.IO.Path.Combine(Viewer.ContentPath, "ETCS", "mipmap-2", name));
+//            else return SharedTextureManager.Get(Viewer.RenderProcess.GraphicsDevice, System.IO.Path.Combine(Viewer.ContentPath, "ETCS", name));
+        }
+
+        public void PrepareFrame(float elapsedSeconds)
         {
             ETCSStatus currentStatus = Locomotive.TrainControlSystem.ETCSStatus;
             Active = currentStatus != null && currentStatus.DMIActive;
             if (!Active) return;
+
+            BlinkerTime += elapsedSeconds;
+            BlinkerTime -= (int)BlinkerTime;
+            Blinker2Hz = BlinkerTime < 0.5;
+            Blinker4Hz = BlinkerTime < 0.25 || (BlinkerTime > 0.5 && BlinkerTime < 0.75);
+
             CircularSpeedGauge.PrepareFrame(currentStatus);
             PlanningWindow.PrepareFrame(currentStatus);
             DistanceArea.PrepareFrame(currentStatus);
@@ -151,10 +169,12 @@ namespace Orts.Viewer3D.RollingStock.Subsystems.ETCS
             if (Math.Abs(1f - PrevScale / Scale) > 0.1f)
             {
                 PrevScale = Scale;
-                CircularSpeedGauge.SetFont();
-                PlanningWindow.SetFont();
-                DistanceArea.SetFont();
-                MessageArea.SetFont();
+                if (Scale < 0.5) MipMapScale = 2;
+                else MipMapScale = 1;
+                CircularSpeedGauge.ScaleChanged();
+                PlanningWindow.ScaleChanged();
+                DistanceArea.ScaleChanged();
+                MessageArea.ScaleChanged();
             }
         }
 
@@ -172,7 +192,7 @@ namespace Orts.Viewer3D.RollingStock.Subsystems.ETCS
             CircularSpeedGauge.Draw(spriteBatch, new Point(position.X + (int)(SpeedAreaLocation.X * Scale), position.Y + (int)(SpeedAreaLocation.Y * Scale)));
             PlanningWindow.Draw(spriteBatch, new Point(position.X + (int)(PlanningLocation.X * Scale), position.Y + (int)(PlanningLocation.Y * Scale)));
             DistanceArea.Draw(spriteBatch, new Point(position.X + (int)(DistanceAreaLocation.X * Scale), position.Y + (int)(DistanceAreaLocation.Y * Scale)));
-            //MessageArea.Draw(spriteBatch, new Point(position.X + (int)(MessageAreaLocation.X * Scale), position.Y + (int)(MessageAreaLocation.Y * Scale)));
+            MessageArea.Draw(spriteBatch, new Point(position.X + (int)(MessageAreaLocation.X * Scale), position.Y + (int)(MessageAreaLocation.Y * Scale)));
         }
 
         public void HandleMouseInput(bool pressed, int x, int y)
@@ -255,9 +275,13 @@ namespace Orts.Viewer3D.RollingStock.Subsystems.ETCS
         {
             return new Rectangle(origin.X + (int)(x * Scale), origin.Y + (int)(y * Scale), Math.Max((int)(width * Scale), 1), Math.Max((int)(height * Scale), 1));
         }
+        public void DrawRectangle(SpriteBatch spriteBatch, Point origin, int x, int y, int width, int height, Color color)
+        {
+            spriteBatch.Draw(ColorTexture, new Vector2(origin.X + x * Scale, origin.Y + y * Scale), null, color, 0f, Vector2.Zero, new Vector2(width * Scale, height * Scale), SpriteEffects.None, 0);
+        }
         public void DrawSymbol(SpriteBatch spriteBatch, Texture2D texture, Point origin, float x, float y)
         {
-            spriteBatch.Draw(texture, new Vector2(origin.X + x * Scale, origin.Y + y * Scale), null, Color.White, 0, Vector2.Zero, Scale, SpriteEffects.None, 0);
+            spriteBatch.Draw(texture, new Vector2(origin.X + x * Scale, origin.Y + y * Scale), null, Color.White, 0, Vector2.Zero, Scale * DMI.MipMapScale, SpriteEffects.None, 0);
         }
         /// <summary>
         /// Get scaled font size, increasing it if result is small
@@ -285,7 +309,7 @@ namespace Orts.Viewer3D.RollingStock.Subsystems.ETCS
         public override void PrepareFrame(RenderFrame frame, ElapsedTime elapsedTime)
         {
             base.PrepareFrame(frame, elapsedTime);
-            DMI.PrepareFrame();
+            DMI.PrepareFrame(elapsedTime.ClockSeconds);
             DMI.SizeTo(DrawPosition.Width * 640 / 280, DrawPosition.Height * 480 / 300);
         }
 
@@ -295,7 +319,7 @@ namespace Orts.Viewer3D.RollingStock.Subsystems.ETCS
             int y = (int)((UserInput.MouseY - DrawPosition.Y) / DMI.Scale + 15);
             foreach (DriverMachineInterface.Button b in DMI.SensitiveButtons)
             {
-                if (b.SensitiveArea.Contains(x, y)) return true;
+                if (b.SensitiveArea.Contains(x, y) && b.Enabled) return true;
             }
             return false;
         }
