@@ -87,22 +87,22 @@ namespace Orts.Viewer3D.Common
 
         public static string GetTransferTextureFile(Simulator simulator, string textureName)
         {
-            return GetTextureFile(simulator, Helpers.TextureFlags.Snow | Helpers.TextureFlags.Rain, simulator.RoutePath + @"\Textures", textureName);
+            return GetTextureFile(simulator, Helpers.TextureFlags.Snow, simulator.RoutePath + @"\Textures", textureName);
         }
 
         public static string GetTerrainTextureFile(Simulator simulator, string textureName)
         {
-            return GetTextureFile(simulator, Helpers.TextureFlags.Snow | Helpers.TextureFlags.Rain, simulator.RoutePath + @"\TerrTex", textureName);
+            return GetTextureFile(simulator, Helpers.TextureFlags.Snow, simulator.RoutePath + @"\TerrTex", textureName);
         }
 
         public static string GetTextureFile(Simulator simulator, TextureFlags textureFlags, string texturePath, string textureName)
         {
             var alternativePath = @"\";
             if ((textureFlags & TextureFlags.Snow) != 0 || (textureFlags & TextureFlags.SnowTrack) != 0)
+            {
                 if (IsSnow(simulator))
                     alternativePath = @"\Snow\";
-                else
-                    alternativePath = @"\";
+            }
             else if (IsRain(simulator) && (textureFlags & TextureFlags.Rain) != 0)
                 alternativePath = @"\Rain\";
             else if ((textureFlags & TextureFlags.Spring) != 0 && simulator.Season == SeasonType.Spring && simulator.WeatherType != WeatherType.Snow)
@@ -117,6 +117,7 @@ namespace Orts.Viewer3D.Common
                 alternativePath = @"\AutumnSnow\";
             else if ((textureFlags & TextureFlags.WinterSnow) != 0 && simulator.Season == SeasonType.Winter && simulator.WeatherType == WeatherType.Snow)
                 alternativePath = @"\WinterSnow\";
+            else alternativePath = @"\";
 
             if (alternativePath.Length > 0) return texturePath + alternativePath + textureName;
             return texturePath + @"\" + textureName;
