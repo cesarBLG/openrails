@@ -39,6 +39,7 @@ namespace Orts.Viewer3D.Common
             AutumnSnow = 0x40,
             WinterSnow = 0x80,
             Night = 0x100,
+            Rain = 0x200,
             Underground = 0x40000000,
         }
 
@@ -86,12 +87,12 @@ namespace Orts.Viewer3D.Common
 
         public static string GetTransferTextureFile(Simulator simulator, string textureName)
         {
-            return GetTextureFile(simulator, Helpers.TextureFlags.Snow, simulator.RoutePath + @"\Textures", textureName);
+            return GetTextureFile(simulator, Helpers.TextureFlags.Snow | Helpers.TextureFlags.Rain, simulator.RoutePath + @"\Textures", textureName);
         }
 
         public static string GetTerrainTextureFile(Simulator simulator, string textureName)
         {
-            return GetTextureFile(simulator, Helpers.TextureFlags.Snow, simulator.RoutePath + @"\TerrTex", textureName);
+            return GetTextureFile(simulator, Helpers.TextureFlags.Snow | Helpers.TextureFlags.Rain, simulator.RoutePath + @"\TerrTex", textureName);
         }
 
         public static string GetTextureFile(Simulator simulator, TextureFlags textureFlags, string texturePath, string textureName)
@@ -102,6 +103,8 @@ namespace Orts.Viewer3D.Common
                     alternativePath = @"\Snow\";
                 else
                     alternativePath = @"\";
+            else if (IsRain(simulator) && (textureFlags & TextureFlags.Rain) != 0)
+                alternativePath = @"\Rain\";
             else if ((textureFlags & TextureFlags.Spring) != 0 && simulator.Season == SeasonType.Spring && simulator.WeatherType != WeatherType.Snow)
                 alternativePath = @"\Spring\";
             else if ((textureFlags & TextureFlags.Autumn) != 0 && simulator.Season == SeasonType.Autumn && simulator.WeatherType != WeatherType.Snow)
@@ -125,6 +128,11 @@ namespace Orts.Viewer3D.Common
             //   - In winter, no matter what the weather is.
             //   - In spring and autumn, if the weather is snow.
             return (simulator.Season == SeasonType.Winter) || ((simulator.Season != SeasonType.Summer) && (simulator.WeatherType == WeatherType.Snow));
+        }
+
+        public static bool IsRain(Simulator simulator)
+        {
+            return (simulator.WeatherType == WeatherType.Rain);
         }
 
         static readonly Dictionary<string, SceneryMaterialOptions> TextureAddressingModeNames = new Dictionary<string, SceneryMaterialOptions> {
