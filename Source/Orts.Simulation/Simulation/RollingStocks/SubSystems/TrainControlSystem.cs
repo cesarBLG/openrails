@@ -309,9 +309,9 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                 Script.IsDirectionForward = () => Locomotive.Direction == Direction.Forward;
                 Script.IsDirectionNeutral = () => Locomotive.Direction == Direction.N;
                 Script.IsDirectionReverse = () => Locomotive.Direction == Direction.Reverse;
+                Script.CurrentTrainMUDirection = () => Locomotive.Train.MUDirection; // Direction of train
                 Script.IsFlipped = () => Locomotive.Flipped;
                 Script.IsRearCab = () => Locomotive.UsingRearCab;
-                Script.CurrentTrainMUDirection = () => Locomotive.Train.MUDirection; // Direction of train
                 Script.IsBrakeEmergency = () => Locomotive.TrainBrakeController.EmergencyBraking;
                 Script.IsBrakeFullService = () => Locomotive.TrainBrakeController.TCSFullServiceBraking;
                 Script.PowerAuthorization = () => PowerAuthorization;
@@ -320,7 +320,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                 Script.PantographCount = () => Locomotive.Pantographs.Count;
                 Script.GetPantographState = (pantoID) =>
                 {
-                    if (pantoID >= Pantographs.MinPantoID && pantoID <= Pantographs.MaxPantoID)
+                   if (pantoID >= Pantographs.MinPantoID && pantoID <= Pantographs.MaxPantoID)
                     {
                         return Locomotive.Pantographs[pantoID].State;
                     }
@@ -415,7 +415,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                         return;
                     }
                     Locomotive.Train.SignalEvent(PowerSupplyEvent.RaisePantograph, pantoID);
-                };
+                };               
                 Script.SetPantographDown = (pantoID) =>
                 {
                     if (pantoID < Pantographs.MinPantoID || pantoID > Pantographs.MaxPantoID)
@@ -517,6 +517,8 @@ namespace Orts.Simulation.RollingStocks.SubSystems
         {
             Script?.InitializeMoving();
         }
+
+
 
         private Aspect NextNormalSignalDistanceHeadsAspect()
         {

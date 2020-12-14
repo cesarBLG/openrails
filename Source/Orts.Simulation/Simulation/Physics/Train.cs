@@ -3924,9 +3924,10 @@ namespace Orts.Simulation.Physics
                 MSTSLocomotive lead = (MSTSLocomotive)Cars[LeadLocomotiveIndex];
                 if (lead.TrainBrakeController != null)
                 {
-                    lead.TrainBrakeController.UpdatePressure(ref EqualReservoirPressurePSIorInHg, 1000, ref BrakeLine4);
                     maxPressurePSI = lead.TrainBrakeController.MaxPressurePSI;
                     fullServPressurePSI = lead.BrakeSystem is VacuumSinglePipe ? 16 : maxPressurePSI - lead.TrainBrakeController.FullServReductionPSI;
+                    EqualReservoirPressurePSIorInHg = Math.Min(maxPressurePSI, EqualReservoirPressurePSIorInHg);
+                    lead.TrainBrakeController.UpdatePressure(ref EqualReservoirPressurePSIorInHg, 1000, ref BrakeLine4);
                     EqualReservoirPressurePSIorInHg =
                             MathHelper.Max(EqualReservoirPressurePSIorInHg, fullServPressurePSI);
                 }
@@ -14438,6 +14439,7 @@ namespace Orts.Simulation.Physics
 
         public TrainInfo GetTrainInfo()
         {
+            // This may occur just  after player train switching 
             if (IsActualPlayerTrain && PlayerTrainSignals == null)
                 UpdatePlayerTrainData();
             TrainInfo thisInfo = new TrainInfo();

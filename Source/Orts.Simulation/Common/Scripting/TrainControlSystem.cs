@@ -96,15 +96,15 @@ namespace ORTS.Scripting.Api
         /// </summary>
         public Func<float> NextDistanceSignalDistanceM;
         /// <summary>
-        /// Signal type of main head of hext generic signal.
+        /// Signal type of main head of hext generic signal. Not for NORMAL signals
         /// </summary>
         public Func<string, string> NextGenericSignalMainHeadSignalType;
         /// <summary>
-        /// Aspect of the next generic signal.
+        /// Aspect of the next generic signal. Not for NORMAL signals
         /// </summary>
         public Func<string, Aspect> NextGenericSignalAspect;
         /// <summary>
-        /// Distance to next generic signal.
+        /// Distance to next generic signal. Not for NORMAL signals
         /// </summary>
         public Func<string, float> NextGenericSignalDistanceM;
         /// <summary>
@@ -202,6 +202,27 @@ namespace ORTS.Scripting.Api
         /// True if circuit breaker or power contactor opening order is true.
         /// </summary>
         public Func<bool> CircuitBreakerOpeningOrder;
+         /// <summary>
+        /// Returns the number of pantographs on the locomotive.
+        /// </summary>
+        public Func<int> PantographCount;
+        /// <summary>
+        /// Checks the state of any pantograph
+        /// int: pantograph ID (1 for first pantograph)
+        /// </summary>
+        public Func<int, PantographState> GetPantographState;
+        /// <summary>
+        /// True if all pantographs are down.
+        /// </summary>
+        public Func<bool> ArePantographsDown;
+        /// <summary>
+        /// Returns throttle percent
+        /// </summary>
+        public Func<float> ThrottlePercent;
+        /// <summary>
+        /// Returns dynamic brake percent
+        /// </summary>
+        public Func<float> DynamicBrakePercent;
         /// <summary>
         /// Returns the number of pantographs on the locomotive.
         /// </summary>
