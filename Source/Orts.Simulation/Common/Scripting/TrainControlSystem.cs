@@ -224,27 +224,6 @@ namespace ORTS.Scripting.Api
         /// </summary>
         public Func<float> DynamicBrakePercent;
         /// <summary>
-        /// Returns the number of pantographs on the locomotive.
-        /// </summary>
-        public Func<int> PantographCount;
-        /// <summary>
-        /// Checks the state of any pantograph
-        /// int: pantograph ID (1 for first pantograph)
-        /// </summary>
-        public Func<int, PantographState> GetPantographState;
-        /// <summary>
-        /// True if all pantographs are down.
-        /// </summary>
-        public Func<bool> ArePantographsDown;
-        /// <summary>
-        /// Returns throttle percent
-        /// </summary>
-        public Func<float> ThrottlePercent;
-        /// <summary>
-        /// Returns dynamic brake percent
-        /// </summary>
-        public Func<float> DynamicBrakePercent;
-        /// <summary>
         /// True if traction is authorized.
         /// </summary>
         public Func<bool> TractionAuthorization;
