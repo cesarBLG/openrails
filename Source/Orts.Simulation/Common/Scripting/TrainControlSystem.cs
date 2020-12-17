@@ -96,15 +96,15 @@ namespace ORTS.Scripting.Api
         /// </summary>
         public Func<float> NextDistanceSignalDistanceM;
         /// <summary>
-        /// Signal type of main head of hext generic signal.
+        /// Signal type of main head of hext generic signal. Not for NORMAL signals
         /// </summary>
         public Func<string, string> NextGenericSignalMainHeadSignalType;
         /// <summary>
-        /// Aspect of the next generic signal.
+        /// Aspect of the next generic signal. Not for NORMAL signals
         /// </summary>
         public Func<string, Aspect> NextGenericSignalAspect;
         /// <summary>
-        /// Distance to next generic signal.
+        /// Distance to next generic signal. Not for NORMAL signals
         /// </summary>
         public Func<string, float> NextGenericSignalDistanceM;
         /// <summary>
@@ -202,7 +202,7 @@ namespace ORTS.Scripting.Api
         /// True if circuit breaker or power contactor opening order is true.
         /// </summary>
         public Func<bool> CircuitBreakerOpeningOrder;
-        /// <summary>
+         /// <summary>
         /// Returns the number of pantographs on the locomotive.
         /// </summary>
         public Func<int> PantographCount;

@@ -309,9 +309,9 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                 Script.IsDirectionForward = () => Locomotive.Direction == Direction.Forward;
                 Script.IsDirectionNeutral = () => Locomotive.Direction == Direction.N;
                 Script.IsDirectionReverse = () => Locomotive.Direction == Direction.Reverse;
+                Script.CurrentTrainMUDirection = () => Locomotive.Train.MUDirection; // Direction of train
                 Script.IsFlipped = () => Locomotive.Flipped;
                 Script.IsRearCab = () => Locomotive.UsingRearCab;
-                Script.CurrentTrainMUDirection = () => Locomotive.Train.MUDirection; // Direction of train
                 Script.IsBrakeEmergency = () => Locomotive.TrainBrakeController.EmergencyBraking;
                 Script.IsBrakeFullService = () => Locomotive.TrainBrakeController.TCSFullServiceBraking;
                 Script.PowerAuthorization = () => PowerAuthorization;
@@ -320,7 +320,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                 Script.PantographCount = () => Locomotive.Pantographs.Count;
                 Script.GetPantographState = (pantoID) =>
                 {
-                    if (pantoID >= Pantographs.MinPantoID && pantoID <= Pantographs.MaxPantoID)
+                   if (pantoID >= Pantographs.MinPantoID && pantoID <= Pantographs.MaxPantoID)
                     {
                         return Locomotive.Pantographs[pantoID].State;
                     }
@@ -346,8 +346,18 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                 Script.DoesStartFromTerminalStation = () => DoesStartFromTerminalStation();
                 Script.IsColdStart = () => Locomotive.Train.ColdStart;
                 Script.GetTrackNodeOffset = () => Locomotive.Train.FrontTDBTraveller.TrackNodeLength - Locomotive.Train.FrontTDBTraveller.TrackNodeOffset;
-                Script.NextDivergingSwitchDistanceM = (value) => NextGenericSignalItem<float>(0, ref ItemDistance, value, Train.TrainObjectItem.TRAINOBJECTTYPE.FACING_SWITCH);
-                Script.NextTrailingDivergingSwitchDistanceM = (value) => NextGenericSignalItem<float>(0, ref ItemDistance, value, Train.TrainObjectItem.TRAINOBJECTTYPE.TRAILING_SWITCH);
+                Script.NextDivergingSwitchDistanceM = (value) =>
+                {
+                    var list = Locomotive.Train.PlayerTrainDivergingSwitches[Locomotive.Train.MUDirection == Direction.Reverse ? 1 : 0, 0];
+                    if (list == null || list.Count == 0 || list[0].DistanceToTrainM > value) return float.MaxValue;
+                    return list[0].DistanceToTrainM;
+                };
+                Script.NextTrailingDivergingSwitchDistanceM = (value) =>
+                {
+                    var list = Locomotive.Train.PlayerTrainDivergingSwitches[Locomotive.Train.MUDirection == Direction.Reverse ? 1 : 0, 1];
+                    if (list == null || list.Count == 0 || list[0].DistanceToTrainM > value) return float.MaxValue;
+                    return list[0].DistanceToTrainM;
+                };
                 Script.GetControlMode = () => (TRAIN_CONTROL)(int)Locomotive.Train.ControlMode;
                 Script.NextStationName = () => Locomotive.Train.StationStops != null && Locomotive.Train.StationStops.Count > 0 ? Locomotive.Train.StationStops[0].PlatformItem.Name : "";
                 Script.NextStationDistanceM = () => Locomotive.Train.StationStops != null && Locomotive.Train.StationStops.Count > 0 ? Locomotive.Train.StationStops[0].DistanceToTrainM : float.MaxValue;
@@ -405,7 +415,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                         return;
                     }
                     Locomotive.Train.SignalEvent(PowerSupplyEvent.RaisePantograph, pantoID);
-                };
+                };               
                 Script.SetPantographDown = (pantoID) =>
                 {
                     if (pantoID < Pantographs.MinPantoID || pantoID > Pantographs.MaxPantoID)
@@ -508,6 +518,8 @@ namespace Orts.Simulation.RollingStocks.SubSystems
             Script?.InitializeMoving();
         }
 
+
+
         private Aspect NextNormalSignalDistanceHeadsAspect()
         {
             var signal = Locomotive.Train.NextSignalObject[Locomotive.Train.MUDirection == Direction.Reverse ? 1 : 0];
@@ -578,13 +590,13 @@ namespace Orts.Simulation.RollingStocks.SubSystems
             int fn_type = Locomotive.Train.signalRef.ORTSSignalTypes.IndexOf(signalTypeName);
             if (index < 0)
                 goto Exit;
-            if (fn_type == -1)
-            {
-                distanceM = -1;
-                goto Exit;
-            }
             if (type == Train.TrainObjectItem.TRAINOBJECTTYPE.SIGNAL)
             {
+                if (fn_type == -1) // check for not existing signal type
+                {
+                    distanceM = -1;
+                    goto Exit;
+                }
                 var playerTrainSignalList = Locomotive.Train.PlayerTrainSignals[dir, fn_type];
                 if (itemSequenceIndex > playerTrainSignalList.Count - 1)
                     goto Exit; // no n-th signal available
