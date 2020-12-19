@@ -231,6 +231,7 @@ namespace Orts.Formats.Msts
         ORTS_TCS46,
         ORTS_TCS47,
         ORTS_TCS48,
+        ORTS_ETCS,
 
         // Further CabViewControlTypes must be added above this line, to avoid their malfunction in 3DCabs
         EXTERNALWIPERS,
@@ -312,6 +313,7 @@ namespace Orts.Formats.Msts
                 new STFReader.TokenProcessor("firebox", ()=>{ Add(new CVCFirebox(stf, basepath)); }),
                 new STFReader.TokenProcessor("dialclock", ()=>{ ProcessDialClock(stf, basepath);  }),
                 new STFReader.TokenProcessor("digitalclock", ()=>{ Add(new CVCDigitalClock(stf, basepath)); }),
+                new STFReader.TokenProcessor("screendisplay", ()=>{ Add(new CVCScreen(stf, basepath)); })
                 new STFReader.TokenProcessor("ortsanimateddisplay", ()=>{ Add(new CVCAnimatedDisplay(stf, basepath)); })
             });
             
@@ -1210,6 +1212,36 @@ namespace Orts.Formats.Msts
         }
     }
 
+    #endregion
+
+    #region Screen based controls
+    public class CVCScreen : CabViewControl
+    {
+        public readonly Dictionary<string, string> CustomParameters = new Dictionary<string, string>();
+        public CVCScreen()
+        {
+        }
+
+        public CVCScreen(STFReader stf, string basepath)
+        {
+            stf.MustMatch("(");
+            stf.ParseBlock(new STFReader.TokenProcessor[] {
+                new STFReader.TokenProcessor("type", ()=>{ ParseType(stf); }),
+                new STFReader.TokenProcessor("position", ()=>{ ParsePosition(stf); }),
+                new STFReader.TokenProcessor("graphic", ()=>{ ParseGraphic(stf, basepath); }),
+                new STFReader.TokenProcessor("units", ()=>{ ParseUnits(stf); }),
+                new STFReader.TokenProcessor("parameters", ()=>{ ParseCustomParameters(stf); }),
+            });
+        }
+        protected void ParseCustomParameters(STFReader stf)
+        {
+            stf.MustMatch("(");
+            while (!stf.EndOfBlock())
+            {
+                CustomParameters[stf.ReadString().ToLower()] = stf.ReadString().ToLower();
+            }
+        }
+    }
     #endregion
 
     #region other controls
