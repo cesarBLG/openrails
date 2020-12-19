@@ -313,7 +313,7 @@ namespace Orts.Formats.Msts
                 new STFReader.TokenProcessor("firebox", ()=>{ Add(new CVCFirebox(stf, basepath)); }),
                 new STFReader.TokenProcessor("dialclock", ()=>{ ProcessDialClock(stf, basepath);  }),
                 new STFReader.TokenProcessor("digitalclock", ()=>{ Add(new CVCDigitalClock(stf, basepath)); }),
-                new STFReader.TokenProcessor("screendisplay", ()=>{ Add(new CVCScreen(stf, basepath)); })
+                new STFReader.TokenProcessor("screendisplay", ()=>{ Add(new CVCScreen(stf, basepath)); }),
                 new STFReader.TokenProcessor("ortsanimateddisplay", ()=>{ Add(new CVCAnimatedDisplay(stf, basepath)); })
             });
             
