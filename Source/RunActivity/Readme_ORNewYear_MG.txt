@@ -1,5 +1,5 @@
-﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.83Rain
-December 9th, 2020
+﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.84
+December 20th, 2020
 
 Please note that the installation and use of Open Rails software, even of its unofficial versions, is governed by the Open Rails End User License Agreement. 
 
@@ -12,10 +12,13 @@ INSTALLATION
 you would return to the official OR version.
 
 RELEASE NOTES
-This unofficial version has been derived from the official OpenRails Unstable release U2020.10.16-1021 (which does NOT include Monogame),
-from the latest official OpenRails testing revision X1.3.1-265.
-No more recent Unstable releases are in general used to preserve the Monogame version of OR NewYear MG. However all TCS hook pull requests present in the Unstable release U2020.11.27-1806 are included.
-It includes some features not (yet) available in the Open Rails unstable official version, that is:
+This unofficial version has been derived from the latest official OpenRails testing revision X1.3.1-270. It includes also the latest changes in the OR official master branch,
+that is 
+- Bug fix for https://bugs.launchpad.net/or/+bug/1906786 - Approach Control doesn't work for non NORMAL signals, by CesarBLG
+- Reintroduction of  feature "Allowing manual Call On from dispatcher window", by CesarBLG
+
+No Unstable releases are used to preserve the Monogame version of OR NewYear MG. 
+This version includes some features not (yet) available in the Open Rails unstable official version, that is:
 - Monogame, OR NewYear MG version
 - addition of track sounds in the sound debug window (by dennisat)
 - F5 HUD scrolling (by mbm_or)
@@ -51,10 +54,11 @@ It includes some features not (yet) available in the Open Rails unstable officia
 - support for ETCS L2 planning area, by césarbl, see http://www.elvastower.com/forums/index.php?/topic/34577-planning-area-of-the-etcs-dmi/ 
 - support for animation of wipers in 2D cabs, see http://www.elvastower.com/forums/index.php?/topic/34604-2d-cabs-wipers-animation/page__view__findpost__p__265101 ,
 with the contribution of Paolo.
-- NEW: extended support for ETCS L2 planning area, and introduced support for braking distance and text area, by césar BL
-- NEW: bug fix for http://www.elvastower.com/forums/index.php?/topic/34633-unhandled-exception-overflow-in-win7/page__view__findpost__p__265463 , by mbm_OR
-- NEW: added specific check existence of requested signal type in TCS hook
-- NEW: added tentative support for RAIN textures for objects, terrain and transfers. 
+- bug fix for http://www.elvastower.com/forums/index.php?/topic/34633-unhandled-exception-overflow-in-win7/page__view__findpost__p__265463 , by mbm_OR
+- NEW: added tentative support for RAIN textures for objects, terrain and transfers
+- NEW: extended support for ETCS L2 planning area, for braking distance and text area, and initial support for menus by césar BL
+- NEW: removed trace of wait processes when enable watchdog option deselected.
+ 
 
 
 
