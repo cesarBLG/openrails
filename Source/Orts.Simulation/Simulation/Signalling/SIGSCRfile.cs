@@ -1028,6 +1028,7 @@ namespace Orts.Simulation.Signalling
                         dumpfile = String.Concat(dpr_fileLoc, "printproc.txt");
                     }
 #endif
+                    thisHead.mainSignal.CallOnEnabled = true;
                     temp_value = thisHead.mainSignal.TrainHasCallOn(true, false, dumpfile);
                     return_value = Convert.ToInt32(temp_value);
                     break;
@@ -1050,6 +1051,7 @@ namespace Orts.Simulation.Signalling
                         dumpfile = String.Concat(dpr_fileLoc, "printproc.txt");
                     }
 #endif
+                    thisHead.mainSignal.CallOnEnabled = true;
                     temp_value = thisHead.mainSignal.TrainHasCallOn(false, false, dumpfile);
                     return_value = Convert.ToInt32(temp_value);
                     break;
@@ -1072,6 +1074,7 @@ namespace Orts.Simulation.Signalling
                         dumpfile = String.Concat(dpr_fileLoc, "printproc.txt");
                     }
 #endif
+                    thisHead.mainSignal.CallOnEnabled = true;
                     temp_value = thisHead.mainSignal.TrainHasCallOn(true, true, dumpfile);
                     return_value = Convert.ToInt32(temp_value);
                     break;
@@ -1094,6 +1097,7 @@ namespace Orts.Simulation.Signalling
                         dumpfile = String.Concat(dpr_fileLoc, "printproc.txt");
                     }
 #endif
+                    thisHead.mainSignal.CallOnEnabled = true;
                     temp_value = thisHead.mainSignal.TrainHasCallOn(false, true, dumpfile);
                     return_value = Convert.ToInt32(temp_value);
                     break;
