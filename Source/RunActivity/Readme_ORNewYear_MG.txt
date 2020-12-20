@@ -1,5 +1,5 @@
-﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.83beta
-December 5hh, 2020
+﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.83Rain
+December 9th, 2020
 
 Please note that the installation and use of Open Rails software, even of its unofficial versions, is governed by the Open Rails End User License Agreement. 
 
@@ -49,11 +49,12 @@ It includes some features not (yet) available in the Open Rails unstable officia
 - bug fix for http://www.elvastower.com/forums/index.php?/topic/34572-new-player-trains-dont-show-train-brakes-in-hud/
 - bug fix for http://www.elvastower.com/forums/index.php?/topic/34565-tt-crash-when-forming-new-train-player/ 
 - support for ETCS L2 planning area, by césarbl, see http://www.elvastower.com/forums/index.php?/topic/34577-planning-area-of-the-etcs-dmi/ 
-- support for animation of pantographs in 2D cabs, see http://www.elvastower.com/forums/index.php?/topic/34604-2d-cabs-wipers-animation/page__view__findpost__p__265101 ,
+- support for animation of wipers in 2D cabs, see http://www.elvastower.com/forums/index.php?/topic/34604-2d-cabs-wipers-animation/page__view__findpost__p__265101 ,
 with the contribution of Paolo.
 - NEW: extended support for ETCS L2 planning area, and introduced support for braking distance and text area, by césar BL
 - NEW: bug fix for http://www.elvastower.com/forums/index.php?/topic/34633-unhandled-exception-overflow-in-win7/page__view__findpost__p__265463 , by mbm_OR
-- NEW: added specific check existence of requested signal type in TCS hook. 
+- NEW: added specific check existence of requested signal type in TCS hook
+- NEW: added tentative support for RAIN textures for objects, terrain and transfers. 
 
 
 
