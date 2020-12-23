@@ -245,9 +245,7 @@ namespace Orts.Viewer3D
             Tile = null;
             Patch = null;
 
-            DummyVertexBuffer = new VertexBuffer(viewer.GraphicsDevice, DummyVertexDeclaration, 1, BufferUsage.WriteOnly);
-            DummyVertexBuffer.SetData(DummyVertexData);
-            VertexBufferBindings = new[] { new VertexBufferBinding(PatchVertexBuffer), new VertexBufferBinding(DummyVertexBuffer) };
+            VertexBufferBindings = new[] { new VertexBufferBinding(PatchVertexBuffer), new VertexBufferBinding(GetDummyVertexBuffer(viewer.GraphicsDevice)) };
         }
 
         [CallOnThread("Updater")]
@@ -502,7 +500,7 @@ namespace Orts.Viewer3D
     {
         readonly Texture2D PatchTexture;
         readonly Texture2D PatchTextureOverlay;
-        readonly int OverlayScale;
+        readonly float OverlayScale;
         IEnumerator<EffectPass> ShaderPasses;
 
         public TerrainMaterial(Viewer viewer, string terrainTexture, Texture2D defaultTexture)
@@ -511,7 +509,7 @@ namespace Orts.Viewer3D
             var textures = terrainTexture.Split('\0');
             PatchTexture = Viewer.TextureManager.Get(textures[0], defaultTexture);
             PatchTextureOverlay = textures.Length > 1 ? Viewer.TextureManager.Get(textures[1]) : null;
-            var converted = textures.Length > 2 && Int32.TryParse(textures[2], out OverlayScale);
+            var converted = textures.Length > 2 && float.TryParse(textures[2], out OverlayScale);
             OverlayScale = OverlayScale != 0 && converted ?  OverlayScale : 32; 
 
         }
