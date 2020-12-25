@@ -45,6 +45,9 @@ namespace Orts.Viewer3D
         int TileZ;
         int VisibleTileX;
         int VisibleTileZ;
+        long CameraTile;
+        int CameraTileX;
+        int CameraTileZ;
 
         [CallOnThread("Render")]
         public TerrainViewer(Viewer viewer)
@@ -70,8 +73,15 @@ namespace Orts.Viewer3D
                 // First we establish the regular tiles we need to cover the current viewable area.
                 for (var x = TileX - needed; x <= TileX + needed; x++)
                     for (var z = TileZ - needed; z <= TileZ + needed; z++)
+                    {
+                        var cameraTile = CameraTile;
+                        CameraTileX = (int)(cameraTile / 100000);
+                        CameraTileZ = (int)(Math.Abs(cameraTile) - (long)Math.Abs(CameraTileX) * 100000);
+                        if ((CameraTileX != TileX || CameraTileZ != TileZ) && (Math.Abs(CameraTileX - x) > needed || Math.Abs(CameraTileZ - z) > needed))
+                            continue;
                         if (!cancellation.IsCancellationRequested)
                             tiles.Add(Viewer.Tiles.LoadAndGetTile(x, z, x == TileX && z == TileZ));
+                    }
 
                 if (Viewer.Settings.DistantMountains)
                 {
@@ -86,10 +96,12 @@ namespace Orts.Viewer3D
                 if (cancellation.IsCancellationRequested)
                     return;
 
+
                 // Now we turn each unique (distinct) loaded tile in to a terrain tile.
+                needed = (int)Math.Ceiling((float)Viewer.Settings.ViewingDistance / 2048);
                 newTerrainTiles = tiles
                     .Where(t => t != null).Distinct()
-                    .Select(tile => terrainTiles.FirstOrDefault(tt => tt.TileX == tile.TileX && tt.TileZ == tile.TileZ && tt.Size == tile.Size) ?? new TerrainTile(Viewer, Viewer.Tiles, tile))
+                    .Select(tile => terrainTiles.FirstOrDefault(tt => tt.TileX == tile.TileX && tt.TileZ == tile.TileZ && tt.Size == tile.Size) ?? ConditionallyCreateTerrainTile(tile, needed))
                     .Union(loTiles
                         .Where(t => t != null).Distinct()
                         .Select(tile => terrainTiles.FirstOrDefault(tt => tt.TileX == tile.TileX && tt.TileZ == tile.TileZ && tt.Size == tile.Size) ?? new TerrainTile(Viewer, Viewer.LoTiles, tile))
@@ -99,11 +111,27 @@ namespace Orts.Viewer3D
             }
         }
 
+        private TerrainTile ConditionallyCreateTerrainTile(Tile tile, int needed)
+        {
+            var cameraTile = CameraTile;
+            CameraTileX = (int)(cameraTile / 100000);
+            CameraTileZ = (int)(Math.Abs(cameraTile) - (long)Math.Abs(CameraTileX) * 100000);
+            if ((CameraTileX != TileX || CameraTileZ != TileZ) && (Math.Abs(CameraTileX - tile.TileX) > needed || Math.Abs(CameraTileZ - tile.TileZ) > needed))
+                return null;
+            return new TerrainTile(Viewer, Viewer.Tiles, tile);
+        }
+
         [CallOnThread("Updater")]
         public void LoadPrep()
         {
             VisibleTileX = Viewer.Camera.TileX;
             VisibleTileZ = Viewer.Camera.TileZ;
+        }
+
+        [CallOnThread("Updater")]
+        public void GetCameraTile(long cameraTile)
+        {
+            CameraTile = cameraTile;
         }
 
         [CallOnThread("Updater")]
@@ -245,9 +273,7 @@ namespace Orts.Viewer3D
             Tile = null;
             Patch = null;
 
-            DummyVertexBuffer = new VertexBuffer(viewer.GraphicsDevice, DummyVertexDeclaration, 1, BufferUsage.WriteOnly);
-            DummyVertexBuffer.SetData(DummyVertexData);
-            VertexBufferBindings = new[] { new VertexBufferBinding(PatchVertexBuffer), new VertexBufferBinding(DummyVertexBuffer) };
+            VertexBufferBindings = new[] { new VertexBufferBinding(PatchVertexBuffer), new VertexBufferBinding(GetDummyVertexBuffer(viewer.GraphicsDevice)) };
         }
 
         [CallOnThread("Updater")]
@@ -502,7 +528,7 @@ namespace Orts.Viewer3D
     {
         readonly Texture2D PatchTexture;
         readonly Texture2D PatchTextureOverlay;
-        readonly int OverlayScale;
+        readonly float OverlayScale;
         IEnumerator<EffectPass> ShaderPasses;
 
         public TerrainMaterial(Viewer viewer, string terrainTexture, Texture2D defaultTexture)
@@ -511,7 +537,7 @@ namespace Orts.Viewer3D
             var textures = terrainTexture.Split('\0');
             PatchTexture = Viewer.TextureManager.Get(textures[0], defaultTexture);
             PatchTextureOverlay = textures.Length > 1 ? Viewer.TextureManager.Get(textures[1]) : null;
-            var converted = textures.Length > 2 && Int32.TryParse(textures[2], out OverlayScale);
+            var converted = textures.Length > 2 && float.TryParse(textures[2], out OverlayScale);
             OverlayScale = OverlayScale != 0 && converted ?  OverlayScale : 32; 
 
         }
