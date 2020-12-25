@@ -98,12 +98,9 @@ namespace Orts.Viewer3D.Common
         public static string GetTextureFile(Simulator simulator, TextureFlags textureFlags, string texturePath, string textureName)
         {
             var alternativePath = @"\";
-            if ((textureFlags & TextureFlags.Snow) != 0 || (textureFlags & TextureFlags.SnowTrack) != 0)
-            {
-                if (IsSnow(simulator))
-                    alternativePath = @"\Snow\";
-            }
-            else if (IsRain(simulator) && (textureFlags & TextureFlags.Rain) != 0)
+            if (((textureFlags & TextureFlags.Snow) != 0 || (textureFlags & TextureFlags.SnowTrack) != 0) && IsSnow(simulator))
+                alternativePath = @"\Snow\";
+            else if ((textureFlags & TextureFlags.Rain) != 0 && IsRain(simulator))
                 alternativePath = @"\Rain\";
             else if ((textureFlags & TextureFlags.Spring) != 0 && simulator.Season == SeasonType.Spring && simulator.WeatherType != WeatherType.Snow)
                 alternativePath = @"\Spring\";
