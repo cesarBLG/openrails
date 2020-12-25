@@ -20,6 +20,7 @@
 using Microsoft.Xna.Framework;
 using Orts.Common;
 using ORTS.Common;
+using System;
 using System.Collections.Generic;
 
 namespace Orts.Viewer3D
@@ -45,6 +46,7 @@ namespace Orts.Viewer3D
         int TileZ;
         int VisibleTileX;
         int VisibleTileZ;
+        long CameraTile;
         bool PerformanceTune;
 
         [CallOnThread("Render")]
@@ -194,6 +196,15 @@ namespace Orts.Viewer3D
             Scenery.PrepareFrame(frame, elapsedTime);
             Trains.PrepareFrame(frame, elapsedTime);
             RoadCars.PrepareFrame(frame, elapsedTime);
+        }
+
+        [CallOnThread("Updater")]
+        public void GetCameraTile()
+        {
+            long cameraTile = (Math.Abs(Viewer.Camera.TileX) * 100000 + Viewer.Camera.TileZ) * Math.Sign(Viewer.Camera.TileX);
+            CameraTile = cameraTile;
+            Terrain.GetCameraTile(CameraTile);
+            Scenery.GetCameraTile(CameraTile);
         }
     }
 }

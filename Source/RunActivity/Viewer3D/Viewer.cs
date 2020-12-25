@@ -465,6 +465,7 @@ namespace Orts.Viewer3D
             // This ensures that a) we have all the required objects loaded when the 3D view first appears and b) that
             // all loading is performed on a single thread that we can handle in debugging and tracing.
             World.LoadPrep();
+            World.GetCameraTile();
             if (Simulator.Settings.ConditionalLoadOfDayOrNightTextures) // We need to compute sun height only in this case
             {
             MaterialManager.LoadPrep();
