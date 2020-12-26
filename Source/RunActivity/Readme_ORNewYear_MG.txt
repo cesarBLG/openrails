@@ -1,5 +1,5 @@
-﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.84
-December 20th, 2020
+﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.85
+December 26th, 2020
 
 Please note that the installation and use of Open Rails software, even of its unofficial versions, is governed by the Open Rails End User License Agreement. 
 
@@ -12,10 +12,7 @@ INSTALLATION
 you would return to the official OR version.
 
 RELEASE NOTES
-This unofficial version has been derived from the latest official OpenRails testing revision X1.3.1-270. It includes also the latest changes in the OR official master branch,
-that is 
-- Bug fix for https://bugs.launchpad.net/or/+bug/1906786 - Approach Control doesn't work for non NORMAL signals, by CesarBLG
-- Reintroduction of  feature "Allowing manual Call On from dispatcher window", by CesarBLG
+This unofficial version has been derived from the latest official OpenRails testing revision X1.3.1-275. 
 
 No Unstable releases are used to preserve the Monogame version of OR NewYear MG. 
 This version includes some features not (yet) available in the Open Rails unstable official version, that is:
@@ -51,13 +48,18 @@ This version includes some features not (yet) available in the Open Rails unstab
 - support for inclined gauges in 2Dcabs, see http://www.elvastower.com/forums/index.php?/topic/34517-enable-inclined-gauges-in-2d-cabs/
 - bug fix for http://www.elvastower.com/forums/index.php?/topic/34572-new-player-trains-dont-show-train-brakes-in-hud/
 - bug fix for http://www.elvastower.com/forums/index.php?/topic/34565-tt-crash-when-forming-new-train-player/ 
-- support for ETCS L2 planning area, by césarbl, see http://www.elvastower.com/forums/index.php?/topic/34577-planning-area-of-the-etcs-dmi/ 
 - support for animation of wipers in 2D cabs, see http://www.elvastower.com/forums/index.php?/topic/34604-2d-cabs-wipers-animation/page__view__findpost__p__265101 ,
 with the contribution of Paolo.
 - bug fix for http://www.elvastower.com/forums/index.php?/topic/34633-unhandled-exception-overflow-in-win7/page__view__findpost__p__265463 , by mbm_OR
-- NEW: added tentative support for RAIN textures for objects, terrain and transfers
-- NEW: extended support for ETCS L2 planning area, for braking distance and text area, and initial support for menus by césar BL
-- NEW: removed trace of wait processes when enable watchdog option deselected.
+- extended support for ETCS L2 planning area, for braking distance and text area, and initial support for menus by césarBL, see  http://www.elvastower.com/forums/index.php?/topic/34577-planning-area-of-the-etcs-dmi/ 
+- removed trace of wait processes when enable watchdog option deselected
+- NEW: corrected tentative support for RAIN textures for objects, terrain and transfers
+- NEW: shadow in on-screen messages now shown only behind text and not on the whole screen width, see http://www.elvastower.com/forums/index.php?/topic/34709-shadow-behind-on-screen-messages/
+- NEW: dynamic terrain and scenery loading strategy (useful for slower computers).
+
+Moreover some features present in the Unstable Monogame version by James Ross have been inserted.
+
+
  
 
 
