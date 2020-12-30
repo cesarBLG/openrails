@@ -167,7 +167,7 @@ namespace Orts.Simulation.AIs
             {
                 foreach (AITrain.DistanceTravelledItem specRequiredAction in aiTrain.AuxActionsContain.specRequiredActions)
                 {
-                    if (specRequiredAction is AuxActionHornItem)
+                    if (specRequiredAction is AuxActionHornItem && (specRequiredAction as AuxActionHornItem).ActualDepart != 0)
                     {
                         if (SpecAuxActions.Count > 0)
                         {
