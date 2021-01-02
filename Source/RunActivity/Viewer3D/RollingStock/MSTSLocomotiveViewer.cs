@@ -1181,7 +1181,7 @@ namespace Orts.Viewer3D.RollingStock
                         {
                             CabViewDigitalRenderer cvdr;
                             if (viewer.Settings.CircularSpeedGauge && digital.ControlStyle == CABViewControlStyles.NEEDLE)
-                                cvdr = new DigitalDMIRenderer(viewer, car, digital, _Shader);
+                                cvdr = new CircularSpeedGaugeRenderer(viewer, car, digital, _Shader);
                             else
                                 cvdr = new CabViewDigitalRenderer(viewer, car, digital, _Shader);
                             cvdr.SortIndex = controlSortIndex;
@@ -1294,7 +1294,7 @@ namespace Orts.Viewer3D.RollingStock
                 {
                     CabViewDigitalRenderer cvdr;
                     if (viewer.Settings.CircularSpeedGauge && digital.ControlStyle == CABViewControlStyles.NEEDLE)
-                        cvdr = new DigitalDMIRenderer(viewer, car, digital, _Shader);
+                        cvdr = new CircularSpeedGaugeRenderer(viewer, car, digital, _Shader);
                     else
                         cvdr = new CabViewDigitalRenderer(viewer, car, digital, _Shader);
                     cvdr.SortIndex = controlSortIndex;
