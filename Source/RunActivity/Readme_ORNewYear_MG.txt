@@ -1,5 +1,5 @@
-﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.85
-December 26th, 2020
+﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.86
+January 2nd, 2021
 
 Please note that the installation and use of Open Rails software, even of its unofficial versions, is governed by the Open Rails End User License Agreement. 
 
@@ -13,6 +13,10 @@ you would return to the official OR version.
 
 RELEASE NOTES
 This unofficial version has been derived from the latest official OpenRails testing revision X1.3.1-275. 
+It includes also changes introduced in the OR official master release up today, that is:
+- Fix invisible forest shadows during most of the day: https://bugs.launchpad.net/or/+bug/1863217 , by YoRyan
+- Display shadow of on-screen messages only behind text, see http://www.elvastower.com/forums/index.php?/topic/34709-shadow-behind-on-screen-messages/
+- Bug fix for https://bugs.launchpad.net/or/+bug/1909684 AI train speed variable not initialized 
 
 No Unstable releases are used to preserve the Monogame version of OR NewYear MG. 
 This version includes some features not (yet) available in the Open Rails unstable official version, that is:
@@ -53,9 +57,10 @@ with the contribution of Paolo.
 - bug fix for http://www.elvastower.com/forums/index.php?/topic/34633-unhandled-exception-overflow-in-win7/page__view__findpost__p__265463 , by mbm_OR
 - extended support for ETCS L2 planning area, for braking distance and text area, and initial support for menus by césarBL, see  http://www.elvastower.com/forums/index.php?/topic/34577-planning-area-of-the-etcs-dmi/ 
 - removed trace of wait processes when enable watchdog option deselected
-- NEW: corrected tentative support for RAIN textures for objects, terrain and transfers
-- NEW: shadow in on-screen messages now shown only behind text and not on the whole screen width, see http://www.elvastower.com/forums/index.php?/topic/34709-shadow-behind-on-screen-messages/
-- NEW: dynamic terrain and scenery loading strategy (useful for slower computers).
+- tentative support for RAIN textures for objects, terrain and transfers
+- dynamic terrain and scenery loading strategy (useful for slower computers)
+- NEW: improved backward compatibility for ETCS circular gauge, by césarBL
+- NEW: American horn blow sequence for AI trains, see http://www.elvastower.com/forums/index.php?/topic/34721-ai-train-horn-honk-american-style/ .
 
 Moreover some features present in the Unstable Monogame version by James Ross have been inserted.
 
