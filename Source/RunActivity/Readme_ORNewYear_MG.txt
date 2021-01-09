@@ -1,5 +1,5 @@
-﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.86
-January 2nd, 2021
+﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.87
+January 9th, 2021
 
 Please note that the installation and use of Open Rails software, even of its unofficial versions, is governed by the Open Rails End User License Agreement. 
 
@@ -12,14 +12,10 @@ INSTALLATION
 you would return to the official OR version.
 
 RELEASE NOTES
-This unofficial version has been derived from the latest official OpenRails testing revision X1.3.1-275. 
-It includes also changes introduced in the OR official master release up today, that is:
-- Fix invisible forest shadows during most of the day: https://bugs.launchpad.net/or/+bug/1863217 , by YoRyan
-- Display shadow of on-screen messages only behind text, see http://www.elvastower.com/forums/index.php?/topic/34709-shadow-behind-on-screen-messages/
-- Bug fix for https://bugs.launchpad.net/or/+bug/1909684 AI train speed variable not initialized 
+This unofficial version has been derived from the latest official OpenRails testing revision X1.3.1-279. 
 
 No Unstable releases are used to preserve the Monogame version of OR NewYear MG. 
-This version includes some features not (yet) available in the Open Rails unstable official version, that is:
+This version includes some features not (yet) available in the Open Rails testing official version, that is:
 - Monogame, OR NewYear MG version
 - addition of track sounds in the sound debug window (by dennisat)
 - F5 HUD scrolling (by mbm_or)
@@ -59,15 +55,11 @@ with the contribution of Paolo.
 - removed trace of wait processes when enable watchdog option deselected
 - tentative support for RAIN textures for objects, terrain and transfers
 - dynamic terrain and scenery loading strategy (useful for slower computers)
-- NEW: improved backward compatibility for ETCS circular gauge, by césarBL
-- NEW: American horn blow sequence for AI trains, see http://www.elvastower.com/forums/index.php?/topic/34721-ai-train-horn-honk-american-style/ .
+- American horn blow sequence for AI trains, see http://www.elvastower.com/forums/index.php?/topic/34721-ai-train-horn-honk-american-style/ 
+- NEW: bug fix for https://bugs.launchpad.net/or/+bug/1910684 Crash selecting height entry in altitude file
+- NEW: first thread hang is now logged even if watchdog disabled
 
 Moreover some features present in the Unstable Monogame version by James Ross have been inserted.
-
-
- 
-
-
 
 CREDITS
 This unofficial version couldn't have been created without following contributions:
