@@ -39,6 +39,7 @@ namespace Orts.Viewer3D.Processes
         readonly ProcessState State = new ProcessState("Sound");
         readonly Game Game;
         readonly Thread Thread;
+        bool ThreadHangAlreadyOccurred = false;
 
         // THREAD SAFETY:
         //   All accesses must be done in local variables. No modifications to the objects are allowed except by
@@ -142,6 +143,13 @@ namespace Orts.Viewer3D.Processes
                             Debugger.Break();
                         else
                             Environment.Exit(1);
+                    }
+                    else if (!ThreadHangAlreadyOccurred)
+                    {
+                        // report only first thread hang
+                        foreach (var token in hungTokens)
+                            Trace.WriteLine(new FatalException(new ThreadHangException(token.Thread, token.Stacks)));
+                        ThreadHangAlreadyOccurred = true;
                     }
                 }
             }
