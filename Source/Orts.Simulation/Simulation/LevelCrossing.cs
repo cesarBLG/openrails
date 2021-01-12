@@ -187,7 +187,7 @@ namespace Orts.Simulation
 
                 if (train is AITrain && train.TrainType != Train.TRAINTYPE.AI_PLAYERDRIVEN && (train.ReservedTrackLengthM <= 0 || frontDist < train.ReservedTrackLengthM))
                 {
-                    if (train.Simulator.Activity.Tr_Activity.Tr_Activity_File.ORTSAIHornAtCrossings == 1)
+                    if (train.Simulator.Activity?.Tr_Activity.Tr_Activity_File.ORTSAIHornAtCrossings == 1)
                     {
                         if (frontDist <= hornReqDist && rearDist <= minimumDist)
                         {
@@ -195,7 +195,7 @@ namespace Orts.Simulation
                             ((AITrain)train).AuxActionsContain.CheckGenActions(this.GetType(), crossing.Location, rearDist, frontDist, crossing.TrackIndex);
                         }
                     }
-                    else if (train.Simulator.Activity.Tr_Activity.Tr_Activity_File.ORTSAIHornAtCrossings == 2)
+                    else if (train.Simulator.Activity?.Tr_Activity.Tr_Activity_File.ORTSAIHornAtCrossings == 2)
                     {
                         if (frontDist <= amHornReqDist && rearDist <= minimumDist)
                         {
