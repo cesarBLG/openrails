@@ -220,7 +220,11 @@ namespace Orts.Viewer3D.RollingStock
                 }
                 if (UserInput.RDState.Active)
                 {
-                    Locomotive.AlerterReset();
+                    if (UserInput.RDState.Changed)
+                    {
+                        Locomotive.AlerterReset();
+                        UserInput.RDState.Handled();
+                    }
 
                     Locomotive.SetThrottlePercentWithSound(UserInput.RDState.ThrottlePercent);
                     Locomotive.SetTrainBrakePercent(UserInput.RDState.TrainBrakePercent);
