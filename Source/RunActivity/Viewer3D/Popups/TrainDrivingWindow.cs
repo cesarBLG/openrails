@@ -955,8 +955,9 @@ namespace Orts.Viewer3D.Popups
             }
             List<ListLabel> returnList = new List<ListLabel>();
             try
-            {              
-               returnList = ListToLabel.ToList(); // try to avoid crash in the JsonConvert.SerializeObject
+            // needed for thread safety
+            {
+                returnList = ListToLabel.ToList();
             }
             catch
             { 

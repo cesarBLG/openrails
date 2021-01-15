@@ -14523,6 +14523,7 @@ namespace Orts.Simulation.Physics
             float maxDistanceM = 7000.0f;
 
             try
+            // needed for thread safety when called from web server
             {
                 foreach (TrainObjectItem thisTrainItem in PlayerTrainSignals[0, 0])
                 {
@@ -14710,6 +14711,7 @@ namespace Orts.Simulation.Physics
             if (ValidRoute[0] != null)
             {
                 try
+                // needed for thread safety when called from web server
                 {
                     foreach (TrainObjectItem thisTrainItem in PlayerTrainSignals[0, 0])
                     {
@@ -14748,6 +14750,7 @@ namespace Orts.Simulation.Physics
             if (ValidRoute[1] != null)
             {
                 try
+                // needed for thread safety when called from web server
                 {
 
                     foreach (TrainObjectItem thisTrainItem in PlayerTrainSignals[1, 0])
