@@ -26,29 +26,11 @@ var hr = new XMLHttpRequest;
 var httpCodeSuccess = 200;
 var xmlHttpRequestCodeDone = 4;
 
-var idleMs = 500; // default idle time between calls
-function poll(initialIdleMs) {
-	if (initialIdleMs != null)
-		idleMs = initialIdleMs; // Save it to use at end
-	
-	api();
-	
-	// setTimeout() used instead of setInterval() to avoid overloading the browser's queue.
-	// (It's not true recursion, so it won't blow the stack.)
-	setTimeout(poll, idleMs); // In this call, initialIdleMs == null
-}
-
-var pageNo = 0;
-
-function api() {
-	// If this file is located in folder /API/<API_name>/, then Open Rails will call the API with the signature "/API/<API_name"
-
-	// GET preferred over POST as Internet Explorer may then fail intermittently with network error 00002eff
-	// hr.open("post", "call_API", true);
-	// hr.send("pageno="+pageNo);
-	hr.open("GET", "call_API?pageNo="+pageNo, true);
+function ApiHeadUpDisplay() {
+	// GET to fetch data, POST to send it
+	// "/API/APISAMPLE" /API is a prefix hard-coded into the WebServer class
+	hr.open("GET", "/API/HUD/"+pageNo, true);
 	hr.send();
-	
 	hr.onreadystatechange = function () {
 		if (this.readyState == xmlHttpRequestCodeDone && this.status == httpCodeSuccess) {
 			var obj = JSON.parse(hr.responseText);

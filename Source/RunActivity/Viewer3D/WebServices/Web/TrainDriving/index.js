@@ -25,26 +25,12 @@
 var hr = new XMLHttpRequest;
 var httpCodeSuccess = 200;
 var xmlHttpRequestCodeDone = 4;
+var normalTextMode = true;
 
-var idleMs = 500; // default idle time between calls
-function poll(initialIdleMs) {
-	if (initialIdleMs != null)
-		idleMs = initialIdleMs; // Save it to use at end
-
-	api();
-
-	// setTimeout() used instead of setInterval() to avoid overloading the browser's queue.
-	// (It's not true recursion, so it won't blow the stack.)
-    setTimeout(poll, idleMs); // In this call, initialIdleMs == null
-}
-
-function api() {
-	// If this file is located in folder /API/<API_name>/, then Open Rails will call the API with the signature "/API/<API_name"
-
-	// GET preferred over POST as Internet Explorer may then fail intermittently with network error 00002eff
-	// hr.open("post", "call_API", true);
-	// hr.send(""");
-	hr.open("GET", "call_API", true);
+function ApiTrainDriving() {
+	// GET to fetch data, POST to send it
+	// "/API/APISAMPLE" /API is a prefix hard-coded into the WebServer class
+	hr.open("GET", `/API/TRAINDRIVINGDISPLAY?normalText=${normalTextMode}`, true);
 	hr.send();
 
 	hr.onreadystatechange = function () {
@@ -56,17 +42,23 @@ function api() {
 				var endIndexFirst = 0,
 					endIndexLast = 0,
 					endIndexKey = 0;
-					
+
 				var keyPressedColor = "",
 					newDataFirst = "",
 					newDataLast = "",
 					smallSymbolColor = "",
 					stringColorFirst = "",
 					stringColorLast = "";
+
 				// Color codes
 				var codeColor = ['???','??!','?!?','?!!','!??','!!?','!!!','%%%','$$$'];
+
+				// Table title
+				Str += "<tr> <td colspan='5' style='text-align: center'>" + 'Train Driving Info' + "</td></tr>";
+				Str += "<tr> <td colspan='5' class='separator'></td></tr>";
+
 				// Customize data
-				for (var row = 0; row < obj.trainDrivingData.length; ++row) {
+				for (const data of obj) {
 					Str += "<tr>";
 					firstColor = false;
 					lastColor = false;
@@ -74,31 +66,31 @@ function api() {
 					symbolColor = false;
 
 					// FirstCol
-					if (obj.trainDrivingData[row].FirstCol != null) {
-						endIndexFirst = obj.trainDrivingData[row].FirstCol.length;
-						newDataFirst = obj.trainDrivingData[row].FirstCol.slice(0, endIndexFirst -3);
-						stringColorFirst = obj.trainDrivingData[row].FirstCol.slice(-3);
+					if (data.FirstCol != null) {
+						endIndexFirst = data.FirstCol.length;
+						newDataFirst = data.FirstCol.slice(0, endIndexFirst -3);
+						stringColorFirst = data.FirstCol.slice(-3);
 					}
 
 					// LastCol
-					if (obj.trainDrivingData[row].LastCol != null) {
-						endIndexLast = obj.trainDrivingData[row].LastCol.length;
-						newDataLast = obj.trainDrivingData[row].LastCol.slice(0, endIndexLast -3);
-						stringColorLast = obj.trainDrivingData[row].LastCol.slice(-3);
+					if (data.LastCol != null) {
+						endIndexLast = data.LastCol.length;
+						newDataLast = data.LastCol.slice(0, endIndexLast -3);
+						stringColorLast = data.LastCol.slice(-3);
 					}
 
 					// keyPressed
-					if (obj.trainDrivingData[row].keyPressed != null) {
-						endIndexKey = obj.trainDrivingData[row].keyPressed.length;
-						newDataKey = obj.trainDrivingData[row].keyPressed.slice(0, endIndexKey -3);
-						keyPressedColor = obj.trainDrivingData[row].keyPressed.slice(-3);
+					if (data.KeyPressed != null) {
+						endIndexKey = data.KeyPressed.length;
+						newDataKey = data.KeyPressed.slice(0, endIndexKey -3);
+						keyPressedColor = data.KeyPressed.slice(-3);
 					}
 
 					// smallSymbol
-					if (obj.trainDrivingData[row].SymbolCol != null) {
-						endIndexSymbol = obj.trainDrivingData[row].SymbolCol.length;
-						newDataSymbol = obj.trainDrivingData[row].SymbolCol.slice(0, endIndexSymbol -3);
-						smallSymbolColor = obj.trainDrivingData[row].SymbolCol.slice(-3);
+					if (data.SymbolCol != null) {
+						endIndexSymbol = data.SymbolCol.length;
+						newDataSymbol = data.SymbolCol.slice(0, endIndexSymbol -3);
+						smallSymbolColor = data.SymbolCol.slice(-3);
 					}
 
 					// detects color
@@ -107,10 +99,10 @@ function api() {
 					if (codeColor.indexOf(keyPressedColor) != -1) { keyColor = true; }
 					if (codeColor.indexOf(smallSymbolColor) != -1) { symbolColor = true; }
 
-					if (obj.trainDrivingData[row].FirstCol == null) {
+					if (data.FirstCol == null) {
 						Str += "<td></td>";
 					}
-					else if (obj.trainDrivingData[row].FirstCol == "Sprtr"){
+					else if (data.FirstCol == "Sprtr"){
 						Str += "<td colspan='5' class='separator'></td>";
 					}
 					else{
@@ -119,7 +111,7 @@ function api() {
 							Str += "<td ColorCode=" + keyPressedColor + ">" + newDataKey + "</td>";
 						}
 						else{
-							Str += "<td width='16'>" + obj.trainDrivingData[row].keyPressed + "</td>";
+							Str += "<td width='16'>" + data.KeyPressed + "</td>";
 						}
 
 						// second col = FirstCol data
@@ -127,7 +119,7 @@ function api() {
 							Str += "<td ColorCode=" + stringColorFirst + ">" + newDataFirst + "</td>";
 						}
 						else{
-							Str += "<td>" + obj.trainDrivingData[row].FirstCol + "</td>";
+							Str += "<td>" + data.FirstCol + "</td>";
 						}
 
 						// third col  = key symbol
@@ -138,7 +130,7 @@ function api() {
 							Str += "<td ColorCode=" + smallSymbolColor + ">" + newDataSymbol + "</td>";
 						}
 						else{
-							Str += "<td width='16'>" + obj.trainDrivingData[row].keyPressed + "</td>";
+							Str += "<td width='16'>" + data.KeyPressed + "</td>";
 						}
 
 						// fourth col = LastCol data
@@ -146,15 +138,15 @@ function api() {
 							Str += "<td ColorCode=" + stringColorLast + ">" + newDataLast + "</td>";
 						}
 						else{
-							Str += "<td>" + obj.trainDrivingData[row].LastCol + "</td>";
+							Str += "<td>" + data.LastCol + "</td>";
 						}
 					}
 					Str += "</tr>";
 				}
 				Str += "</table>";
 				// space at bottom
-				Str += "<tr> <td colspan='5' style='text-align: center'>" + '.' + "</td> </tr>";
-				Str += "</table>";
+				Str += "<tr> <td colspan='5' onclick='changeNormalTextMode()' style='text-align: center'><img src='/or_logo.png' height='16' width='16'></img></td> </tr>";
+                Str += "</table>";
 				TrainDriving.innerHTML = Str;
 			}
 		}
@@ -164,7 +156,7 @@ function api() {
 function changePageColor() {
 	var buttonClicked = document.getElementById("buttonDN");
 	var bodyColor = document.getElementById("body");
-	
+
 	if (buttonClicked.innerHTML == "Day"){
 		buttonClicked.innerHTML = "Night";
 		bodyColor.style.background = "black";
@@ -175,4 +167,8 @@ function changePageColor() {
 		bodyColor.style.background = "white";
 		bodyColor.style.color =	"black";
 	}
+};
+
+function changeNormalTextMode() {
+	normalTextMode = !normalTextMode;
 };
