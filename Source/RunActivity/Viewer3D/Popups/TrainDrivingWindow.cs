@@ -953,7 +953,16 @@ namespace Orts.Viewer3D.Popups
                     LinesCount = ListToLabel.Count();
                 }
             }
-            return (ListToLabel.ToList());// try to avoid crash in the JsonConvert.SerializeObject
+            List<ListLabel> returnList = new List<ListLabel>();
+            try
+            // needed for thread safety
+            {
+                returnList = ListToLabel.ToList();
+            }
+            catch
+            { 
+            }
+            return returnList;
         }
     }
 }
