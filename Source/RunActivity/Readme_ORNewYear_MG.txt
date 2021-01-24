@@ -1,5 +1,5 @@
-﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.87
-January 9th, 2021
+﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.88
+January 17th, 2021
 
 Please note that the installation and use of Open Rails software, even of its unofficial versions, is governed by the Open Rails End User License Agreement. 
 
@@ -12,7 +12,7 @@ INSTALLATION
 you would return to the official OR version.
 
 RELEASE NOTES
-This unofficial version has been derived from the latest official OpenRails testing revision X1.3.1-279. 
+This unofficial version has been derived from the latest official OpenRails testing revision X1.3.1-285. 
 
 No Unstable releases are used to preserve the Monogame version of OR NewYear MG. 
 This version includes some features not (yet) available in the Open Rails testing official version, that is:
@@ -56,8 +56,10 @@ with the contribution of Paolo.
 - tentative support for RAIN textures for objects, terrain and transfers
 - dynamic terrain and scenery loading strategy (useful for slower computers)
 - American horn blow sequence for AI trains, see http://www.elvastower.com/forums/index.php?/topic/34721-ai-train-horn-honk-american-style/ 
-- NEW: bug fix for https://bugs.launchpad.net/or/+bug/1910684 Crash selecting height entry in altitude file
-- NEW: first thread hang is now logged even if watchdog disabled
+- bug fix for https://bugs.launchpad.net/or/+bug/1910684 Crash selecting height entry in altitude file
+- NEW: tentative fixes to avoid crashes in web server
+- NEW: inserted full definition ETCS icons and .txt file with credit
+- NEW: make alerter working with RailDriver
 
 Moreover some features present in the Unstable Monogame version by James Ross have been inserted.
 
