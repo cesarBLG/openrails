@@ -1384,7 +1384,9 @@ namespace Orts.Viewer3D
                     if (MousePickedControl != null & MousePickedControl != OldMousePickedControl)
                     {
                         // say what control you have here
-                        Simulator.Confirmer.Message(ConfirmLevel.None, MousePickedControl.GetControlName());
+                        string label = MousePickedControl.GetControlLabel();
+                        if (String.IsNullOrEmpty(label)) label = MousePickedControl.GetControlName();
+                        Simulator.Confirmer.Message(ConfirmLevel.None, label);
                     }
                     if (MousePickedControl != null) ActualCursor = Cursors.Hand;
                     else if (ActualCursor == Cursors.Hand) ActualCursor = Cursors.Default;
@@ -1506,7 +1508,9 @@ namespace Orts.Viewer3D
                     if (MousePickedControl != null & MousePickedControl != OldMousePickedControl)
                     {
                         // say what control you have here
-                        Simulator.Confirmer.Message(ConfirmLevel.None, MousePickedControl.GetControlName());
+                        string label = MousePickedControl.GetControlLabel();
+                        if (String.IsNullOrEmpty(label)) label = MousePickedControl.GetControlName();
+                        Simulator.Confirmer.Message(ConfirmLevel.None, label);
                     }
                     if (MousePickedControl != null)
                     {

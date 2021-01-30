@@ -350,6 +350,7 @@ namespace Orts.Formats.Msts
         public double MaxValue;
         public double OldValue;
         public string ACEFile = "";
+        public string Label = "";
 
         public CABViewControlTypes ControlType = CABViewControlTypes.NONE;
         public CABViewControlStyles ControlStyle = CABViewControlStyles.NONE;
@@ -508,6 +509,11 @@ namespace Orts.Formats.Msts
                     ToDegree = stf.ReadFloat(STFReader.UNITS.None, null);
                     stf.SkipRestOfBlock();
                 }),
+                new STFReader.TokenProcessor("label", ()=>{
+                    stf.MustMatch("(");
+                    Label = stf.ReadString();
+                    stf.SkipRestOfBlock();
+                }),
             });
         }
     }
@@ -591,7 +597,12 @@ namespace Orts.Formats.Msts
                             new STFReader.TokenProcessor("controlcolour", ()=>{ DecreaseColor = ParseControlColor(stf); }) });
                     }
                 }),
-                new STFReader.TokenProcessor("ortsangle", () =>{ Rotation = ParseRotation(stf); })
+                new STFReader.TokenProcessor("ortsangle", () =>{ Rotation = ParseRotation(stf); }),
+                new STFReader.TokenProcessor("label", ()=>{
+                    stf.MustMatch("(");
+                    Label = stf.ReadString();
+                    stf.SkipRestOfBlock();
+                }),
             });
         }
     }
@@ -712,7 +723,12 @@ namespace Orts.Formats.Msts
                     }
                 }),
                 new STFReader.TokenProcessor("ortsfont", ()=>{ParseFont(stf); }),
-                new STFReader.TokenProcessor("ortsangle", () => {Rotation = ParseRotation(stf); }),              
+                new STFReader.TokenProcessor("ortsangle", () => {Rotation = ParseRotation(stf); }),
+                new STFReader.TokenProcessor("label", ()=>{
+                    stf.MustMatch("(");
+                    Label = stf.ReadString();
+                    stf.SkipRestOfBlock();
+                }),
             });
         }
 
@@ -871,7 +887,7 @@ namespace Orts.Formats.Msts
                             positionsRead++;
 
                         if (minPosition < 0)
-                        { 
+                        {
                             for (int iPos = 0; iPos <= Positions.Count - 1; iPos++)
                             {
                                 Positions[iPos] -= minPosition;
@@ -889,8 +905,8 @@ namespace Orts.Formats.Msts
                         // Check if eligible for filling
 
                         if (Positions.Count > 1 && Positions[0] != 0) canFill = false;
-                        else 
-                        { 
+                        else
+                        {
                             for (var iPos = 1; iPos <= Positions.Count - 1; iPos++)
                             {
                                 if (Positions[iPos] > Positions[iPos-1]) continue;
@@ -927,7 +943,7 @@ namespace Orts.Formats.Msts
                             // Avoid later repositioning, put every value to its Position
                             // But before resize Values if needed
                             if (numValues != numPositions)
-                            { 
+                            {
                                 while (Values.Count <= Positions[_ValuesRead])
                                 {
                                     Values.Add(0);
@@ -938,6 +954,11 @@ namespace Orts.Formats.Msts
                             Values.Add(v);
                             _ValuesRead++;
                         }
+                    }),
+                    new STFReader.TokenProcessor("label", ()=>{
+                        stf.MustMatch("(");
+                        Label = stf.ReadString();
+                        stf.SkipRestOfBlock();
                     }),
                 });
 
