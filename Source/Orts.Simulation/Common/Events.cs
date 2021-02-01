@@ -204,6 +204,12 @@ namespace Orts.Common
         GearPosition7,
         GearPosition8,
 
+        // Jindrich
+        CruiseControlSpeedRegulator,
+        CruiseControlSpeedSelector,
+        CruiseControlMaxForce,
+        Alert,
+        Alert1,
 
     }
 
@@ -422,6 +428,13 @@ namespace Orts.Common
                         case 206: return Event.GearPosition6;
                         case 207: return Event.GearPosition7;
                         case 208: return Event.GearPosition8;
+
+                        // Jindrich
+                        case 1000: return Event.CruiseControlSpeedRegulator;
+                        case 1001: return Event.CruiseControlSpeedSelector;
+                        case 1002: return Event.CruiseControlMaxForce;
+                        case 1003: return Event.Alert;
+                        case 1004: return Event.Alert1;
 
                         default: return 0;
                     }
