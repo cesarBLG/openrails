@@ -430,11 +430,11 @@ namespace Orts.Common
                         case 208: return Event.GearPosition8;
 
                         // Jindrich
-                        case 1000: return Event.CruiseControlSpeedRegulator;
-                        case 1001: return Event.CruiseControlSpeedSelector;
-                        case 1002: return Event.CruiseControlMaxForce;
-                        case 1003: return Event.Alert;
-                        case 1004: return Event.Alert1;
+                        case 300: return Event.CruiseControlSpeedRegulator;
+                        case 301: return Event.CruiseControlSpeedSelector;
+                        case 302: return Event.CruiseControlMaxForce;
+                        case 303: return Event.Alert;
+                        case 304: return Event.Alert1;
 
                         default: return 0;
                     }

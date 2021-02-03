@@ -38,6 +38,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
         public float SpeedRegulatorMaxForceSteps = 0;
         public bool MaxForceSetSingleStep = false;
         public bool MaxForceKeepSelectedStepWhenManualModeSet = false;
+        public bool ForceRegulatorAutoWhenNonZeroSpeedSelected = false;
         public List<string> SpeedRegulatorOptions = new List<string>();
         public SpeedRegulatorMode SpeedRegMode = SpeedRegulatorMode.Manual;
         public SpeedSelectorMode SpeedSelMode = SpeedSelectorMode.Neutral;
@@ -105,6 +106,66 @@ namespace Orts.Simulation.RollingStocks.SubSystems
         public float MaxPowerThreshold = 0;
         public float SafeSpeedForAutomaticOperationMpS = 0;
 
+        public void Parse(string lowercasetoken, STFReader stf)
+        {
+            switch (lowercasetoken)
+            {
+                case "engine(ortscruisecontrol": Equipped = true; break;
+                case "engine(ortscruisecontrol(usethrottle": UseThrottle = stf.ReadBoolBlock(false); break;
+                case "engine(ortscruisecontrol(throttleincreasespeed": ThrottleIncreaseSpeed = stf.ReadFloatBlock(STFReader.UNITS.Any, 0.1f); break;
+                case "engine(ortscruisecontrol(throttledecreasespeed": ThrottleDecreaseSpeed = stf.ReadFloatBlock(STFReader.UNITS.Any, 0.2f); break;
+                case "engine(ortscruisecontrol(throttlefullrangeincreasetimeseconds": ThrottleFullRangeIncreaseTimeSeconds = stf.ReadFloatBlock(STFReader.UNITS.Any, 5); break;
+                case "engine(ortscruisecontrol(throttlefullrangedecreasetimeseconds": ThrottleFullRangeDecreaseTimeSeconds = stf.ReadFloatBlock(STFReader.UNITS.Any, 5); break;
+                case "engine(ortscruisecontrol(dynamicbrakefullrangeincreasetimeseconds": DynamicBrakeFullRangeIncreaseTimeSeconds = stf.ReadFloatBlock(STFReader.UNITS.Any, 5); break;
+                case "engine(ortscruisecontrol(dynamicbrakefullrangedecreasetimeseconds": DynamicBrakeFullRangeDecreaseTimeSeconds = stf.ReadFloatBlock(STFReader.UNITS.Any, 5); break;
+                case "engine(ortscruisecontrol(parkingbrakeengagespeed": ParkingBrakeEngageSpeed = stf.ReadFloatBlock(STFReader.UNITS.Speed, 0); break;
+                case "engine(ortscruisecontrol(parkingbrakepercent": ParkingBrakePercent = stf.ReadFloatBlock(STFReader.UNITS.Any, 0); break;
+                case "engine(ortscruisecontrol(maxpowerthreshold": MaxPowerThreshold = stf.ReadFloatBlock(STFReader.UNITS.Any, 0); break;
+                case "engine(ortscruisecontrol(maxforcepercentunits": SpeedRegulatorMaxForcePercentUnits = stf.ReadBoolBlock(false); break;
+                case "engine(ortscruisecontrol(maxforcesteps": SpeedRegulatorMaxForceSteps = stf.ReadIntBlock(0); break;
+                case "engine(ortscruisecontrol(maxforcesetsinglestep": MaxForceSetSingleStep = stf.ReadBoolBlock(false); break;
+                case "engine(ortscruisecontrol(maxforcekeepselectedstepwhenmanualmodeset": MaxForceKeepSelectedStepWhenManualModeSet = stf.ReadBoolBlock(false); break;
+                case "engine(ortscruisecontrol(forceregulatorautowhennonzerospeedselected": ForceRegulatorAutoWhenNonZeroSpeedSelected = stf.ReadBoolBlock(false); break;
+                case "engine(ortscruisecontrol(forcestepsthrottletable":
+                    foreach (var forceStepThrottleValue in stf.ReadStringBlock("").Replace(" ", "").Split(','))
+                    {
+                        ForceStepsThrottleTable.Add(int.Parse(forceStepThrottleValue));
+                    }
+                    break;
+                case "engine(ortscruisecontrol(accelerationtable":
+                    foreach (var accelerationValue in stf.ReadStringBlock("").Replace(" ", "").Split(','))
+                    {
+                        AccelerationTable.Add(float.Parse(accelerationValue));
+                    }
+                    break;
+                case "engine(ortscruisecontrol(powerbreakoutampers": PowerBreakoutAmpers = stf.ReadFloatBlock(STFReader.UNITS.Any, 100.0f); break;
+                case "engine(ortscruisecontrol(powerbreakoutspeeddelta": PowerBreakoutSpeedDelta = stf.ReadFloatBlock(STFReader.UNITS.Any, 100.0f); break;
+                case "engine(ortscruisecontrol(powerresumespeeddelta": PowerResumeSpeedDelta = stf.ReadFloatBlock(STFReader.UNITS.Any, 100.0f); break;
+                case "engine(ortscruisecontrol(powerreductiondelaypaxtrain": PowerReductionDelayPaxTrain = stf.ReadFloatBlock(STFReader.UNITS.Any, 0.0f); break;
+                case "engine(ortscruisecontrol(powerreductiondelaycargotrain": PowerReductionDelayCargoTrain = stf.ReadFloatBlock(STFReader.UNITS.Any, 0.0f); break;
+                case "engine(ortscruisecontrol(powerreductionvalue": PowerReductionValue = stf.ReadFloatBlock(STFReader.UNITS.Any, 100.0f); break;
+
+                case "engine(ortscruisecontrol(disablezeroforcestep": DisableZeroForceStep = stf.ReadBoolBlock(false); break;
+                case "engine(ortscruisecontrol(defaultforcestep": SelectedMaxAccelerationStep = stf.ReadFloatBlock(STFReader.UNITS.Any, 1.0f); break;
+                case "engine(ortscruisecontrol(dynamicbrakemaxforceatselectorstep": DynamicBrakeMaxForceAtSelectorStep = stf.ReadFloatBlock(STFReader.UNITS.Any, 1.0f); break;
+                case "engine(ortscruisecontrol(startreducingspeeddelta": StartReducingSpeedDelta = stf.ReadFloatBlock(STFReader.UNITS.Any, 1.0f); break;
+                case "engine(ortscruisecontrol(dynamicbrakedescentcoefficient": DynamicBrakeDescentCoefficient = stf.ReadFloatBlock(STFReader.UNITS.Any, 0.5f); break;
+                case "engine(ortscruisecontrol(climbdeltacoefficient": DeltaCoefficient = stf.ReadFloatBlock(STFReader.UNITS.Any, 0.8f); break;
+                case "engine(ortscruisecontrol(maxacceleration": MaxAccelerationMpSS = stf.ReadFloatBlock(STFReader.UNITS.Any, 1); break;
+                case "engine(ortscruisecontrol(maxdeceleration": MaxDecelerationMpSS = stf.ReadFloatBlock(STFReader.UNITS.Any, 0.5f); break;
+                case "engine(ortscruisecontrol(antiwheelspinequipped": AntiWheelSpinEquipped = stf.ReadBoolBlock(false); break;
+                case "engine(ortscruisecontrol(nominalspeedstep": SpeedRegulatorNominalSpeedStepMpS = MpS.FromKpH(stf.ReadFloatBlock(STFReader.UNITS.Speed, 0)); break;
+                case "engine(ortscruisecontrol(usethrottleasspeedselector": stf.ReadBoolBlock(false); break;
+                case "engine(ortscruisecontrol(dynamicbrakeincreasespeed": DynamicBrakeIncreaseSpeed = stf.ReadFloatBlock(STFReader.UNITS.Any, 0.5f); break;
+                case "engine(ortscruisecontrol(dynamicbrakedecreasespeed": DynamicBrakeDecreaseSpeed = stf.ReadFloatBlock(STFReader.UNITS.Any, 0.5f); break;
+                case "engine(ortscruisecontrol(options":
+                    foreach (var speedRegulatorOption in stf.ReadStringBlock("").ToLower().Replace(" ", "").Split(','))
+                    {
+                        SpeedRegulatorOptions.Add(speedRegulatorOption.ToLower());
+                    }
+                    break;
+            }
+        }
         public float AccelerationRampMpSSS
         {
             get
@@ -423,6 +484,10 @@ namespace Orts.Simulation.RollingStocks.SubSystems
         protected bool selectedSpeedIncreasing = false;
         public void SpeedRegulatorSelectedSpeedStartIncrease()
         {
+            if (SpeedRegMode != SpeedRegulatorMode.Auto && ForceRegulatorAutoWhenNonZeroSpeedSelected)
+            {
+                SpeedRegMode = SpeedRegulatorMode.Auto;
+            }
             if (!UseThrottleAsSpeedSelector)
                 selectedSpeedIncreasing = true;
             else
@@ -462,6 +527,14 @@ namespace Orts.Simulation.RollingStocks.SubSystems
             SelectedSpeedMpS -= SpeedRegulatorNominalSpeedStepMpS;
             if (SelectedSpeedMpS < 0)
                 SelectedSpeedMpS = 0f;
+            if (SpeedRegMode == SpeedRegulatorMode.Auto && ForceRegulatorAutoWhenNonZeroSpeedSelected && SelectedSpeedMpS == 0)
+            {
+                // return back to manual, clear all we have controlled before and let the driver to set up new stuff
+                SpeedRegMode = SpeedRegulatorMode.Manual;
+                Locomotive.SetThrottlePercent(0);
+                Locomotive.SetDynamicBrakePercent(0);
+                Locomotive.DynamicBrakeChangeActiveState(false);
+            }
             Simulator.Confirmer.Message(ConfirmLevel.Information, Simulator.Catalog.GetString("Selected speed changed to ") + Math.Round(MpS.FromMpS(SelectedSpeedMpS, true), 0, MidpointRounding.AwayFromZero).ToString() + " km/h");
         }
         public void NumerOfAxlesIncrease()
@@ -513,12 +586,14 @@ namespace Orts.Simulation.RollingStocks.SubSystems
 
         public void SetSpeed(float SpeedKpH)
         {
+            if (SpeedRegMode == SpeedRegulatorMode.Manual && ForceRegulatorAutoWhenNonZeroSpeedSelected)
+                SpeedRegMode = SpeedRegulatorMode.Auto;
             Locomotive.SignalEvent(Common.Event.Alert1);
             if (!Equipped) return;
             SelectedSpeedMpS = MpS.FromKpH(SpeedKpH);
             if (SelectedSpeedMpS > Locomotive.MaxSpeedMpS)
                 SelectedSpeedMpS = Locomotive.MaxSpeedMpS;
-            Simulator.Confirmer.Message(ConfirmLevel.Information, Simulator.Catalog.GetString("Selected speed set to ") + SpeedKpH.ToString());
+            Simulator.Confirmer.Message(ConfirmLevel.Information, Simulator.Catalog.GetString("Selected speed set to ") + SpeedKpH.ToString() + "kmh");
         }
 
         protected List<MSTSLocomotive> playerNotDriveableTrainLocomotives = new List<MSTSLocomotive>();
@@ -721,9 +796,9 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                             {
                                 delta = 0;
                                 if (!RestrictedSpeedActive)
-                                    delta = (SelectedSpeedMpS + (TrainElevation < -0.01 ? TrainElevation * (SelectedNumberOfAxles / 40) : 0)) - AbsWheelSpeedMpS;
+                                    delta = (SelectedSpeedMpS + (TrainElevation < -0.01 ? TrainElevation * (SelectedNumberOfAxles / 12) : 0)) - AbsWheelSpeedMpS;
                                 else
-                                    delta = (CurrentSelectedSpeedMpS + (TrainElevation < -0.01 ? TrainElevation * (SelectedNumberOfAxles / 40) : 0)) - AbsWheelSpeedMpS;
+                                    delta = (CurrentSelectedSpeedMpS + (TrainElevation < -0.01 ? TrainElevation * (SelectedNumberOfAxles / 12) : 0)) - AbsWheelSpeedMpS;
 
                                 relativeAcceleration = (float)-Math.Sqrt(-StartReducingSpeedDelta * delta);
                                 AccelerationDemandMpSS = (float)-Math.Sqrt(-StartReducingSpeedDelta * AccelerationRampMpSSS * delta);
@@ -822,7 +897,10 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                     if (delta > 0.0f)
                     {
                         if (Locomotive.DynamicBrakePercent > 0)
+                        {
                             Locomotive.SetDynamicBrakePercent(0);
+                            Locomotive.DynamicBrakeChangeActiveState(false);
+                        }
                         if (Locomotive.DynamicBrakePercent == 0 && Locomotive.DynamicBrake) Locomotive.DynamicBrakeChangeActiveState(false);
                         relativeAcceleration = (float)Math.Sqrt(AccelerationRampMaxMpSSS * delta);
                         float coeff = 1;
@@ -836,7 +914,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                             coeff = 1;
                         }
                         float numAxesCoeff = 0;
-                        numAxesCoeff = (SelectedNumberOfAxles) / 3;
+                        numAxesCoeff = (SelectedNumberOfAxles) / 12;
                         AccelerationDemandMpSS = (float)Math.Sqrt((StartReducingSpeedDelta + numAxesCoeff) * coeff * coeff * AccelerationRampMpSSS * (delta));
                     }
                     else // start braking
@@ -852,9 +930,9 @@ namespace Orts.Simulation.RollingStocks.SubSystems
 
                         delta = 0;
                         if (!RestrictedSpeedActive)
-                            delta = (SelectedSpeedMpS + (TrainElevation < -0.01 ? TrainElevation * (SelectedNumberOfAxles / 40) : 0)) - AbsWheelSpeedMpS;
+                            delta = (SelectedSpeedMpS + (TrainElevation < -0.01 ? TrainElevation * (SelectedNumberOfAxles / 12) : 0)) - AbsWheelSpeedMpS;
                         else
-                            delta = (CurrentSelectedSpeedMpS + (TrainElevation < -0.01 ? TrainElevation * (SelectedNumberOfAxles / 40) : 0)) - AbsWheelSpeedMpS;
+                            delta = (CurrentSelectedSpeedMpS + (TrainElevation < -0.01 ? TrainElevation * (SelectedNumberOfAxles / 12) : 0)) - AbsWheelSpeedMpS;
 
                         if (delta > 0)
                         {
@@ -894,9 +972,9 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                                 {
                                     delta = 0;
                                     if (!RestrictedSpeedActive)
-                                        delta = (SelectedSpeedMpS + (TrainElevation < -0.01 ? TrainElevation * (SelectedNumberOfAxles / 40) : 0)) - AbsWheelSpeedMpS;
+                                        delta = (SelectedSpeedMpS + (TrainElevation < -0.01 ? TrainElevation * (SelectedNumberOfAxles / 12) : 0)) - AbsWheelSpeedMpS;
                                     else
-                                        delta = (CurrentSelectedSpeedMpS + (TrainElevation < -0.01 ? TrainElevation * (SelectedNumberOfAxles / 40) : 0)) - AbsWheelSpeedMpS;
+                                        delta = (CurrentSelectedSpeedMpS + (TrainElevation < -0.01 ? TrainElevation * (SelectedNumberOfAxles / 12) : 0)) - AbsWheelSpeedMpS;
 
                                     relativeAcceleration = (float)-Math.Sqrt(-StartReducingSpeedDelta * delta);
                                     AccelerationDemandMpSS = (float)-Math.Sqrt(-StartReducingSpeedDelta * AccelerationRampMpSSS * delta);

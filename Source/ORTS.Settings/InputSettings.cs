@@ -443,7 +443,7 @@ namespace ORTS.Settings
             Commands[(int)UserCommand.ControlSpeedRegulatorSelectedSpeedDecrease] = new UserCommandKeyInput(0x1E, KeyModifiers.Shift);
             Commands[(int)UserCommand.ControlNumberOfAxlesIncrease] = new UserCommandKeyInput(0x48, KeyModifiers.Shift);
             Commands[(int)UserCommand.ControlNumberOfAxlesDecrease] = new UserCommandKeyInput(0x50, KeyModifiers.Shift);
-            Commands[(int)UserCommand.ControlRestrictedSpeedZoneActive] = new UserCommandKeyInput(0x19, KeyModifiers.Control | KeyModifiers.Shift);
+            Commands[(int)UserCommand.ControlRestrictedSpeedZoneActive] = new UserCommandKeyInput(0x13, KeyModifiers.Control | KeyModifiers.Shift);
             Commands[(int)UserCommand.ControlCruiseControlModeDecrease] = new UserCommandKeyInput(0x1E, KeyModifiers.Control);
             Commands[(int)UserCommand.ControlCruiseControlModeIncrease] = new UserCommandKeyInput(0x20, KeyModifiers.Control);
             Commands[(int)UserCommand.ControlTrainTypePaxCargo] = new UserCommandKeyInput(0x31, KeyModifiers.Control | KeyModifiers.Shift);
