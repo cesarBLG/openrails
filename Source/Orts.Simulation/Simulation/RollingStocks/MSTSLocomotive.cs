@@ -433,7 +433,6 @@ namespace Orts.Simulation.RollingStocks
             ThrottleController = new MSTSNotchController();
             DynamicBrakeController = new MSTSNotchController();
             TrainControlSystem = new ScriptedTrainControlSystem(this);
-            CruiseControl = new CruiseControl(this);
         }
 
         /// <summary>
@@ -929,7 +928,8 @@ namespace Orts.Simulation.RollingStocks
                 case "engine(ortsmaxtracksanderboxcapacity": MaxTrackSandBoxCapacityM3 = stf.ReadFloatBlock(STFReader.UNITS.Volume, null); break;
                 case "engine(ortsmaxtracksandersandconsumption": TrackSanderSandConsumptionM3pS = stf.ReadFloatBlock(STFReader.UNITS.Volume, null); break;
                 case "engine(ortsmaxtracksanderairconsumption": TrackSanderAirComsumptionM3pS = stf.ReadFloatBlock(STFReader.UNITS.Volume, null); break;
-                default: base.Parse(lowercasetoken, stf); CruiseControl.Parse(lowercasetoken, stf); break;
+                case "engine(ortscruisecontrol": SetUpCruiseControl(); break;
+                default: base.Parse(lowercasetoken, stf); if (CruiseControl != null) CruiseControl.Parse(lowercasetoken, stf); break;
             }
         }
 
@@ -1030,7 +1030,8 @@ namespace Orts.Simulation.RollingStocks
             WaterScoopDepthM = locoCopy.WaterScoopDepthM;
             WaterScoopWidthM = locoCopy.WaterScoopWidthM;
             MoveParamsToAxle();
-            CruiseControl = locoCopy.CruiseControl;
+            if (locoCopy.CruiseControl != null)
+                CruiseControl = locoCopy.CruiseControl;
 
 
         }
@@ -1092,7 +1093,8 @@ namespace Orts.Simulation.RollingStocks
 
             TrainControlSystem.Save(outf);
             LocomotiveAxle.Save(outf);
-            CruiseControl.Save(outf);
+            if (CruiseControl != null)
+                CruiseControl.Save(outf);
         }
 
         /// <summary>
@@ -1139,7 +1141,8 @@ namespace Orts.Simulation.RollingStocks
 
             TrainControlSystem.Restore(inf);
             LocomotiveAxle = new Axle(inf);
-            CruiseControl.Restore(inf);
+            if (CruiseControl != null)
+                CruiseControl.Restore(inf);
         }
 
         public bool IsLeadLocomotive()
@@ -1220,7 +1223,6 @@ namespace Orts.Simulation.RollingStocks
             EngineBrakeController.Initialize();
             BrakemanBrakeController.Initialize();
             TrainControlSystem.Initialize();
-            CruiseControl.Initialize();
 
             if (MaxSteamHeatPressurePSI == 0)       // Check to see if steam heating is fitted to locomotive
             {
@@ -1438,6 +1440,16 @@ namespace Orts.Simulation.RollingStocks
             DrvWheelWeightKg = InitialDrvWheelWeightKg;
         }
 
+        /// <summary>
+        /// Make instance of Cruise Control and Initialize it
+        /// </summary>
+        public void SetUpCruiseControl()
+        {
+            CruiseControl = new CruiseControl(this);
+            CruiseControl.Initialize();
+            CruiseControl.Equipped = true;
+        }
+
         //================================================================================================//
         /// <summary>
         /// Set starting conditions  when initial speed > 0 
@@ -1590,16 +1602,15 @@ namespace Orts.Simulation.RollingStocks
                AbsWheelSpeedMpS = AbsSpeedMpS;
             // Jindrich
             //UpdateMotiveForce(elapsedClockSeconds, t, AbsSpeedMpS, AbsWheelSpeedMpS);
-            if (!IsPlayerTrain || !CruiseControl.Equipped || CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Manual || CruiseControl.UseThrottle)
+            if (CruiseControl != null)
+            {
+                if (!IsPlayerTrain || CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Manual || CruiseControl.UseThrottle)
+                    UpdateMotiveForce(elapsedClockSeconds, t, AbsSpeedMpS, AbsWheelSpeedMpS);
+                else if (IsPlayerTrain || CruiseControl.SpeedRegulatorOptions.Contains("engageforceonnonzerospeed"))
+                    CruiseControl.Update(elapsedClockSeconds, AbsWheelSpeedMpS);
+            }
+            else
                 UpdateMotiveForce(elapsedClockSeconds, t, AbsSpeedMpS, AbsWheelSpeedMpS);
-            else if (IsPlayerTrain && CruiseControl.Equipped || CruiseControl.SpeedRegulatorOptions.Contains("engageforceonnonzerospeed"))
-            {
-                CruiseControl.Update(elapsedClockSeconds, AbsWheelSpeedMpS);
-            }
-            if (IsPlayerTrain && CruiseControl.Equipped)
-            {
-                if (CruiseControl.RestrictedSpeedActive) CruiseControl.CheckRestrictedSpeedZone();
-            }
 
             ApplyDirectionToMotiveForce();
 
@@ -2868,7 +2879,7 @@ namespace Orts.Simulation.RollingStocks
 
         public void StartThrottleIncrease()
         {
-            if (CruiseControl.Equipped)
+            if (CruiseControl != null)
             {
                 if (CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto)
                 {
@@ -2896,7 +2907,7 @@ namespace Orts.Simulation.RollingStocks
 
         public void StopThrottleIncrease()
         {
-            if (CruiseControl.Equipped)
+            if (CruiseControl != null)
             {
                 if (CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto)
                 {
@@ -2931,7 +2942,7 @@ namespace Orts.Simulation.RollingStocks
         protected bool speedSelectorModeDecreasing = false;
         public void StartThrottleDecrease()
         {
-            if (CruiseControl.Equipped)
+            if (CruiseControl != null)
             {
                 if (CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto)
                 {
@@ -2953,7 +2964,7 @@ namespace Orts.Simulation.RollingStocks
 
         public void StopThrottleDecrease()
         {
-            if (CruiseControl.Equipped)
+            if (CruiseControl != null)
             {
                 if (CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto)
                 {
@@ -3655,7 +3666,7 @@ namespace Orts.Simulation.RollingStocks
     public void StartDynamicBrakeIncrease(float? target)
         {
             AlerterReset(TCSEvent.DynamicBrakeChanged);
-            if (CruiseControl.Equipped)
+            if (CruiseControl != null)
             {
                 SetThrottlePercent(0);
                 CruiseControl.DynamicBrakePriority = true;
@@ -4926,6 +4937,11 @@ namespace Orts.Simulation.RollingStocks
                 case CABViewControlTypes.ORTS_SELECTED_SPEED:
                 case CABViewControlTypes.ORTS_SELECTED_SPEED_DISPLAY:
                     {
+                        if (CruiseControl == null)
+                        {
+                            data = 0;
+                            break;
+                        }
                         bool metric = cvc.Units == CABViewControlUnits.KM_PER_HOUR;
                         float temp = CruiseControl.RestrictedSpeedActive ? MpS.FromMpS(CruiseControl.CurrentSelectedSpeedMpS, metric) : temp = MpS.FromMpS(CruiseControl.SelectedSpeedMpS, metric);
                         if (previousSelectedSpeed < temp) previousSelectedSpeed += 1f;
@@ -4935,16 +4951,31 @@ namespace Orts.Simulation.RollingStocks
                     }
                 case CABViewControlTypes.ORTS_SELECTED_SPEED_MODE:
                     {
+                        if (CruiseControl == null)
+                        {
+                            data = 0;
+                            break;
+                        }
                         data = (float)CruiseControl.SpeedSelMode;
                         break;
                     }
                 case CABViewControlTypes.ORTS_SELECTED_SPEED_REGULATOR_MODE:
                     {
+                        if (CruiseControl == null)
+                        {
+                            data = 0;
+                            break;
+                        }
                         data = (float)CruiseControl.SpeedRegMode;
                         break;
                     }
                 case CABViewControlTypes.ORTS_SELECTED_SPEED_MAXIMUM_ACCELERATION:
                     {
+                        if (CruiseControl == null)
+                        {
+                            data = 0;
+                            break;
+                        }
                         if (CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto || CruiseControl.MaxForceKeepSelectedStepWhenManualModeSet)
                             data = CruiseControl.SelectedMaxAccelerationStep - 1;
                         else
@@ -4953,31 +4984,61 @@ namespace Orts.Simulation.RollingStocks
                     }
                 case CABViewControlTypes.ORTS_RESTRICTED_SPEED_ZONE_ACTIVE:
                     {
+                        if (CruiseControl == null)
+                        {
+                            data = 0;
+                            break;
+                        }
                         data = CruiseControl.RestrictedSpeedActive ? 1 : 0;
                         break;
                     }
                 case CABViewControlTypes.ORTS_NUMBER_OF_AXES_DISPLAY_UNITS:
                     {
+                        if (CruiseControl == null)
+                        {
+                            data = 0;
+                            break;
+                        }
                         data = CruiseControl.SelectedNumberOfAxles % 10;
                         break;
                     }
                 case CABViewControlTypes.ORTS_NUMBER_OF_AXES_DISPLAY_TENS:
                     {
+                        if (CruiseControl == null)
+                        {
+                            data = 0;
+                            break;
+                        }
                         data = (CruiseControl.SelectedNumberOfAxles / 10) % 10;
                         break;
                     }
                 case CABViewControlTypes.ORTS_NUMBER_OF_AXES_DISPLAY_HUNDREDS:
                     {
+                        if (CruiseControl == null)
+                        {
+                            data = 0;
+                            break;
+                        }
                         data = (CruiseControl.SelectedNumberOfAxles / 100) % 10;
                         break;
                     }
                 case CABViewControlTypes.ORTS_TRAIN_LENGTH_METERS:
                     {
+                        if (CruiseControl == null)
+                        {
+                            data = 0;
+                            break;
+                        }
                         data = CruiseControl.TrainLengthMeters;
                         break;
                     }
                 case CABViewControlTypes.ORTS_REMAINING_TRAIN_LENGHT_SPEED_RESTRICTED:
                     {
+                        if (CruiseControl == null)
+                        {
+                            data = 0;
+                            break;
+                        }
                         if (CruiseControl.RemainingTrainLengthToPassRestrictedZone == 0)
                             data = 0;
                         else
@@ -4986,6 +5047,11 @@ namespace Orts.Simulation.RollingStocks
                     }
                 case CABViewControlTypes.ORTS_REMAINING_TRAIN_LENGTH_PERCENT:
                     {
+                        if (CruiseControl == null)
+                        {
+                            data = 0;
+                            break;
+                        }
                         if (CruiseControl.SpeedRegMode != CruiseControl.SpeedRegulatorMode.Auto)
                         {
                             data = 0;
@@ -5017,10 +5083,25 @@ namespace Orts.Simulation.RollingStocks
                     }
                 case CABViewControlTypes.ORTS_FORCE_IN_PERCENT_THROTTLE_AND_DYNAMIC_BRAKE:
                     {
-                        if (CruiseControl.Equipped && CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto)
+                        if (CruiseControl != null)
                         {
-                            data = CruiseControl.ForceThrottleAndDynamicBrake;
-                            if (DynamicBrakePercent > 0 && data > -DynamicBrakePercent) data = -DynamicBrakePercent;
+                            if (CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto)
+                            {
+                                data = CruiseControl.ForceThrottleAndDynamicBrake;
+                                if (DynamicBrakePercent > 0 && data > -DynamicBrakePercent) data = -DynamicBrakePercent;
+                            }
+                            else
+                            {
+                                if (ThrottlePercent > 0)
+                                {
+                                    data = ThrottlePercent;
+                                }
+                                else if (DynamicBrakePercent > 0 && AbsSpeedMpS > 0)
+                                {
+                                    data = -DynamicBrakePercent;
+                                }
+                                else data = 0;
+                            }
                         }
                         else
                         {
@@ -5043,23 +5124,36 @@ namespace Orts.Simulation.RollingStocks
                     }
                 case CABViewControlTypes.ORTS_CONTROLLER_VOLTAGE:
                     {
+                        if (CruiseControl == null)
+                        {
+                            data = 0;
+                            break;
+                        }
                         data = CruiseControl.controllerVolts;
                         break;
                     }
                 case CABViewControlTypes.ORTS_AMPERS_BY_CONTROLLER_VOLTAGE:
                     {
-                        if (CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto)
+                        if (CruiseControl != null)
                         {
-                            if (CruiseControl.controllerVolts < 0) data = -CruiseControl.controllerVolts / 100 * (MaxCurrentA * 0.8f);
-                            else data = CruiseControl.controllerVolts / 100 * (MaxCurrentA * 0.8f);
-                            if (data == 0 && DynamicBrakePercent > 0 && AbsSpeedMpS > 0) data = DynamicBrakePercent / 100 * (MaxCurrentA * 0.8f);
+                            if (CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto)
+                            {
+                                if (CruiseControl.controllerVolts < 0) data = -CruiseControl.controllerVolts / 100 * (MaxCurrentA * 0.8f);
+                                else data = CruiseControl.controllerVolts / 100 * (MaxCurrentA * 0.8f);
+                                if (data == 0 && DynamicBrakePercent > 0 && AbsSpeedMpS > 0) data = DynamicBrakePercent / 100 * (MaxCurrentA * 0.8f);
+                            }
+                            else
+                            {
+                                if (DynamicBrakePercent > 0 && AbsSpeedMpS > 0) data = DynamicBrakePercent / 200 * (MaxCurrentA * 0.8f);
+                                else data = ThrottlePercent / 100 * (MaxCurrentA * 0.8f);
+                            }
+                            CruiseControl.Ampers = data;
                         }
                         else
                         {
                             if (DynamicBrakePercent > 0 && AbsSpeedMpS > 0) data = DynamicBrakePercent / 200 * (MaxCurrentA * 0.8f);
                             else data = ThrottlePercent / 100 * (MaxCurrentA * 0.8f);
                         }
-                        CruiseControl.Ampers = data;
                         break;
                     }
                 case CABViewControlTypes.ORTS_ODOMETER:

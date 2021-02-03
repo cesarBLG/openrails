@@ -1965,9 +1965,14 @@ namespace Orts.Viewer3D.RollingStock
                         }
                         else
                         {
-                            if ((Locomotive.CruiseControl.SpeedRegMode == Simulation.RollingStocks.SubSystems.CruiseControl.SpeedRegulatorMode.Auto && !Locomotive.CruiseControl.DynamicBrakePriority) || Locomotive.DynamicBrakeIntervention > 0)
+                            if (Locomotive.CruiseControl != null)
                             {
-                                index = 0;
+                                if ((Locomotive.CruiseControl.SpeedRegMode == Simulation.RollingStocks.SubSystems.CruiseControl.SpeedRegulatorMode.Auto && !Locomotive.CruiseControl.DynamicBrakePriority) || Locomotive.DynamicBrakeIntervention > 0)
+                                {
+                                    index = 0;
+                                }
+                                else
+                                    index = PercentToIndex(dynBrakePercent);
                             }
                             else
                                 index = PercentToIndex(dynBrakePercent);
@@ -1996,6 +2001,11 @@ namespace Orts.Viewer3D.RollingStock
                         index = PercentToIndex(Locomotive.GetCombinedHandleValue(false));
                     break;
                 case CABViewControlTypes.ORTS_SELECTED_SPEED_DISPLAY:
+                    if (Locomotive.CruiseControl == null)
+                    {
+                        index = 0;
+                        break;
+                    }
                     index = (int)MpS.ToKpH(Locomotive.CruiseControl.SelectedSpeedMpS) / 10;
                     break;
                 case CABViewControlTypes.ALERTER_DISPLAY:
@@ -2376,6 +2386,8 @@ namespace Orts.Viewer3D.RollingStock
 
                 // Jindrich
                 case CABViewControlTypes.ORTS_CC_SELECT_SPEED:
+                    if (Locomotive.CruiseControl == null)
+                        break;
                     var p = ChangedValue(0);
                     if (p == 1)
                     {

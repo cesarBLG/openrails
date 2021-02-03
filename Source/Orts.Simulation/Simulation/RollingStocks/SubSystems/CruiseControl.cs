@@ -110,7 +110,6 @@ namespace Orts.Simulation.RollingStocks.SubSystems
         {
             switch (lowercasetoken)
             {
-                case "engine(ortscruisecontrol": Equipped = true; break;
                 case "engine(ortscruisecontrol(usethrottle": UseThrottle = stf.ReadBoolBlock(false); break;
                 case "engine(ortscruisecontrol(throttleincreasespeed": ThrottleIncreaseSpeed = stf.ReadFloatBlock(STFReader.UNITS.Any, 0.1f); break;
                 case "engine(ortscruisecontrol(throttledecreasespeed": ThrottleDecreaseSpeed = stf.ReadFloatBlock(STFReader.UNITS.Any, 0.2f); break;
