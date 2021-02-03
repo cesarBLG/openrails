@@ -831,7 +831,7 @@ namespace Orts.Simulation.RollingStocks
                 case "engine(ortsbrakepipechargingrate": BrakePipeChargingRatePSIorInHgpS = stf.ReadFloatBlock(STFReader.UNITS.PressureRateDefaultPSIpS, null); break;
                 case "engine(ortsbrakepipequickchargingrate": BrakePipeQuickChargingRatePSIpS = stf.ReadFloatBlock(STFReader.UNITS.PressureRateDefaultPSIpS, null); break;
                 case "engine(ortsbrakepipedischargetimemult": BrakePipeDischargeTimeFactor = stf.ReadFloatBlock(STFReader.UNITS.None, null); break;
-                case "engine(ortsmaxtractiveforcecurves": TractiveForceCurves = new InterpolatorDiesel2D(stf, false); TractiveForceCurves.HasNegativeValue();  break;
+                case "engine(ortsmaxtractiveforcecurves": TractiveForceCurves = new InterpolatorDiesel2D(stf, false); TractiveForceCurves.HasNegativeValue(); break;
                 case "engine(ortstractioncharacteristics": TractiveForceCurves = new InterpolatorDiesel2D(stf, true); break;
                 case "engine(ortsdynamicbrakeforcecurves": DynamicBrakeForceCurves = new InterpolatorDiesel2D(stf, false); break;
                 case "engine(ortscontinuousforcetimefactor": ContinuousForceTimeFactor = stf.ReadFloatBlock(STFReader.UNITS.None, null); break;
@@ -873,7 +873,7 @@ namespace Orts.Simulation.RollingStocks
                         {
                             switch (brakesenginecontrollers)
                             {
-                                case "blended":                              
+                                case "blended":
                                     DynamicBrakeBlendingEnabled = true;
                                     break;
                                 case "dynamic":
@@ -890,13 +890,13 @@ namespace Orts.Simulation.RollingStocks
                     foreach (var brakestrainbraketype in stf.ReadStringBlock("").ToLower().Replace(" ", "").Split(','))
                     {
                         switch (brakestrainbraketype)
-                            {
-                                case "vacuum_single_pipe_eq":
-                                    VacuumBrakeEQFitted = true;
-                                    break;
-                                 default:
-                                    break;
-                            }
+                        {
+                            case "vacuum_single_pipe_eq":
+                                VacuumBrakeEQFitted = true;
+                                break;
+                            default:
+                                break;
+                        }
                     }
                     break;
 
@@ -929,61 +929,7 @@ namespace Orts.Simulation.RollingStocks
                 case "engine(ortsmaxtracksanderboxcapacity": MaxTrackSandBoxCapacityM3 = stf.ReadFloatBlock(STFReader.UNITS.Volume, null); break;
                 case "engine(ortsmaxtracksandersandconsumption": TrackSanderSandConsumptionM3pS = stf.ReadFloatBlock(STFReader.UNITS.Volume, null); break;
                 case "engine(ortsmaxtracksanderairconsumption": TrackSanderAirComsumptionM3pS = stf.ReadFloatBlock(STFReader.UNITS.Volume, null); break;
-                case "engine(ortscruisecontrol": CruiseControl.Equipped = true; break;
-                case "engine(ortscruisecontrol(usethrottle": CruiseControl.UseThrottle = stf.ReadBoolBlock(false); break;
-                case "engine(ortscruisecontrol(throttleincreasespeed": CruiseControl.ThrottleIncreaseSpeed = stf.ReadFloatBlock(STFReader.UNITS.Any, 0.1f); break;
-                case "engine(ortscruisecontrol(throttledecreasespeed": CruiseControl.ThrottleDecreaseSpeed = stf.ReadFloatBlock(STFReader.UNITS.Any, 0.2f); break;
-                case "engine(ortscruisecontrol(throttlefullrangeincreasetimeseconds": CruiseControl.ThrottleFullRangeIncreaseTimeSeconds = stf.ReadFloatBlock(STFReader.UNITS.Any, 5); break;
-                case "engine(ortscruisecontrol(throttlefullrangedecreasetimeseconds": CruiseControl.ThrottleFullRangeDecreaseTimeSeconds = stf.ReadFloatBlock(STFReader.UNITS.Any, 5); break;
-                case "engine(ortscruisecontrol(dynamicbrakefullrangeincreasetimeseconds": CruiseControl.DynamicBrakeFullRangeIncreaseTimeSeconds = stf.ReadFloatBlock(STFReader.UNITS.Any, 5); break;
-                case "engine(ortscruisecontrol(dynamicbrakefullrangedecreasetimeseconds": CruiseControl.DynamicBrakeFullRangeDecreaseTimeSeconds = stf.ReadFloatBlock(STFReader.UNITS.Any, 5); break;
-                case "engine(ortscruisecontrol(parkingbrakeengagespeed": CruiseControl.ParkingBrakeEngageSpeed = stf.ReadFloatBlock(STFReader.UNITS.Speed, 0); break;
-                case "engine(ortscruisecontrol(parkingbrakepercent": CruiseControl.ParkingBrakePercent = stf.ReadFloatBlock(STFReader.UNITS.Any, 0); break;
-                case "engine(ortscruisecontrol(maxpowerthreshold": CruiseControl.MaxPowerThreshold = stf.ReadFloatBlock(STFReader.UNITS.Any, 0); break;
-                case "engine(ortscruisecontrol(maxforcepercentunits": CruiseControl.SpeedRegulatorMaxForcePercentUnits = stf.ReadBoolBlock(false); break;
-                case "engine(ortscruisecontrol(maxforcesteps": CruiseControl.SpeedRegulatorMaxForceSteps = stf.ReadIntBlock(0); break;
-                case "engine(ortscruisecontrol(maxforcesetsinglestep": CruiseControl.MaxForceSetSingleStep = stf.ReadBoolBlock(false); break;
-                case "engine(ortscruisecontrol(maxforcekeepselectedstepwhenmanualmodeset": CruiseControl.MaxForceKeepSelectedStepWhenManualModeSet = stf.ReadBoolBlock(false); break;
-                case "engine(ortscruisecontrol(forcestepsthrottletable":
-                    foreach (var forceStepThrottleValue in stf.ReadStringBlock("").Replace(" ", "").Split(','))
-                    {
-                        CruiseControl.ForceStepsThrottleTable.Add(int.Parse(forceStepThrottleValue));
-                    }
-                    break;
-                case "engine(ortscruisecontrol(accelerationtable":
-                    foreach (var accelerationValue in stf.ReadStringBlock("").Replace(" ", "").Split(','))
-                    {
-                        CruiseControl.AccelerationTable.Add(float.Parse(accelerationValue));
-                    }
-                    break;
-                case "engine(ortscruisecontrol(powerbreakoutampers": CruiseControl.PowerBreakoutAmpers = stf.ReadFloatBlock(STFReader.UNITS.Any, 100.0f); break;
-                case "engine(ortscruisecontrol(powerbreakoutspeeddelta": CruiseControl.PowerBreakoutSpeedDelta = stf.ReadFloatBlock(STFReader.UNITS.Any, 100.0f); break;
-                case "engine(ortscruisecontrol(powerresumespeeddelta": CruiseControl.PowerResumeSpeedDelta = stf.ReadFloatBlock(STFReader.UNITS.Any, 100.0f); break;
-                case "engine(ortscruisecontrol(powerreductiondelaypaxtrain": CruiseControl.PowerReductionDelayPaxTrain = stf.ReadFloatBlock(STFReader.UNITS.Any, 0.0f); break;
-                case "engine(ortscruisecontrol(powerreductiondelaycargotrain": CruiseControl.PowerReductionDelayCargoTrain = stf.ReadFloatBlock(STFReader.UNITS.Any, 0.0f); break;
-                case "engine(ortscruisecontrol(powerreductionvalue": CruiseControl.PowerReductionValue = stf.ReadFloatBlock(STFReader.UNITS.Any, 100.0f); break;
-
-                case "engine(ortscruisecontrol(disablezeroforcestep": CruiseControl.DisableZeroForceStep = stf.ReadBoolBlock(false); break;
-                case "engine(ortscruisecontrol(defaultforcestep": CruiseControl.SelectedMaxAccelerationStep = stf.ReadFloatBlock(STFReader.UNITS.Any, 1.0f); break;
-                case "engine(ortscruisecontrol(dynamicbrakemaxforceatselectorstep": CruiseControl.DynamicBrakeMaxForceAtSelectorStep = stf.ReadFloatBlock(STFReader.UNITS.Any, 1.0f); break;
-                case "engine(ortscruisecontrol(startreducingspeeddelta": CruiseControl.StartReducingSpeedDelta = stf.ReadFloatBlock(STFReader.UNITS.Any, 1.0f); break;
-                case "engine(ortscruisecontrol(dynamicbrakedescentcoefficient": CruiseControl.DynamicBrakeDescentCoefficient = stf.ReadFloatBlock(STFReader.UNITS.Any, 0.5f); break;
-                case "engine(ortscruisecontrol(climbdeltacoefficient": CruiseControl.DeltaCoefficient = stf.ReadFloatBlock(STFReader.UNITS.Any, 0.8f); break;
-                case "engine(ortscruisecontrol(maxacceleration": CruiseControl.MaxAccelerationMpSS = stf.ReadFloatBlock(STFReader.UNITS.Any, 1); break;
-                case "engine(ortscruisecontrol(maxdeceleration": CruiseControl.MaxDecelerationMpSS = stf.ReadFloatBlock(STFReader.UNITS.Any, 0.5f); break;
-                case "engine(ortscruisecontrol(antiwheelspinequipped": CruiseControl.AntiWheelSpinEquipped = stf.ReadBoolBlock(false); break;
-                case "engine(ortscruisecontrol(nominalspeedstep": CruiseControl.SpeedRegulatorNominalSpeedStepMpS = MpS.FromKpH(stf.ReadFloatBlock(STFReader.UNITS.Speed, 0)); break;
-                case "engine(ortscruisecontrol(usethrottleasspeedselector": CruiseControl.UseThrottleAsSpeedSelector = stf.ReadBoolBlock(false); break;
-                case "engine(ortscruisecontrol(dynamicbrakeincreasespeed": CruiseControl.DynamicBrakeIncreaseSpeed = stf.ReadFloatBlock(STFReader.UNITS.Any, 0.5f); break;
-                case "engine(ortscruisecontrol(dynamicbrakedecreasespeed": CruiseControl.DynamicBrakeDecreaseSpeed = stf.ReadFloatBlock(STFReader.UNITS.Any, 0.5f); break;
-                case "engine(ortscruisecontrol(options":
-                    foreach (var speedRegulatorOption in stf.ReadStringBlock("").ToLower().Replace(" ", "").Split(','))
-                    {
-                        CruiseControl.SpeedRegulatorOptions.Add(speedRegulatorOption.ToLower());
-                    }
-                    break;
-                default: base.Parse(lowercasetoken, stf); break;
-                    
+                default: base.Parse(lowercasetoken, stf); CruiseControl.Parse(lowercasetoken, stf); break;
             }
         }
 
@@ -3189,21 +3135,12 @@ namespace Orts.Simulation.RollingStocks
 
         public void ThrottleToZero()
         {
-            if (CruiseControl.SpeedRegulatorOptions.Contains("shutdownonsetthrottlezero"))
-            {
-                CruiseControl.SelectedSpeedMpS = 0;
-                CruiseControl.SpeedSelMode = CruiseControl.SpeedSelectorMode.Neutral;
-                CruiseControl.SpeedRegMode = CruiseControl.SpeedRegulatorMode.Manual;
-                SetThrottlePercent(0);
-                return;
-            }
             if (CombinedControlType == CombinedControl.ThrottleDynamic && ThrottleController.CurrentValue <= 0)
                 StartDynamicBrakeIncrease(null);
             else if (CombinedControlType == CombinedControl.ThrottleAir && ThrottleController.CurrentValue <= 0)
                 StartTrainBrakeIncrease(null);
             else
                 StartThrottleToZero(0.0f);
-
         }
 
         public void StartThrottleToZero(float? target)
@@ -5067,7 +5004,10 @@ namespace Orts.Simulation.RollingStocks
                     }
                 case CABViewControlTypes.ORTS_MOTIVE_FORCE_KILONEWTON:
                     {
-                        data = (float)Math.Round(FilteredMotiveForceN / 1000, 0);
+                        if (FilteredMotiveForceN > DynamicBrakeForceN)
+                            data = (float)Math.Round(FilteredMotiveForceN / 1000, 0);
+                        else if (DynamicBrakeForceN > 0)
+                            data = -(float)Math.Round(DynamicBrakeForceN / 1000, 0);
                         break;
                     }
                 case CABViewControlTypes.ORTS_MAXIMUM_FORCE:
