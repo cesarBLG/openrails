@@ -405,6 +405,7 @@ namespace Orts.Simulation.RollingStocks
 
         // Jindrich
         public CruiseControl CruiseControl;
+        public MultiPositionController MultiPositionController;
         public bool SelectingSpeedPressed = false;
         public bool EngineBrakePriority = false;
         public bool IsAPartOfPlayerTrain = false;
@@ -929,6 +930,7 @@ namespace Orts.Simulation.RollingStocks
                 case "engine(ortsmaxtracksandersandconsumption": TrackSanderSandConsumptionM3pS = stf.ReadFloatBlock(STFReader.UNITS.Volume, null); break;
                 case "engine(ortsmaxtracksanderairconsumption": TrackSanderAirComsumptionM3pS = stf.ReadFloatBlock(STFReader.UNITS.Volume, null); break;
                 case "engine(ortscruisecontrol": SetUpCruiseControl(); break;
+                case "engine(multipositioncontroller": SetUpMPC(); break;
                 default: base.Parse(lowercasetoken, stf); if (CruiseControl != null) CruiseControl.Parse(lowercasetoken, stf); break;
             }
         }
@@ -1448,6 +1450,14 @@ namespace Orts.Simulation.RollingStocks
             CruiseControl = new CruiseControl(this);
             CruiseControl.Initialize();
             CruiseControl.Equipped = true;
+        }
+
+        /// <summary>
+        /// Make instance of multi position controller
+        /// </summary>
+        public void SetUpMPC()
+        {
+            MultiPositionController = new MultiPositionController(this);
         }
 
         //================================================================================================//
@@ -2881,10 +2891,18 @@ namespace Orts.Simulation.RollingStocks
         {
             if (CruiseControl != null)
             {
-                if (CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto)
+                if (CruiseControl.UseThrottleAsForceSelector && CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto)
                 {
-                    CruiseControl.SpeedSelectorModeStartIncrease();
+                    CruiseControl.SpeedRegulatorMaxForceStartIncrease();
                     return;
+                }
+                else
+                {
+                    if (CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto)
+                    {
+                        CruiseControl.SpeedSelectorModeStartIncrease();
+                        return;
+                    }
                 }
             }
             if (DynamicBrakeController != null && DynamicBrakeController.CurrentValue >= 0 && (DynamicBrakePercent >= 0 || !(DynamicBrakePercent == -1 && !DynamicBrake || DynamicBrakePercent >= 0 && DynamicBrake)))
@@ -2909,10 +2927,18 @@ namespace Orts.Simulation.RollingStocks
         {
             if (CruiseControl != null)
             {
-                if (CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto)
+                if (CruiseControl.UseThrottleAsForceSelector && CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto)
                 {
-                    CruiseControl.SpeedSelectorModeStopIncrease();
+                    CruiseControl.SpeedRegulatorMaxForceStopIncrease();
                     return;
+                }
+                else
+                {
+                    if (CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto)
+                    {
+                        CruiseControl.SpeedSelectorModeStopIncrease();
+                        return;
+                    }
                 }
             }
             AlerterReset(TCSEvent.ThrottleChanged);
@@ -2944,14 +2970,22 @@ namespace Orts.Simulation.RollingStocks
         {
             if (CruiseControl != null)
             {
-                if (CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto)
+                if (CruiseControl.UseThrottleAsForceSelector && CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto)
                 {
-                    if (!speedSelectorModeDecreasing)
-                    {
-                        CruiseControl.SpeedSelectorModeDecrease();
-                        speedSelectorModeDecreasing = true;
-                    }
+                    CruiseControl.SpeedRegulatorMaxForceStartDecrease();
                     return;
+                }
+                else
+                {
+                    if (CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto)
+                    {
+                        if (!speedSelectorModeDecreasing)
+                        {
+                            CruiseControl.SpeedSelectorModeDecrease();
+                            speedSelectorModeDecreasing = true;
+                        }
+                        return;
+                    }
                 }
             }
             if (CombinedControlType == CombinedControl.ThrottleDynamic && ThrottleController.CurrentValue <= 0)
@@ -2966,10 +3000,18 @@ namespace Orts.Simulation.RollingStocks
         {
             if (CruiseControl != null)
             {
-                if (CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto)
+                if (CruiseControl.UseThrottleAsForceSelector && CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto)
                 {
-                    speedSelectorModeDecreasing = false;
+                    CruiseControl.SpeedRegulatorMaxForceStopDecrease();
                     return;
+                }
+                else
+                {
+                    if (CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto)
+                    {
+                        speedSelectorModeDecreasing = false;
+                        return;
+                    }
                 }
             }
             AlerterReset(TCSEvent.ThrottleChanged);
@@ -3115,6 +3157,14 @@ namespace Orts.Simulation.RollingStocks
 
         public void SetThrottleValue(float value)
         {
+            if (CruiseControl != null)
+            {
+                if (CruiseControl.UseThrottleAsForceSelector && CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto)
+                {
+                    CruiseControl.SetMaxForcePercent((float)Math.Round(value * 100, 0));
+                    return;
+                }
+            }
             var controller = ThrottleController;
             var oldValue = controller.IntermediateValue;
             var change = controller.SetValue(value);
@@ -3133,7 +3183,18 @@ namespace Orts.Simulation.RollingStocks
 
         public void SetThrottlePercent(float percent)
         {
-            ThrottleController.SetPercent(percent);
+            if (CruiseControl != null)
+            {
+                if (CruiseControl.UseThrottleAsForceSelector && CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto)
+                {
+                    CruiseControl.SetMaxForcePercent(percent);
+                    return;
+                }
+                else
+                    ThrottleController.SetPercent(percent);
+            }
+            else
+                ThrottleController.SetPercent(percent);
         }
 
         public void SetThrottlePercentWithSound(float percent)
@@ -3729,7 +3790,11 @@ namespace Orts.Simulation.RollingStocks
             {
                 DynamicBrakeController.StopDecrease();
                 new DynamicBrakeCommand(Simulator.Log, false, DynamicBrakeController.CurrentValue, DynamicBrakeController.CommandStartTime);
-                if (DynamicBrakePercent < 1) CruiseControl.DynamicBrakePriority = false;
+                if (CruiseControl != null)
+                {
+                    if (DynamicBrakePercent < 1)
+                        CruiseControl.DynamicBrakePriority = false;
+                }
             }
         }
 
@@ -4546,7 +4611,8 @@ namespace Orts.Simulation.RollingStocks
                 case CABViewControlTypes.THROTTLE_DISPLAY:
                 case CABViewControlTypes.CPH_DISPLAY:
                     {
-                        if (CruiseControl.SkipThrottleDisplay) break;
+                        if (CruiseControl != null)
+                            if (CruiseControl.SkipThrottleDisplay) break;
                         data = Train.TrainType == Train.TRAINTYPE.AI_PLAYERHOSTING? ThrottlePercent / 100f : LocalThrottlePercent / 100f;
                         break;
                     }
@@ -4977,7 +5043,9 @@ namespace Orts.Simulation.RollingStocks
                             break;
                         }
                         if (CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto || CruiseControl.MaxForceKeepSelectedStepWhenManualModeSet)
-                            data = CruiseControl.SelectedMaxAccelerationStep - 1;
+                        {
+                            data = (CruiseControl.SelectedMaxAccelerationStep - 1) * (float)cvc.MaxValue / 100;
+                        }
                         else
                             data = 0;
                         break;
