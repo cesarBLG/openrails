@@ -264,7 +264,6 @@ namespace Orts.Simulation.RollingStocks.SubSystems
             RestrictedSpeedActive = inf.ReadBoolean();
             SelectedMaxAccelerationPercent = inf.ReadSingle();
             SelectedMaxAccelerationStep = inf.ReadSingle();
-            SelectedMaxAccelerationStep = inf.ReadSingle();
             SelectedNumberOfAxles = inf.ReadInt32();
             SelectedSpeedMpS = inf.ReadSingle();
             int fSpeedRegMode = inf.ReadInt32();
@@ -907,7 +906,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                     float numAxesCoeff = 0;
                     numAxesCoeff = (SelectedNumberOfAxles) / 12;
                     AccelerationDemandMpSS = (float)Math.Sqrt((StartReducingSpeedDelta + numAxesCoeff) * coeff * coeff * AccelerationRampMpSSS * (delta));
-                    if (delta > 0.0f && Locomotive.DynamicBrakePercent < 1)
+                    if (delta > 0.0f)
                     {
                         if (Locomotive.DynamicBrakePercent > 0)
                         {
@@ -915,7 +914,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                             step *= elapsedClockSeconds;
                             controllerVolts += step;
                         }
-                        if (Locomotive.DynamicBrakePercent < 0.5f && Locomotive.DynamicBrake)
+                        if (Locomotive.DynamicBrakePercent < 2 && Locomotive.DynamicBrake)
                         {
                             Locomotive.SetDynamicBrakePercent(0);
                             Locomotive.DynamicBrakeChangeActiveState(false);
