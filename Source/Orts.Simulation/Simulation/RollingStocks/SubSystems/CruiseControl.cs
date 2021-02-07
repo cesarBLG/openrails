@@ -264,7 +264,6 @@ namespace Orts.Simulation.RollingStocks.SubSystems
             RestrictedSpeedActive = inf.ReadBoolean();
             SelectedMaxAccelerationPercent = inf.ReadSingle();
             SelectedMaxAccelerationStep = inf.ReadSingle();
-            SelectedMaxAccelerationStep = inf.ReadSingle();
             SelectedNumberOfAxles = inf.ReadInt32();
             SelectedSpeedMpS = inf.ReadSingle();
             int fSpeedRegMode = inf.ReadInt32();
