@@ -184,7 +184,6 @@
     <Compile Include="Viewer3D\RollingStock\SubSystems\ETCS\Menus.cs" />
     <Compile Include="Viewer3D\RollingStock\SubSystems\ETCS\TextMessages.cs" />
     <Compile Include="Viewer3D\RollingStock\SubSystems\FreightAnimationsViewer.cs" />
-	<Compile Include="Viewer3D\RollingStock\SubSystems\CruiseControlViewer.cs" />
     <Compile Include="Viewer3D\RollingStock\TrainCarViewer.cs" />
     <Compile Include="Viewer3D\Scenery.cs" />
     <Compile Include="Viewer3D\Shaders.cs" />
