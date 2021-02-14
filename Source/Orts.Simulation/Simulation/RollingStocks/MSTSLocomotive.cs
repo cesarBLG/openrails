@@ -169,6 +169,7 @@ namespace Orts.Simulation.RollingStocks
         bool WaterScoopSlowSpeedFlag = false;
         bool WaterScoopDirectionFlag = false;
         public bool IsWaterScoopPlayerLocomotive = false;
+        bool WaterScoopSoundOn = false;
         public float MaxTotalCombinedWaterVolumeUKG;
         public MSTSNotchController WaterController = new MSTSNotchController(0, 1, 0.01f);
         public float CombinedTenderWaterVolumeUKG          // Decreased by running injectors and increased by refilling
@@ -2450,13 +2451,11 @@ namespace Orts.Simulation.RollingStocks
                         WaterScoopNotFittedFlag = true;
                     }
                     RefillingFromTrough = false;
-                    return;
                 }
                 else if (ScoopIsBroken)
                 {
                     Simulator.Confirmer.Message(ConfirmLevel.Error, Simulator.Catalog.GetString("Scoop is broken, can't refill"));
-                    RefillingFromTrough = false;
-                    return;
+                    RefillingFromTrough = false;       
                 }
                 else if (IsOverJunction())
                 {
@@ -2466,7 +2465,7 @@ namespace Orts.Simulation.RollingStocks
                     }
                     ScoopIsBroken = true;
                     RefillingFromTrough = false;
-                    return;
+                    SignalEvent(Event.WaterScoopBroken);       
                 }
                 else if (!IsOverTrough())
                 {
@@ -2478,7 +2477,6 @@ namespace Orts.Simulation.RollingStocks
                         MSTSWagon.RefillProcess.ActivePickupObjectUID = 0;
                     }
                     RefillingFromTrough = false;
-                    return;
                 }
                 else if (IsTenderRequired == 1 && Direction == Direction.Reverse) // Locomotives with tenders cannot go in reverse
                 {
@@ -2488,7 +2486,6 @@ namespace Orts.Simulation.RollingStocks
                         WaterScoopDirectionFlag = true;
                     }
                     RefillingFromTrough = false;
-                    return;
                 }
                 else if (absSpeedMpS < WaterScoopMinSpeedMpS)
                 {
@@ -2501,12 +2498,10 @@ namespace Orts.Simulation.RollingStocks
                         MSTSWagon.RefillProcess.ActivePickupObjectUID = 0;
                     }
                     RefillingFromTrough = false;
-                    return;
                 }
                 else if (fraction > 1.0)
                 {
                     Simulator.Confirmer.Message(ConfirmLevel.None, Simulator.Catalog.GetStringFmt("Refill: Water supply now replenished."));
-                    return;
                 }
                 else
                 {
@@ -2522,7 +2517,6 @@ namespace Orts.Simulation.RollingStocks
                 MSTSWagon.RefillProcess.OkToRefill = false;
                 MSTSWagon.RefillProcess.ActivePickupObjectUID = 0;
                 RefillingFromTrough = false;
-                return;
             }
 
 
@@ -2575,6 +2569,12 @@ namespace Orts.Simulation.RollingStocks
                 float ScoopFluidDensityKgpM3 = 998.2f; // Fuild density of water @ 20c
                 WaterScoopDragForceN = 0.5f * ScoopDragCoeff * ScoopFluidDensityKgpM3 * ScoopDragAreaM * absSpeedMpS * absSpeedMpS;
 
+                // Turn water scoop sound on
+                if (!WaterScoopSoundOn)
+                {
+                    WaterScoopSoundOn = true;
+                    SignalEvent(Event.WaterScoopDown);
+                }
             }
             else // Ensure water scoop values are zero if not taking water.
             {
@@ -2587,9 +2587,14 @@ namespace Orts.Simulation.RollingStocks
                 {
                     WaterScoopTotalWaterL = 0.0f; // Reset amount of water picked up by water sccop.
                 }
+
+                // Turn water scoop sound off
+                if (WaterScoopSoundOn)
+                {
+                    WaterScoopSoundOn = false;
+                    SignalEvent(Event.WaterScoopUp);
+                }
             }
-
-
         }
 
         #region Calculate Friction Coefficient
@@ -3095,16 +3100,14 @@ namespace Orts.Simulation.RollingStocks
             if (Simulator.PlayerLocomotive == this)
             {
                 WaterScoopDown = !WaterScoopDown;
-                SignalEvent(Event.WaterScoopDown);
+                SignalEvent(Event.WaterScoopRaiseLower);
                 if (WaterScoopDown)
                 {
                     IsWaterScoopDown = true; // Set flag to potentially fill from water trough
-                    SignalEvent(Event.WaterScoopDown);
                 }
                 else
                 {
                     IsWaterScoopDown = false;
-                    SignalEvent(Event.WaterScoopUp);
                     WaterScoopOverTroughFlag = false; // Reset flags so that message will come up again
                     WaterScoopNotFittedFlag = false;
                     WaterScoopSlowSpeedFlag = false;
