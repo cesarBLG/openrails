@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Open Rails.  If not, see <http://www.gnu.org/licenses/>.
 
+using Orts.Formats.Msts;
 using Orts.Parsers.Msts;
 using ORTS.Common;
 using System;
@@ -1278,7 +1279,131 @@ namespace Orts.Simulation.RollingStocks.SubSystems
             }
         }
 
-        public enum AvvSignal {
+        private float previousSelectedSpeed = 0;
+
+        public float GetDataOf(CabViewControl cvc)
+        {
+            float data = 0;
+            switch (cvc.ControlType)
+            { 
+                case CABViewControlTypes.ORTS_SELECTED_SPEED:
+                case CABViewControlTypes.ORTS_SELECTED_SPEED_DISPLAY:
+                    bool metric = cvc.Units == CABViewControlUnits.KM_PER_HOUR;
+                    float temp =RestrictedSpeedActive ? MpS.FromMpS(CurrentSelectedSpeedMpS, metric) : temp = MpS.FromMpS(SelectedSpeedMpS, metric);
+                    if (previousSelectedSpeed < temp) previousSelectedSpeed += 1f;
+                    if (previousSelectedSpeed > temp) previousSelectedSpeed -= 1f;
+                    data = previousSelectedSpeed;
+                    break;
+                case CABViewControlTypes.ORTS_SELECTED_SPEED_MODE:
+                    data = (float)SpeedSelMode;
+                    break;
+                case CABViewControlTypes.ORTS_SELECTED_SPEED_REGULATOR_MODE:
+                    data = (float)SpeedRegMode;
+                    break;
+                case CABViewControlTypes.ORTS_SELECTED_SPEED_MAXIMUM_ACCELERATION:
+                    if (SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto || MaxForceKeepSelectedStepWhenManualModeSet)
+                    {
+                        data = (SelectedMaxAccelerationStep - 1) * (float)cvc.MaxValue / 100;
+                    }
+                    else
+                        data = 0;
+                    break;
+                case CABViewControlTypes.ORTS_RESTRICTED_SPEED_ZONE_ACTIVE:
+                    data = RestrictedSpeedActive ? 1 : 0;
+                    break;
+                case CABViewControlTypes.ORTS_NUMBER_OF_AXES_DISPLAY_UNITS:
+                    data = SelectedNumberOfAxles % 10;
+                    break;
+                case CABViewControlTypes.ORTS_NUMBER_OF_AXES_DISPLAY_TENS:
+                    data = (SelectedNumberOfAxles / 10) % 10;
+                    break;
+                case CABViewControlTypes.ORTS_NUMBER_OF_AXES_DISPLAY_HUNDREDS:
+                    data = (SelectedNumberOfAxles / 100) % 10;
+                    break;
+                case CABViewControlTypes.ORTS_TRAIN_LENGTH_METERS:
+                    data = TrainLengthMeters;
+                    break;
+                case CABViewControlTypes.ORTS_REMAINING_TRAIN_LENGHT_SPEED_RESTRICTED:
+                    if (RemainingTrainLengthToPassRestrictedZone == 0)
+                        data = 0;
+                    else
+                        data = TrainLengthMeters - RemainingTrainLengthToPassRestrictedZone;
+                    break;
+                case CABViewControlTypes.ORTS_REMAINING_TRAIN_LENGTH_PERCENT:
+                    if (SpeedRegMode != CruiseControl.SpeedRegulatorMode.Auto)
+                    {
+                        data = 0;
+                        break;
+                    }
+                    if (TrainLengthMeters > 0 && RemainingTrainLengthToPassRestrictedZone > 0)
+                    {
+                        data = (((float)TrainLengthMeters - (float)RemainingTrainLengthToPassRestrictedZone) / (float)TrainLengthMeters) * 100;
+                    }
+                    break;
+                case CABViewControlTypes.ORTS_MOTIVE_FORCE:
+                    data = Locomotive.FilteredMotiveForceN;
+                    break;
+                case CABViewControlTypes.ORTS_MOTIVE_FORCE_KILONEWTON:
+                    if (Locomotive.FilteredMotiveForceN > Locomotive.DynamicBrakeForceN)
+                        data = (float)Math.Round(Locomotive.FilteredMotiveForceN / 1000, 0);
+                    else if (Locomotive.DynamicBrakeForceN > 0)
+                        data = -(float)Math.Round(Locomotive.DynamicBrakeForceN / 1000, 0);
+                    break;
+                case CABViewControlTypes.ORTS_MAXIMUM_FORCE:
+                    data = Locomotive.MaxForceN;
+                    break;
+                case CABViewControlTypes.ORTS_FORCE_IN_PERCENT_THROTTLE_AND_DYNAMIC_BRAKE:
+                    if (SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto)
+                    {
+                        data = ForceThrottleAndDynamicBrake;
+                        if (Locomotive.DynamicBrakePercent > 0 && data > -Locomotive.DynamicBrakePercent) data = -Locomotive.DynamicBrakePercent;
+                    }
+                    else
+                    {
+                        if (Locomotive.ThrottlePercent > 0)
+                        {
+                            data = Locomotive.ThrottlePercent;
+                        }
+                        else if (Locomotive.DynamicBrakePercent > 0 && Locomotive.AbsSpeedMpS > 0)
+                        {
+                            data = -Locomotive.DynamicBrakePercent;
+                        }
+                        else data = 0;
+                    }
+                    break;
+                case CABViewControlTypes.ORTS_TRAIN_TYPE_PAX_OR_CARGO:
+                    data = (int)Locomotive.SelectedTrainType;
+                    break;
+                case CABViewControlTypes.ORTS_CONTROLLER_VOLTAGE:
+                    data = controllerVolts;
+                    break;
+                case CABViewControlTypes.ORTS_AMPERS_BY_CONTROLLER_VOLTAGE:
+                    if (SpeedRegMode == SpeedRegulatorMode.Auto)
+                    {
+                        if (controllerVolts < 0) data = -controllerVolts / 100 * (Locomotive.MaxCurrentA * 0.8f);
+                        else data = controllerVolts / 100 * (Locomotive.MaxCurrentA * 0.8f);
+                        if (data == 0 && Locomotive.DynamicBrakePercent > 0 && Locomotive.AbsSpeedMpS > 0) data = Locomotive.DynamicBrakePercent / 100 * (Locomotive.MaxCurrentA * 0.8f);
+                    }
+                    else
+                    {
+                        if (Locomotive.DynamicBrakePercent > 0 && Locomotive.AbsSpeedMpS > 0) data = Locomotive.DynamicBrakePercent / 200 * (Locomotive.MaxCurrentA * 0.8f);
+                        else data = Locomotive.ThrottlePercent / 100 * (Locomotive.MaxCurrentA * 0.8f);
+                    }
+                    break;
+                case CABViewControlTypes.ORTS_ODOMETER:
+                    data = cvc.Units == CABViewControlUnits.KILOMETRES ? float.Parse(Math.Round(Locomotive.OdometerM / 1000, 0).ToString()) : Locomotive.OdometerM;
+                    break;
+                case CABViewControlTypes.ORTS_CC_SELECT_SPEED:
+                    data = Locomotive.SelectingSpeedPressed ? 1 : 0;
+                    break;
+                default:
+                    data = 0;
+                    break;
+            }
+            return data;
+        }
+
+      public enum AvvSignal {
             Stop,
             Restricted,
             Restricting40,

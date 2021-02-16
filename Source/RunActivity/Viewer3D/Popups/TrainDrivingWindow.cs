@@ -932,37 +932,5 @@ namespace Orts.Viewer3D.Popups
             }
         }
 
-        // ==========================================================================================================================================
-        //      Method to construct the train driving info data for use by the WebServer
-        //      Replaces the Prepare Frame Method
-        //      updated from  djr - 20171221
-        // ==========================================================================================================================================
-        public List<ListLabel> TrainDrivingWebApiData()
-        {
-            if (!TrainDrivingUpdating)
-            {
-                TrainDrivingUpdating = true;
-                UpdateData();
-                TrainDrivingUpdating = false;
-
-                // Ctrl + F (FiringIsManual)
-                if (ResizeWindow || LinesCount != ListToLabel.Count())
-                {
-                    ResizeWindow = false;
-                    UpdateWindowSize();
-                    LinesCount = ListToLabel.Count();
-                }
-            }
-            List<ListLabel> returnList = new List<ListLabel>();
-            try
-            // needed for thread safety
-            {
-                returnList = ListToLabel.ToList();
-            }
-            catch
-            { 
-            }
-            return returnList;
-        }
     }
 }

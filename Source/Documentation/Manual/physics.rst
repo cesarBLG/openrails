@@ -26,6 +26,8 @@ place the OR-specific .wag or .eng file in a created folder
 ``TRAINS\TRAINSET\TrainCar\OpenRails\`` (see :ref:`here <physics-inclusions>`
 for more).
 
+For a full list of parameters, see :ref:`Developing OR Content - Parameters and Tokens<parameters_and_tokens>`
+
 Train Cars (WAG, or Wagon Part of ENG file)
 ===========================================
 
@@ -1772,11 +1774,6 @@ iii. `Testing Resources for Open Rails Steam Locomotives
 |                                                           |(y) to coal        |series of x        |                   |
 |                                                           |combustion (x)     |& y values.        |                   |
 |                                                           |                   |Leave out if       |                   |
-|                                                           |                   |unused             |                   |
-+-----------------------------------------------------------+-------------------+-------------------+-------------------+
-|ORTS |-| Cylinder |-| Exhaust |-| Open ( x )               |Point at which the |Between            |(0.1)              |
-|                                                           |cylinder exhaust   |0.1--0.95,         |                   |
-|                                                           |port opens         |Leave out if       |                   |
 |                                                           |                   |unused             |                   |
 +-----------------------------------------------------------+-------------------+-------------------+-------------------+
 |ORTS |-| Cylinder |-| Port |-| Opening ( x )               |Size of cylinder   |Between            |(0.085)            |

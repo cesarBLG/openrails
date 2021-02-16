@@ -169,6 +169,7 @@ namespace Orts.Simulation.RollingStocks
         bool WaterScoopSlowSpeedFlag = false;
         bool WaterScoopDirectionFlag = false;
         public bool IsWaterScoopPlayerLocomotive = false;
+        bool WaterScoopSoundOn = false;
         public float MaxTotalCombinedWaterVolumeUKG;
         public MSTSNotchController WaterController = new MSTSNotchController(0, 1, 0.01f);
         public float CombinedTenderWaterVolumeUKG          // Decreased by running injectors and increased by refilling
@@ -2450,13 +2451,11 @@ namespace Orts.Simulation.RollingStocks
                         WaterScoopNotFittedFlag = true;
                     }
                     RefillingFromTrough = false;
-                    return;
                 }
                 else if (ScoopIsBroken)
                 {
                     Simulator.Confirmer.Message(ConfirmLevel.Error, Simulator.Catalog.GetString("Scoop is broken, can't refill"));
-                    RefillingFromTrough = false;
-                    return;
+                    RefillingFromTrough = false;       
                 }
                 else if (IsOverJunction())
                 {
@@ -2466,7 +2465,7 @@ namespace Orts.Simulation.RollingStocks
                     }
                     ScoopIsBroken = true;
                     RefillingFromTrough = false;
-                    return;
+                    SignalEvent(Event.WaterScoopBroken);       
                 }
                 else if (!IsOverTrough())
                 {
@@ -2478,7 +2477,6 @@ namespace Orts.Simulation.RollingStocks
                         MSTSWagon.RefillProcess.ActivePickupObjectUID = 0;
                     }
                     RefillingFromTrough = false;
-                    return;
                 }
                 else if (IsTenderRequired == 1 && Direction == Direction.Reverse) // Locomotives with tenders cannot go in reverse
                 {
@@ -2488,7 +2486,6 @@ namespace Orts.Simulation.RollingStocks
                         WaterScoopDirectionFlag = true;
                     }
                     RefillingFromTrough = false;
-                    return;
                 }
                 else if (absSpeedMpS < WaterScoopMinSpeedMpS)
                 {
@@ -2501,12 +2498,10 @@ namespace Orts.Simulation.RollingStocks
                         MSTSWagon.RefillProcess.ActivePickupObjectUID = 0;
                     }
                     RefillingFromTrough = false;
-                    return;
                 }
                 else if (fraction > 1.0)
                 {
                     Simulator.Confirmer.Message(ConfirmLevel.None, Simulator.Catalog.GetStringFmt("Refill: Water supply now replenished."));
-                    return;
                 }
                 else
                 {
@@ -2522,7 +2517,6 @@ namespace Orts.Simulation.RollingStocks
                 MSTSWagon.RefillProcess.OkToRefill = false;
                 MSTSWagon.RefillProcess.ActivePickupObjectUID = 0;
                 RefillingFromTrough = false;
-                return;
             }
 
 
@@ -2575,6 +2569,12 @@ namespace Orts.Simulation.RollingStocks
                 float ScoopFluidDensityKgpM3 = 998.2f; // Fuild density of water @ 20c
                 WaterScoopDragForceN = 0.5f * ScoopDragCoeff * ScoopFluidDensityKgpM3 * ScoopDragAreaM * absSpeedMpS * absSpeedMpS;
 
+                // Turn water scoop sound on
+                if (!WaterScoopSoundOn)
+                {
+                    WaterScoopSoundOn = true;
+                    SignalEvent(Event.WaterScoopDown);
+                }
             }
             else // Ensure water scoop values are zero if not taking water.
             {
@@ -2587,9 +2587,14 @@ namespace Orts.Simulation.RollingStocks
                 {
                     WaterScoopTotalWaterL = 0.0f; // Reset amount of water picked up by water sccop.
                 }
+
+                // Turn water scoop sound off
+                if (WaterScoopSoundOn)
+                {
+                    WaterScoopSoundOn = false;
+                    SignalEvent(Event.WaterScoopUp);
+                }
             }
-
-
         }
 
         #region Calculate Friction Coefficient
@@ -3095,16 +3100,14 @@ namespace Orts.Simulation.RollingStocks
             if (Simulator.PlayerLocomotive == this)
             {
                 WaterScoopDown = !WaterScoopDown;
-                SignalEvent(Event.WaterScoopDown);
+                SignalEvent(Event.WaterScoopRaiseLower);
                 if (WaterScoopDown)
                 {
                     IsWaterScoopDown = true; // Set flag to potentially fill from water trough
-                    SignalEvent(Event.WaterScoopDown);
                 }
                 else
                 {
                     IsWaterScoopDown = false;
-                    SignalEvent(Event.WaterScoopUp);
                     WaterScoopOverTroughFlag = false; // Reset flags so that message will come up again
                     WaterScoopNotFittedFlag = false;
                     WaterScoopSlowSpeedFlag = false;
@@ -5000,245 +5003,12 @@ namespace Orts.Simulation.RollingStocks
                 case CABViewControlTypes.ORTS_TCS48:
                     data = TrainControlSystem.CabDisplayControls[(int)cvc.ControlType - (int)CABViewControlTypes.ORTS_TCS1];
                     break;
-                case CABViewControlTypes.ORTS_SELECTED_SPEED:
-                case CABViewControlTypes.ORTS_SELECTED_SPEED_DISPLAY:
-                    {
-                        if (CruiseControl == null)
-                        {
-                            data = 0;
-                            break;
-                        }
-                        bool metric = cvc.Units == CABViewControlUnits.KM_PER_HOUR;
-                        float temp = CruiseControl.RestrictedSpeedActive ? MpS.FromMpS(CruiseControl.CurrentSelectedSpeedMpS, metric) : temp = MpS.FromMpS(CruiseControl.SelectedSpeedMpS, metric);
-                        if (previousSelectedSpeed < temp) previousSelectedSpeed += 1f;
-                        if (previousSelectedSpeed > temp) previousSelectedSpeed -= 1f;
-                        data = previousSelectedSpeed;
-                        break;
-                    }
-                case CABViewControlTypes.ORTS_SELECTED_SPEED_MODE:
-                    {
-                        if (CruiseControl == null)
-                        {
-                            data = 0;
-                            break;
-                        }
-                        data = (float)CruiseControl.SpeedSelMode;
-                        break;
-                    }
-                case CABViewControlTypes.ORTS_SELECTED_SPEED_REGULATOR_MODE:
-                    {
-                        if (CruiseControl == null)
-                        {
-                            data = 0;
-                            break;
-                        }
-                        data = (float)CruiseControl.SpeedRegMode;
-                        break;
-                    }
-                case CABViewControlTypes.ORTS_SELECTED_SPEED_MAXIMUM_ACCELERATION:
-                    {
-                        if (CruiseControl == null)
-                        {
-                            data = 0;
-                            break;
-                        }
-                        if (CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto || CruiseControl.MaxForceKeepSelectedStepWhenManualModeSet)
-                        {
-                            data = (CruiseControl.SelectedMaxAccelerationStep - 1) * (float)cvc.MaxValue / 100;
-                        }
-                        else
-                            data = 0;
-                        break;
-                    }
-                case CABViewControlTypes.ORTS_RESTRICTED_SPEED_ZONE_ACTIVE:
-                    {
-                        if (CruiseControl == null)
-                        {
-                            data = 0;
-                            break;
-                        }
-                        data = CruiseControl.RestrictedSpeedActive ? 1 : 0;
-                        break;
-                    }
-                case CABViewControlTypes.ORTS_NUMBER_OF_AXES_DISPLAY_UNITS:
-                    {
-                        if (CruiseControl == null)
-                        {
-                            data = 0;
-                            break;
-                        }
-                        data = CruiseControl.SelectedNumberOfAxles % 10;
-                        break;
-                    }
-                case CABViewControlTypes.ORTS_NUMBER_OF_AXES_DISPLAY_TENS:
-                    {
-                        if (CruiseControl == null)
-                        {
-                            data = 0;
-                            break;
-                        }
-                        data = (CruiseControl.SelectedNumberOfAxles / 10) % 10;
-                        break;
-                    }
-                case CABViewControlTypes.ORTS_NUMBER_OF_AXES_DISPLAY_HUNDREDS:
-                    {
-                        if (CruiseControl == null)
-                        {
-                            data = 0;
-                            break;
-                        }
-                        data = (CruiseControl.SelectedNumberOfAxles / 100) % 10;
-                        break;
-                    }
-                case CABViewControlTypes.ORTS_TRAIN_LENGTH_METERS:
-                    {
-                        if (CruiseControl == null)
-                        {
-                            data = 0;
-                            break;
-                        }
-                        data = CruiseControl.TrainLengthMeters;
-                        break;
-                    }
-                case CABViewControlTypes.ORTS_REMAINING_TRAIN_LENGHT_SPEED_RESTRICTED:
-                    {
-                        if (CruiseControl == null)
-                        {
-                            data = 0;
-                            break;
-                        }
-                        if (CruiseControl.RemainingTrainLengthToPassRestrictedZone == 0)
-                            data = 0;
-                        else
-                            data = CruiseControl.TrainLengthMeters - CruiseControl.RemainingTrainLengthToPassRestrictedZone;
-                        break;
-                    }
-                case CABViewControlTypes.ORTS_REMAINING_TRAIN_LENGTH_PERCENT:
-                    {
-                        if (CruiseControl == null)
-                        {
-                            data = 0;
-                            break;
-                        }
-                        if (CruiseControl.SpeedRegMode != CruiseControl.SpeedRegulatorMode.Auto)
-                        {
-                            data = 0;
-                            break;
-                        }
-                        if (CruiseControl.TrainLengthMeters > 0 && CruiseControl.RemainingTrainLengthToPassRestrictedZone > 0)
-                        {
-                            data = (((float)CruiseControl.TrainLengthMeters - (float)CruiseControl.RemainingTrainLengthToPassRestrictedZone) / (float)CruiseControl.TrainLengthMeters) * 100;
-                        }
-                        break;
-                    }
-                case CABViewControlTypes.ORTS_MOTIVE_FORCE:
-                    {
-                        data = FilteredMotiveForceN;
-                        break;
-                    }
-                case CABViewControlTypes.ORTS_MOTIVE_FORCE_KILONEWTON:
-                    {
-                        if (FilteredMotiveForceN > DynamicBrakeForceN)
-                            data = (float)Math.Round(FilteredMotiveForceN / 1000, 0);
-                        else if (DynamicBrakeForceN > 0)
-                            data = -(float)Math.Round(DynamicBrakeForceN / 1000, 0);
-                        break;
-                    }
-                case CABViewControlTypes.ORTS_MAXIMUM_FORCE:
-                    {
-                        data = MaxForceN;
-                        break;
-                    }
-                case CABViewControlTypes.ORTS_FORCE_IN_PERCENT_THROTTLE_AND_DYNAMIC_BRAKE:
-                    {
-                        if (CruiseControl != null)
-                        {
-                            if (CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto)
-                            {
-                                data = CruiseControl.ForceThrottleAndDynamicBrake;
-                                if (DynamicBrakePercent > 0 && data > -DynamicBrakePercent) data = -DynamicBrakePercent;
-                            }
-                            else
-                            {
-                                if (ThrottlePercent > 0)
-                                {
-                                    data = ThrottlePercent;
-                                }
-                                else if (DynamicBrakePercent > 0 && AbsSpeedMpS > 0)
-                                {
-                                    data = -DynamicBrakePercent;
-                                }
-                                else data = 0;
-                            }
-                        }
-                        else
-                        {
-                            if (ThrottlePercent > 0)
-                            {
-                                data = ThrottlePercent;
-                            }
-                            else if (DynamicBrakePercent > 0 && AbsSpeedMpS > 0)
-                            {
-                                data = -DynamicBrakePercent;
-                            }
-                            else data = 0;
-                        }
-                        break;
-                    }
-                case CABViewControlTypes.ORTS_TRAIN_TYPE_PAX_OR_CARGO:
-                    {
-                        data = (int)SelectedTrainType;
-                        break;
-                    }
-                case CABViewControlTypes.ORTS_CONTROLLER_VOLTAGE:
-                    {
-                        if (CruiseControl == null)
-                        {
-                            data = 0;
-                            break;
-                        }
-                        data = CruiseControl.controllerVolts;
-                        break;
-                    }
-                case CABViewControlTypes.ORTS_AMPERS_BY_CONTROLLER_VOLTAGE:
-                    {
-                        if (CruiseControl != null)
-                        {
-                            if (CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto)
-                            {
-                                if (CruiseControl.controllerVolts < 0) data = -CruiseControl.controllerVolts / 100 * (MaxCurrentA * 0.8f);
-                                else data = CruiseControl.controllerVolts / 100 * (MaxCurrentA * 0.8f);
-                                if (data == 0 && DynamicBrakePercent > 0 && AbsSpeedMpS > 0) data = DynamicBrakePercent / 100 * (MaxCurrentA * 0.8f);
-                            }
-                            else
-                            {
-                                if (DynamicBrakePercent > 0 && AbsSpeedMpS > 0) data = DynamicBrakePercent / 200 * (MaxCurrentA * 0.8f);
-                                else data = ThrottlePercent / 100 * (MaxCurrentA * 0.8f);
-                            }
-                            CruiseControl.Ampers = data;
-                        }
-                        else
-                        {
-                            if (DynamicBrakePercent > 0 && AbsSpeedMpS > 0) data = DynamicBrakePercent / 200 * (MaxCurrentA * 0.8f);
-                            else data = ThrottlePercent / 100 * (MaxCurrentA * 0.8f);
-                        }
-                        break;
-                    }
-                case CABViewControlTypes.ORTS_ODOMETER:
-                    {
-                        data = cvc.Units == CABViewControlUnits.KILOMETRES ? float.Parse(Math.Round(OdometerM / 1000, 0).ToString()) : OdometerM;
-                        break;
-                    }
-                case CABViewControlTypes.ORTS_CC_SELECT_SPEED:
-                    {
-                        data = SelectingSpeedPressed ? 1 : 0;
-                        break;
-                    }
                 default:
-                    {
+                    if (CruiseControl != null)
+                        data = CruiseControl.GetDataOf(cvc);
+                    else
                         data = 0;
-                        break;
-                    }
+                    break;
             }
             return data;
         }
