@@ -1,5 +1,5 @@
-﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.90
-February 13rh, 2021
+﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.91
+February 20th, 2021
 
 Please note that the installation and use of Open Rails software, even of its unofficial versions, is governed by the Open Rails End User License Agreement. 
 
@@ -12,7 +12,7 @@ INSTALLATION
 you would return to the official OR version.
 
 RELEASE NOTES
-This unofficial version has been derived from the latest official OpenRails testing revision X1.3.1-296. 
+This unofficial version has been derived from the latest official OpenRails testing revision X1.3.1-297. 
 
 No Unstable releases are used to preserve the Monogame version of OR NewYear MG. 
 This version includes some features not (yet) available in the Open Rails testing official version, that is:
@@ -50,12 +50,13 @@ This version includes some features not (yet) available in the Open Rails testin
 - support for animation of wipers in 2D cabs, see http://www.elvastower.com/forums/index.php?/topic/34604-2d-cabs-wipers-animation/page__view__findpost__p__265101 ,
 with the contribution of Paolo.
 - bug fix for http://www.elvastower.com/forums/index.php?/topic/34633-unhandled-exception-overflow-in-win7/page__view__findpost__p__265463 , by mbm_OR
-- extended support for ETCS L2 planning area, for braking distance and text area, and initial support for menus by césarBL, see  http://www.elvastower.com/forums/index.php?/topic/34577-planning-area-of-the-etcs-dmi/ 
+- extended support for ETCS L2 planning area, for braking distance and text area, and initial support for menus by césarbl, see  http://www.elvastower.com/forums/index.php?/topic/34577-planning-area-of-the-etcs-dmi/ 
 - removed trace of wait processes when enable watchdog option deselected
 - tentative support for RAIN textures for objects, terrain and transfers
 - dynamic terrain and scenery loading strategy (useful for slower computers)
 - American horn blow sequence for AI trains, see http://www.elvastower.com/forums/index.php?/topic/34721-ai-train-horn-honk-american-style/ 
 - enable customized tooltips for cabview controls, by adding a Label ( "string" ) line in the cabview control block in the .cvf file, by Jindrich
+- NEW: corrected bug in display of ETCS DMIs for certain screen resolutions, by césarbl
 
 
 Moreover some features present in the Unstable Monogame version by James Ross have been inserted.
