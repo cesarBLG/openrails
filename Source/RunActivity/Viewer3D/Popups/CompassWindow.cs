@@ -25,7 +25,7 @@ using System;
 
 namespace Orts.Viewer3D.Popups
 {
-    public class CompassWindow : Window
+	public class CompassWindow : Window
 	{
 		PopupCompass Compass;
 		Label Latitude;

@@ -1,4 +1,4 @@
-﻿// COPYRIGHT 2014 by the Open Rails project.
+// COPYRIGHT 2014 by the Open Rails project.
 // 
 // This file is part of Open Rails.
 // 
@@ -186,9 +186,8 @@ namespace ORTS.TrackViewer.Drawing
             {
                 shadowMapCombined.Dispose();
             }
-            var pp = graphicsDevice.PresentationParameters;
             shadowRenderTargetCombined = new RenderTarget2D(graphicsDevice, Nouter * blockW, Nouter * blockH, false, SurfaceFormat.Color,
-                pp.DepthStencilFormat, pp.MultiSampleCount, RenderTargetUsage.DiscardContents);
+                DepthFormat.Depth16, 0, RenderTargetUsage.PreserveContents);
             shadowDrawArea.SetScreenSize(0, 0, blockW, blockH);
 
             // create initial empty subtextures
@@ -202,9 +201,8 @@ namespace ORTS.TrackViewer.Drawing
                 {
                     shadowMapsSingle[i].Dispose();
                 }
-                pp = graphicsDevice.PresentationParameters;
                 shadowRenderTargetSingle[i] = new RenderTarget2D(graphicsDevice, 1 * blockW, 1 * blockH, false, SurfaceFormat.Color,
-                    pp.DepthStencilFormat, pp.MultiSampleCount, RenderTargetUsage.DiscardContents);
+                    DepthFormat.Depth16, 0, RenderTargetUsage.PreserveContents); 
                 shadowMapsSingle[i] = new Texture2D(graphicsDevice, 1, 1);
             }
         }

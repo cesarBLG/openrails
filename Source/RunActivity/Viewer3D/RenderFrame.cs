@@ -1,4 +1,4 @@
-﻿// COPYRIGHT 2009, 2010, 2011, 2012, 2013 by the Open Rails project.
+// COPYRIGHT 2009, 2010, 2011, 2012, 2013 by the Open Rails project.
 // 
 // This file is part of Open Rails.
 // 
@@ -16,6 +16,13 @@
 // along with Open Rails.  If not, see <http://www.gnu.org/licenses/>.
 
 // This file is the responsibility of the 3D & Environment Team. 
+
+// Define this to check every material is resetting the RenderState correctly.
+// #define DEBUG_RENDER_STATE
+
+// Define this to enable sorting of blended render primitives. This is a
+// complex feature and performance is not guaranteed.
+#define RENDER_BLEND_SORTING
 
 using System;
 using System.Collections.Generic;
@@ -380,6 +387,9 @@ namespace Orts.Viewer3D
         Vector3 ShadowMapY;
         Vector3[] ShadowMapCenter;
 
+        internal RenderTarget2D RenderSurface;
+        SpriteBatchMaterial RenderSurfaceMaterial;
+
         readonly Material DummyBlendedMaterial;
 		readonly Dictionary<Material, RenderItemCollection>[] RenderItems = new Dictionary<Material, RenderItemCollection>[(int)RenderPrimitiveSequence.Sentinel];
         readonly RenderItemCollection[] RenderShadowSceneryItems;
@@ -437,6 +447,22 @@ namespace Orts.Viewer3D
 
             XNACameraView = Matrix.Identity;
             XNACameraProjection = Matrix.CreateOrthographic(game.RenderProcess.DisplaySize.X, game.RenderProcess.DisplaySize.Y, 1, 100);
+
+            ScreenChanged();
+        }
+
+        void ScreenChanged()
+        {
+            RenderSurface = new RenderTarget2D(
+                Game.RenderProcess.GraphicsDevice,
+                Game.RenderProcess.GraphicsDevice.PresentationParameters.BackBufferWidth,
+                Game.RenderProcess.GraphicsDevice.PresentationParameters.BackBufferHeight,
+                false,
+                Game.RenderProcess.GraphicsDevice.PresentationParameters.BackBufferFormat,
+                Game.RenderProcess.GraphicsDevice.PresentationParameters.DepthStencilFormat,
+                Game.RenderProcess.GraphicsDevice.PresentationParameters.MultiSampleCount,
+                RenderTargetUsage.PreserveContents
+            );
         }
 
         public void Clear()
@@ -473,6 +499,9 @@ namespace Orts.Viewer3D
 
         public void PrepareFrame(Viewer viewer)
         {
+            if (RenderSurfaceMaterial == null)
+                RenderSurfaceMaterial = new SpriteBatchMaterial(viewer, BlendState.Opaque);
+
             if (viewer.Settings.UseMSTSEnv == false)
                 SolarDirection = viewer.World.Sky.solarDirection;
             else
@@ -681,6 +710,12 @@ namespace Orts.Viewer3D
         [CallOnThread("Render")]
         public void Draw(GraphicsDevice graphicsDevice)
         {
+            if (RenderSurface.Width != graphicsDevice.PresentationParameters.BackBufferWidth || RenderSurface.Height != graphicsDevice.PresentationParameters.BackBufferHeight)
+                ScreenChanged();
+
+#if DEBUG_RENDER_STATE
+            DebugRenderState(graphicsDevice, "RenderFrame.Draw");
+#endif
             var logging = UserInput.IsPressed(UserCommand.DebugLogRenderFrame);
             if (logging)
             {
@@ -753,12 +788,18 @@ namespace Orts.Viewer3D
 
             // All done.
             ShadowMapMaterial.ResetState(graphicsDevice);
+#if DEBUG_RENDER_STATE
+            DebugRenderState(graphicsDevice, ShadowMapMaterial.ToString());
+#endif
             graphicsDevice.SetRenderTarget(null);
 
             // Blur the shadow map.
             if (Game.Settings.ShadowMapBlur)
             {
 				ShadowMap[shadowMapIndex] = ShadowMapMaterial.ApplyBlur(graphicsDevice, ShadowMap[shadowMapIndex], ShadowMapRenderTarget[shadowMapIndex]);
+#if DEBUG_RENDER_STATE
+                DebugRenderState(graphicsDevice, ShadowMapMaterial.ToString() + " ApplyBlur()");
+#endif
             }
             else
                 ShadowMap[shadowMapIndex] = ShadowMapRenderTarget[shadowMapIndex];
@@ -773,6 +814,11 @@ namespace Orts.Viewer3D
         /// <param name="logging"></param>
         void DrawSimple(GraphicsDevice graphicsDevice, bool logging)
         {
+            if (RenderSurfaceMaterial != null)
+            {
+                graphicsDevice.SetRenderTarget(RenderSurface);
+            }
+
             if (Game.Settings.DistantMountains)
             {
                 if (logging) Console.WriteLine("  DrawSimple (Distant Mountains) {");
@@ -790,6 +836,15 @@ namespace Orts.Viewer3D
                 graphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer | ClearOptions.Stencil, Color.Transparent, 1, 0);
                 DrawSequences(graphicsDevice, logging);
                 if (logging) Console.WriteLine("  }");
+            }
+
+            if (RenderSurfaceMaterial != null)
+            {
+                graphicsDevice.SetRenderTarget(null);
+                graphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer | ClearOptions.Stencil, Color.Transparent, 1, 0);
+                RenderSurfaceMaterial.SetState(graphicsDevice, null);
+                RenderSurfaceMaterial.SpriteBatch.Draw(RenderSurface, Vector2.Zero, Color.White);
+                RenderSurfaceMaterial.ResetState(graphicsDevice);
             }
         }
 
@@ -824,6 +879,10 @@ namespace Orts.Viewer3D
                                 }
                                 if (lastMaterial != null)
                                     lastMaterial.ResetState(graphicsDevice);
+#if DEBUG_RENDER_STATE
+                                if (lastMaterial != null)
+                                    DebugRenderState(graphicsDevice, lastMaterial.ToString());
+#endif
                                 renderItem.Material.SetState(graphicsDevice, lastMaterial);
                                 lastMaterial = renderItem.Material;
                             }
@@ -837,6 +896,10 @@ namespace Orts.Viewer3D
                         }
                         if (lastMaterial != null)
                             lastMaterial.ResetState(graphicsDevice);
+#if DEBUG_RENDER_STATE
+                        if (lastMaterial != null)
+                            DebugRenderState(graphicsDevice, lastMaterial.ToString());
+#endif
                     }
                     else
                     {
@@ -848,6 +911,9 @@ namespace Orts.Viewer3D
                         if (logging) Console.WriteLine("      {0,-5} * {1}", sequenceMaterial.Value.Count, sequenceMaterial.Key);
                         sequenceMaterial.Key.Render(graphicsDevice, sequenceMaterial.Value, ref XNACameraView, ref XNACameraProjection);
                         sequenceMaterial.Key.ResetState(graphicsDevice);
+#if DEBUG_RENDER_STATE
+                        DebugRenderState(graphicsDevice, sequenceMaterial.Key.ToString());
+#endif
                     }
                 }
                 if (logging) Console.WriteLine("    }");
@@ -874,10 +940,23 @@ namespace Orts.Viewer3D
                         if (logging) Console.WriteLine("      {0,-5} * {1}", sequenceMaterial.Value.Count, sequenceMaterial.Key);
                         sequenceMaterial.Key.Render(graphicsDevice, sequenceMaterial.Value, ref XNACameraView, ref Camera.XnaDistantMountainProjection);
                         sequenceMaterial.Key.ResetState(graphicsDevice);
+#if DEBUG_RENDER_STATE
+                        DebugRenderState(graphicsDevice, sequenceMaterial.Key.ToString());
+#endif
                     }
                 }
                 if (logging) Console.WriteLine("    }");
             }
         }
+
+#if DEBUG_RENDER_STATE
+        static void DebugRenderState(GraphicsDevice graphicsDevice, string location)
+        {
+            if (graphicsDevice.BlendState != BlendState.Opaque) throw new InvalidOperationException($"BlendState is {graphicsDevice.BlendState}; expected {BlendState.Opaque} at {location}.");
+            if (graphicsDevice.DepthStencilState != DepthStencilState.Default) throw new InvalidOperationException($"DepthStencilState is {graphicsDevice.DepthStencilState}; expected {DepthStencilState.Default} at {location}.");
+            if (graphicsDevice.RasterizerState != RasterizerState.CullCounterClockwise) throw new InvalidOperationException($"RasterizerState is {graphicsDevice.RasterizerState}; expected {RasterizerState.CullCounterClockwise} at {location}.");
+            // TODO: Check graphicsDevice.ScissorRectangle? Tricky because we struggle to know what the default Width/Height should be (different for shadows vs normal)
+        }
+#endif
     }
 }

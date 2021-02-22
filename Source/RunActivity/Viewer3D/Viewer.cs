@@ -1,4 +1,4 @@
-﻿// COPYRIGHT 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017 by the Open Rails project.
+// COPYRIGHT 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017 by the Open Rails project.
 //
 // This file is part of Open Rails.
 //
@@ -1789,7 +1789,7 @@ namespace Orts.Viewer3D
             if (frame.IsScreenChanged)
             {
                 WindowManager.ScreenChanged();
-                AdjustCabHeight(RenderProcess.GraphicsDeviceManager.PreferredBackBufferWidth, RenderProcess.GraphicsDeviceManager.PreferredBackBufferHeight);
+                AdjustCabHeight(DisplaySize.X, DisplaySize.Y);
             }
 
             MaterialManager.UpdateShaders();
@@ -1837,18 +1837,12 @@ namespace Orts.Viewer3D
         [CallOnThread("Render")]
         void SaveScreenshotToFile(GraphicsDevice graphicsDevice, string fileName, bool silent)
         {
-            if (graphicsDevice.GraphicsProfile != GraphicsProfile.HiDef)
-                return;
+            var width = graphicsDevice.PresentationParameters.BackBufferWidth;
+            var height = graphicsDevice.PresentationParameters.BackBufferHeight;
+            var data = new uint[width * height];
 
-            int w = graphicsDevice.PresentationParameters.BackBufferWidth;
-            int h = graphicsDevice.PresentationParameters.BackBufferHeight;
-            int[] backBuffer = new int[w * h];
+            graphicsDevice.GetBackBufferData(data);
 
-
-            graphicsDevice.GetBackBufferData(backBuffer);
-            //copy into a texture 
-            Texture2D screenshot = new Texture2D(GraphicsDevice, w, h, false, GraphicsDevice.PresentationParameters.BackBufferFormat);
-            screenshot.SetData(backBuffer);
             new Thread(() =>
             {
                 try
@@ -1856,18 +1850,19 @@ namespace Orts.Viewer3D
                     // Unfortunately, the back buffer includes an alpha channel. Although saving this might seem okay,
                     // it actually ruins the picture - nothing in the back buffer is seen on-screen according to its
                     // alpha, it's only used for blending (if at all). We'll remove the alpha here.
-                    var data = new uint[screenshot.Width * screenshot.Height];
-                    screenshot.GetData(data);
                     for (var i = 0; i < data.Length; i++)
                         data[i] |= 0xFF000000;
-                    screenshot.SetData(data);
 
-                    // Now save the modified image.
-                    using (var stream = File.OpenWrite(fileName))
+                    using (var screenshot = new Texture2D(graphicsDevice, width, height))
                     {
-                        screenshot.SaveAsPng(stream, w, h);
+                        screenshot.SetData(data);
+
+                        // Now save the modified image.
+                        using (var stream = File.OpenWrite(fileName))
+                        {
+                            screenshot.SaveAsPng(stream, width, height);
+                        }
                     }
-                    screenshot.Dispose();
 
                     if (!silent)
                         MessagesWindow.AddMessage(String.Format("Saving screenshot to '{0}'.", fileName), 10);

@@ -41,14 +41,15 @@ namespace Orts.Viewer3D
             var basePath = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath), "Content");
             var effectFileName = System.IO.Path.Combine(basePath, filename + ".fx");
 
-            EffectContent effectSource = new EffectContent
+            var input = new EffectContent()
             {
+                // Bizarrely, MonoGame loads the content from the identity's filename and ignores the EffectCode property, so we don't need to bother loading the file ourselves
                 Identity = new ContentIdentity(effectFileName),
-                EffectCode = File.ReadAllText(effectFileName),
             };
-            EffectProcessor processor = new EffectProcessor();
-            CompiledEffectContent compiledEffect = processor.Process(effectSource, new ProcessorContext());
-            return compiledEffect.GetEffectCode();
+            var context = new ProcessorContext();
+            var processor = new EffectProcessor();
+            var effect = processor.Process(input, context);
+            return effect.GetEffectCode();
         }
     }
 
@@ -60,13 +61,15 @@ namespace Orts.Viewer3D
         public override string IntermediateDirectory { get { return string.Empty; } }
         public override string OutputDirectory { get { return string.Empty; } }
         public override string OutputFilename { get { return string.Empty; } }
-        public override ContentIdentity SourceIdentity { get { return new ContentIdentity(""); } }
+
+        public override ContentIdentity SourceIdentity { get { return sourceIdentity; } }
+        readonly ContentIdentity sourceIdentity = new ContentIdentity();
 
         public override OpaqueDataDictionary Parameters { get { return parameters; } }
-        OpaqueDataDictionary parameters = new OpaqueDataDictionary();
+        readonly OpaqueDataDictionary parameters = new OpaqueDataDictionary();
 
         public override ContentBuildLogger Logger { get { return logger; } }
-        ContentBuildLogger logger = new Logger();
+        readonly ContentBuildLogger logger = new Logger();
 
         public override void AddDependency(string filename) { }
         public override void AddOutputFile(string filename) { }
@@ -78,17 +81,9 @@ namespace Orts.Viewer3D
 
     class Logger : ContentBuildLogger
     {
-        public override void LogMessage(string message, params object[] messageArgs) { Console.WriteLine(message, messageArgs); }
-        public override void LogImportantMessage(string message, params object[] messageArgs) { Console.WriteLine(message, messageArgs); }
-        public override void LogWarning(string helpLink, ContentIdentity contentIdentity, string message, params object[] messageArgs)
-        {
-            var warning = "";
-            if (messageArgs != null && messageArgs.Length != 0)
-                warning += string.Format(message, messageArgs);
-            else if (!string.IsNullOrEmpty(message))
-                warning += message;
-            Console.WriteLine("{0}({1}): {2}", Path.GetFileName(contentIdentity.SourceFilename), contentIdentity.FragmentIdentifier, warning);
-        }
+        public override void LogMessage(string message, params object[] messageArgs) => Console.WriteLine(message, messageArgs);
+        public override void LogImportantMessage(string message, params object[] messageArgs) => Console.WriteLine(message, messageArgs);
+        public override void LogWarning(string helpLink, ContentIdentity contentIdentity, string message, params object[] messageArgs) => Console.WriteLine(message, messageArgs);
     }
 
     [CallOnThread("Render")]

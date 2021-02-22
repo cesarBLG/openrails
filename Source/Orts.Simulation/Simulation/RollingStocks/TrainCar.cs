@@ -46,7 +46,6 @@ using ORTS.Common;
 using ORTS.Scripting.Api;
 using ORTS.Settings;
 using System;
-using Orts.Parsers.Msts;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
