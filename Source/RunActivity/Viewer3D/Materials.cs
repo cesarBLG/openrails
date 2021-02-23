@@ -1158,8 +1158,7 @@ namespace Orts.Viewer3D
             if (ShaderPassesPopupWindow == null) ShaderPassesPopupWindow = shader.Techniques["PopupWindow"].Passes.GetEnumerator();
             if (ShaderPassesPopupWindowGlass == null) ShaderPassesPopupWindowGlass = shader.Techniques["PopupWindowGlass"].Passes.GetEnumerator();
             ShaderPasses = screen == null ? ShaderPassesPopupWindow : ShaderPassesPopupWindowGlass;
-            // FIXME: MonoGame cannot read backbuffer contents
-            //shader.Screen = screen;
+            shader.Screen = screen;
             shader.GlassColor = Color.Black;
 
 			graphicsDevice.BlendState = BlendState.NonPremultiplied;
