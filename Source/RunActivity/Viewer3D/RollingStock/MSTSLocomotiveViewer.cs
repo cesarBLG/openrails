@@ -1,4 +1,4 @@
-// COPYRIGHT 2009, 2010, 2011, 2012, 2013, 2014, 2015 by the Open Rails project.
+﻿// COPYRIGHT 2009, 2010, 2011, 2012, 2013, 2014, 2015 by the Open Rails project.
 // 
 // This file is part of Open Rails.
 // 
@@ -1041,7 +1041,7 @@ namespace Orts.Viewer3D.RollingStock
 
     public class CabRenderer : RenderPrimitive
     {
-        private SpriteBatchMaterial _Sprite2DCabView;
+        private CabSpriteBatchMaterial _SpriteShader2DCabView;
         private Matrix _Scale = Matrix.Identity;
         private Texture2D _CabTexture;
         private CabShader _Shader;  // Shaders must have unique Keys - below
@@ -1067,21 +1067,6 @@ namespace Orts.Viewer3D.RollingStock
 
             // _Viewer.DisplaySize intercepted to adjust cab view height
             Point DisplaySize = _Viewer.DisplaySize;
-            DisplaySize.Y = _Viewer.CabHeightPixels;
-
-            _PrevScreenSize = DisplaySize;
-
-            // Use same shader for both front-facing and rear-facing cabs.
-            if (_Locomotive.CabViewList[(int)CabViewType.Front].ExtendedCVF != null)
-            {
-                _Shader = new CabShader(viewer.GraphicsDevice,
-                    ExtendedCVF.TranslatedPosition(_Locomotive.CabViewList[(int)CabViewType.Front].ExtendedCVF.Light1Position, DisplaySize),
-                    ExtendedCVF.TranslatedPosition(_Locomotive.CabViewList[(int)CabViewType.Front].ExtendedCVF.Light2Position, DisplaySize),
-                    ExtendedCVF.TranslatedColor(_Locomotive.CabViewList[(int)CabViewType.Front].ExtendedCVF.Light1Color),
-                    ExtendedCVF.TranslatedColor(_Locomotive.CabViewList[(int)CabViewType.Front].ExtendedCVF.Light2Color));
-            }
-
-            _Sprite2DCabView = (SpriteBatchMaterial)viewer.MaterialManager.Load("SpriteBatch", effect: _Shader);
 
             #region Create Control renderers
             ControlMap = new Dictionary<int, CabViewControlRenderer>();
@@ -1113,7 +1098,7 @@ namespace Orts.Viewer3D.RollingStock
                             ExtendedCVF.TranslatedColor(_Locomotive.CabViewList[(int)CabViewType.Front].ExtendedCVF.Light1Color),
                             ExtendedCVF.TranslatedColor(_Locomotive.CabViewList[(int)CabViewType.Front].ExtendedCVF.Light2Color));
                         }
-                        _Sprite2DCabView = (SpriteBatchMaterial)viewer.MaterialManager.Load("SpriteBatch", effect: _Shader);
+                        _SpriteShader2DCabView = (CabSpriteBatchMaterial)viewer.MaterialManager.Load("CabSpriteBatch", null, 0, 0, ShaderKey, _Shader);
                         firstOne = false;
                     }
 
@@ -1228,9 +1213,8 @@ namespace Orts.Viewer3D.RollingStock
             }
             #endregion
 
-            _Viewer.AdjustCabHeight(_Viewer.DisplaySize.X, _Viewer.DisplaySize.Y);
+            _PrevScreenSize = DisplaySize;
 
-            _Viewer.CabCamera.ScreenChanged();
         }
 
         public CabRenderer(Viewer viewer, MSTSLocomotive car, CabViewFile CVFFile) //used by 3D cab as a refrence, thus many can be eliminated
@@ -1370,7 +1354,7 @@ namespace Orts.Viewer3D.RollingStock
                     ExtendedCVF.TranslatedPosition(_Locomotive.CabViewList[i].ExtendedCVF.Light2Position, _Viewer.DisplaySize));
             }
 
-            frame.AddPrimitive(_Sprite2DCabView, this, RenderPrimitiveGroup.Cab, ref _Scale);
+            frame.AddPrimitive(_SpriteShader2DCabView, this, RenderPrimitiveGroup.Cab, ref _Scale);
             //frame.AddPrimitive(Materials.SpriteBatchMaterial, this, RenderPrimitiveGroup.Cab, ref _Scale);
 
             if (_Location == 0)
@@ -1397,7 +1381,6 @@ namespace Orts.Viewer3D.RollingStock
                 _Shader.SetData(_Viewer.MaterialManager.sunDirection, _isNightTexture, false, overcast);
 
                 _Shader.SetTextureData(cabRect.Left, cabRect.Top, cabRect.Width, cabRect.Height);
-                _Shader.CurrentTechnique.Passes[0].Apply();
             }
 
             if (_CabTexture == null)
@@ -1409,7 +1392,7 @@ namespace Orts.Viewer3D.RollingStock
             drawPos.X += _Viewer.CabXLetterboxPixels;
             drawPos.Y += _Viewer.CabYLetterboxPixels;
 
-            _Sprite2DCabView.SpriteBatch.Draw(_CabTexture, drawPos, cabRect, Color.White, 0f, drawOrigin, cabScale, SpriteEffects.None, 0f);
+            _SpriteShader2DCabView.SpriteBatch.Draw(_CabTexture, drawPos, cabRect, Color.White, 0f, drawOrigin, cabScale, SpriteEffects.None, 0f);
 
             // Draw letterboxing.
             if (_Viewer.Settings.Letterbox2DCab && _LetterboxTexture == null)
@@ -1432,7 +1415,7 @@ namespace Orts.Viewer3D.RollingStock
 
         internal void DrawLetterbox(int x, int y, int w, int h)
         {
-            _Sprite2DCabView.SpriteBatch.Draw(_LetterboxTexture, new Rectangle(x, y, w, h), Color.White);
+            _SpriteShader2DCabView.SpriteBatch.Draw(_LetterboxTexture, new Rectangle(x, y, w, h), Color.White);
         }
 
         internal void Mark()
@@ -1455,7 +1438,7 @@ namespace Orts.Viewer3D.RollingStock
         protected readonly CabViewControl Control;
         protected readonly CabShader Shader;
         protected readonly int ShaderKey = 1;
-        protected readonly SpriteBatchMaterial ControlView;
+        protected readonly CabSpriteBatchMaterial CabShaderControlView;
 
         protected Vector2 Position;
         protected Texture2D Texture;
@@ -1471,7 +1454,7 @@ namespace Orts.Viewer3D.RollingStock
             Control = control;
             Shader = shader;
 
-            ControlView = (SpriteBatchMaterial)viewer.MaterialManager.Load("SpriteBatch", effect: Shader);
+            CabShaderControlView = (CabSpriteBatchMaterial)viewer.MaterialManager.Load("CabSpriteBatch", null, 0, 0, ShaderKey, Shader);
 
             HasCabLightDirectory = CABTextureManager.LoadTextures(Viewer, Control.ACEFile);
         }
@@ -1507,7 +1490,7 @@ namespace Orts.Viewer3D.RollingStock
         [CallOnThread("Updater")]
         public virtual void PrepareFrame(RenderFrame frame, ElapsedTime elapsedTime)
         {
-            frame.AddPrimitive(ControlView, this, RenderPrimitiveGroup.Cab, ref Matrix);
+            frame.AddPrimitive(CabShaderControlView, this, RenderPrimitiveGroup.Cab, ref Matrix);
         }
 
         internal void Mark()
@@ -1589,7 +1572,7 @@ namespace Orts.Viewer3D.RollingStock
             {
                 Shader.SetTextureData(Position.X, Position.Y, Texture.Width * ScaleToScreen, Texture.Height * ScaleToScreen);
             }
-            ControlView.SpriteBatch.Draw(Texture, Position, null, Color.White, Rotation, Origin, ScaleToScreen, SpriteEffects.None, 0);
+            CabShaderControlView.SpriteBatch.Draw(Texture, Position, null, Color.White, Rotation, Origin, ScaleToScreen, SpriteEffects.None, 0);
         }
     }
 
@@ -1808,7 +1791,7 @@ namespace Orts.Viewer3D.RollingStock
             {
                 Shader.SetTextureData(DestinationRectangle.Left, DestinationRectangle.Top, DestinationRectangle.Width, DestinationRectangle.Height);
             }
-            ControlView.SpriteBatch.Draw(Texture, DestinationRectangle, SourceRectangle, DrawColor, DrawRotation, Vector2.Zero, SpriteEffects.None, 0);
+            CabShaderControlView.SpriteBatch.Draw(Texture, DestinationRectangle, SourceRectangle, DrawColor, DrawRotation, Vector2.Zero, SpriteEffects.None, 0);
         }
     }
 
@@ -1898,7 +1881,7 @@ namespace Orts.Viewer3D.RollingStock
             {
                 Shader.SetTextureData(DestinationRectangle.Left, DestinationRectangle.Top, DestinationRectangle.Width, DestinationRectangle.Height);
             }
-            ControlView.SpriteBatch.Draw(Texture, DestinationRectangle, SourceRectangle, Color.White);
+            CabShaderControlView.SpriteBatch.Draw(Texture, DestinationRectangle, SourceRectangle, Color.White);
         }
 
         /// <summary>
@@ -2537,7 +2520,7 @@ namespace Orts.Viewer3D.RollingStock
 
         public override void Draw(GraphicsDevice graphicsDevice)
         {
-            DrawFont.Draw(ControlView.SpriteBatch, DrawPosition, Point.Zero, DrawRotation, DrawText, Alignment, DrawColor, Color.Black);
+            DrawFont.Draw(CabShaderControlView.SpriteBatch, DrawPosition, Point.Zero, DrawRotation, DrawText, Alignment, DrawColor, Color.Black);
         }
 
         public string GetDigits(out Color DrawColor)

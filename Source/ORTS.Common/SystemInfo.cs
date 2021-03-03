@@ -197,18 +197,6 @@ namespace ORTS.Common
             return fullVersion;
         }
 
-        static void WriteGraphicsAdapter(TextWriter output)
-        {
-            foreach (var adapter in GraphicsAdapter.Adapters)
-            {
-                try
-                {
-                    output.WriteLine("{0} = {1}", adapter.DeviceName, adapter.Description);
-                }
-                catch (Exception) { }
-            }
-        }
-
         static T SafeReadKey<T>(RegistryKey key, string name, T defaultValue)
         {
             try

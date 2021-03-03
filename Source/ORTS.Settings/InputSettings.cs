@@ -228,7 +228,7 @@ namespace ORTS.Settings
                     if (command.ToString().StartsWith(prefixToColor.Key))
                         return prefixToColor.Value;
 
-            return Color.Transparent;
+            return Color.TransparentBlack;
         }
 
         public void DumpToText(string filePath)
@@ -259,7 +259,7 @@ namespace ORTS.Settings
 
                     var keyColor = GetScanCodeColor(keyScanCode);
                     var keyTextColor = System.Drawing.Brushes.Black;
-                    if (keyColor == Color.Transparent)
+                    if (keyColor == Color.TransparentBlack)
                     {
                         keyColor = Color.White;
                     }

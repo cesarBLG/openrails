@@ -1,4 +1,4 @@
-// COPYRIGHT 2014, 2018 by the Open Rails project.
+﻿// COPYRIGHT 2014, 2018 by the Open Rails project.
 // 
 // This file is part of Open Rails.
 // 
@@ -401,7 +401,13 @@ namespace ORTS.TrackViewer.Drawing
         {
             UpdateCamera(drawArea);
 
-            device.SamplerStates[0] = SamplerState.LinearWrap;
+            device.SamplerStates[0] = new SamplerState
+            {
+                AddressU = TextureAddressMode.Wrap,
+                AddressV = TextureAddressMode.Wrap,
+                AddressW = TextureAddressMode.Wrap,
+                Filter = TextureFilter.Point
+            };
 
             foreach (string textureName in vertexBuffers.Keys)
             {
@@ -978,11 +984,12 @@ namespace ORTS.TrackViewer.Drawing
 
         private Texture2D GetStableTextureFromRenderTarget(RenderTarget2D renderTarget)
         {
-            int width = renderTarget.Width;
-            int height = renderTarget.Height;
-            var scaledTexture = new Texture2D(device, width, height, mipmap: false, SurfaceFormat.Color);
+            var renderedTexture = renderTarget;
+            int width = renderedTexture.Width;
+            int height = renderedTexture.Height;
+            var scaledTexture = new Texture2D(device, width, height, false, SurfaceFormat.Color);
             Color[] data = GetColorDataArray(width * height);
-            renderTarget.GetData<Color>(data);
+            renderedTexture.GetData<Color>(data);
             scaledTexture.SetData(data);
             return scaledTexture;
         }
@@ -1014,16 +1021,10 @@ namespace ORTS.TrackViewer.Drawing
         private static RenderTarget2D GetNewRenderTarget(int width, int height)
         {
             //todo Handle situations where backbuffer is not large enough to support width and height
-            var renderTarget = new RenderTarget2D(
-                device,
-                width,
-                height,
-                true,
-                SurfaceFormat.Color,
-                device.PresentationParameters.DepthStencilFormat,
-                device.PresentationParameters.MultiSampleCount,
-                device.PresentationParameters.RenderTargetUsage
-            );
+            PresentationParameters pp = device.PresentationParameters;
+            var renderTarget =
+                    new RenderTarget2D(device, width, height,
+                        false, SurfaceFormat.Color, pp.DepthStencilFormat, pp.MultiSampleCount, RenderTargetUsage.DiscardContents);
             return renderTarget;
 
         }

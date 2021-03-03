@@ -90,13 +90,6 @@ namespace ORTS.Settings
         }
         #endregion
 
-        public enum DirectXFeature
-        {
-            Level9_1,
-            Level9_3,
-            Level10_0,
-        }
-
         #region User Settings
 
         // Please put all user settings in here as auto-properties. Public properties
@@ -336,9 +329,6 @@ namespace ORTS.Settings
         public string LoggingPath { get; set; }
         [Default("")]
         public string ScreenshotPath { get; set; }
-        [Default("")]
-        public string DirectXFeatureLevel { get; set; }
-        public bool IsDirectXFeatureLevelIncluded(DirectXFeature level) => (int)level <= (int)Enum.Parse(typeof(DirectXFeature), "Level" + this.DirectXFeatureLevel);
         [Default(true)]
         public bool ShadowMapBlur { get; set; }
         [Default(4)]
