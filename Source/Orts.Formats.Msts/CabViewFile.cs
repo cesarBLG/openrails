@@ -254,10 +254,12 @@ namespace Orts.Formats.Msts
         ORTS_TRAIN_TYPE_PAX_OR_CARGO,
         ORTS_CONTROLLER_VOLTAGE,
         ORTS_AMPERS_BY_CONTROLLER_VOLTAGE,
+        ORTS_ACCELERATION_IN_TIME,
         ORTS_ODOMETER,
         ORTS_CC_SELECT_SPEED,
         ORTS_NUMBER_OF_AXES_INCREASE,
         ORTS_NUMBER_OF_AXES_DECREASE,
+        ORTS_MULTI_POSITION_CONTROLLER,
 
 
         // Further CabViewControlTypes must be added above this line, to avoid their malfunction in 3DCabs
@@ -377,6 +379,11 @@ namespace Orts.Formats.Msts
         public double OldValue;
         public string ACEFile = "";
         public string Label = "";
+        public int ControlId = 0;
+        public double UpdateTime;
+        public float ElapsedTime;
+        public float PreviousData;
+        public float Precision;
 
         public CABViewControlTypes ControlType = CABViewControlTypes.NONE;
         public CABViewControlStyles ControlStyle = CABViewControlStyles.NONE;
@@ -540,6 +547,17 @@ namespace Orts.Formats.Msts
                     Label = stf.ReadString();
                     stf.SkipRestOfBlock();
                 }),
+                new STFReader.TokenProcessor("updatetime", ()=>{
+                    stf.MustMatch("(");
+                    UpdateTime = stf.ReadDouble(0);
+                    stf.SkipRestOfBlock();
+                }),
+                new STFReader.TokenProcessor("precision", () =>
+                {
+                    stf.MustMatch("(");
+                    Precision = stf.ReadFloat(STFReader.UNITS.None, null);
+                    stf.SkipRestOfBlock();
+                })
             });
         }
     }
@@ -986,6 +1004,7 @@ namespace Orts.Formats.Msts
                         Label = stf.ReadString();
                         stf.SkipRestOfBlock();
                     }),
+                    new STFReader.TokenProcessor("controlid", ()=> { ControlId = stf.ReadIntBlock(0); }),
                 });
 
                 // If no ACE, just don't need any fixup

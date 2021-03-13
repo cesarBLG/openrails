@@ -4,8 +4,6 @@
 Further Open Rails Rolling Stock Features
 *****************************************
 
-For a full list of parameters, see :ref:`Developing OR Content - Parameters and Tokens<parameters_and_tokens>`
-
 Train Engine Lights
 ===================
 

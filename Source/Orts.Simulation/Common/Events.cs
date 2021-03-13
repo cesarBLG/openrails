@@ -190,9 +190,6 @@ namespace Orts.Common
         BoilerBlowdownOn,
         BoilerBlowdownOff,
 
-        WaterScoopRaiseLower,
-        WaterScoopBroken,
-
         SteamGearLeverToggle,
         AIFiremanSoundOn,
         AIFiremanSoundOff,
@@ -365,9 +362,6 @@ namespace Orts.Common
                         case 141: return Event.BrakePipePressureIncrease;
                         case 142: return Event.BrakePipePressureDecrease;
                         case 143: return Event.BrakePipePressureStoppedChanging;
-
-                        case 145: return Event.WaterScoopRaiseLower;
-                        case 146: return Event.WaterScoopBroken;
 
                         case 147: return Event.SteamGearLeverToggle;
                         case 148: return Event.AIFiremanSoundOn;

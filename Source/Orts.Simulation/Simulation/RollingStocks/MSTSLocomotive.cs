@@ -169,7 +169,6 @@ namespace Orts.Simulation.RollingStocks
         bool WaterScoopSlowSpeedFlag = false;
         bool WaterScoopDirectionFlag = false;
         public bool IsWaterScoopPlayerLocomotive = false;
-        bool WaterScoopSoundOn = false;
         public float MaxTotalCombinedWaterVolumeUKG;
         public MSTSNotchController WaterController = new MSTSNotchController(0, 1, 0.01f);
         public float CombinedTenderWaterVolumeUKG          // Decreased by running injectors and increased by refilling
@@ -407,10 +406,12 @@ namespace Orts.Simulation.RollingStocks
         // Jindrich
         public CruiseControl CruiseControl;
         public MultiPositionController MultiPositionController;
+        public List<MultiPositionController> MultiPositionControllers;
         public bool SelectingSpeedPressed = false;
         public bool EngineBrakePriority = false;
         public bool IsAPartOfPlayerTrain = false;
         public float ThrottleOverriden = 0;
+        public int AccelerationBits = 0;
 
         public MSTSLocomotive(Simulator simulator, string wagPath)
             : base(simulator, wagPath)
@@ -537,6 +538,31 @@ namespace Orts.Simulation.RollingStocks
                 interp[DynamicBrakeSpeed4MpS + 0.5f] = 0;
                 interp[100] = 0;
                 DynamicBrakeForceCurves[1] = interp;
+            }
+        }
+
+        protected float checkAccBitsPreviousSpeed = 0;
+        protected float checkAccBitsOffTime = 0;
+        protected void CheckAccelerationBits(float elapsedSeconds, float speed)
+        {
+            float delta = MpS.ToKpH(speed) - checkAccBitsPreviousSpeed;
+            if (delta > 0.5) // increased, blink the increasing speed sign
+            {
+                checkAccBitsPreviousSpeed = MpS.ToKpH(speed);
+                AccelerationBits = 2;
+                checkAccBitsOffTime = 0;
+            }
+            if (delta < -0.5) // decreased, blink the decreasing speed sign
+            {
+                checkAccBitsPreviousSpeed = MpS.ToKpH(speed);
+                AccelerationBits = 1;
+                checkAccBitsOffTime = 0;
+            }
+            checkAccBitsOffTime += elapsedSeconds;
+            if (checkAccBitsOffTime > 0.25f)
+            {
+                AccelerationBits = 0;
+                checkAccBitsOffTime = 0;
             }
         }
 
@@ -931,8 +957,14 @@ namespace Orts.Simulation.RollingStocks
                 case "engine(ortsmaxtracksandersandconsumption": TrackSanderSandConsumptionM3pS = stf.ReadFloatBlock(STFReader.UNITS.Volume, null); break;
                 case "engine(ortsmaxtracksanderairconsumption": TrackSanderAirComsumptionM3pS = stf.ReadFloatBlock(STFReader.UNITS.Volume, null); break;
                 case "engine(ortscruisecontrol": SetUpCruiseControl(); break;
-                case "engine(multipositioncontroller": SetUpMPC(); break;
-                default: base.Parse(lowercasetoken, stf); if (CruiseControl != null) CruiseControl.Parse(lowercasetoken, stf); break;
+                case "engine(ortsmultipositioncontroller": SetUpMPC(); break;
+                default:
+                    base.Parse(lowercasetoken, stf);
+                    if (CruiseControl != null)
+                        CruiseControl.Parse(lowercasetoken, stf);
+                    if (MultiPositionController != null)
+                        MultiPositionController.Parse(lowercasetoken, stf);
+                    break;
             }
         }
 
@@ -1459,6 +1491,11 @@ namespace Orts.Simulation.RollingStocks
         public void SetUpMPC()
         {
             MultiPositionController = new MultiPositionController(this);
+            if (MultiPositionControllers == null)
+            {
+                MultiPositionControllers = new List<MultiPositionController>();
+            }
+            MultiPositionControllers.Add(MultiPositionController);
         }
 
         //================================================================================================//
@@ -1585,6 +1622,8 @@ namespace Orts.Simulation.RollingStocks
             UpdatePowerSupply(elapsedClockSeconds);
             UpdateControllers(elapsedClockSeconds);
 
+            elapsedTime = elapsedClockSeconds;
+
             // Train Heading - only check the lead locomotive otherwise flipped locomotives further in consist will overwrite the train direction
             if (IsLeadLocomotive())
             {
@@ -1613,15 +1652,23 @@ namespace Orts.Simulation.RollingStocks
                AbsWheelSpeedMpS = AbsSpeedMpS;
             // Jindrich
             //UpdateMotiveForce(elapsedClockSeconds, t, AbsSpeedMpS, AbsWheelSpeedMpS);
+            CheckAccelerationBits(elapsedClockSeconds, AbsWheelSpeedMpS);
+
             if (CruiseControl != null)
             {
                 if (!IsPlayerTrain || CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Manual || CruiseControl.UseThrottle)
                     UpdateMotiveForce(elapsedClockSeconds, t, AbsSpeedMpS, AbsWheelSpeedMpS);
-                else if (IsPlayerTrain || CruiseControl.SpeedRegulatorOptions.Contains("engageforceonnonzerospeed"))
+                else
                     CruiseControl.Update(elapsedClockSeconds, AbsWheelSpeedMpS);
             }
             else
                 UpdateMotiveForce(elapsedClockSeconds, t, AbsSpeedMpS, AbsWheelSpeedMpS);
+
+            if (MultiPositionControllers != null)
+            {
+                foreach (MultiPositionController mpc in MultiPositionControllers)
+                    mpc.Update(elapsedClockSeconds);
+            }
 
             ApplyDirectionToMotiveForce();
 
@@ -2451,11 +2498,13 @@ namespace Orts.Simulation.RollingStocks
                         WaterScoopNotFittedFlag = true;
                     }
                     RefillingFromTrough = false;
+                    return;
                 }
                 else if (ScoopIsBroken)
                 {
                     Simulator.Confirmer.Message(ConfirmLevel.Error, Simulator.Catalog.GetString("Scoop is broken, can't refill"));
-                    RefillingFromTrough = false;       
+                    RefillingFromTrough = false;
+                    return;
                 }
                 else if (IsOverJunction())
                 {
@@ -2465,7 +2514,7 @@ namespace Orts.Simulation.RollingStocks
                     }
                     ScoopIsBroken = true;
                     RefillingFromTrough = false;
-                    SignalEvent(Event.WaterScoopBroken);       
+                    return;
                 }
                 else if (!IsOverTrough())
                 {
@@ -2477,6 +2526,7 @@ namespace Orts.Simulation.RollingStocks
                         MSTSWagon.RefillProcess.ActivePickupObjectUID = 0;
                     }
                     RefillingFromTrough = false;
+                    return;
                 }
                 else if (IsTenderRequired == 1 && Direction == Direction.Reverse) // Locomotives with tenders cannot go in reverse
                 {
@@ -2486,6 +2536,7 @@ namespace Orts.Simulation.RollingStocks
                         WaterScoopDirectionFlag = true;
                     }
                     RefillingFromTrough = false;
+                    return;
                 }
                 else if (absSpeedMpS < WaterScoopMinSpeedMpS)
                 {
@@ -2498,10 +2549,12 @@ namespace Orts.Simulation.RollingStocks
                         MSTSWagon.RefillProcess.ActivePickupObjectUID = 0;
                     }
                     RefillingFromTrough = false;
+                    return;
                 }
                 else if (fraction > 1.0)
                 {
                     Simulator.Confirmer.Message(ConfirmLevel.None, Simulator.Catalog.GetStringFmt("Refill: Water supply now replenished."));
+                    return;
                 }
                 else
                 {
@@ -2517,6 +2570,7 @@ namespace Orts.Simulation.RollingStocks
                 MSTSWagon.RefillProcess.OkToRefill = false;
                 MSTSWagon.RefillProcess.ActivePickupObjectUID = 0;
                 RefillingFromTrough = false;
+                return;
             }
 
 
@@ -2569,12 +2623,6 @@ namespace Orts.Simulation.RollingStocks
                 float ScoopFluidDensityKgpM3 = 998.2f; // Fuild density of water @ 20c
                 WaterScoopDragForceN = 0.5f * ScoopDragCoeff * ScoopFluidDensityKgpM3 * ScoopDragAreaM * absSpeedMpS * absSpeedMpS;
 
-                // Turn water scoop sound on
-                if (!WaterScoopSoundOn)
-                {
-                    WaterScoopSoundOn = true;
-                    SignalEvent(Event.WaterScoopDown);
-                }
             }
             else // Ensure water scoop values are zero if not taking water.
             {
@@ -2587,14 +2635,9 @@ namespace Orts.Simulation.RollingStocks
                 {
                     WaterScoopTotalWaterL = 0.0f; // Reset amount of water picked up by water sccop.
                 }
-
-                // Turn water scoop sound off
-                if (WaterScoopSoundOn)
-                {
-                    WaterScoopSoundOn = false;
-                    SignalEvent(Event.WaterScoopUp);
-                }
             }
+
+
         }
 
         #region Calculate Friction Coefficient
@@ -2894,6 +2937,21 @@ namespace Orts.Simulation.RollingStocks
 
         public void StartThrottleIncrease()
         {
+            if (MultiPositionControllers != null)
+            {
+                foreach (MultiPositionController mpc in MultiPositionControllers)
+                {
+                    if (mpc.controllerBinding == MultiPositionController.ControllerBinding.Throttle)
+                    {
+                        if (!mpc.StateChanged)
+                        {
+                            mpc.StateChanged = true;
+                            mpc.DoMovement(MultiPositionController.Movement.Forward);
+                        }
+                        return;
+                    }
+                }
+            }
             if (CruiseControl != null)
             {
                 if (CruiseControl.UseThrottleAsForceSelector && CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto)
@@ -2905,11 +2963,11 @@ namespace Orts.Simulation.RollingStocks
                 {
                     if (CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto)
                     {
-                        CruiseControl.SpeedSelectorModeStartIncrease();
                         return;
                     }
                 }
             }
+
             if (DynamicBrakeController != null && DynamicBrakeController.CurrentValue >= 0 && (DynamicBrakePercent >= 0 || !(DynamicBrakePercent == -1 && !DynamicBrake || DynamicBrakePercent >= 0 && DynamicBrake)))
             {
                 if (!(CombinedControlType == CombinedControl.ThrottleDynamic
@@ -2930,6 +2988,21 @@ namespace Orts.Simulation.RollingStocks
 
         public void StopThrottleIncrease()
         {
+            if (MultiPositionControllers != null)
+            {
+                foreach (MultiPositionController mpc in MultiPositionControllers)
+                {
+                    if (mpc.controllerBinding == MultiPositionController.ControllerBinding.Throttle)
+                    {
+                        if (mpc.StateChanged)
+                        {
+                            mpc.StateChanged = false;
+                            mpc.DoMovement(MultiPositionController.Movement.Neutral);
+                        }
+                        return;
+                    }
+                }
+            }
             if (CruiseControl != null)
             {
                 if (CruiseControl.UseThrottleAsForceSelector && CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto)
@@ -2941,7 +3014,6 @@ namespace Orts.Simulation.RollingStocks
                 {
                     if (CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto)
                     {
-                        CruiseControl.SpeedSelectorModeStopIncrease();
                         return;
                     }
                 }
@@ -2973,6 +3045,21 @@ namespace Orts.Simulation.RollingStocks
         protected bool speedSelectorModeDecreasing = false;
         public void StartThrottleDecrease()
         {
+            if (MultiPositionControllers != null)
+            {
+                foreach (MultiPositionController mpc in MultiPositionControllers)
+                {
+                    if (mpc.controllerBinding == MultiPositionController.ControllerBinding.Throttle)
+                    {
+                        if (!mpc.StateChanged)
+                        {
+                            mpc.StateChanged = true;
+                            mpc.DoMovement(MultiPositionController.Movement.Aft);
+                        }
+                        return;
+                    }
+                }
+            }
             if (CruiseControl != null)
             {
                 if (CruiseControl.UseThrottleAsForceSelector && CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto)
@@ -2984,11 +3071,6 @@ namespace Orts.Simulation.RollingStocks
                 {
                     if (CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto)
                     {
-                        if (!speedSelectorModeDecreasing)
-                        {
-                            CruiseControl.SpeedSelectorModeDecrease();
-                            speedSelectorModeDecreasing = true;
-                        }
                         return;
                     }
                 }
@@ -3003,6 +3085,21 @@ namespace Orts.Simulation.RollingStocks
 
         public void StopThrottleDecrease()
         {
+            if (MultiPositionControllers != null)
+            {
+                foreach (MultiPositionController mpc in MultiPositionControllers)
+                {
+                    if (mpc.controllerBinding == MultiPositionController.ControllerBinding.Throttle)
+                    {
+                        if (mpc.StateChanged)
+                        {
+                            mpc.StateChanged = false;
+                            mpc.DoMovement(MultiPositionController.Movement.Neutral);
+                        }
+                        return;
+                    }
+                }
+            }
             if (CruiseControl != null)
             {
                 if (CruiseControl.UseThrottleAsForceSelector && CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto)
@@ -3100,14 +3197,16 @@ namespace Orts.Simulation.RollingStocks
             if (Simulator.PlayerLocomotive == this)
             {
                 WaterScoopDown = !WaterScoopDown;
-                SignalEvent(Event.WaterScoopRaiseLower);
+                SignalEvent(Event.WaterScoopDown);
                 if (WaterScoopDown)
                 {
                     IsWaterScoopDown = true; // Set flag to potentially fill from water trough
+                    SignalEvent(Event.WaterScoopDown);
                 }
                 else
                 {
                     IsWaterScoopDown = false;
+                    SignalEvent(Event.WaterScoopUp);
                     WaterScoopOverTroughFlag = false; // Reset flags so that message will come up again
                     WaterScoopNotFittedFlag = false;
                     WaterScoopSlowSpeedFlag = false;
@@ -4241,8 +4340,7 @@ namespace Orts.Simulation.RollingStocks
         /*       public virtual void RemoteUpdate()
                {
                }*/
-        private float previousSelectedSpeed = 0;
-
+        private float elapsedTime;
         public virtual float GetDataOf(CabViewControl cvc)
         {
             float data = 0;
@@ -4250,9 +4348,16 @@ namespace Orts.Simulation.RollingStocks
             {
                 case CABViewControlTypes.SPEEDOMETER:
                     {
+                        cvc.ElapsedTime += elapsedTime;
+                        if (cvc.ElapsedTime < cvc.UpdateTime)
+                        {
+                            data = cvc.PreviousData;
+                            break;
+                        }
+                        cvc.ElapsedTime = 0;
                         //data = SpeedMpS;
                         if (AdvancedAdhesionModel)
-                            data = WheelSpeedMpS;
+                            data = AbsWheelSpeedMpS;
                         else
                             data = SpeedMpS;
 
@@ -4261,6 +4366,13 @@ namespace Orts.Simulation.RollingStocks
                         else // MPH
                             data *= 2.2369f;
                         data = Math.Abs(data);
+                        if (cvc.Precision > 0)
+                        {
+                            data = data * cvc.Precision;
+                            data = (float)Math.Round(data, 0);
+                            data = data / cvc.Precision;
+                        }
+                        cvc.PreviousData = data;
                         break;
                     }
                 case CABViewControlTypes.SPEED_PROJECTED:
@@ -5007,6 +5119,10 @@ namespace Orts.Simulation.RollingStocks
                     if (CruiseControl != null)
                         data = CruiseControl.GetDataOf(cvc);
                     else
+                        data = 0;
+                    if (MultiPositionController != null && data == 0)
+                        data = MultiPositionController.GetDataOf(cvc);
+                    else if (data == 0)
                         data = 0;
                     break;
             }

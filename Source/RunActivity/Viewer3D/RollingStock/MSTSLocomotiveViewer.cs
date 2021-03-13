@@ -56,6 +56,7 @@ namespace Orts.Viewer3D.RollingStock
         public static int DbfEvalEBPBstopped = 0;//Debrief eval
         public static int DbfEvalEBPBmoving = 0;//Debrief eval
         public bool lemergencybuttonpressed = false;
+        CruiseControlViewer CruiseControlViewer;
 
         public MSTSLocomotiveViewer(Viewer viewer, MSTSLocomotive car)
             : base(viewer, car)
@@ -80,6 +81,11 @@ namespace Orts.Viewer3D.RollingStock
                         Trace.TraceInformation("File " + Locomotive.TrainControlSystem.Sounds[script] + " in script of locomotive of train " + Locomotive.Train.Name + " : " + error.Message);
                     }
                 }
+            if (Locomotive.CruiseControl != null)
+            {
+                CruiseControlViewer = new CruiseControlViewer(this, Locomotive, Locomotive.CruiseControl);
+                CruiseControlViewer.InitializeUserInputCommands();
+            }
         }
 
         protected virtual void StartGearBoxIncrease()
@@ -197,41 +203,6 @@ namespace Orts.Viewer3D.RollingStock
                     new TCSSwitchCommand(Viewer.Log, !Locomotive.TrainControlSystem.TCSCommandSwitchOn[1], 1);
                 }
             });
-            if ((Car as MSTSLocomotive).CruiseControl != null)
-            {
-                UserInputCommands.Add(UserCommand.ControlSpeedRegulatorMaxAccelerationDecrease, new Action[] { () => Locomotive.CruiseControl.SpeedRegulatorMaxForceStopDecrease(), () => Locomotive.CruiseControl.SpeedRegulatorMaxForceStartDecrease() });
-                UserInputCommands.Add(UserCommand.ControlSpeedRegulatorMaxAccelerationIncrease, new Action[] { () => Locomotive.CruiseControl.SpeedRegulatorMaxForceStopIncrease(), () => Locomotive.CruiseControl.SpeedRegulatorMaxForceStartIncrease() });
-                UserInputCommands.Add(UserCommand.ControlSpeedRegulatorModeDecrease, new Action[] { Noop, () => Locomotive.CruiseControl.SpeedRegulatorModeDecrease() });
-                UserInputCommands.Add(UserCommand.ControlSpeedRegulatorModeIncrease, new Action[] { Noop, () => Locomotive.CruiseControl.SpeedRegulatorModeIncrease() });
-                UserInputCommands.Add(UserCommand.ControlSpeedRegulatorSelectedSpeedDecrease, new Action[] { () => Locomotive.CruiseControl.SpeedRegulatorSelectedSpeedStopDecrease(), () => Locomotive.CruiseControl.SpeedRegulatorSelectedSpeedStartDecrease() });
-                UserInputCommands.Add(UserCommand.ControlSpeedRegulatorSelectedSpeedIncrease, new Action[] { () => Locomotive.CruiseControl.SpeedRegulatorSelectedSpeedStopIncrease(), () => Locomotive.CruiseControl.SpeedRegulatorSelectedSpeedStartIncrease() });
-                UserInputCommands.Add(UserCommand.ControlNumberOfAxlesDecrease, new Action[] { Noop, () => Locomotive.CruiseControl.NumberOfAxlesDecrease() });
-                UserInputCommands.Add(UserCommand.ControlNumberOfAxlesIncrease, new Action[] { Noop, () => Locomotive.CruiseControl.NumerOfAxlesIncrease() });
-                UserInputCommands.Add(UserCommand.ControlRestrictedSpeedZoneActive, new Action[] { Noop, () => Locomotive.CruiseControl.ActivateRestrictedSpeedZone() });
-                UserInputCommands.Add(UserCommand.ControlCruiseControlModeIncrease, new Action[] { () => Locomotive.CruiseControl.SpeedSelectorModeStopIncrease(), () => Locomotive.CruiseControl.SpeedSelectorModeStartIncrease() });
-                UserInputCommands.Add(UserCommand.ControlCruiseControlModeDecrease, new Action[] { Noop, () => Locomotive.CruiseControl.SpeedSelectorModeDecrease() });
-                UserInputCommands.Add(UserCommand.ControlTrainTypePaxCargo, new Action[] { Noop, () => Locomotive.ChangeTrainTypePaxCargo() });
-                UserInputCommands.Add(UserCommand.ControlSelectSpeed10, new Action[] { Noop, () => Locomotive.CruiseControl.SetSpeed(10) });
-                UserInputCommands.Add(UserCommand.ControlSelectSpeed20, new Action[] { Noop, () => Locomotive.CruiseControl.SetSpeed(20) });
-                UserInputCommands.Add(UserCommand.ControlSelectSpeed30, new Action[] { Noop, () => Locomotive.CruiseControl.SetSpeed(30) });
-                UserInputCommands.Add(UserCommand.ControlSelectSpeed40, new Action[] { Noop, () => Locomotive.CruiseControl.SetSpeed(40) });
-                UserInputCommands.Add(UserCommand.ControlSelectSpeed50, new Action[] { Noop, () => Locomotive.CruiseControl.SetSpeed(50) });
-                UserInputCommands.Add(UserCommand.ControlSelectSpeed60, new Action[] { Noop, () => Locomotive.CruiseControl.SetSpeed(60) });
-                UserInputCommands.Add(UserCommand.ControlSelectSpeed70, new Action[] { Noop, () => Locomotive.CruiseControl.SetSpeed(70) });
-                UserInputCommands.Add(UserCommand.ControlSelectSpeed80, new Action[] { Noop, () => Locomotive.CruiseControl.SetSpeed(80) });
-                UserInputCommands.Add(UserCommand.ControlSelectSpeed90, new Action[] { Noop, () => Locomotive.CruiseControl.SetSpeed(90) });
-                UserInputCommands.Add(UserCommand.ControlSelectSpeed100, new Action[] { Noop, () => Locomotive.CruiseControl.SetSpeed(100) });
-                UserInputCommands.Add(UserCommand.ControlSelectSpeed110, new Action[] { Noop, () => Locomotive.CruiseControl.SetSpeed(110) });
-                UserInputCommands.Add(UserCommand.ControlSelectSpeed120, new Action[] { Noop, () => Locomotive.CruiseControl.SetSpeed(120) });
-                UserInputCommands.Add(UserCommand.ControlSelectSpeed130, new Action[] { Noop, () => Locomotive.CruiseControl.SetSpeed(130) });
-                UserInputCommands.Add(UserCommand.ControlSelectSpeed140, new Action[] { Noop, () => Locomotive.CruiseControl.SetSpeed(140) });
-                UserInputCommands.Add(UserCommand.ControlSelectSpeed150, new Action[] { Noop, () => Locomotive.CruiseControl.SetSpeed(150) });
-                UserInputCommands.Add(UserCommand.ControlSelectSpeed160, new Action[] { Noop, () => Locomotive.CruiseControl.SetSpeed(160) });
-                UserInputCommands.Add(UserCommand.ControlSelectSpeed170, new Action[] { Noop, () => Locomotive.CruiseControl.SetSpeed(170) });
-                UserInputCommands.Add(UserCommand.ControlSelectSpeed180, new Action[] { Noop, () => Locomotive.CruiseControl.SetSpeed(180) });
-                UserInputCommands.Add(UserCommand.ControlSelectSpeed190, new Action[] { Noop, () => Locomotive.CruiseControl.SetSpeed(190) });
-                UserInputCommands.Add(UserCommand.ControlSelectSpeed200, new Action[] { Noop, () => Locomotive.CruiseControl.SetSpeed(200) });
-            }
 
             base.InitializeUserInputCommands();
         }
@@ -2150,7 +2121,8 @@ namespace Orts.Viewer3D.RollingStock
                 case CABViewControlTypes.ORTS_CONTROLLER_VOLTAGE:
                 case CABViewControlTypes.ORTS_AMPERS_BY_CONTROLLER_VOLTAGE:
                 case CABViewControlTypes.ORTS_CC_SELECT_SPEED:
-
+                case CABViewControlTypes.ORTS_MULTI_POSITION_CONTROLLER:
+                case CABViewControlTypes.ORTS_ACCELERATION_IN_TIME:
                     index = (int)data;
                     break;
             }
@@ -2474,6 +2446,35 @@ namespace Orts.Viewer3D.RollingStock
                         Locomotive.Simulator.Confirmer.Information("Selected maximum acceleration was changed to " + Math.Round(Locomotive.CruiseControl.SelectedMaxAccelerationStep, 0).ToString() + " percent");
                     }
                     break;
+                case CABViewControlTypes.ORTS_MULTI_POSITION_CONTROLLER:
+                    {
+                        foreach (MultiPositionController mpc in Locomotive.MultiPositionControllers)
+                        {
+                            if (mpc.ControllerId == Control.ControlId)
+                            {
+                                p = ChangedValue(0);
+                                if (!mpc.StateChanged)
+                                    mpc.StateChanged = true;
+                                if (p == 1)
+                                {
+                                    if (mpc.controllerBinding == MultiPositionController.ControllerBinding.SelectedSpeed && Locomotive.CruiseControl.ForceRegulatorAutoWhenNonZeroSpeedSelected)
+                                    {
+                                        Locomotive.CruiseControl.SpeedRegMode = Simulation.RollingStocks.SubSystems.CruiseControl.SpeedRegulatorMode.Auto;
+                                        Locomotive.CruiseControl.SpeedSelMode = Simulation.RollingStocks.SubSystems.CruiseControl.SpeedSelectorMode.On;
+                                    }
+                                    mpc.DoMovement(MultiPositionController.Movement.Forward);
+                                }
+                                if (p == -1) mpc.DoMovement(MultiPositionController.Movement.Aft);
+                                if (p == 0 && !UserInput.IsMouseLeftButtonDown)
+                                {
+                                    mpc.DoMovement(MultiPositionController.Movement.Neutral);
+                                    mpc.StateChanged = false;
+                                }
+                                    
+                            }
+                        }
+                        break;
+                    }
             }
 
         }
