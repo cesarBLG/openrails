@@ -755,6 +755,9 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                 firstIteration = false;
             }
 
+            float numAxesCoeff = 0;
+            numAxesCoeff = ((float)SelectedNumberOfAxles) / 12f;
+
             if (SpeedRegMode == SpeedRegulatorMode.Auto)
             {
                 if (SpeedSelMode == SpeedSelectorMode.Parking && !Locomotive.EngineBrakePriority)
@@ -935,8 +938,6 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                     {
                         coeff = 1;
                     }
-                    float numAxesCoeff = 0;
-                    numAxesCoeff = (SelectedNumberOfAxles) / 12;
                     AccelerationDemandMpSS = (float)Math.Sqrt((StartReducingSpeedDelta) * coeff * (delta));
                     if (delta > 0.0f && Locomotive.DynamicBrakePercent < 1)
                     {
@@ -980,14 +981,18 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                                 if (Locomotive.DynamicBrakeAvailable)
                                 {
                                     relativeAcceleration = (float)-Math.Sqrt(-StartReducingSpeedDelta * delta);
-                                    float val = (StartReducingSpeedDelta + (numAxesCoeff / 10)) * coeff * coeff * (delta);
+
+                                    if (delta > -0.5f)
+                                        delta = -0.5f;
+
+                                    float val = (StartReducingSpeedDelta) * coeff * ((delta + 0.5f) / 3);
                                     if (val < 0)
                                         val = -val;
                                     AccelerationDemandMpSS = -(float)Math.Sqrt(val);
                                     if (maxForceN == 0)
                                     {
                                         if (!UseThrottle) Locomotive.ThrottleController.SetPercent(0);
-                                        if (Locomotive.AccelerationMpSS > AccelerationDemandMpSS + 0.1f)
+                                        if (Locomotive.AccelerationMpSS > AccelerationDemandMpSS)
                                         {
                                             if (controllerVolts > -100)
                                             {
@@ -996,6 +1001,8 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                                                 if (step > (Locomotive.AccelerationMpSS - AccelerationDemandMpSS) * 2)
                                                     step = (Locomotive.AccelerationMpSS - AccelerationDemandMpSS) * 2;
                                                 controllerVolts -= step;
+                                                if (controllerVolts < -100)
+                                                    controllerVolts = -100;
                                             }
                                         }
                                         if (Locomotive.AccelerationMpSS + 0.01f < AccelerationDemandMpSS)
@@ -1137,13 +1144,10 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                             }
                             else
                             {
-                                if (controllerVolts > demandedVolts)
+                                if (controllerVolts - 0.2f > demandedVolts)
                                 {
                                     float step = 100 / ThrottleFullRangeIncreaseTimeSeconds;
                                     step *= elapsedClockSeconds;
-                                    float accelDiff = AccelerationDemandMpSS - Locomotive.AccelerationMpSS;
-                                    if (step / 10 < accelDiff)
-                                        step = accelDiff * 10;
                                     controllerVolts -= step;
                                 }
                             }
