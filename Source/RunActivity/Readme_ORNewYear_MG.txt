@@ -1,5 +1,5 @@
-﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.92
-March 3rd, 2021
+﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.93
+March 13th, 2021
 
 Please note that the installation and use of Open Rails software, even of its unofficial versions, is governed by the Open Rails End User License Agreement. 
 
@@ -12,7 +12,7 @@ INSTALLATION
 you would return to the official OR version.
 
 RELEASE NOTES
-This unofficial version has been derived from the latest official OpenRails testing revision X1.3.1-308, which already includes Monogame. 
+This unofficial version has been derived from the latest official OpenRails testing revision X1.3.1-315 (not yet available), which already includes Monogame. 
 
 This version includes some features not (yet) available in the Open Rails testing official version, that is:
 - addition of track sounds in the sound debug window (by dennisat)
@@ -44,10 +44,11 @@ This version includes some features not (yet) available in the Open Rails testin
 with the contribution of Paolo.
 - bug fix for http://www.elvastower.com/forums/index.php?/topic/34633-unhandled-exception-overflow-in-win7/page__view__findpost__p__265463 , by mbm_OR
 - extended support for ETCS L2 planning area, for braking distance and text area, and initial support for menus by césarbl, see  http://www.elvastower.com/forums/index.php?/topic/34577-planning-area-of-the-etcs-dmi/ 
-- removed trace of wait processes when enable watchdog option deselected
 - tentative support for RAIN textures for objects, terrain and transfers
 - dynamic terrain and scenery loading strategy (useful for slower computers)
 - enable customized tooltips for cabview controls, by adding a Label ( "string" ) line in the cabview control block in the .cvf file, by Jindrich
+- NEW: bug fix for https://bugs.launchpad.net/or/+bug/1918921 Crash on restoring in timetable mode
+- NEW: bug fox for http://www.elvastower.com/forums/index.php?/topic/34926-turntable-problems/page__p__269128#entry269128 , by mbm_OR
 
 
 
