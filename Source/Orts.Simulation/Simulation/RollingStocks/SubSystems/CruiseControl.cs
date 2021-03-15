@@ -1323,7 +1323,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                 case CABViewControlTypes.ORTS_SELECTED_SPEED:
                 case CABViewControlTypes.ORTS_SELECTED_SPEED_DISPLAY:
                     bool metric = cvc.Units == CABViewControlUnits.KM_PER_HOUR;
-                    float temp = RestrictedSpeedActive ? MpS.FromMpS(CurrentSelectedSpeedMpS, metric) : temp = MpS.FromMpS(SelectedSpeedMpS, metric);
+                    float temp = (float)Math.Round(RestrictedSpeedActive ? MpS.FromMpS(CurrentSelectedSpeedMpS, metric) : MpS.FromMpS(SelectedSpeedMpS, metric));
                     if (previousSelectedSpeed < temp) previousSelectedSpeed += 1f;
                     if (previousSelectedSpeed > temp) previousSelectedSpeed -= 1f;
                     data = previousSelectedSpeed;
