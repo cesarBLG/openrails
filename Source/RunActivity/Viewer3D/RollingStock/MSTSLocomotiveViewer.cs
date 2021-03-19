@@ -1086,8 +1086,6 @@ namespace Orts.Viewer3D.RollingStock
                     if (firstOne)
                     {
                         _Viewer.AdjustCabHeight(_Viewer.DisplaySize.X, _Viewer.DisplaySize.Y);
-
-                        _Viewer.CabCamera.ScreenChanged();
                         DisplaySize.Y = _Viewer.CabHeightPixels;
                         // Use same shader for both front-facing and rear-facing cabs.
                         if (_Locomotive.CabViewList[(int)CabViewType.Front].ExtendedCVF != null)
