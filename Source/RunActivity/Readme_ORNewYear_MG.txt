@@ -1,5 +1,5 @@
-﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.93
-March 13th, 2021
+﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.94
+March 20th, 2021
 
 Please note that the installation and use of Open Rails software, even of its unofficial versions, is governed by the Open Rails End User License Agreement. 
 
@@ -12,7 +12,7 @@ INSTALLATION
 you would return to the official OR version.
 
 RELEASE NOTES
-This unofficial version has been derived from the latest official OpenRails testing revision X1.3.1-315 (not yet available), which already includes Monogame. 
+This unofficial version has been derived from the latest official OpenRails testing revision X1.3.1-323, which already includes Monogame. 
 
 This version includes some features not (yet) available in the Open Rails testing official version, that is:
 - addition of track sounds in the sound debug window (by dennisat)
@@ -47,8 +47,11 @@ with the contribution of Paolo.
 - tentative support for RAIN textures for objects, terrain and transfers
 - dynamic terrain and scenery loading strategy (useful for slower computers)
 - enable customized tooltips for cabview controls, by adding a Label ( "string" ) line in the cabview control block in the .cvf file, by Jindrich
-- NEW: bug fix for https://bugs.launchpad.net/or/+bug/1918921 Crash on restoring in timetable mode
-- NEW: bug fox for http://www.elvastower.com/forums/index.php?/topic/34926-turntable-problems/page__p__269128#entry269128 , by mbm_OR
+- bug fix for https://bugs.launchpad.net/or/+bug/1919337 In activities after midnight boarding times are not respected
+- Bug fix for https://bugs.launchpad.net/or/+bug/1919354 In isolated locos rear brakeman view is not available
+- NEW: removed update links in main menu window
+
+
 
 
 
