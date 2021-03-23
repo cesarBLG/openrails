@@ -53,7 +53,10 @@ namespace Orts.Simulation.RollingStocks.SubSystems
         public float MaxDecelerationMpSS = 0;
         public bool UseThrottle = false;
         public bool AntiWheelSpinEquipped = false;
+        public float AntiWheelSpinSpeedDiffThreshold = 0.5f;
         public float DynamicBrakeMaxForceAtSelectorStep = 0;
+        public bool ForceResetRequiredAfterBraking = false;
+        public bool ForceResetIncludeDynamicBrake = false;
         public float ForceThrottleAndDynamicBrake = 0;
         protected float maxForceN = 0;
         protected float trainBrakePercent = 0;
@@ -145,6 +148,8 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                 case "engine(ortscruisecontrol(powerreductiondelaycargotrain": PowerReductionDelayCargoTrain = stf.ReadFloatBlock(STFReader.UNITS.Any, 0.0f); break;
                 case "engine(ortscruisecontrol(powerreductionvalue": PowerReductionValue = stf.ReadFloatBlock(STFReader.UNITS.Any, 100.0f); break;
 
+                case "engine(ortscruisecontrol(forceresetrequiredafterbraking": ForceResetRequiredAfterBraking = stf.ReadBoolBlock(false); break;
+                case "engine(ortscruisecontrol(forceresetincludedynamicbrake": ForceResetIncludeDynamicBrake = stf.ReadBoolBlock(false); break;
                 case "engine(ortscruisecontrol(disablezeroforcestep": DisableZeroForceStep = stf.ReadBoolBlock(false); break;
                 case "engine(ortscruisecontrol(defaultforcestep": SelectedMaxAccelerationStep = stf.ReadFloatBlock(STFReader.UNITS.Any, 1.0f); break;
                 case "engine(ortscruisecontrol(dynamicbrakemaxforceatselectorstep": DynamicBrakeMaxForceAtSelectorStep = stf.ReadFloatBlock(STFReader.UNITS.Any, 1.0f); break;
@@ -152,6 +157,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                 case "engine(ortscruisecontrol(maxacceleration": MaxAccelerationMpSS = stf.ReadFloatBlock(STFReader.UNITS.Any, 1); break;
                 case "engine(ortscruisecontrol(maxdeceleration": MaxDecelerationMpSS = stf.ReadFloatBlock(STFReader.UNITS.Any, 0.5f); break;
                 case "engine(ortscruisecontrol(antiwheelspinequipped": AntiWheelSpinEquipped = stf.ReadBoolBlock(false); break;
+                case "engine(ortscruisecontrol(antiwheelspinspeeddiffthreshold": AntiWheelSpinSpeedDiffThreshold = stf.ReadFloatBlock(STFReader.UNITS.None, 0.5f); break;
                 case "engine(ortscruisecontrol(nominalspeedstep": SpeedRegulatorNominalSpeedStepMpS = SpeedIsMph ? MpS.FromMpH(stf.ReadFloatBlock(STFReader.UNITS.Speed, 0)) : MpS.FromKpH(stf.ReadFloatBlock(STFReader.UNITS.Speed, 0)); break;
                 case "engine(ortscruisecontrol(usethrottleasspeedselector": UseThrottleAsSpeedSelector = stf.ReadBoolBlock(false); break;
                 case "engine(ortscruisecontrol(usethrottleasforceselector": UseThrottleAsForceSelector = stf.ReadBoolBlock(false); break;
@@ -298,6 +304,11 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                             currentThrottlePercent = 0;
                             if (SpeedRegulatorOptions.Contains("regulatormanual")) test = true;
                             SelectedSpeedMpS = 0;
+                            foreach (MSTSLocomotive lc in playerNotDriveableTrainLocomotives)
+                            {
+                                lc.ThrottleOverriden = 0;
+                                lc.IsAPartOfPlayerTrain = false; // in case we uncouple the loco later
+                            }
                             break;
                         }
                 }
@@ -468,7 +479,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
             {
                 SpeedRegMode = SpeedRegulatorMode.Auto;
             }
-            if (!UseThrottleAsSpeedSelector)
+            if (UseThrottleAsSpeedSelector)
                 selectedSpeedIncreasing = true;
             else
                 SpeedSelectorModeStartIncrease();
@@ -486,7 +497,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                     return;
                 }
             }
-            if (!UseThrottleAsSpeedSelector)
+            if (UseThrottleAsSpeedSelector)
                 selectedSpeedIncreasing = false;
             else
                 SpeedSelectorModeStopIncrease();
@@ -524,7 +535,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                     }
                 }
             }
-            if (!UseThrottleAsSpeedSelector)
+            if (UseThrottleAsSpeedSelector)
                 SelectedSpeedDecreasing = true;
             else
                 SpeedSelectorModeDecrease();
@@ -563,6 +574,8 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                 Locomotive.SetDynamicBrakePercent(0);
                 Locomotive.DynamicBrakeChangeActiveState(false);
             }
+            if (SelectedSpeedMpS == 0)
+                SelectedSpeedDecreasing = false;
             Simulator.Confirmer.Message(ConfirmLevel.Information, Simulator.Catalog.GetString("Selected speed changed to ") + Math.Round(MpS.FromMpS(SelectedSpeedMpS, true), 0, MidpointRounding.AwayFromZero).ToString() + " km/h");
         }
         public void NumerOfAxlesIncrease()
@@ -644,6 +657,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
         public float TrainElevation = 0;
         protected float skidSpeedDegratation = 0;
         protected float previousAccelerationDemand = 0;
+        public bool TrainBrakePriority = false;
 
         protected virtual void UpdateMotiveForce(float elapsedClockSeconds, float AbsWheelSpeedMpS)
         {
@@ -652,6 +666,11 @@ namespace Orts.Simulation.RollingStocks.SubSystems
             if (DynamicBrakeFullRangeDecreaseTimeSeconds == 0)
                 DynamicBrakeFullRangeDecreaseTimeSeconds = 6;
             float speedDiff = AbsWheelSpeedMpS - Locomotive.AbsSpeedMpS;
+            foreach (MSTSLocomotive loco in playerNotDriveableTrainLocomotives)
+            {
+                if ((loco.AbsWheelSpeedMpS - loco.AbsSpeedMpS) > speedDiff)
+                    speedDiff = loco.AbsWheelSpeedMpS - loco.AbsSpeedMpS;
+            }
             float newThrotte = 0;
             // calculate new max force if MaxPowerThreshold is set
             if (MaxPowerThreshold > 0)
@@ -672,7 +691,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
             }
             TrainElevation = TrainElevation / count;
 
-            if (SpeedSelMode == SpeedSelectorMode.On || SpeedSelMode == SpeedSelectorMode.Start)
+            if (SpeedSelMode == SpeedSelectorMode.On || SpeedSelMode == SpeedSelectorMode.Start && !TrainBrakePriority)
             {
                 canAddForce = true;
             }
@@ -682,6 +701,10 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                 timeFromEngineMoved = 0;
                 reducingForce = true;
             }
+
+            if (Locomotive.TrainBrakeController.TrainBrakeControllerState == ORTS.Scripting.Api.ControllerState.Release)
+                TrainBrakePriority = false;
+
             if (canAddForce)
             {
                 if (Locomotive.AbsSpeedMpS == 0)
@@ -714,6 +737,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
             {
                 canAddForce = true;
             }
+
             if (SpeedRegulatorOptions.Contains("engageforceonnonzerospeed") && SelectedSpeedMpS > 0)
             {
                 SpeedSelMode = SpeedSelectorMode.On;
@@ -1201,7 +1225,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
 
                 if (controllerVolts > 0)
                 {
-                    if (speedDiff > 0.5)
+                    if (speedDiff > AntiWheelSpinSpeedDiffThreshold)
                     {
                         skidSpeedDegratation += 0.05f;
                     }
@@ -1209,9 +1233,10 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                     {
                         skidSpeedDegratation -= 0.1f;
                     }
-                    if (speedDiff < 0.4)
+                    if (speedDiff < AntiWheelSpinSpeedDiffThreshold - 0.05f)
                         skidSpeedDegratation = 0;
-                    controllerVolts -= skidSpeedDegratation;
+                    if (AntiWheelSpinEquipped)
+                        controllerVolts -= skidSpeedDegratation;
                     if (breakout || Bar.FromPSI(Locomotive.BrakeSystem.BrakeLine1PressurePSI) < 4.98)
                     {
                         maxForceN = 0;
