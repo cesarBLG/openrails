@@ -1152,7 +1152,7 @@ namespace Orts.Viewer3D
                 CheckReplaying();
                 new UseHeadOutBackCameraCommand(Log);
             }
-            if (UserInput.IsPressed(UserCommand.GameSwitchAhead))
+/*            if (UserInput.IsPressed(UserCommand.GameSwitchAhead))
             {
                 if (PlayerTrain.ControlMode == Train.TRAIN_CONTROL.MANUAL || PlayerTrain.ControlMode == Train.TRAIN_CONTROL.EXPLORER)
                     new ToggleSwitchAheadCommand(Log);
@@ -1165,7 +1165,7 @@ namespace Orts.Viewer3D
                     new ToggleSwitchBehindCommand(Log);
                 else
                     Simulator.Confirmer.Warning(CabControl.SwitchBehind, CabSetting.Warn1);
-            }
+            }*/
             if (UserInput.IsPressed(UserCommand.GameFacingSwitchAhead))
             {
                 if (PlayerTrain.ControlMode == Train.TRAIN_CONTROL.MANUAL || PlayerTrain.ControlMode == Train.TRAIN_CONTROL.EXPLORER)
