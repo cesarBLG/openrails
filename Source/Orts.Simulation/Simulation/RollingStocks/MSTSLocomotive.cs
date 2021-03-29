@@ -1685,10 +1685,13 @@ namespace Orts.Simulation.RollingStocks
             //UpdateMotiveForce(elapsedClockSeconds, t, AbsSpeedMpS, AbsWheelSpeedMpS);
             CheckAccelerationBits(elapsedClockSeconds, AbsWheelSpeedMpS);
 
-            if (CruiseControl != null)
+            if (CruiseControl != null && !TrainBrakeController.TCSEmergencyBraking)
             {
                 if (!IsPlayerTrain || CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Manual || CruiseControl.UseThrottle)
+                {
+                    CruiseControl.WasForceReset = false;
                     UpdateMotiveForce(elapsedClockSeconds, t, AbsSpeedMpS, AbsWheelSpeedMpS);
+                }
                 else
                     CruiseControl.Update(elapsedClockSeconds, AbsWheelSpeedMpS);
             }
@@ -3207,7 +3210,6 @@ namespace Orts.Simulation.RollingStocks
                     if (CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto && CruiseControl.SelectedSpeedMpS > 0)
                     {
                         speedSelectorModeDecreasing = false;
-                        return;
                     }
                 }
             }

@@ -1972,11 +1972,6 @@ namespace Orts.Viewer3D.RollingStock
                     bool intermediateValue = false;
                     if (Locomotive.CruiseControl != null)
                     {
-                        if (Locomotive.CruiseControl.SpeedRegMode == Simulation.RollingStocks.SubSystems.CruiseControl.SpeedRegulatorMode.Auto && !Locomotive.CruiseControl.UseThrottleAsSpeedSelector)
-                        {
-                            index = PercentToIndex(Locomotive.CombinedControlSplitPosition * 100);
-                            break;
-                        }
                         if (Locomotive.CruiseControl.SpeedRegMode == Simulation.RollingStocks.SubSystems.CruiseControl.SpeedRegulatorMode.Auto && Locomotive.CruiseControl.UseThrottleAsSpeedSelector)
                         {
                             intermediateValue = true;
@@ -1995,11 +1990,18 @@ namespace Orts.Viewer3D.RollingStock
                             }
                         }
                     }
-                    if (Locomotive.CombinedControlType == MSTSLocomotive.CombinedControl.ThrottleDynamic && Locomotive.DynamicBrakePercent >= 0
-                        || Locomotive.CombinedControlType == MSTSLocomotive.CombinedControl.ThrottleAir && Locomotive.TrainBrakeController.CurrentValue > 0)
-                        index = PercentToIndex(Locomotive.GetCombinedHandleValue(false));
+                    if (!Locomotive.CruiseControl.SkipThrottleDisplay)
+                    {
+                        if (Locomotive.CombinedControlType == MSTSLocomotive.CombinedControl.ThrottleDynamic && Locomotive.DynamicBrakePercent >= 0
+                            || Locomotive.CombinedControlType == MSTSLocomotive.CombinedControl.ThrottleAir && Locomotive.TrainBrakeController.CurrentValue > 0)
+                            index = PercentToIndex(Locomotive.GetCombinedHandleValue(false));
+                        else
+                            index = PercentToIndex(Locomotive.GetCombinedHandleValue(intermediateValue));
+                    }
                     else
-                        index = PercentToIndex(Locomotive.GetCombinedHandleValue(intermediateValue));
+                    {
+                        index = PercentToIndex((Locomotive.CombinedControlSplitPosition * 100));
+                    }
                     break;
                 case CABViewControlTypes.ORTS_SELECTED_SPEED_DISPLAY:
                     if (Locomotive.CruiseControl == null)
