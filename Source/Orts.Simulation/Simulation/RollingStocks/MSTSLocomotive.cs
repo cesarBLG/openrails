@@ -1692,11 +1692,18 @@ namespace Orts.Simulation.RollingStocks
                     CruiseControl.WasForceReset = false;
                     UpdateMotiveForce(elapsedClockSeconds, t, AbsSpeedMpS, AbsWheelSpeedMpS);
                 }
-                else
+                else if (CruiseControl.SelectedSpeedMpS > 0)
                     CruiseControl.Update(elapsedClockSeconds, AbsWheelSpeedMpS);
+                else
+                    UpdateMotiveForce(elapsedClockSeconds, t, AbsSpeedMpS, AbsWheelSpeedMpS);
+
             }
             else
+            {
+                if (CruiseControl != null && (TrainBrakeController.TCSEmergencyBraking || TrainBrakeController.TCSFullServiceBraking))
+                    CruiseControl.WasBraking = true;
                 UpdateMotiveForce(elapsedClockSeconds, t, AbsSpeedMpS, AbsWheelSpeedMpS);
+            }
 
             if (MultiPositionControllers != null)
             {
@@ -2083,6 +2090,8 @@ namespace Orts.Simulation.RollingStocks
             // An alternative method in the steam locomotive will override this and input force and power info for it.
 
             if (IsAPartOfPlayerTrain) t = ThrottleOverriden;
+            if (t > 1)
+                t = 1;
             if (PowerOn && Direction != Direction.N)
             {
                 if (TractiveForceCurves == null)
@@ -3464,8 +3473,12 @@ namespace Orts.Simulation.RollingStocks
                 return CombinedControlSplitPosition + (1 - CombinedControlSplitPosition) * (intermediateValue ? DynamicBrakeController.IntermediateValue : DynamicBrakeController.CurrentValue);
             else if (CombinedControlType == CombinedControl.ThrottleAir && TrainBrakeController.CurrentValue > 0)
                 return CombinedControlSplitPosition + (1 - CombinedControlSplitPosition) * (intermediateValue ? TrainBrakeController.IntermediateValue : TrainBrakeController.CurrentValue);
-            else
+            else if (CruiseControl == null)
                 return CombinedControlSplitPosition * (1 - (intermediateValue ? ThrottleController.IntermediateValue : ThrottleController.CurrentValue));
+            else if (CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Manual)
+                return CombinedControlSplitPosition * (1 - (intermediateValue ? ThrottleController.IntermediateValue : ThrottleController.CurrentValue));
+            else
+                return CombinedControlSplitPosition * (1 - (CruiseControl.SelectedSpeedMpS / MaxSpeedMpS));
         }
         #endregion
 

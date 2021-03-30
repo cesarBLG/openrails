@@ -644,7 +644,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
         }
 
         protected List<MSTSLocomotive> playerNotDriveableTrainLocomotives = new List<MSTSLocomotive>();
-        float _AccelerationMpSS = 0;
+        protected float _AccelerationMpSS = 0;
         protected bool throttleIsZero = false;
         protected bool brakeIncreasing = false;
         protected float controllerTime = 0;
@@ -664,7 +664,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
         protected float skidSpeedDegratation = 0;
         protected float previousAccelerationDemand = 0;
         public bool TrainBrakePriority = false;
-        protected bool wasBraking = false;
+        public bool WasBraking = false;
         public bool WasForceReset = false;
 
         protected virtual void UpdateMotiveForce(float elapsedClockSeconds, float AbsWheelSpeedMpS)
@@ -715,16 +715,16 @@ namespace Orts.Simulation.RollingStocks.SubSystems
 
             if (Locomotive.TrainBrakeController.TrainBrakeControllerState == ORTS.Scripting.Api.ControllerState.Release)
                 TrainBrakePriority = false;
-
+            
             if (TrainBrakePriority || DynamicBrakePriority)
             {
                 WasForceReset = false;
-                wasBraking = true;
+                WasBraking = true;
             }
 
             if (SelectedMaxAccelerationPercent == 0 && SelectedMaxAccelerationStep == 0)
-                wasBraking = false;
-            if (ResetForceAfterAnyBraking && wasBraking && (SelectedMaxAccelerationStep > 0 || SelectedMaxAccelerationPercent > 0))
+                WasBraking = false;
+            if (ResetForceAfterAnyBraking && WasBraking && (SelectedMaxAccelerationStep > 0 || SelectedMaxAccelerationPercent > 0))
             {
                 Locomotive.SetThrottlePercent(0);
                 controllerVolts = 0;
@@ -814,9 +814,6 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                 }
                 firstIteration = false;
             }
-
-            float numAxesCoeff = 0;
-            numAxesCoeff = ((float)SelectedNumberOfAxles) / 12f;
 
             if (SpeedRegMode == SpeedRegulatorMode.Auto)
             {
@@ -1053,9 +1050,6 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                                 if (Locomotive.DynamicBrakeAvailable)
                                 {
                                     relativeAcceleration = (float)-Math.Sqrt(-StartReducingSpeedDelta * delta);
-
-                                    if (delta > -0.5f)
-                                        delta = -0.5f;
 
                                     float val = (StartReducingSpeedDelta) * coeff * ((delta + 0.5f) / 3);
                                     if (val < 0)
@@ -1402,6 +1396,9 @@ namespace Orts.Simulation.RollingStocks.SubSystems
 
             if (playerNotDriveableTrainLocomotives.Count > 0) // update any other than the player's locomotive in the consist throttles to percentage of the current force and the max force
             {
+                float locoPercent = Locomotive.MaxForceN - (Locomotive.MaxForceN - Locomotive.MotiveForceN);
+                locoPercent = (locoPercent / Locomotive.MaxForceN) * 100;
+                //Simulator.Confirmer.MSG(locoPercent.ToString());
                 foreach (MSTSLocomotive lc in playerNotDriveableTrainLocomotives)
                 {
                     if (UseThrottle)
@@ -1411,8 +1408,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                     else
                     {
                         lc.IsAPartOfPlayerTrain = true;
-                        float locoPercent = Locomotive.MaxForceN - (Locomotive.MaxForceN - Locomotive.MotiveForceN);
-                        lc.ThrottleOverriden = locoPercent / Locomotive.MaxForceN;
+                        lc.ThrottleOverriden = locoPercent / 100;
                     }
                 }
             }

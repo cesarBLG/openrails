@@ -1990,17 +1990,28 @@ namespace Orts.Viewer3D.RollingStock
                             }
                         }
                     }
-                    if (!Locomotive.CruiseControl.SkipThrottleDisplay)
+                    if (Locomotive.CruiseControl != null)
+                    {
+                        if (!Locomotive.CruiseControl.SkipThrottleDisplay)
+                        {
+                            if (Locomotive.CombinedControlType == MSTSLocomotive.CombinedControl.ThrottleDynamic && Locomotive.DynamicBrakePercent >= 0
+                                || Locomotive.CombinedControlType == MSTSLocomotive.CombinedControl.ThrottleAir && Locomotive.TrainBrakeController.CurrentValue > 0)
+                                index = PercentToIndex(Locomotive.GetCombinedHandleValue(false));
+                            else
+                                index = PercentToIndex(Locomotive.GetCombinedHandleValue(intermediateValue));
+                        }
+                        else
+                        {
+                            index = PercentToIndex((Locomotive.CombinedControlSplitPosition * 100));
+                        }
+                    }
+                    else
                     {
                         if (Locomotive.CombinedControlType == MSTSLocomotive.CombinedControl.ThrottleDynamic && Locomotive.DynamicBrakePercent >= 0
                             || Locomotive.CombinedControlType == MSTSLocomotive.CombinedControl.ThrottleAir && Locomotive.TrainBrakeController.CurrentValue > 0)
                             index = PercentToIndex(Locomotive.GetCombinedHandleValue(false));
                         else
                             index = PercentToIndex(Locomotive.GetCombinedHandleValue(intermediateValue));
-                    }
-                    else
-                    {
-                        index = PercentToIndex((Locomotive.CombinedControlSplitPosition * 100));
                     }
                     break;
                 case CABViewControlTypes.ORTS_SELECTED_SPEED_DISPLAY:
@@ -2263,7 +2274,27 @@ namespace Orts.Viewer3D.RollingStock
                 case CABViewControlTypes.ORTS_QUICKRELEASE: new QuickReleaseCommand(Viewer.Log, ChangedValue(Locomotive.TrainBrakeController.QuickReleaseButtonPressed ? 1 : 0) > 0); break;
                 case CABViewControlTypes.ORTS_OVERCHARGE: new BrakeOverchargeCommand(Viewer.Log, ChangedValue(Locomotive.TrainBrakeController.OverchargeButtonPressed ? 1 : 0) > 0); break;
                 case CABViewControlTypes.RESET: new AlerterCommand(Viewer.Log, ChangedValue(Locomotive.TrainControlSystem.AlerterButtonPressed ? 1 : 0) > 0); break;
-                case CABViewControlTypes.CP_HANDLE: Locomotive.SetCombinedHandleValue(ChangedValue(Locomotive.GetCombinedHandleValue(true))); break;
+                case CABViewControlTypes.CP_HANDLE:
+                    if (Locomotive.CruiseControl == null)
+                    {
+                        Locomotive.SetCombinedHandleValue(ChangedValue(Locomotive.GetCombinedHandleValue(true))); break;
+                    }
+                    else
+                    {
+                        if (Locomotive.CruiseControl.SpeedRegMode == Simulation.RollingStocks.SubSystems.CruiseControl.SpeedRegulatorMode.Manual)
+                        {
+                            Locomotive.SetCombinedHandleValue(ChangedValue(Locomotive.GetCombinedHandleValue(true))); break;
+                        }
+                        else
+                        {
+                            float speed = (1 - MathHelper.Clamp(ChangedValue(Locomotive.GetCombinedHandleValue(true)), 0, Locomotive.CombinedControlSplitPosition) / Locomotive.CombinedControlSplitPosition) * Locomotive.MaxSpeedMpS;
+                            speed = (float)Math.Round(MpS.ToKpH(speed));
+                            if (speed < 5)
+                                speed = 5;
+                            Locomotive.CruiseControl.SetSpeed(speed);
+                            break;
+                        }
+                    }
 
                 // Steam locomotives only:
                 case CABViewControlTypes.CUTOFF: (Locomotive as MSTSSteamLocomotive).SetCutoffValue(ChangedValue((Locomotive as MSTSSteamLocomotive).CutoffController.IntermediateValue)); break;
