@@ -44,6 +44,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
         public List<string> SpeedRegulatorOptions = new List<string>();
         public SpeedRegulatorMode SpeedRegMode = SpeedRegulatorMode.Manual;
         public SpeedSelectorMode SpeedSelMode = SpeedSelectorMode.Neutral;
+        public ControllerCruiseControlLogic CruiseControlLogic = new ControllerCruiseControlLogic();
         public float SelectedMaxAccelerationPercent = 0;
         public float SelectedMaxAccelerationStep = 0;
         public float SelectedSpeedMpS = 0;
@@ -55,8 +56,6 @@ namespace Orts.Simulation.RollingStocks.SubSystems
         public bool AntiWheelSpinEquipped = false;
         public float AntiWheelSpinSpeedDiffThreshold = 0.5f;
         public float DynamicBrakeMaxForceAtSelectorStep = 0;
-        public bool ForceResetRequiredAfterBraking = false;
-        public bool ForceResetIncludeDynamicBrake = false;
         public float ForceThrottleAndDynamicBrake = 0;
         protected float maxForceN = 0;
         protected float trainBrakePercent = 0;
@@ -127,11 +126,14 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                 case "engine(ortscruisecontrol(parkingbrakeengagespeed": ParkingBrakeEngageSpeed = stf.ReadFloatBlock(STFReader.UNITS.Speed, 0); break;
                 case "engine(ortscruisecontrol(parkingbrakepercent": ParkingBrakePercent = stf.ReadFloatBlock(STFReader.UNITS.Any, 0); break;
                 case "engine(ortscruisecontrol(maxpowerthreshold": MaxPowerThreshold = stf.ReadFloatBlock(STFReader.UNITS.Any, 0); break;
+                case "engine(ortscruisecontrol(safespeedforautomaticoperationmps": SafeSpeedForAutomaticOperationMpS = stf.ReadFloatBlock(STFReader.UNITS.Any, 0); break;
                 case "engine(ortscruisecontrol(maxforcepercentunits": SpeedRegulatorMaxForcePercentUnits = stf.ReadBoolBlock(false); break;
                 case "engine(ortscruisecontrol(maxforcesteps": SpeedRegulatorMaxForceSteps = stf.ReadIntBlock(0); break;
                 case "engine(ortscruisecontrol(maxforcesetsinglestep": MaxForceSetSingleStep = stf.ReadBoolBlock(false); break;
                 case "engine(ortscruisecontrol(maxforcekeepselectedstepwhenmanualmodeset": MaxForceKeepSelectedStepWhenManualModeSet = stf.ReadBoolBlock(false); break;
                 case "engine(ortscruisecontrol(forceregulatorautowhennonzerospeedselected": ForceRegulatorAutoWhenNonZeroSpeedSelected = stf.ReadBoolBlock(false); break;
+                case "engine(ortscruisecontrol(continuousspeedincreasing": ContinuousSpeedIncreasing = stf.ReadBoolBlock(false); break;
+                    
                 case "engine(ortscruisecontrol(forcestepsthrottletable":
                     foreach (var forceStepThrottleValue in stf.ReadStringBlock("").Replace(" ", "").Split(','))
                     {
@@ -150,9 +152,6 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                 case "engine(ortscruisecontrol(powerreductiondelaypaxtrain": PowerReductionDelayPaxTrain = stf.ReadFloatBlock(STFReader.UNITS.Any, 0.0f); break;
                 case "engine(ortscruisecontrol(powerreductiondelaycargotrain": PowerReductionDelayCargoTrain = stf.ReadFloatBlock(STFReader.UNITS.Any, 0.0f); break;
                 case "engine(ortscruisecontrol(powerreductionvalue": PowerReductionValue = stf.ReadFloatBlock(STFReader.UNITS.Any, 100.0f); break;
-
-                case "engine(ortscruisecontrol(forceresetrequiredafterbraking": ForceResetRequiredAfterBraking = stf.ReadBoolBlock(false); break;
-                case "engine(ortscruisecontrol(forceresetincludedynamicbrake": ForceResetIncludeDynamicBrake = stf.ReadBoolBlock(false); break;
                 case "engine(ortscruisecontrol(disablezeroforcestep": DisableZeroForceStep = stf.ReadBoolBlock(false); break;
                 case "engine(ortscruisecontrol(dynamicbrakeisselectedforcedependant": DynamicBrakeIsSelectedForceDependant = stf.ReadBoolBlock(false); break;                    
                 case "engine(ortscruisecontrol(defaultforcestep": SelectedMaxAccelerationStep = stf.ReadFloatBlock(STFReader.UNITS.Any, 1.0f); break;
@@ -173,6 +172,24 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                         SpeedRegulatorOptions.Add(speedRegulatorOption.ToLower());
                     }
                     break;
+                case "engine(ortscruisecontrol(controllercruisecontrollogic":
+                    {
+                        String speedControlLogic = stf.ReadStringBlock("none").ToLower();
+                        switch (speedControlLogic)
+                        {
+                            case "full":
+                                {
+                                    CruiseControlLogic = ControllerCruiseControlLogic.Full;
+                                    break;
+                                }
+                            case "speedonly":
+                                {
+                                    CruiseControlLogic = ControllerCruiseControlLogic.SpeedOnly;
+                                    break;
+                                }
+                        }
+                        break;
+                    }
             }
         }
 
@@ -633,10 +650,12 @@ namespace Orts.Simulation.RollingStocks.SubSystems
 
         public void SetSpeed(float Speed)
         {
+            if (!Equipped) return;
             if (SpeedRegMode == SpeedRegulatorMode.Manual && ForceRegulatorAutoWhenNonZeroSpeedSelected)
                 SpeedRegMode = SpeedRegulatorMode.Auto;
+            if (SpeedRegMode == SpeedRegulatorMode.Manual)
+                return;
             Locomotive.SignalEvent(Common.Event.Alert1);
-            if (!Equipped) return;
             SelectedSpeedMpS = SpeedIsMph ? MpS.FromMpH(Speed) : MpS.FromKpH(Speed);
             if (SelectedSpeedMpS > Locomotive.MaxSpeedMpS)
                 SelectedSpeedMpS = Locomotive.MaxSpeedMpS;
@@ -665,7 +684,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
         protected float previousAccelerationDemand = 0;
         public bool TrainBrakePriority = false;
         public bool WasBraking = false;
-        public bool WasForceReset = false;
+        public bool WasForceReset = true;
 
         protected virtual void UpdateMotiveForce(float elapsedClockSeconds, float AbsWheelSpeedMpS)
         {
@@ -699,7 +718,11 @@ namespace Orts.Simulation.RollingStocks.SubSystems
             }
             TrainElevation = TrainElevation / count;
 
-            if (SpeedSelMode == SpeedSelectorMode.On || SpeedSelMode == SpeedSelectorMode.Start && !TrainBrakePriority)
+            if (Locomotive.TrainBrakeController.TrainBrakeControllerState == ORTS.Scripting.Api.ControllerState.Release ||
+                Locomotive.TrainBrakeController.TrainBrakeControllerState == ORTS.Scripting.Api.ControllerState.Neutral)
+                TrainBrakePriority = false;
+
+            if ((SpeedSelMode == SpeedSelectorMode.On || SpeedSelMode == SpeedSelectorMode.Start) && !TrainBrakePriority)
             {
                 canAddForce = true;
             }
@@ -708,13 +731,19 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                 canAddForce = false;
                 timeFromEngineMoved = 0;
                 reducingForce = true;
+                Locomotive.TractiveForceN = 0;
+                if (TrainBrakePriority)
+                {
+                    if (SpeedSelMode == SpeedSelectorMode.Parking)
+                        if (AbsWheelSpeedMpS < (SpeedIsMph ? MpS.FromMpH(ParkingBrakeEngageSpeed) : MpS.FromKpH(ParkingBrakeEngageSpeed)))
+                            Locomotive.SetEngineBrakePercent(ParkingBrakePercent);
+                    return;
+                }
             }
 
-            if (SelectedMaxAccelerationStep == 0 && SelectedMaxAccelerationPercent == 0)
-                WasForceReset = true;
 
-            if (Locomotive.TrainBrakeController.TrainBrakeControllerState == ORTS.Scripting.Api.ControllerState.Release)
-                TrainBrakePriority = false;
+            if ((SelectedMaxAccelerationStep == 0 && SelectedMaxAccelerationPercent == 0) || SpeedSelMode == SpeedSelectorMode.Start)
+                WasForceReset = true;
             
             if (TrainBrakePriority || DynamicBrakePriority)
             {
@@ -729,6 +758,9 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                 Locomotive.SetThrottlePercent(0);
                 controllerVolts = 0;
                 maxForceN = 0;
+                if (SpeedSelMode == SpeedSelectorMode.Parking)
+                    if (AbsWheelSpeedMpS < (SpeedIsMph ? MpS.FromMpH(ParkingBrakeEngageSpeed) : MpS.FromKpH(ParkingBrakeEngageSpeed)))
+                        Locomotive.SetEngineBrakePercent(ParkingBrakePercent);
                 return;
             }
 
@@ -737,6 +769,9 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                 Locomotive.SetThrottlePercent(0);
                 controllerVolts = 0;
                 maxForceN = 0;
+                if (SpeedSelMode == SpeedSelectorMode.Parking)
+                    if (AbsWheelSpeedMpS < (SpeedIsMph ? MpS.FromMpH(ParkingBrakeEngageSpeed) : MpS.FromKpH(ParkingBrakeEngageSpeed)))
+                        Locomotive.SetEngineBrakePercent(ParkingBrakePercent);
                 return;
             }
 
@@ -1016,7 +1051,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                             step *= elapsedClockSeconds;
                             controllerVolts += step;
                         }
-                        if (Locomotive.DynamicBrakePercent < 0.5f && Locomotive.DynamicBrake)
+                        if (Locomotive.DynamicBrakePercent < 1 && Locomotive.DynamicBrake)
                         {
                             Locomotive.SetDynamicBrakePercent(0);
                             Locomotive.DynamicBrakeChangeActiveState(false);
@@ -1201,9 +1236,10 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                                 t = PowerReductionValue / 100;
                         }
                         float demandedVolts = t * 100;
-                        if (demandedVolts < PowerBreakoutAmpers)
+                        float current = maxForceN / Locomotive.MaxForceN * Locomotive.MaxCurrentA;
+                        if (current < PowerBreakoutAmpers)
                             breakout = true;
-                        if (demandedVolts > 13.5f)
+                        if (breakout && delta > 0.2f)
                             breakout = false;
                         if (UseThrottle) // not valid for diesel engines.
                             breakout = false;
@@ -1535,6 +1571,111 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                 case CABViewControlTypes.ORTS_CC_SELECT_SPEED:
                     data = Locomotive.SelectingSpeedPressed ? 1 : 0;
                     break;
+                case CABViewControlTypes.ORTS_CC_SPEED_0:
+                    {
+                        data = Locomotive.Speed0Pressed ? 1 : 0;
+                        break;
+                    }
+                case CABViewControlTypes.ORTS_CC_SPEED_10:
+                    {
+                        data = Locomotive.Speed10Pressed ? 1 : 0;
+                        break;
+                    }
+                case CABViewControlTypes.ORTS_CC_SPEED_20:
+                    {
+                        data = Locomotive.Speed20Pressed ? 1 : 0;
+                        break;
+                    }
+                case CABViewControlTypes.ORTS_CC_SPEED_30:
+                    {
+                        data = Locomotive.Speed30Pressed ? 1 : 0;
+                        break;
+                    }
+                case CABViewControlTypes.ORTS_CC_SPEED_40:
+                    {
+                        data = Locomotive.Speed40Pressed ? 1 : 0;
+                        break;
+                    }
+                case CABViewControlTypes.ORTS_CC_SPEED_50:
+                    {
+                        data = Locomotive.Speed50Pressed ? 1 : 0;
+                        break;
+                    }
+                case CABViewControlTypes.ORTS_CC_SPEED_60:
+                    {
+                        data = Locomotive.Speed60Pressed ? 1 : 0;
+                        break;
+                    }
+                case CABViewControlTypes.ORTS_CC_SPEED_70:
+                    {
+                        data = Locomotive.Speed70Pressed ? 1 : 0;
+                        break;
+                    }
+                case CABViewControlTypes.ORTS_CC_SPEED_80:
+                    {
+                        data = Locomotive.Speed80Pressed ? 1 : 0;
+                        break;
+                    }
+                case CABViewControlTypes.ORTS_CC_SPEED_90:
+                    {
+                        data = Locomotive.Speed90Pressed ? 1 : 0;
+                        break;
+                    }
+                case CABViewControlTypes.ORTS_CC_SPEED_100:
+                    {
+                        data = Locomotive.Speed100Pressed ? 1 : 0;
+                        break;
+                    }
+                case CABViewControlTypes.ORTS_CC_SPEED_110:
+                    {
+                        data = Locomotive.Speed110Pressed ? 1 : 0;
+                        break;
+                    }
+                case CABViewControlTypes.ORTS_CC_SPEED_120:
+                    {
+                        data = Locomotive.Speed120Pressed ? 1 : 0;
+                        break;
+                    }
+                case CABViewControlTypes.ORTS_CC_SPEED_130:
+                    {
+                        data = Locomotive.Speed130Pressed ? 1 : 0;
+                        break;
+                    }
+                case CABViewControlTypes.ORTS_CC_SPEED_140:
+                    {
+                        data = Locomotive.Speed140Pressed ? 1 : 0;
+                        break;
+                    }
+                case CABViewControlTypes.ORTS_CC_SPEED_150:
+                    {
+                        data = Locomotive.Speed150Pressed ? 1 : 0;
+                        break;
+                    }
+                case CABViewControlTypes.ORTS_CC_SPEED_160:
+                    {
+                        data = Locomotive.Speed160Pressed ? 1 : 0;
+                        break;
+                    }
+                case CABViewControlTypes.ORTS_CC_SPEED_170:
+                    {
+                        data = Locomotive.Speed170Pressed ? 1 : 0;
+                        break;
+                    }
+                case CABViewControlTypes.ORTS_CC_SPEED_180:
+                    {
+                        data = Locomotive.Speed180Pressed ? 1 : 0;
+                        break;
+                    }
+                case CABViewControlTypes.ORTS_CC_SPEED_190:
+                    {
+                        data = Locomotive.Speed190Pressed ? 1 : 0;
+                        break;
+                    }
+                case CABViewControlTypes.ORTS_CC_SPEED_200:
+                    {
+                        data = Locomotive.Speed200Pressed ? 1 : 0;
+                        break;
+                    }
                 default:
                     data = 0;
                     break;
@@ -1551,6 +1692,14 @@ namespace Orts.Simulation.RollingStocks.SubSystems
             Restricting80,
             Restricting100
         };
+
+        public enum ControllerCruiseControlLogic
+        {
+            None,
+            Full,
+            SpeedOnly
+        }
+
         public AvvSignal avvSignal = AvvSignal.Stop;
         public void DrawAvvSignal(AvvSignal ToState)
         {

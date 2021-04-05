@@ -442,6 +442,11 @@ namespace Orts.Simulation.RollingStocks
         public bool IsAPartOfPlayerTrain = false;
         public float ThrottleOverriden = 0;
         public int AccelerationBits = 0;
+        public bool
+      Speed0Pressed, Speed10Pressed, Speed20Pressed, Speed30Pressed, Speed40Pressed, Speed50Pressed
+    , Speed60Pressed, Speed70Pressed, Speed80Pressed, Speed90Pressed, Speed100Pressed
+    , Speed110Pressed, Speed120Pressed, Speed130Pressed, Speed140Pressed, Speed150Pressed
+    , Speed160Pressed, Speed170Pressed, Speed180Pressed, Speed190Pressed, Speed200Pressed;
 
         public MSTSLocomotive(Simulator simulator, string wagPath)
             : base(simulator, wagPath)
@@ -1693,6 +1698,8 @@ namespace Orts.Simulation.RollingStocks
                     UpdateMotiveForce(elapsedClockSeconds, t, AbsSpeedMpS, AbsWheelSpeedMpS);
                 }
                 else if (CruiseControl.SelectedSpeedMpS > 0)
+                    CruiseControl.Update(elapsedClockSeconds, AbsWheelSpeedMpS);
+                else if (CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto)
                     CruiseControl.Update(elapsedClockSeconds, AbsWheelSpeedMpS);
                 else
                     UpdateMotiveForce(elapsedClockSeconds, t, AbsSpeedMpS, AbsWheelSpeedMpS);
