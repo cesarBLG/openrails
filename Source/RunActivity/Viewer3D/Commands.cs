@@ -112,37 +112,41 @@ namespace Orts.Viewer3D
     public sealed class ToggleSwitchAheadCommand : Command
     {
         public static Viewer Receiver { get; set; }
+        public SwitchOrientation SwitchOrientation;
 
-        public ToggleSwitchAheadCommand(CommandLog log)
+        public ToggleSwitchAheadCommand(CommandLog log, SwitchOrientation switchOrientation = SwitchOrientation.Any)
             : base(log)
         {
+            SwitchOrientation = switchOrientation;
             Redo();
         }
 
         public override void Redo()
         {
-            Receiver.ToggleSwitchAhead();
+            Receiver.ToggleSwitchAhead(SwitchOrientation);
             // Report();
         }
-        }
+    }
 
     [Serializable()]
     public sealed class ToggleSwitchBehindCommand : Command
     {
         public static Viewer Receiver { get; set; }
+        public SwitchOrientation SwitchOrientation;
 
-        public ToggleSwitchBehindCommand(CommandLog log)
+        public ToggleSwitchBehindCommand(CommandLog log, SwitchOrientation switchOrientation = SwitchOrientation.Any)
             : base(log)
         {
+            SwitchOrientation = switchOrientation;
             Redo();
         }
 
         public override void Redo()
         {
-            Receiver.ToggleSwitchBehind();
+            Receiver.ToggleSwitchBehind(SwitchOrientation);
             // Report();
         }
-        }
+    }
 
     [Serializable()]
     public sealed class ToggleAnySwitchCommand : IndexCommand
@@ -290,17 +294,7 @@ namespace Orts.Viewer3D
             Redo();
         }
 
-        public override void Redo()
-        {
-            if (Receiver.ThreeDimCabCamera.Enabled)
-            {
-                Receiver.ThreeDimCabCamera.Activate();
-            }
-            else
-            {
-                Receiver.CabCamera.Activate();
-            }
-        }
+        public override void Redo() => Receiver.ActivateCabCamera();
     }
 
 	[Serializable()]
@@ -313,19 +307,7 @@ namespace Orts.Viewer3D
 			Redo();
 		}
 
-		public override void Redo()
-		{
-            Receiver.ThreeDimCabCamera.Enabled = !Receiver.ThreeDimCabCamera.Enabled;
-
-            if (Receiver.ThreeDimCabCamera.Enabled && Receiver.Camera == Receiver.CabCamera)
-            {
-                Receiver.ThreeDimCabCamera.Activate();
-            }
-            else if (!Receiver.ThreeDimCabCamera.Enabled && Receiver.Camera == Receiver.ThreeDimCabCamera)
-            {
-                Receiver.CabCamera.Activate();
-            }
-        }
+        public override void Redo() => Receiver.ToggleCabCameraView();
 	}
 	
 	[Serializable()]

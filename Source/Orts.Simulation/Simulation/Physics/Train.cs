@@ -1728,6 +1728,7 @@ namespace Orts.Simulation.Physics
                     car.TotalForceN = -car.TotalForceN;
                     car.SpeedMpS = -car.SpeedMpS;
                 }
+
                 if (car.WheelSlip)
                     whlslp = true;
                 if (car.WheelSlipWarning)
@@ -4731,9 +4732,9 @@ namespace Orts.Simulation.Physics
             {
                 // If car is moving then the raw total force on each car is adjusted according to changing forces.
                 if (Cars[i].SpeedMpS > 0)
-                    Cars[i].TotalForceN -= (Cars[i].FrictionForceN + Cars[i].BrakeForceN + Cars[i].CurveForceN + Cars[i].WindForceN + Cars[i].TunnelForceN + Cars[i].DynamicBrakeForceN);
+                    Cars[i].TotalForceN -= (Cars[i].FrictionForceN + Cars[i].BrakeForceN + Cars[i].CurveForceN + Cars[i].WindForceN + Cars[i].TunnelForceN);
                 else if (Cars[i].SpeedMpS < 0)
-                    Cars[i].TotalForceN += Cars[i].FrictionForceN + Cars[i].BrakeForceN + Cars[i].CurveForceN + Cars[i].WindForceN + Cars[i].TunnelForceN + +Cars[i].DynamicBrakeForceN;
+                    Cars[i].TotalForceN += Cars[i].FrictionForceN + Cars[i].BrakeForceN + Cars[i].CurveForceN + Cars[i].WindForceN + Cars[i].TunnelForceN;
             }
 
             if (Cars.Count < 2)
@@ -5298,7 +5299,7 @@ namespace Orts.Simulation.Physics
             for (int i = 0; i < Cars.Count; i++)
             {
                 TrainCar car = Cars[i];
-                if (car.SpeedMpS != 0 || car.TotalForceN <= (car.FrictionForceN + car.BrakeForceN + car.CurveForceN + car.WindForceN + car.TunnelForceN + car.DynamicBrakeForceN))
+                if (car.SpeedMpS != 0 || car.TotalForceN <= (car.FrictionForceN + car.BrakeForceN + car.CurveForceN + car.WindForceN + car.TunnelForceN))
                 {
                     // Skip this section to start car if car is already moving, or force not sufficient to start it moving
                     continue;
@@ -5309,7 +5310,7 @@ namespace Orts.Simulation.Physics
                 for (;;)
                 {
                     // Cycle down the train consist until the first stationary car is found that has its leading couplers starting to pull it. The next car is then started by allowing its speed to increase above 0.
-                    f += car.TotalForceN - (car.FrictionForceN + car.BrakeForceN + car.CurveForceN + car.WindForceN + car.TunnelForceN + car.DynamicBrakeForceN);
+                    f += car.TotalForceN - (car.FrictionForceN + car.BrakeForceN + car.CurveForceN + car.WindForceN + car.TunnelForceN);
                     m += car.MassKG;
                     if (car.IsPlayerTrain && Simulator.UseAdvancedAdhesion && car.IsAdvancedCoupler) // "Advanced coupler" - operates in three extension zones
                     {
@@ -5355,7 +5356,7 @@ namespace Orts.Simulation.Physics
             for (int i = Cars.Count - 1; i >= 0; i--)
             {
                 TrainCar car = Cars[i];
-                if (car.SpeedMpS != 0 || car.TotalForceN > (-1.0f * (car.FrictionForceN + car.BrakeForceN + car.CurveForceN + car.WindForceN + car.TunnelForceN + car.DynamicBrakeForceN)))
+                if (car.SpeedMpS != 0 || car.TotalForceN > (-1.0f * (car.FrictionForceN + car.BrakeForceN + car.CurveForceN + car.WindForceN + car.TunnelForceN)))
                 {
                     // Skip this section to start car if car is already moving, or force not sufficient to start it moving
                     continue;
@@ -5366,7 +5367,7 @@ namespace Orts.Simulation.Physics
                 for (;;)
                 {
                     // Cycle up the train consist until the first stationary car is found that has its leading couplers starting to pull it. The next car is then started by allowing its speed to increase above 0.
-                    f += car.TotalForceN + car.FrictionForceN + car.BrakeForceN + car.CurveForceN + car.WindForceN + car.TunnelForceN + car.DynamicBrakeForceN;
+                    f += car.TotalForceN + car.FrictionForceN + car.BrakeForceN + car.CurveForceN + car.WindForceN + car.TunnelForceN;
                     m += car.MassKG;
                     if (car.IsPlayerTrain && Simulator.UseAdvancedAdhesion && car.IsAdvancedCoupler) // "Advanced coupler" - operates in three extension zones
                     {
@@ -8405,7 +8406,7 @@ namespace Orts.Simulation.Physics
         /// Process request to set switch in manual mode
         /// Request may contain direction or actual node
         /// </summary>
-        public bool ProcessRequestManualSetSwitch(Direction direction)
+        public bool ProcessRequestManualSetSwitch(Direction direction, SwitchOrientation switchOrientation = SwitchOrientation.Any)
         {
             // find first switch in required direction
 
@@ -8418,10 +8419,24 @@ namespace Orts.Simulation.Physics
                 TrackCircuitSection thisSection = signalRef.TrackCircuitList[ValidRoute[routeDirectionIndex][iindex].TCSectionIndex];
                 if (thisSection.CircuitType == TrackCircuitSection.TrackCircuitType.Junction)
                 {
-                    reqSwitch = thisSection;
+                    TrJunctionNode junctionNode = Simulator.TDB.TrackDB.TrackNodes[thisSection.OriginalIndex].TrJunctionNode;
+                    switch (switchOrientation)
+                    {
+                        case SwitchOrientation.Any:
+                            reqSwitch = thisSection;
+                            break;
+                        case SwitchOrientation.Facing:
+                            if (thisSection.Pins[ValidRoute[routeDirectionIndex][iindex].Direction, 1].Link != -1)
+                                reqSwitch = thisSection;
+                            break;
+                        case SwitchOrientation.Trailing:
+                            if (thisSection.Pins[ValidRoute[routeDirectionIndex][iindex].Direction, 1].Link == -1)
+                                reqSwitch = thisSection;
+                            break;
+                    }
                 }
             }
-
+            // TODO da qui in avanti
             if (reqSwitch == null)
             {
                 // search beyond last section for switch using default pins (continue through normal sections only)
@@ -8456,9 +8471,24 @@ namespace Orts.Simulation.Physics
                         lastSection = signalRef.TrackCircuitList[nextSectionIndex];
                     }
 
-                    if (lastSection.CircuitType == TrackCircuitSection.TrackCircuitType.Junction)
+                    if (lastSection.CircuitType == TrackCircuitSection.TrackCircuitType.Junction) 
                     {
-                        reqSwitch = lastSection;
+                        switch (switchOrientation)
+                        {
+                            case SwitchOrientation.Any:
+                                reqSwitch = lastSection;
+                                break;
+                            case SwitchOrientation.Facing:
+                                if (lastSection.Pins[curDirection, 1].Link != -1)
+                                    reqSwitch = lastSection;
+                                else validRoute = false;
+                                break;
+                            case SwitchOrientation.Trailing:
+                                if (lastSection.Pins[curDirection, 1].Link == -1)
+                                    reqSwitch = lastSection;
+                                else validRoute = false;
+                                break;
+                        }
                     }
                     else if (lastSection.CircuitType != TrackCircuitSection.TrackCircuitType.Normal)
                     {
@@ -9524,7 +9554,7 @@ namespace Orts.Simulation.Physics
         /// Request may contain direction or actual node
         /// </summary>
 
-        public bool ProcessRequestExplorerSetSwitch(Direction direction)
+        public bool ProcessRequestExplorerSetSwitch(Direction direction, SwitchOrientation switchOrientation = SwitchOrientation.Any)
         {
             // find first switch in required direction
 
@@ -9537,7 +9567,21 @@ namespace Orts.Simulation.Physics
                 TrackCircuitSection thisSection = signalRef.TrackCircuitList[ValidRoute[routeDirectionIndex][iindex].TCSectionIndex];
                 if (thisSection.CircuitType == TrackCircuitSection.TrackCircuitType.Junction)
                 {
-                    reqSwitch = thisSection;
+                    TrJunctionNode junctionNode = Simulator.TDB.TrackDB.TrackNodes[thisSection.OriginalIndex].TrJunctionNode;
+                    switch (switchOrientation)
+                    {
+                        case SwitchOrientation.Any:
+                            reqSwitch = thisSection;
+                            break;
+                        case SwitchOrientation.Facing:
+                            if (thisSection.Pins[ValidRoute[routeDirectionIndex][iindex].Direction, 1].Link != -1)
+                                reqSwitch = thisSection;
+                            break;
+                        case SwitchOrientation.Trailing:
+                            if (thisSection.Pins[ValidRoute[routeDirectionIndex][iindex].Direction, 1].Link == -1)
+                                reqSwitch = thisSection;
+                            break;
+                    }
                 }
             }
 
@@ -9577,7 +9621,22 @@ namespace Orts.Simulation.Physics
 
                     if (lastSection.CircuitType == TrackCircuitSection.TrackCircuitType.Junction)
                     {
-                        reqSwitch = lastSection;
+                        switch (switchOrientation)
+                        {
+                            case SwitchOrientation.Any:
+                                reqSwitch = lastSection;
+                                break;
+                            case SwitchOrientation.Facing:
+                                if (lastSection.Pins[curDirection, 1].Link != -1)
+                                    reqSwitch = lastSection;
+                                else validRoute = false;
+                                break;
+                            case SwitchOrientation.Trailing:
+                                if (lastSection.Pins[curDirection, 1].Link == -1)
+                                    reqSwitch = lastSection;
+                                else validRoute = false;
+                                break;
+                        }
                     }
                     else if (lastSection.CircuitType != TrackCircuitSection.TrackCircuitType.Normal)
                     {

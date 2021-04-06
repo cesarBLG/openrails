@@ -110,7 +110,14 @@ namespace Orts.Viewer3D
         // Cameras
         public Camera Camera { get; set; } // Current camera
         public Camera AbovegroundCamera { get; private set; } // Previous camera for when automatically switching to cab.
-        public CabCamera CabCamera { get; private set; } // Camera 1
+        /// <summary>
+        /// Camera #1, 2D cab. Swaps with <see cref="ThreeDimCabCamera"/> with Alt+1.
+        /// </summary>
+        private readonly CabCamera CabCamera;
+        /// <summary>
+        /// Camera #1, 3D cab. Swaps with <see cref="CabCamera"/> with Alt+1.
+        /// </summary>
+        private readonly ThreeDimCabCamera ThreeDimCabCamera;
         public HeadOutCamera HeadOutForwardCamera { get; private set; } // Camera 1+Up
         public HeadOutCamera HeadOutBackCamera { get; private set; } // Camera 2+Down
         public TrackingCamera FrontCamera { get; private set; } // Camera 2
@@ -121,7 +128,27 @@ namespace Orts.Viewer3D
         public BrakemanCamera BrakemanCamera { get; private set; } // Camera 6
         public List<FreeRoamCamera> FreeRoamCameraList = new List<FreeRoamCamera>();
         public FreeRoamCamera FreeRoamCamera { get { return FreeRoamCameraList[0]; } } // Camera 8
-        public ThreeDimCabCamera ThreeDimCabCamera; //Camera 0
+
+        /// <summary>
+        /// Activate the 2D or 3D cab camera depending on the current player preference.
+        /// </summary>
+        public void ActivateCabCamera()
+        {
+            if (Settings.Use3DCab && ThreeDimCabCamera.IsAvailable)
+                ThreeDimCabCamera.Activate();
+            else
+                CabCamera.Activate();
+        }
+
+        /// <summary>
+        /// Toggle the 2D/3D cab preference and, if already in the cab camera, switch modes.
+        /// </summary>
+        public void ToggleCabCameraView()
+        {
+            Settings.Use3DCab = !Settings.Use3DCab;
+            if (Camera == CabCamera || Camera == ThreeDimCabCamera)
+                ActivateCabCamera();
+        }
 
         List<Camera> WellKnownCameras; // Providing Camera save functionality by GeorgeS
 
@@ -453,13 +480,10 @@ namespace Orts.Viewer3D
             };
             Simulator.Confirmer.DisplayMessage += (s, e) => MessagesWindow.AddMessage(e.Key, e.Text, e.Duration);
 
-            if (Simulator.PlayerLocomotive.HasFront3DCab || Simulator.PlayerLocomotive.HasRear3DCab)
-            {
-                ThreeDimCabCamera.Enabled = true;
-                ThreeDimCabCamera.Activate();
-            }
-            else if (Simulator.PlayerLocomotive.HasFrontCab || Simulator.PlayerLocomotive.HasRearCab) CabCamera.Activate();
-            else CameraActivate();
+            if (CabCamera.IsAvailable || ThreeDimCabCamera.IsAvailable)
+                ActivateCabCamera();
+            else
+                CameraActivate();
 
             // Prepare the world to be loaded and then load it from the correct thread for debugging/tracing purposes.
             // This ensures that a) we have all the required objects loaded when the 3D view first appears and b) that
@@ -1128,7 +1152,7 @@ namespace Orts.Viewer3D
                 CheckReplaying();
                 new UseHeadOutBackCameraCommand(Log);
             }
-            if (UserInput.IsPressed(UserCommand.GameSwitchAhead))
+/*            if (UserInput.IsPressed(UserCommand.GameSwitchAhead))
             {
                 if (PlayerTrain.ControlMode == Train.TRAIN_CONTROL.MANUAL || PlayerTrain.ControlMode == Train.TRAIN_CONTROL.EXPLORER)
                     new ToggleSwitchAheadCommand(Log);
@@ -1141,6 +1165,34 @@ namespace Orts.Viewer3D
                     new ToggleSwitchBehindCommand(Log);
                 else
                     Simulator.Confirmer.Warning(CabControl.SwitchBehind, CabSetting.Warn1);
+            }*/
+            if (UserInput.IsPressed(UserCommand.GameFacingSwitchAhead))
+            {
+                if (PlayerTrain.ControlMode == Train.TRAIN_CONTROL.MANUAL || PlayerTrain.ControlMode == Train.TRAIN_CONTROL.EXPLORER)
+                    new ToggleSwitchAheadCommand(Log, SwitchOrientation.Facing);
+                else
+                    Simulator.Confirmer.Warning(CabControl.FacingSwitchAhead, CabSetting.Warn1);
+            }
+            if (UserInput.IsPressed(UserCommand.GameFacingSwitchBehind))
+            {
+                if (PlayerTrain.ControlMode == Train.TRAIN_CONTROL.MANUAL || PlayerTrain.ControlMode == Train.TRAIN_CONTROL.EXPLORER)
+                    new ToggleSwitchBehindCommand(Log, SwitchOrientation.Facing);
+                else
+                    Simulator.Confirmer.Warning(CabControl.FacingSwitchBehind, CabSetting.Warn1);
+            }
+            if (UserInput.IsPressed(UserCommand.GameTrailingSwitchAhead))
+            {
+                if (PlayerTrain.ControlMode == Train.TRAIN_CONTROL.MANUAL || PlayerTrain.ControlMode == Train.TRAIN_CONTROL.EXPLORER)
+                    new ToggleSwitchAheadCommand(Log, SwitchOrientation.Trailing);
+                else
+                    Simulator.Confirmer.Warning(CabControl.TrailingSwitchAhead, CabSetting.Warn1);
+            }
+            if (UserInput.IsPressed(UserCommand.GameTrailingSwitchBehind))
+            {
+                if (PlayerTrain.ControlMode == Train.TRAIN_CONTROL.MANUAL || PlayerTrain.ControlMode == Train.TRAIN_CONTROL.EXPLORER)
+                    new ToggleSwitchBehindCommand(Log, SwitchOrientation.Trailing);
+                else
+                    Simulator.Confirmer.Warning(CabControl.TrailingSwitchBehind, CabSetting.Warn1);
             }
             if (UserInput.IsPressed(UserCommand.GameClearSignalForward)) PlayerTrain.RequestSignalPermission(Direction.Forward);
             if (UserInput.IsPressed(UserCommand.GameClearSignalBackward)) PlayerTrain.RequestSignalPermission(Direction.Reverse);
@@ -1752,27 +1804,28 @@ namespace Orts.Viewer3D
         {
             Simulator.Signals.RequestSetSwitch(index);
         }
-        public void ToggleSwitchAhead()
+
+        public void ToggleSwitchAhead(SwitchOrientation switchOrientation = SwitchOrientation.Any)
         {
             if (PlayerTrain.ControlMode == Train.TRAIN_CONTROL.MANUAL)
             {
-                PlayerTrain.ProcessRequestManualSetSwitch(Direction.Forward);
+                PlayerTrain.ProcessRequestManualSetSwitch(Direction.Forward, switchOrientation);
             }
             else if (PlayerTrain.ControlMode == Train.TRAIN_CONTROL.EXPLORER)
             {
-                PlayerTrain.ProcessRequestExplorerSetSwitch(Direction.Forward);
+                PlayerTrain.ProcessRequestExplorerSetSwitch(Direction.Forward, switchOrientation);
             }
         }
 
-        public void ToggleSwitchBehind()
+        public void ToggleSwitchBehind(SwitchOrientation switchOrientation = SwitchOrientation.Any)
         {
             if (PlayerTrain.ControlMode == Train.TRAIN_CONTROL.MANUAL)
             {
-                PlayerTrain.ProcessRequestManualSetSwitch(Direction.Reverse);
+                PlayerTrain.ProcessRequestManualSetSwitch(Direction.Reverse, switchOrientation);
             }
             else if (PlayerTrain.ControlMode == Train.TRAIN_CONTROL.EXPLORER)
             {
-                PlayerTrain.ProcessRequestExplorerSetSwitch(Direction.Reverse);
+                PlayerTrain.ProcessRequestExplorerSetSwitch(Direction.Reverse, switchOrientation);
             }
         }
 

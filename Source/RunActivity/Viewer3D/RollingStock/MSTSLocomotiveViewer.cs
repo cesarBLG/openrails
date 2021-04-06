@@ -1094,8 +1094,6 @@ namespace Orts.Viewer3D.RollingStock
                     if (firstOne)
                     {
                         _Viewer.AdjustCabHeight(_Viewer.DisplaySize.X, _Viewer.DisplaySize.Y);
-
-                        _Viewer.CabCamera.ScreenChanged();
                         DisplaySize.Y = _Viewer.CabHeightPixels;
                         // Use same shader for both front-facing and rear-facing cabs.
                         if (_Locomotive.CabViewList[(int)CabViewType.Front].ExtendedCVF != null)
@@ -1443,7 +1441,7 @@ namespace Orts.Viewer3D.RollingStock
     {
         protected readonly Viewer Viewer;
         protected readonly MSTSLocomotive Locomotive;
-        protected readonly CabViewControl Control;
+        public readonly CabViewControl Control;
         protected readonly CabShader Shader;
         protected readonly int ShaderKey = 1;
         protected readonly CabSpriteBatchMaterial CabShaderControlView;

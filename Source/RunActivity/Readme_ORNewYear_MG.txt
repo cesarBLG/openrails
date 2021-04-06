@@ -1,5 +1,5 @@
-﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.93
-March 13th, 2021
+﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.95
+March 27th, 2021
 
 Please note that the installation and use of Open Rails software, even of its unofficial versions, is governed by the Open Rails End User License Agreement. 
 
@@ -12,7 +12,7 @@ INSTALLATION
 you would return to the official OR version.
 
 RELEASE NOTES
-This unofficial version has been derived from the latest official OpenRails testing revision X1.3.1-315 (not yet available), which already includes Monogame. 
+This unofficial version has been derived from the latest official OpenRails testing revision X1.3.1-331, which already includes Monogame. 
 
 This version includes some features not (yet) available in the Open Rails testing official version, that is:
 - addition of track sounds in the sound debug window (by dennisat)
@@ -38,7 +38,6 @@ This version includes some features not (yet) available in the Open Rails testin
 - first edition of management of ORTS_POWERKEY and ORTS_BATTERY cab controls, by Paolo
 - re-introduced advanced coupling, by steamer_ctn
 - bug fix for https://bugs.launchpad.net/or/+bug/1895391 Calculation of reversal point distance failing
-- support for inclined gauges in 2Dcabs, see http://www.elvastower.com/forums/index.php?/topic/34517-enable-inclined-gauges-in-2d-cabs/
 - bug fix for http://www.elvastower.com/forums/index.php?/topic/34572-new-player-trains-dont-show-train-brakes-in-hud/
 - support for animation of wipers in 2D cabs, see http://www.elvastower.com/forums/index.php?/topic/34604-2d-cabs-wipers-animation/page__view__findpost__p__265101 ,
 with the contribution of Paolo.
@@ -47,8 +46,10 @@ with the contribution of Paolo.
 - tentative support for RAIN textures for objects, terrain and transfers
 - dynamic terrain and scenery loading strategy (useful for slower computers)
 - enable customized tooltips for cabview controls, by adding a Label ( "string" ) line in the cabview control block in the .cvf file, by Jindrich
-- NEW: bug fix for https://bugs.launchpad.net/or/+bug/1918921 Crash on restoring in timetable mode
-- NEW: bug fox for http://www.elvastower.com/forums/index.php?/topic/34926-turntable-problems/page__p__269128#entry269128 , by mbm_OR
+- NEW: commands to selectively throw facing or trailing switches, see http://www.elvastower.com/forums/index.php?/topic/34991-opposite-switch-throwing-with-g-key/page__view__findpost__p__270291
+
+
+
 
 
 
