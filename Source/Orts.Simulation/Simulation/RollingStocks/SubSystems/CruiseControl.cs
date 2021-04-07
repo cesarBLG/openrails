@@ -688,6 +688,12 @@ namespace Orts.Simulation.RollingStocks.SubSystems
 
         protected virtual void UpdateMotiveForce(float elapsedClockSeconds, float AbsWheelSpeedMpS)
         {
+            if (SelectedMaxAccelerationStep == 0) // no effort, no throttle (i.e. for reverser change, etc) and return
+            {
+                Locomotive.SetThrottlePercent(0);
+                return;
+            }
+
             if (DynamicBrakeFullRangeIncreaseTimeSeconds == 0)
                 DynamicBrakeFullRangeIncreaseTimeSeconds = 4;
             if (DynamicBrakeFullRangeDecreaseTimeSeconds == 0)
@@ -1042,7 +1048,12 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                     {
                         coeff = 1;
                     }
+                    float tempAccDemand = AccelerationDemandMpSS;
                     AccelerationDemandMpSS = (float)Math.Sqrt((StartReducingSpeedDelta) * coeff * (delta));
+                    if (float.IsNaN(AccelerationDemandMpSS))
+                    {
+                        AccelerationDemandMpSS = tempAccDemand;
+                    }
                     if (delta > 0.0f && Locomotive.DynamicBrakePercent < 1)
                     {
                         if (Locomotive.DynamicBrakePercent > 0)
