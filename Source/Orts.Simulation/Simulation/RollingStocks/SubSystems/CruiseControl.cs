@@ -110,6 +110,8 @@ namespace Orts.Simulation.RollingStocks.SubSystems
         public float SafeSpeedForAutomaticOperationMpS = 0;
         protected float SpeedSelectorStepTimeSeconds = 0;
         protected float elapsedTime = 0;
+        public bool DisableCruiseControlOnThrottleAndZeroSpeed = false;
+        public bool DisableCruiseControlOnThrottleAndZeroForce = false;
 
         public void Parse(string lowercasetoken, STFReader stf)
         {
@@ -133,7 +135,9 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                 case "engine(ortscruisecontrol(maxforcekeepselectedstepwhenmanualmodeset": MaxForceKeepSelectedStepWhenManualModeSet = stf.ReadBoolBlock(false); break;
                 case "engine(ortscruisecontrol(forceregulatorautowhennonzerospeedselected": ForceRegulatorAutoWhenNonZeroSpeedSelected = stf.ReadBoolBlock(false); break;
                 case "engine(ortscruisecontrol(continuousspeedincreasing": ContinuousSpeedIncreasing = stf.ReadBoolBlock(false); break;
-                    
+                case "engine(ortscruisecontrol(disablecruisecontrolonthrottleandzerospeed": DisableCruiseControlOnThrottleAndZeroSpeed = stf.ReadBoolBlock(false); break;
+                case "engine(ortscruisecontrol(disablecruisecontrolonthrottleandzeroforce": DisableCruiseControlOnThrottleAndZeroForce = stf.ReadBoolBlock(false); break;
+
                 case "engine(ortscruisecontrol(forcestepsthrottletable":
                     foreach (var forceStepThrottleValue in stf.ReadStringBlock("").Replace(" ", "").Split(','))
                     {
