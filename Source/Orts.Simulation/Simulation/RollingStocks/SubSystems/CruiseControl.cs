@@ -820,7 +820,27 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                 SkipThrottleDisplay = true;
                 reducingForce = false;
             }
-            if (SpeedRegulatorOptions.Contains("engageforceonnonzerospeed") && SelectedSpeedMpS == 0) return;
+            if (SpeedRegulatorOptions.Contains("engageforceonnonzerospeed") && SelectedSpeedMpS == 0)
+            {
+                if (playerNotDriveableTrainLocomotives.Count > 0) // update any other than the player's locomotive in the consist throttles to percentage of the current force and the max force
+                {
+                    foreach (MSTSLocomotive lc in playerNotDriveableTrainLocomotives)
+                    {
+                        if (UseThrottle)
+                        {
+                            lc.SetThrottlePercent(0);
+                        }
+                        else
+                        {
+                            lc.IsAPartOfPlayerTrain = true;
+                            lc.ThrottleOverriden = 0;
+                        }
+                    }
+                }
+                Locomotive.TractiveForceN = Locomotive.MotiveForceN = 0;
+                Locomotive.SetThrottlePercent(0);
+                return;
+            }
 
             float t = 0;
             if (SpeedRegMode == SpeedRegulatorMode.Manual) DynamicBrakePriority = false;
