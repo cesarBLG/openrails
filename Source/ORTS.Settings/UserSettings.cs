@@ -90,6 +90,44 @@ namespace ORTS.Settings
         }
         #endregion
 
+        /// <summary>
+        /// Specifies an anti-aliasing method. Currently, Monogame's MSAA is the only supported method.
+        /// </summary>
+        public enum AntiAliasingMethod
+        {
+            /// <summary>
+            /// No antialiasing
+            /// </summary>
+            None = 1,
+            /// <summary>
+            /// 2x multisampling
+            /// </summary>
+            MSAA2x = 2,
+            /// <summary>
+            /// 4x multisampling
+            /// </summary>
+            MSAA4x = 3,
+            /// <summary>
+            /// 8x multisampling
+            /// </summary>
+            MSAA8x = 4,
+            /// <summary>
+            /// 16x multisampling
+            /// </summary>
+            MSAA16x = 5,
+            /// <summary>
+            /// 32x multisampling
+            /// </summary>
+            MSAA32x = 6,
+        }
+
+        public enum DirectXFeature
+        {
+            Level9_1,
+            Level9_3,
+            Level10_0,
+        }
+
         #region User Settings
 
         // Please put all user settings in here as auto-properties. Public properties
@@ -178,8 +216,6 @@ namespace ORTS.Settings
         public bool Wire { get; set; }
         [Default(false)]
         public bool VerticalSync { get; set; }
-        [Default(4)]
-        public int MultisamplingCount { get; set; }
         [Default(0)]
         public int Cab2DStretch { get; set; }
         [Default(2000)]
@@ -196,6 +232,8 @@ namespace ORTS.Settings
         public string WindowSize { get; set; }
         [Default(20)]
         public int DayAmbientLight { get; set; }
+        [Default(AntiAliasingMethod.MSAA2x)]
+        public int AntiAliasing { get; set; }
 
         // Simulation settings:
 
