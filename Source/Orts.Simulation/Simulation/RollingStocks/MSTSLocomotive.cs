@@ -3407,6 +3407,11 @@ namespace Orts.Simulation.RollingStocks
                     CruiseControl.SetMaxForcePercent((float)Math.Round(value * 100, 0));
                     return;
                 }
+                if (CruiseControl.UseThrottleAsSpeedSelector && CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto)
+                {
+                    CruiseControl.SetSpeed((float)Math.Round((MpS.ToKpH(MaxSpeedMpS) / 100) * value * 100, 0));
+                    return;
+                }
             }
             var controller = ThrottleController;
             var oldValue = controller.IntermediateValue;
