@@ -3512,15 +3512,34 @@ namespace Orts.Simulation.RollingStocks
         public float GetCombinedHandleValue(bool intermediateValue)
         {
             if (CombinedControlType == CombinedControl.ThrottleDynamic && DynamicBrake)
-                return CombinedControlSplitPosition + (1 - CombinedControlSplitPosition) * (intermediateValue ? DynamicBrakeController.IntermediateValue : DynamicBrakeController.CurrentValue);
+            {
+                if (CruiseControl != null)
+                {
+                    if (CruiseControl.SkipThrottleDisplay)
+                    {
+                        return CombinedControlSplitPosition;
+                    }
+                    else
+                    {
+                        return CombinedControlSplitPosition + (1 - CombinedControlSplitPosition) * (intermediateValue ? DynamicBrakeController.IntermediateValue : DynamicBrakeController.CurrentValue);
+                    }
+                }
+                else
+                {
+                    return CombinedControlSplitPosition + (1 - CombinedControlSplitPosition) * (intermediateValue ? DynamicBrakeController.IntermediateValue : DynamicBrakeController.CurrentValue);
+                }
+            }
             else if (CombinedControlType == CombinedControl.ThrottleAir && TrainBrakeController.CurrentValue > 0)
                 return CombinedControlSplitPosition + (1 - CombinedControlSplitPosition) * (intermediateValue ? TrainBrakeController.IntermediateValue : TrainBrakeController.CurrentValue);
             else if (CruiseControl == null)
                 return CombinedControlSplitPosition * (1 - (intermediateValue ? ThrottleController.IntermediateValue : ThrottleController.CurrentValue));
             else if (CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Manual)
                 return CombinedControlSplitPosition * (1 - (intermediateValue ? ThrottleController.IntermediateValue : ThrottleController.CurrentValue));
-            else
+            else if (CruiseControl.UseThrottleAsSpeedSelector)
                 return CombinedControlSplitPosition * (1 - (CruiseControl.SelectedSpeedMpS / MaxSpeedMpS));
+            else
+                return CombinedControlSplitPosition;
+
         }
         #endregion
 

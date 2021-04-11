@@ -726,6 +726,12 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                 Locomotive.TrainBrakeController.TrainBrakeControllerState == ORTS.Scripting.Api.ControllerState.Neutral)
                 TrainBrakePriority = false;
 
+            if (TrainBrakePriority || DynamicBrakePriority)
+            {
+                WasForceReset = false;
+                WasBraking = true;
+            }
+
             if ((SpeedSelMode == SpeedSelectorMode.On || SpeedSelMode == SpeedSelectorMode.Start) && !TrainBrakePriority)
             {
                 canAddForce = true;
@@ -741,6 +747,9 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                     if (SpeedSelMode == SpeedSelectorMode.Parking)
                         if (AbsWheelSpeedMpS < (SpeedIsMph ? MpS.FromMpH(ParkingBrakeEngageSpeed) : MpS.FromKpH(ParkingBrakeEngageSpeed)))
                             Locomotive.SetEngineBrakePercent(ParkingBrakePercent);
+                    if (Locomotive.DynamicBrakePercent > 0 && SelectedSpeedMpS > 0)
+                        Locomotive.SetDynamicBrakePercent(0);
+                    controllerVolts = 0;
                     return;
                 }
             }
@@ -748,15 +757,12 @@ namespace Orts.Simulation.RollingStocks.SubSystems
 
             if ((SelectedMaxAccelerationStep == 0 && SelectedMaxAccelerationPercent == 0) || SpeedSelMode == SpeedSelectorMode.Start)
                 WasForceReset = true;
-            
-            if (TrainBrakePriority || DynamicBrakePriority)
-            {
-                WasForceReset = false;
-                WasBraking = true;
-            }
 
             if (SelectedMaxAccelerationPercent == 0 && SelectedMaxAccelerationStep == 0)
+            {
                 WasBraking = false;
+                Locomotive.SetThrottlePercent(0);
+            }
             if (ResetForceAfterAnyBraking && WasBraking && (SelectedMaxAccelerationStep > 0 || SelectedMaxAccelerationPercent > 0))
             {
                 Locomotive.SetThrottlePercent(0);
@@ -877,7 +883,8 @@ namespace Orts.Simulation.RollingStocks.SubSystems
             if (SelectedMaxAccelerationStep == 0) // no effort, no throttle (i.e. for reverser change, etc) and return
             {
                 Locomotive.SetThrottlePercent(0);
-                return;
+                if (Locomotive.DynamicBrakePercent > 0)
+                Locomotive.SetDynamicBrakePercent(0);
             }
 
             if (SpeedRegMode == SpeedRegulatorMode.Auto)
@@ -1240,7 +1247,10 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                         {
                             if (!UseThrottle)
                             {
-                                Locomotive.ThrottleController.SetPercent(100);
+                                if (SelectedMaxAccelerationPercent == 0 && SelectedMaxAccelerationStep == 0)
+                                    Locomotive.ThrottleController.SetPercent(0);
+                                else
+                                    Locomotive.ThrottleController.SetPercent(100);
                             }
                             throttleIsZero = false;
                         }
@@ -1392,8 +1402,16 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                     {
                         if (Locomotive.ThrottlePercent < 100 && SpeedSelMode != SpeedSelectorMode.Parking && !UseThrottle)
                         {
-                            Locomotive.ThrottleController.SetPercent(100);
-                            throttleIsZero = false;
+                            if (SelectedMaxAccelerationPercent == 0 && SelectedMaxAccelerationStep == 0)
+                            {
+                                Locomotive.ThrottleController.SetPercent(0);
+                                throttleIsZero = true;
+                            }
+                            else
+                            {
+                                Locomotive.ThrottleController.SetPercent(100);
+                                throttleIsZero = false;
+                            }
                         }
                         if (Locomotive.DynamicBrakePercent > -1)
                         {
@@ -1423,8 +1441,17 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                         string status = Locomotive.GetDynamicBrakeStatus();
                         Locomotive.DynamicBrakeChangeActiveState(true);
                     }
-                    Locomotive.SetDynamicBrakePercent(-controllerVolts);
-                    Locomotive.DynamicBrakePercent = -controllerVolts;
+                    if (SelectedMaxAccelerationPercent == 0 && SelectedMaxAccelerationStep == 0)
+                    {
+                        Locomotive.SetDynamicBrakePercent(0);
+                        Locomotive.DynamicBrakePercent = 0;
+                        controllerVolts = 0;
+                    }
+                    else
+                    {
+                        Locomotive.SetDynamicBrakePercent(-controllerVolts);
+                        Locomotive.DynamicBrakePercent = -controllerVolts;
+                    }
                 }
                 else if (controllerVolts == 0)
                 {
@@ -1472,14 +1499,29 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                 //Simulator.Confirmer.MSG(locoPercent.ToString());
                 foreach (MSTSLocomotive lc in playerNotDriveableTrainLocomotives)
                 {
-                    if (UseThrottle)
+                    if (Locomotive.PowerOn)
                     {
-                        lc.SetThrottlePercent(Locomotive.ThrottlePercent);
+                        if (UseThrottle)
+                        {
+                            lc.SetThrottlePercent(Locomotive.ThrottlePercent);
+                        }
+                        else
+                        {
+                            lc.IsAPartOfPlayerTrain = true;
+                            lc.ThrottleOverriden = locoPercent / 100;
+                        }
                     }
                     else
                     {
-                        lc.IsAPartOfPlayerTrain = true;
-                        lc.ThrottleOverriden = locoPercent / 100;
+                        if (UseThrottle)
+                        {
+                            lc.SetThrottlePercent(0);
+                        }
+                        else
+                        {
+                            lc.IsAPartOfPlayerTrain = true;
+                            lc.ThrottleOverriden = 0;
+                        }
                     }
                 }
             }
