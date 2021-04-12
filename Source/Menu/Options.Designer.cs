@@ -3015,9 +3015,6 @@
         private System.Windows.Forms.CheckBox checkFullRangeThrottle;
         private System.Windows.Forms.Button btnCheck;
         private System.Windows.Forms.Button btnRDSettingsExport;
-        private System.Windows.Forms.Label lblMSAACount;
-        private System.Windows.Forms.TrackBar trackMultiSampling;
-        private System.Windows.Forms.Label label28;
         private System.Windows.Forms.CheckBox checkEnableWatchdog;
         private System.Windows.Forms.CheckBox checkRunAt32bit;
         private System.Windows.Forms.CheckBox checkSaveCommands;

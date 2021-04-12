@@ -613,12 +613,6 @@ private async void OptionsForm_Shown(object sender, EventArgs e)
             toolTip1.SetToolTip(trackDayAmbientLight, (trackDayAmbientLight.Value * 5).ToString() + " %");
         }
 
-        private void trackMultiSampling_ValueChanged(object sender, EventArgs e)
-        {
-            lblMSAACount.Text = trackMultiSampling.Value == 0 ? catalog.GetString("Disabled") : catalog.GetStringFmt($"{1 << trackMultiSampling.Value}x");
-        }
-
-
         private void trackAdhesionFactor_ValueChanged(object sender, EventArgs e)
         {
             SetAdhesionLevelValue();
