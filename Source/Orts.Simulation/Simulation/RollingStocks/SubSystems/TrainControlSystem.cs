@@ -268,7 +268,8 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                 Script.AlerterSound = () => Locomotive.AlerterSnd;
                 Script.TrainSpeedLimitMpS = () => Math.Min(Locomotive.Train.AllowedMaxSpeedMpS, Locomotive.Train.TrainMaxSpeedMpS);
                 Script.TrainMaxSpeedMpS = () => Locomotive.Train.TrainMaxSpeedMpS; // max speed for train in a specific section, independently from speedpost and signal limits
-                Script.CurrentSignalSpeedLimitMpS = () => Locomotive.Train.allowedMaxSpeedSignalMpS;
+                // Timetable mode doesn't provide a usable value for allowedMaxSpeedSignalMpS
+                Script.CurrentSignalSpeedLimitMpS = () => Simulator.TimetableMode ? Locomotive.Train.AllowedMaxSpeedMpS : Locomotive.Train.allowedMaxSpeedSignalMpS;
                 Script.NextSignalSpeedLimitMpS = (value) => NextGenericSignalItem<float>(value, ref ItemSpeedLimit, float.MaxValue,Train.TrainObjectItem.TRAINOBJECTTYPE.SIGNAL, "NORMAL");
                 Script.NextSignalAspect = (value) => NextGenericSignalItem<Aspect>(value, ref ItemAspect, float.MaxValue, Train.TrainObjectItem.TRAINOBJECTTYPE.SIGNAL, "NORMAL");
                 Script.NextSignalDistanceM = (value) => NextGenericSignalItem<float>(value, ref ItemDistance, float.MaxValue, Train.TrainObjectItem.TRAINOBJECTTYPE.SIGNAL, "NORMAL");
