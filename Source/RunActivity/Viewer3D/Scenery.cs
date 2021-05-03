@@ -340,7 +340,6 @@ namespace Orts.Viewer3D
 
                 var shadowCaster = (worldObject.StaticFlags & (uint)StaticFlag.AnyShadow) != 0 || viewer.Settings.ShadowAllShapes;
                 var animated = (worldObject.StaticFlags & (uint)StaticFlag.Animate) != 0;
-                var isAnalogORClock = ShapeIsORClock(worldObject.FileName) == "analog"; //check if worldObject is analog OR-Clock
                 var global = (worldObject is TrackObj) || (worldObject is HazardObj) || (worldObject.StaticFlags & (uint)StaticFlag.Global) != 0;
 
                 // TransferObj have a FileName but it is not a shape, so we need to avoid sanity-checking it as if it was.
@@ -476,9 +475,11 @@ namespace Orts.Viewer3D
                         if (Program.Simulator.CarSpawnerLists != null && ((CarSpawnerObj)worldObject).ListName != null)
                         {
                             ((CarSpawnerObj)worldObject).CarSpawnerListIdx = Program.Simulator.CarSpawnerLists.FindIndex(x => x.ListName == ((CarSpawnerObj)worldObject).ListName);
-                            if (((CarSpawnerObj)worldObject).CarSpawnerListIdx < 0 || ((CarSpawnerObj)worldObject).CarSpawnerListIdx > Program.Simulator.CarSpawnerLists.Count-1) ((CarSpawnerObj)worldObject).CarSpawnerListIdx = 0;
+                            if (((CarSpawnerObj)worldObject).CarSpawnerListIdx < 0 || ((CarSpawnerObj)worldObject).CarSpawnerListIdx > Program.Simulator.CarSpawnerLists.Count-1) 
+                                ((CarSpawnerObj)worldObject).CarSpawnerListIdx = 0;
                         }
-                        else ((CarSpawnerObj)worldObject).CarSpawnerListIdx = 0;
+                        else 
+                            ((CarSpawnerObj)worldObject).CarSpawnerListIdx = 0;
                         carSpawners.Add(new RoadCarSpawner(viewer, worldMatrix, (CarSpawnerObj)worldObject));
                     }
                     else if (worldObject.GetType() == typeof(SidingObj))
@@ -491,14 +492,35 @@ namespace Orts.Viewer3D
                     }
                     else if (worldObject.GetType() == typeof(StaticObj))
                     {
-                        if (isAnalogORClock) //worldObject of type StaticObj is analog OR-Clock
+                        var isAnalogClock = false;                                                            //Declare and preset
+                        //          preTestShape for lookup if it is an analog clock shape with clock hands
+                        StaticShape preTestShape  = (new StaticShape(viewer, shapeFilePath, worldMatrix, shadowCaster ? ShapeFlags.ShadowCaster : ShapeFlags.None));
+                        if (preTestShape.SharedShape.Animations != null)                                      // shape has an Animation at all
                         {
-                            sceneryObjects.Add(new AnalogClockShape(viewer, shapeFilePath, worldMatrix, shadowCaster ? ShapeFlags.ShadowCaster : ShapeFlags.None));
+                            if (preTestShape.SharedShape.Animations[0].anim_nodes.Count > 1)                  // shape has more than 1 anim_nodes
+                            {
+                                var strAnimNodeName = "";                                         			//Declare and preset
+                                //lookup all shapes anim nodes by name if they are OR-clocks hands
+                                for (var i = 0; i <= preTestShape.SharedShape.Animations[0].anim_nodes.Count - 1; i++)
+                                {
+                                    strAnimNodeName = preTestShape.SharedShape.Animations[0].anim_nodes[i].Name.ToLowerInvariant();
+                                    if (strAnimNodeName.IndexOf("hand_clock") == 6)   	//Shape anim node name contains "hand_clock"
+                                    {
+                                        if (strAnimNodeName.IndexOf("orts_") == 0)        //Shape anim node name begins with "ORTS_"
+                                        {
+                                            isAnalogClock = true;                                            //Shape is OR-Clock
+                                            break;                                               			
+                                        }
+                                    }
+                                }
+                            }
                         }
+                        if (isAnalogClock) //worldObject of type StaticObj is analog OR-Clock
+                            sceneryObjects.Add(new AnalogClockShape(viewer, shapeFilePath, worldMatrix, shadowCaster ? ShapeFlags.ShadowCaster : ShapeFlags.None));
                         else if (animated)
                             sceneryObjects.Add(new AnimatedShape(viewer, shapeFilePath, worldMatrix, shadowCaster ? ShapeFlags.ShadowCaster : ShapeFlags.None));
                         else
-                            sceneryObjects.Add(new StaticShape(viewer, shapeFilePath, worldMatrix, shadowCaster ? ShapeFlags.ShadowCaster : ShapeFlags.None));                     
+                            sceneryObjects.Add(new StaticShape(viewer, shapeFilePath, worldMatrix, shadowCaster ? ShapeFlags.ShadowCaster : ShapeFlags.None));
                     }
                     else if (worldObject.GetType() == typeof(PickupObj))
                     {
@@ -575,26 +597,6 @@ namespace Orts.Viewer3D
 
             if (viewer.Simulator.UseSuperElevation > 0 || viewer.Simulator.TRK.Tr_RouteFile.ChangeTrackGauge) SuperElevationManager.DecomposeStaticSuperElevation(Viewer, dTrackList, TileX, TileZ);
             if (Viewer.World.Sounds != null) Viewer.World.Sounds.AddByTile(TileX, TileZ);
-        }
-
-        //Method to check a shape name is listed in "openrails\clocks.dat"
-        public string ShapeIsORClock(string shape)
-        {
-            if (Program.Simulator.ClockLists != null && shape != null) //OR-Clocks list given by "openrails\clocks.dat" and given shape are not null
-            {
-                for (var i = 0; i <= Program.Simulator.ClockLists[0].shapeNames.Count() - 1; i++)                                       //always the first (Default) list is used by now
-                {
-                    if (shape.ToLowerInvariant() == Path.GetFileName(Program.Simulator.ClockLists[0].shapeNames[i]).ToLowerInvariant()) //shape is an OR-Clock
-                    {
-                        string clockType = Program.Simulator.ClockLists[0].clockType[i].ToLowerInvariant();                             //Type of OR-Clock given by "openrails\clocks.dat"
-                        if (clockType == "analog" || clockType == "digital")
-                            return clockType; //Return OR-Clock-Type, analog or digital
-                        else
-                            return "unknown"; //Return OR-Clock-Type as unknown
-                    }
-                }
-            }
-            return "";                        //Return empty string -> shape is not an OR-Clock
         }
 
         [CallOnThread("Loader")]

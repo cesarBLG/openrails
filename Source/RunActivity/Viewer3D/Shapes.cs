@@ -309,7 +309,7 @@ namespace Orts.Viewer3D
                     AnimateMatrix(i, key);
         }
 
-        void AnimateOneMatrix(int iMatrix, float key)
+        protected virtual void AnimateOneMatrix(int iMatrix, float key)
         {
             if (SharedShape.Animations == null || SharedShape.Animations.Count == 0)
             {
