@@ -66,6 +66,9 @@ namespace Orts.Viewer3D
         float WindDirectionVariationRad = (float)MathHelper.ToRadians(45.0f); // Set at 45 Deg
         float calculatedWindDirection;
 
+        private const float FogMinDistance = 10f;
+        private const float FogMaxDistance = 200000f;
+
 
         public WeatherControl(Viewer viewer)
         {
@@ -480,13 +483,13 @@ namespace Orts.Viewer3D
                 // Fog ranges from 10m (can't see anything) to 100km (clear arctic conditions).
                 if (UserInput.IsDown(UserCommand.DebugFogIncrease))
                 {
-                    Weather.FogDistance = MathHelper.Clamp(Weather.FogDistance - elapsedTime.RealSeconds * Weather.FogDistance, 10, 100000);
+                    Weather.FogDistance = MathHelper.Clamp(Weather.FogDistance - elapsedTime.RealSeconds * Weather.FogDistance, FogMinDistance, FogMaxDistance);
                     weatherChangeOn = false;
                     if (dynamicWeather != null) dynamicWeather.ORTSFog = -1;
                 }
                 if (UserInput.IsDown(UserCommand.DebugFogDecrease))
                 {
-                    Weather.FogDistance = MathHelper.Clamp(Weather.FogDistance + elapsedTime.RealSeconds * Weather.FogDistance, 10, 100000);
+                    Weather.FogDistance = MathHelper.Clamp(Weather.FogDistance + elapsedTime.RealSeconds * Weather.FogDistance, FogMinDistance, FogMaxDistance);
                     if (dynamicWeather != null) dynamicWeather.ORTSFog = -1;
                     weatherChangeOn = false;
                 }
@@ -637,7 +640,7 @@ namespace Orts.Viewer3D
                     ORTSFog = eventWeatherChange.ORTSFog;
                     ORTSFogTransitionTimeS = eventWeatherChange.ORTSFogTransitionTimeS;
                     fogTimer = (float)ORTSFogTransitionTimeS;
-                    var fogFinalValue = MathHelper.Clamp(ORTSFog, 10, 100000);
+                    var fogFinalValue = MathHelper.Clamp(ORTSFog, FogMinDistance, FogMaxDistance);
                     fogDistanceIncreasing = false;
                     fogChangeRate = fogTimer > 0 ? (fogFinalValue - weatherControl.Weather.FogDistance) / (ORTSFogTransitionTimeS * ORTSFogTransitionTimeS) : 0;
                     if (fogFinalValue > weatherControl.Weather.FogDistance)
