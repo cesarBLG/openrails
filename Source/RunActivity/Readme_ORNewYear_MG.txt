@@ -1,5 +1,5 @@
-﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.97
-April 25th, 2021
+﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.98
+May 3rd, 2021
 
 Please note that the installation and use of Open Rails software, even of its unofficial versions, is governed by the Open Rails End User License Agreement. 
 
@@ -7,12 +7,11 @@ INSTALLATION
 - the requirements for installation of the official Open Rails version apply, with the precisions of next lines
 - XNA 3.1 Redistributable is not needed
 - you must have at least a Windows Vista computer. Windows XP is not supported
-- start openrails simply by clicking on Openrails.exe
-- don't try to update the pack by using the link on the upper right side of the main menu window: 
-you would return to the official OR version.
+- start openrails simply by clicking on Openrails.exe.
+
 
 RELEASE NOTES
-This unofficial version has been derived from the latest official OpenRails testing revision X1.3.1-342, which already includes Monogame. 
+This unofficial version has been derived from the latest official OpenRails testing revision X1.3.1-348, which already includes Monogame. 
 
 This version includes some features not (yet) available in the Open Rails testing official version, that is:
 - addition of track sounds in the sound debug window (by dennisat)
@@ -26,7 +25,6 @@ This version includes some features not (yet) available in the Open Rails testin
 - general options checkbox for optional run at 32 bit on Win64 (consumes less memory, recommended for computers with 4 GB RAM)
 - translatable Train Driving Info window (see http://www.elvastower.com/forums/index.php?/topic/33401-f5-hud-scrolling/page__view__findpost__p__251671 and following posts), by mbm_OR
 - extended Raildriver setup (by perpetualKid)
-- analog clocks showing game time, see http://www.elvastower.com/forums/index.php?/topic/29546-station-clocks/ , by jonas
 - panto commands and animations now swapped when in rear cab
 - correction to reduce transfer flickering at short distance
 - allow passing a red signal for shunting through dispatcher window, see https://trello.com/c/I19VVKlz/450-manual-callon-from-dispatcher-window , by césarbl
@@ -38,17 +36,18 @@ This version includes some features not (yet) available in the Open Rails testin
 - re-introduced advanced coupling, by steamer_ctn
 - bug fix for https://bugs.launchpad.net/or/+bug/1895391 Calculation of reversal point distance failing
 - bug fix for http://www.elvastower.com/forums/index.php?/topic/34572-new-player-trains-dont-show-train-brakes-in-hud/
-- support for animation of wipers in 2D cabs, see http://www.elvastower.com/forums/index.php?/topic/34604-2d-cabs-wipers-animation/page__view__findpost__p__265101 ,
-with the contribution of Paolo.
 - bug fix for http://www.elvastower.com/forums/index.php?/topic/34633-unhandled-exception-overflow-in-win7/page__view__findpost__p__265463 , by mbm_OR
-- extended support for ETCS L2 planning area, for braking distance and text area, and initial support for menus by césarbl, see  http://www.elvastower.com/forums/index.php?/topic/34577-planning-area-of-the-etcs-dmi/ 
 - tentative support for RAIN textures for objects, terrain and transfers
 - dynamic terrain and scenery loading strategy (useful for slower computers)
 - enable customized tooltips for cabview controls, by adding a Label ( "string" ) line in the cabview control block in the .cvf file, by Jindrich
 - commands to selectively throw facing or trailing switches, see http://www.elvastower.com/forums/index.php?/topic/34991-opposite-switch-throwing-with-g-key/page__view__findpost__p__270291
 - bug fix for https://bugs.launchpad.net/or/+bug/1922480 Wrong subpath selected after join and split
 - locomotive and train elevator, see http://www.elvastower.com/forums/index.php?/topic/35082-locomotive-and-train-elevator/#entry271012
-- NEW: preliminary bug fix for http://www.elvastower.com/forums/index.php?/topic/35112-problem-with-tcs-scripts-and-timetable-mode/ 
+- preliminary bug fix for http://www.elvastower.com/forums/index.php?/topic/35112-problem-with-tcs-scripts-and-timetable-mode/
+- NEW: analog clocks list file no more needed, by jonas
+- NEW: Bug fix for https://bugs.launchpad.net/or/+bug/1926983 Fog distance can't be initialized to value > 20000
+- NEW: max fog distance increased to 300 km
+- NEW: Bug fix for https://bugs.launchpad.net/or/+bug/1922000. Train.CreateStationStop crash; by mbm-OR
 
 
 
