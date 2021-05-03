@@ -30,7 +30,6 @@ namespace Orts.DataConverter
         {
             var converters = new List<IDataConverter>()
                 { new TerrainConverter()
-                , new ClockConverter()
                 };
 
             try
