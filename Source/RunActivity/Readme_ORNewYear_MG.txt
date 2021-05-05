@@ -46,7 +46,7 @@ This version includes some features not (yet) available in the Open Rails testin
 - preliminary bug fix for http://www.elvastower.com/forums/index.php?/topic/35112-problem-with-tcs-scripts-and-timetable-mode/
 - NEW: analog clocks list file no more needed, by jonas
 - NEW: Bug fix for https://bugs.launchpad.net/or/+bug/1926983 Fog distance can't be initialized to value > 20000
-- NEW: max fog distance increased to 300 km
+- NEW: max fog distance increased to 200 km
 - NEW: Bug fix for https://bugs.launchpad.net/or/+bug/1922000. Train.CreateStationStop crash; by mbm-OR
 
 
