@@ -524,8 +524,8 @@ namespace Orts.Viewer3D
                 {
                     dynamicWeather = new DynamicWeather();
                 }
-                var weatherChange = Program.Simulator.ActivityRun.triggeredEventWrapper.ParsedObject.Outcomes.ORTSWeatherChange != null ?
-                    Program.Simulator.ActivityRun.triggeredEventWrapper.ParsedObject.Outcomes.ORTSWeatherChange : Program.Simulator.ActivityRun.triggeredEventWrapper.ParsedObject.ORTSWeatherChange;
+                var weatherChange = Program.Simulator.ActivityRun.triggeredEventWrapper.ParsedObject.ORTSWeatherChange != null ?
+                    Program.Simulator.ActivityRun.triggeredEventWrapper.ParsedObject.ORTSWeatherChange : Program.Simulator.ActivityRun.triggeredEventWrapper.ParsedObject.Outcomes.ORTSWeatherChange;
                 dynamicWeather.WeatherChange_Init(weatherChange, this);
                 Program.Simulator.ActivityRun.triggeredEventWrapper = null;               
             }
