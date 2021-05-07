@@ -351,6 +351,7 @@ namespace Orts.Formats.Msts
             int count = stf.ReadInt(null);
 
             stf.ParseBlock(new STFReader.TokenProcessor[] {
+                new STFReader.TokenProcessor("ortsanimateddisplay", ()=>{ Add(new CVCAnimatedDisplay(stf, basepath)); }),
                 new STFReader.TokenProcessor("dial", ()=>{ Add(new CVCDial(stf, basepath)); }),
                 new STFReader.TokenProcessor("gauge", ()=>{ Add(new CVCGauge(stf, basepath)); }),
                 new STFReader.TokenProcessor("lever", ()=>{ Add(new CVCDiscrete(stf, basepath)); }),
@@ -364,8 +365,7 @@ namespace Orts.Formats.Msts
                 new STFReader.TokenProcessor("firebox", ()=>{ Add(new CVCFirebox(stf, basepath)); }),
                 new STFReader.TokenProcessor("dialclock", ()=>{ ProcessDialClock(stf, basepath);  }),
                 new STFReader.TokenProcessor("digitalclock", ()=>{ Add(new CVCDigitalClock(stf, basepath)); }),
-                new STFReader.TokenProcessor("screendisplay", ()=>{ Add(new CVCScreen(stf, basepath)); }),
-                new STFReader.TokenProcessor("ortsanimateddisplay", ()=>{ Add(new CVCAnimatedDisplay(stf, basepath)); })
+                new STFReader.TokenProcessor("screendisplay", ()=>{ Add(new CVCScreen(stf, basepath)); })
             });
             
             //TODO Uncomment when parsed all type
