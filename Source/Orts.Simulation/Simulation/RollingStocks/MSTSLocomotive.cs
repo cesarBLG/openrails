@@ -3750,6 +3750,7 @@ namespace Orts.Simulation.RollingStocks
             if (change != 0)
             {
                 new TrainBrakeCommand(Simulator.Log, change > 0, controller.CurrentValue, Simulator.ClockTime);
+                if (change > 0 && CruiseControl != null) CruiseControl.TrainBrakePriority = true;
                 SignalEvent(Event.TrainBrakeChange);
                 AlerterReset(TCSEvent.TrainBrakeChanged);
             }

@@ -112,6 +112,8 @@ namespace Orts.Simulation.RollingStocks.SubSystems
         protected float elapsedTime = 0;
         public bool DisableCruiseControlOnThrottleAndZeroSpeed = false;
         public bool DisableCruiseControlOnThrottleAndZeroForce = false;
+        public bool ForceResetRequiredAfterBraking = false;
+        public bool ForceResetIncludeDynamicBrake = false;
 
         public void Parse(string lowercasetoken, STFReader stf)
         {
@@ -170,6 +172,8 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                 case "engine(ortscruisecontrol(usethrottleasforceselector": UseThrottleAsForceSelector = stf.ReadBoolBlock(false); break;
                 case "engine(ortscruisecontrol(dynamicbrakeincreasespeed": DynamicBrakeIncreaseSpeed = stf.ReadFloatBlock(STFReader.UNITS.Any, 0.5f); break;
                 case "engine(ortscruisecontrol(dynamicbrakedecreasespeed": DynamicBrakeDecreaseSpeed = stf.ReadFloatBlock(STFReader.UNITS.Any, 0.5f); break;
+                case "engine(ortscruisecontrol(forceresetrequiredafterbraking": ForceResetRequiredAfterBraking = stf.ReadBoolBlock(false); break;
+                case "engine(ortscruisecontrol(forceresetincludedynamicbrake": ForceResetIncludeDynamicBrake = stf.ReadBoolBlock(false); break;
                 case "engine(ortscruisecontrol(options":
                     foreach (var speedRegulatorOption in stf.ReadStringBlock("").ToLower().Replace(" ", "").Split(','))
                     {
@@ -724,7 +728,11 @@ namespace Orts.Simulation.RollingStocks.SubSystems
 
             if (Locomotive.TrainBrakeController.TrainBrakeControllerState == ORTS.Scripting.Api.ControllerState.Release ||
                 Locomotive.TrainBrakeController.TrainBrakeControllerState == ORTS.Scripting.Api.ControllerState.Neutral)
+            {
+                if (TrainBrakePriority && SelectedMaxAccelerationStep > 0 && ForceResetRequiredAfterBraking)
+                    return;
                 TrainBrakePriority = false;
+            }
 
             if (TrainBrakePriority || DynamicBrakePriority)
             {
