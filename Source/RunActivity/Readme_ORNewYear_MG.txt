@@ -1,5 +1,5 @@
-﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.98
-May 3rd, 2021
+﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.99
+May 24th, 2021
 
 Please note that the installation and use of Open Rails software, even of its unofficial versions, is governed by the Open Rails End User License Agreement. 
 
@@ -11,7 +11,7 @@ INSTALLATION
 
 
 RELEASE NOTES
-This unofficial version has been derived from the latest official OpenRails testing revision X1.3.1-348, which already includes Monogame. 
+This unofficial version has been derived from the latest official OpenRails testing revision X1.3.1-360, which already includes Monogame. 
 
 This version includes some features not (yet) available in the Open Rails testing official version, that is:
 - addition of track sounds in the sound debug window (by dennisat)
@@ -44,10 +44,10 @@ This version includes some features not (yet) available in the Open Rails testin
 - bug fix for https://bugs.launchpad.net/or/+bug/1922480 Wrong subpath selected after join and split
 - locomotive and train elevator, see http://www.elvastower.com/forums/index.php?/topic/35082-locomotive-and-train-elevator/#entry271012
 - preliminary bug fix for http://www.elvastower.com/forums/index.php?/topic/35112-problem-with-tcs-scripts-and-timetable-mode/
-- NEW: analog clocks list file no more needed, by jonas
-- NEW: Bug fix for https://bugs.launchpad.net/or/+bug/1926983 Fog distance can't be initialized to value > 20000
-- NEW: max fog distance increased to 200 km
-- NEW: Bug fix for https://bugs.launchpad.net/or/+bug/1922000. Train.CreateStationStop crash; by mbm-OR
+- analog clocks list file no more needed, by jonas
+- max fog distance increased to 300 km
+- NEW: bug fix for http://www.elvastower.com/forums/index.php?/topic/32640-or-newyear-mg/page__view__findpost__p__272321 , by césarbl
+- NEW: bug fix for http://www.elvastower.com/forums/index.php?/topic/35096-issue-with-advanced-adhesion-after-saveload/ , by steamer_ctn
 
 
 
