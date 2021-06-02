@@ -495,7 +495,7 @@ namespace Orts.Viewer3D
                         var isAnalogClock = false;                                                            //Declare and preset
                         //          preTestShape for lookup if it is an analog clock shape with clock hands
                         StaticShape preTestShape  = (new StaticShape(viewer, shapeFilePath, worldMatrix, shadowCaster ? ShapeFlags.ShadowCaster : ShapeFlags.None));
-                        if (preTestShape.SharedShape.Animations != null)                                      // shape has an Animation at all
+                        if (preTestShape.SharedShape.Animations?.Count > 0)                                      // shape has an Animation at all
                         {
                             if (preTestShape.SharedShape.Animations[0].anim_nodes.Count > 1)                  // shape has more than 1 anim_nodes
                             {
