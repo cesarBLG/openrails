@@ -394,10 +394,8 @@ namespace Orts.Formats.Msts
         public double Width;
         public double Height;
 
-        // Defaults which may be overridden when parsing CVF file
-        public double MinValue = 0.0;
-        public double MaxValue = 1.0;
-        
+        public double MinValue;
+        public double MaxValue;     
         public double OldValue;
         public string ACEFile = "";
         public string Label = "";
