@@ -1835,6 +1835,9 @@ namespace Orts.Simulation.RollingStocks
                     }
                     else
                     {
+                        WheelSlip = false;
+                        WheelSpeedMpS = SpeedMpS;
+                        WheelSpeedSlipMpS = SpeedMpS;
                         SimpleAdhesion();  // Use simple adhesion model
                         AdvancedAdhesionModel = false; // Set flag to advise simple adhesion model is in use
                     }
