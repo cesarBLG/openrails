@@ -11,7 +11,7 @@ INSTALLATION
 
 
 RELEASE NOTES
-This unofficial version has been derived from the latest official OpenRails testing revision X1.3.1-362, which already includes Monogame. 
+This unofficial version has been derived from the latest official OpenRails testing revision X1.3.1-363, which already includes Monogame. 
 
 This unofficial version includes the cruise control software written by Jindrich with final adaptations by myself.
 
