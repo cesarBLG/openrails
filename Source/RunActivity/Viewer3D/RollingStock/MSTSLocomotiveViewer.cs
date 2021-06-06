@@ -1974,9 +1974,6 @@ namespace Orts.Viewer3D.RollingStock
                         index = PercentToIndex(Locomotive.GetCombinedHandleValue(false));
                     break;
                 case CABViewControlTypes.CP_HANDLE:
-                    if (Locomotive.CruiseControl?.SpeedRegMode == Simulation.RollingStocks.SubSystems.CruiseControl.SpeedRegulatorMode.Auto && Locomotive.CruiseControl.SelectedMaxAccelerationStep != 0
-                        && Locomotive.CruiseControl.HasIndependentThrottleDynamicBrakeLever)
-                        break;
                     if (Locomotive.CombinedControlType == MSTSLocomotive.CombinedControl.ThrottleDynamic && Locomotive.DynamicBrakePercent >= 0
                             || Locomotive.CombinedControlType == MSTSLocomotive.CombinedControl.ThrottleAir && Locomotive.TrainBrakeController.CurrentValue > 0)
                             index = PercentToIndex(Locomotive.GetCombinedHandleValue(false));

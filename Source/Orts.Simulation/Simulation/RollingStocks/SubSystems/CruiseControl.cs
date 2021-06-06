@@ -454,6 +454,12 @@ namespace Orts.Simulation.RollingStocks.SubSystems
         bool maxForceIncreasing = false;
         public void SpeedRegulatorMaxForceStartIncrease()
         {
+            if (SelectedMaxAccelerationStep == 0 && DisableCruiseControlOnThrottleAndZeroForce && ForceRegulatorAutoWhenNonZeroForceSelected &&
+                Locomotive.ThrottleController.CurrentValue == 0 && Locomotive.DynamicBrakeController.CurrentValue == 0 && Locomotive.CruiseControl.SpeedRegMode == SpeedRegulatorMode.Manual)
+            {
+                SpeedRegMode = Simulation.RollingStocks.SubSystems.CruiseControl.SpeedRegulatorMode.Auto;
+                WasForceReset = true;
+            }
             maxForceIncreasing = true;
         }
         public void SpeedRegulatorMaxForceStopIncrease()
@@ -1232,7 +1238,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                                     if (delta > -0.1)
                                     {
                                         if (!UseThrottle)
-                                            Locomotive.ThrottleController.SetPercent(SelectedMaxAccelerationStep);
+                                            Locomotive.ThrottleController.SetPercent(controllerVolts);
                                         throttleIsZero = false;
                                         maxForceN = 0;
                                     }
@@ -1285,7 +1291,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                                 if (SelectedMaxAccelerationPercent == 0 && SelectedMaxAccelerationStep == 0)
                                     Locomotive.ThrottleController.SetPercent(0);
                                 else
-                                    Locomotive.ThrottleController.SetPercent(SelectedMaxAccelerationStep);
+                                    Locomotive.ThrottleController.SetPercent(controllerVolts);
                             }
                             throttleIsZero = false;
                         }
@@ -1444,7 +1450,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                             }
                             else
                             {
-                                Locomotive.ThrottleController.SetPercent(SelectedMaxAccelerationStep);
+                                Locomotive.ThrottleController.SetPercent(controllerVolts);
                                 throttleIsZero = false;
                             }
                         }

@@ -3073,7 +3073,14 @@ namespace Orts.Simulation.RollingStocks
             if (CruiseControl?.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto && CruiseControl.SelectedMaxAccelerationStep != 0
                 && CruiseControl.HasIndependentThrottleDynamicBrakeLever)
                 return;
-                if (MultiPositionControllers != null)
+            if (CruiseControl?.SelectedMaxAccelerationPercent == 0 && CruiseControl.DisableCruiseControlOnThrottleAndZeroForce && CruiseControl.SelectedMaxAccelerationStep == 0 && CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto)
+            {
+                if (CruiseControl.ZeroSelectedSpeedWhenPassingToThrottleMode) CruiseControl.SetSpeed(0);
+                if (ThrottleController.CurrentValue == 0)
+                    CruiseControl.SpeedRegMode = CruiseControl.SpeedRegulatorMode.Manual;
+                CruiseControl.SkipThrottleDisplay = false;
+            }
+            if (MultiPositionControllers != null)
             {
                 foreach (MultiPositionController mpc in MultiPositionControllers)
                 {
@@ -3202,6 +3209,13 @@ namespace Orts.Simulation.RollingStocks
             if (CruiseControl?.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto && CruiseControl.SelectedMaxAccelerationStep != 0
                 && CruiseControl.HasIndependentThrottleDynamicBrakeLever)
                 return;
+            if (CruiseControl?.SelectedMaxAccelerationPercent == 0 && CruiseControl.DisableCruiseControlOnThrottleAndZeroForce && CruiseControl.SelectedMaxAccelerationStep == 0 && CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto)
+            {
+                if (CruiseControl.ZeroSelectedSpeedWhenPassingToThrottleMode) CruiseControl.SetSpeed(0);
+                if (ThrottleController.CurrentValue == 0)
+                    CruiseControl.SpeedRegMode = CruiseControl.SpeedRegulatorMode.Manual;
+                CruiseControl.SkipThrottleDisplay = false;
+            }
             if (MultiPositionControllers != null)
             {
                 foreach (MultiPositionController mpc in MultiPositionControllers)
@@ -3535,6 +3549,9 @@ namespace Orts.Simulation.RollingStocks
         /// <returns>Combined position into 0-1 range, where arrangement is [[1--throttle--0]split[0--dynamic|airbrake--1]]</returns>
         public float GetCombinedHandleValue(bool intermediateValue)
         {
+            if (CruiseControl?.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto && CruiseControl.SelectedMaxAccelerationStep != 0
+                && CruiseControl.HasIndependentThrottleDynamicBrakeLever)
+                return CombinedControlSplitPosition;
             if (CombinedControlType == CombinedControl.ThrottleDynamic && DynamicBrake)
             {
                 if (CruiseControl != null)
@@ -3562,7 +3579,7 @@ namespace Orts.Simulation.RollingStocks
             else if (CruiseControl.UseThrottleAsSpeedSelector)
                 return CombinedControlSplitPosition * (1 - (CruiseControl.SelectedSpeedMpS / MaxSpeedMpS));
             else
-                return CombinedControlSplitPosition * (1 - (intermediateValue ? ThrottleController.IntermediateValue : ThrottleController.CurrentValue));
+                return CombinedControlSplitPosition;
 
         }
         #endregion
