@@ -529,11 +529,14 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                     if (!mpc.StateChanged)
                     {
                         mpc.StateChanged = true;
-                        if (SpeedRegMode != SpeedRegulatorMode.Auto && ForceRegulatorAutoWhenNonZeroSpeedSelected)
+                        if (SpeedRegMode != SpeedRegulatorMode.Auto && (ForceRegulatorAutoWhenNonZeroSpeedSelected ||
+                            SelectedMaxAccelerationStep == 0 && DisableCruiseControlOnThrottleAndZeroForce && ForceRegulatorAutoWhenNonZeroSpeedSelectedAndThrottleAtZero &&
+                            Locomotive.ThrottleController.CurrentValue == 0 && Locomotive.DynamicBrakeController.CurrentValue == 0))
                         {
                             SpeedRegMode = SpeedRegulatorMode.Auto;
                         }
-                        mpc.DoMovement(Controllers.MultiPositionController.Movement.Forward);
+
+                            mpc.DoMovement(Controllers.MultiPositionController.Movement.Forward);
                         return;
                     }
                 }
