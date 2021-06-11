@@ -615,6 +615,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Controllers
                         if (isFirst)
                             break;
                         currentPosition = previous;
+                        Locomotive.SignalEvent(Common.Event.MPCChangePosition);
                         break;
                     }
                     isFirst = false;
@@ -631,6 +632,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Controllers
                     if (selectNext)
                     {
                         currentPosition = pair.Type;
+                        Locomotive.SignalEvent(Common.Event.MPCChangePosition);
                         break;
                     }
                     if (pair.Type == currentPosition) selectNext = true;
@@ -816,6 +818,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Controllers
                 if (setNext)
                 {
                     currentPosition = pair.Type;
+                    Locomotive.SignalEvent(Common.Event.MPCChangePosition);
                     break;
                 }
                 if (pair.Type == currentPosition)
@@ -827,6 +830,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Controllers
                     if (pair.Flag.ToLower() == "springloadedforwards" || pair.Flag.ToLower() == "springloadedforwardsimmediatelly")
                     {
                         currentPosition = previous;
+                        Locomotive.SignalEvent(Common.Event.MPCChangePosition);
                         break;
                     }
                 }

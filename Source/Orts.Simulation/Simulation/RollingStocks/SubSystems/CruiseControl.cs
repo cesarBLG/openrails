@@ -454,6 +454,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
         bool maxForceIncreasing = false;
         public void SpeedRegulatorMaxForceStartIncrease()
         {
+            Locomotive.SignalEvent(Common.Event.CruiseControlMaxForce);
             if (SelectedMaxAccelerationStep == 0 && DisableCruiseControlOnThrottleAndZeroForce && ForceRegulatorAutoWhenNonZeroForceSelected &&
                 Locomotive.ThrottleController.CurrentValue == 0 && Locomotive.DynamicBrakeController.CurrentValue == 0 && Locomotive.CruiseControl.SpeedRegMode == SpeedRegulatorMode.Manual)
             {
@@ -493,6 +494,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
         protected bool maxForceDecreasing = false;
         public void SpeedRegulatorMaxForceStartDecrease()
         {
+            Locomotive.SignalEvent(Common.Event.CruiseControlMaxForce);
             maxForceDecreasing = true;
         }
         public void SpeedRegulatorMaxForceStopDecrease()
