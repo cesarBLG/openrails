@@ -3529,7 +3529,7 @@ namespace Orts.Simulation.RollingStocks
         /// </summary>
         public void SetCombinedHandleValue(float value)
         {
-            if (CombinedControlType == CombinedControl.ThrottleDynamic && DynamicBrake)
+            if (CombinedControlType == CombinedControl.ThrottleDynamic && DynamicBrake && !TrainControlSystem.FullDynamicBrakingOrder)
             {
                 if (DynamicBrakeController.CurrentValue == 0 && value < CombinedControlSplitPosition)
                     DynamicBrakeChangeActiveState(false);
@@ -3544,7 +3544,7 @@ namespace Orts.Simulation.RollingStocks
             {
                 if (CombinedControlType == CombinedControl.ThrottleDynamic && ThrottleController.CurrentValue == 0 && value > CombinedControlSplitPosition)
                     DynamicBrakeChangeActiveState(true);
-                else if (DynamicBrakePercent < 0)
+                else if (DynamicBrakePercent < 0 || TrainControlSystem.FullDynamicBrakingOrder)
                     SetThrottleValue(1 - MathHelper.Clamp(value, 0, CombinedControlSplitPosition) / CombinedControlSplitPosition);
             }
         }
@@ -3560,7 +3560,7 @@ namespace Orts.Simulation.RollingStocks
             if (CruiseControl?.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto && CruiseControl.SelectedMaxAccelerationStep != 0
                 && CruiseControl.HasIndependentThrottleDynamicBrakeLever)
                 return CombinedControlSplitPosition;
-            if (CombinedControlType == CombinedControl.ThrottleDynamic && DynamicBrake & !TrainControlSystem.FullDynamicBrakingOrder)
+            if (CombinedControlType == CombinedControl.ThrottleDynamic && DynamicBrake && !TrainControlSystem.FullDynamicBrakingOrder)
             {
                 if (CruiseControl != null)
                 {
