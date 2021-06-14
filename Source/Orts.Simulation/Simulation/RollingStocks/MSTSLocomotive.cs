@@ -418,6 +418,7 @@ namespace Orts.Simulation.RollingStocks
         public float ThrottleIntervention = -1;
         public float DynamicBrakeIntervention = -1;
         protected float PreviousDynamicBrakeIntervention = -1;
+        protected bool PreviousFullDynamicBrakingOrder;
 
         public ScriptedTrainControlSystem TrainControlSystem;
 
@@ -2064,6 +2065,12 @@ namespace Orts.Simulation.RollingStocks
                         LocalDynamicBrakePercent = -1;
                     }
                     PreviousDynamicBrakeIntervention = DynamicBrakeIntervention;
+                    if (PreviousFullDynamicBrakingOrder && !TrainControlSystem.FullDynamicBrakingOrder && DynamicBrakeController.CurrentValue == 0)
+                    {
+                        DynamicBrakePercent = -1;
+                        LocalDynamicBrakePercent = -1;
+                    }
+                    PreviousFullDynamicBrakingOrder = TrainControlSystem.FullDynamicBrakingOrder;
                 }
                 else if (DynamicBrakeController != null)
                     DynamicBrakeController.Update(elapsedClockSeconds);
@@ -3552,7 +3559,7 @@ namespace Orts.Simulation.RollingStocks
             if (CruiseControl?.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto && CruiseControl.SelectedMaxAccelerationStep != 0
                 && CruiseControl.HasIndependentThrottleDynamicBrakeLever)
                 return CombinedControlSplitPosition;
-            if (CombinedControlType == CombinedControl.ThrottleDynamic && DynamicBrake)
+            if (CombinedControlType == CombinedControl.ThrottleDynamic && DynamicBrake & !TrainControlSystem.FullDynamicBrakingOrder)
             {
                 if (CruiseControl != null)
                 {
