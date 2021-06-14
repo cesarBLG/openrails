@@ -2065,10 +2065,11 @@ namespace Orts.Simulation.RollingStocks
                         LocalDynamicBrakePercent = -1;
                     }
                     PreviousDynamicBrakeIntervention = DynamicBrakeIntervention;
-                    if (PreviousFullDynamicBrakingOrder && !TrainControlSystem.FullDynamicBrakingOrder && DynamicBrakeController.CurrentValue == 0)
+                    if (PreviousFullDynamicBrakingOrder && !TrainControlSystem.FullDynamicBrakingOrder && DynamicBrakeController.CurrentValue == 0 && DynamicBrakeIntervention < 0)
                     {
                         DynamicBrakePercent = -1;
                         LocalDynamicBrakePercent = -1;
+                        DynamicBrake = false;
                     }
                     PreviousFullDynamicBrakingOrder = TrainControlSystem.FullDynamicBrakingOrder;
                 }
