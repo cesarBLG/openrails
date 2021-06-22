@@ -233,9 +233,9 @@ at that point lever 1 is moved, CC switches to (or remains in) manual mode.
 If at that point lever 2 is moved, CC switches to (or remains in) auto mode.
 
 The cvf file for the E464 equipped with CC (and also with customized TCS can be 
-found in ``Documentation\SampleFiles\Manual\e464_V2SCMT_SCMTscript_alias_CC.zip``.
+found `here <samplefiles/e464_V2SCMT_SCMTscript_alias_CC.zip>`_.
 
-The eng file for the E464 can be found in 
-``Documentation\SampleFiles\Manual\Fs-E464-390.zip``.
+The eng file for the E464 can be found `here <samplefiles/Fs-E464-390.zip>`_.
+
 
 
