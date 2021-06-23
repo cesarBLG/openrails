@@ -650,7 +650,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Controllers
                             checkNeutral = true;
                             elapsedSecondsFromLastChange = 0;
                         }
-                        if (pair.Flag.ToLower() == "springloadedbackwardsimmediatelly" || pair.Flag.ToLower() == "springloadedforwardsimmediatelly")
+                        if (pair.Flag.ToLower() == "springloadedbackwardsimmediately" || pair.Flag.ToLower() == "springloadedforwardsimmediately")
                         {
                             if (!MouseInputActive)
                             {
@@ -823,11 +823,11 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Controllers
                 }
                 if (pair.Type == currentPosition)
                 {
-                    if (pair.Flag.ToLower() == "springloadedbackwards" || pair.Flag.ToLower() == "springloadedbackwardsimmediatelly")
+                    if (pair.Flag.ToLower() == "springloadedbackwards" || pair.Flag.ToLower() == "springloadedbackwardsimmediately")
                     {
                         setNext = true;
                     }
-                    if (pair.Flag.ToLower() == "springloadedforwards" || pair.Flag.ToLower() == "springloadedforwardsimmediatelly")
+                    if (pair.Flag.ToLower() == "springloadedforwards" || pair.Flag.ToLower() == "springloadedforwardsimmediately")
                     {
                         currentPosition = previous;
                         Locomotive.SignalEvent(Common.Event.MPCChangePosition);
