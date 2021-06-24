@@ -45,6 +45,11 @@ namespace Orts.Viewer3D.Popups
         int LastColOverFlow = 0;
         int LinesCount = 0;
 
+        bool ctrlAIFiremanOn = false; //AIFireman On
+        bool ctrlAIFiremanOff = false;//AIFireman Off
+        bool ctrlAIFiremanReset = false;//AIFireman Reset
+        double clockAIFireTime; //AIFireman reset timing
+
         public bool StandardHUD = true;// Standard text
         public bool TrainDrivingUpdating = false;
 
@@ -95,6 +100,7 @@ namespace Orts.Viewer3D.Popups
 
         readonly Dictionary<string, string> FirstColToAbbreviated = new Dictionary<string, string>()
         {
+            {Viewer.Catalog.GetString("AI Fireman"), Viewer.Catalog.GetString("AIFR")},
             {Viewer.Catalog.GetString("Autopilot"), Viewer.Catalog.GetString("AUTO")},
             {Viewer.Catalog.GetString("Boiler pressure"), Viewer.Catalog.GetString("PRES")},
             {Viewer.Catalog.GetString("Boiler water glass"), Viewer.Catalog.GetString("WATR")},
@@ -160,6 +166,10 @@ namespace Orts.Viewer3D.Popups
             outf.Write(Location.Y);
             outf.Write(Location.Width);
             outf.Write(Location.Height);
+            outf.Write(clockAIFireTime);
+            outf.Write(ctrlAIFiremanOn);
+            outf.Write(ctrlAIFiremanOff);
+            outf.Write(ctrlAIFiremanReset);
         }
 
         protected internal override void Restore(BinaryReader inf)
@@ -171,6 +181,10 @@ namespace Orts.Viewer3D.Popups
             LocationRestore.Y = inf.ReadInt32();
             LocationRestore.Width = inf.ReadInt32();
             LocationRestore.Height = inf.ReadInt32();
+            clockAIFireTime = inf.ReadDouble();
+            ctrlAIFiremanOn = inf.ReadBoolean();
+            ctrlAIFiremanOff = inf.ReadBoolean();
+            ctrlAIFiremanReset = inf.ReadBoolean();
 
             // Display window
             SizeTo(LocationRestore.Width, LocationRestore.Height);
@@ -831,7 +845,7 @@ namespace Orts.Viewer3D.Popups
                 InfoToLabel(keyPressed, Viewer.Catalog.GetString("FPS"), Owner.Viewer.RenderProcess.FrameRate.SmoothedValue.ToString("F0"), "", false, keyPressed);
 
             // Messages
-			// Autopilot
+            // Autopilot
             keyPressed = "";
 
             if (Owner.Viewer.PlayerLocomotive.Train.TrainType == Train.TRAINTYPE.AI_PLAYERHOSTING)
@@ -847,6 +861,43 @@ namespace Orts.Viewer3D.Popups
             else
                 InfoToLabel("", Viewer.Catalog.GetString("Autopilot"), Viewer.Catalog.GetString("Off"), "", false, keyPressed);
 
+            //AI Fireman
+            if (Locomotive is MSTSSteamLocomotive steamLocomotive)
+            {
+                keyPressed = "";
+                if (UserInput.IsDown(UserCommand.ControlAIFireOn))
+                {
+                    ctrlAIFiremanReset = ctrlAIFiremanOff = false;
+                    ctrlAIFiremanOn = true;
+                    keyPressed = arrowToRight.ToString() + "???";
+                }
+                else if (UserInput.IsDown(UserCommand.ControlAIFireOff))
+                {
+                    ctrlAIFiremanReset = ctrlAIFiremanOn = false;
+                    ctrlAIFiremanOff = true;
+                    keyPressed = arrowToRight.ToString() + "???";
+                }
+                else if (UserInput.IsDown(UserCommand.ControlAIFireReset))
+                {
+                    ctrlAIFiremanOn = ctrlAIFiremanOff = false;
+                    ctrlAIFiremanReset = true;
+                    clockAIFireTime = Owner.Viewer.Simulator.ClockTime;
+                    keyPressed = arrowToRight.ToString() + "???";
+                }
+
+                if (!ctrlAIFiremanOn && !ctrlAIFiremanOff && !ctrlAIFiremanReset)
+                {
+                    InfoToLabel(keyPressed, Viewer.Catalog.GetString("AI Fireman") + "?!?", Viewer.Catalog.GetString(""), "", false, keyPressed);
+                }
+                else
+                {
+                    InfoToLabel(keyPressed, Viewer.Catalog.GetString("AI Fireman") + "!??", ctrlAIFiremanOn ? Viewer.Catalog.GetString("On") + "!??" : ctrlAIFiremanOff ? Viewer.Catalog.GetString("Off") + "!??" : ctrlAIFiremanReset ? Viewer.Catalog.GetString("Reset") + "%%%" : "-", "", false, keyPressed);
+                }
+
+                // Delay to hide the Reset label
+                if (ctrlAIFiremanReset && clockAIFireTime + 3 < Owner.Viewer.Simulator.ClockTime)
+                    ctrlAIFiremanReset = false;
+            }
 
             // Grate limit
             keyPressed = "";
