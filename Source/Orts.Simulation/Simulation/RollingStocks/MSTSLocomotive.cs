@@ -359,7 +359,7 @@ namespace Orts.Simulation.RollingStocks
 
         protected bool DynamicBrakeBlended; // dynamic brake blending is currently active
         protected bool DynamicBrakeBlendingEnabled; // dynamic brake blending is configured
-        protected bool DynamicBrakeAvailable; // dynamic brake is available
+        public bool DynamicBrakeAvailable; // dynamic brake is available
         AirSinglePipe airPipeSystem;
         public double DynamicBrakeCommandStartTime;
         protected bool DynamicBrakeBlendingOverride; // true when DB lever >0% should always override the blending. When false, the bigger command is applied.
@@ -418,6 +418,7 @@ namespace Orts.Simulation.RollingStocks
         public float ThrottleIntervention = -1;
         public float DynamicBrakeIntervention = -1;
         protected float PreviousDynamicBrakeIntervention = -1;
+        protected bool PreviousFullDynamicBrakingOrder;
 
         public ScriptedTrainControlSystem TrainControlSystem;
 
@@ -433,6 +434,21 @@ namespace Orts.Simulation.RollingStocks
         public double LastBrakeSoundTime = 0;
 
         public float PowerReduction = 0;
+
+        // Jindrich
+        public CruiseControl CruiseControl;
+        public MultiPositionController MultiPositionController;
+        public List<MultiPositionController> MultiPositionControllers;
+        public bool SelectingSpeedPressed = false;
+        public bool EngineBrakePriority = false;
+        public bool IsAPartOfPlayerTrain = false;
+        public float ThrottleOverriden = 0;
+        public int AccelerationBits = 0;
+        public bool
+      Speed0Pressed, Speed10Pressed, Speed20Pressed, Speed30Pressed, Speed40Pressed, Speed50Pressed
+    , Speed60Pressed, Speed70Pressed, Speed80Pressed, Speed90Pressed, Speed100Pressed
+    , Speed110Pressed, Speed120Pressed, Speed130Pressed, Speed140Pressed, Speed150Pressed
+    , Speed160Pressed, Speed170Pressed, Speed180Pressed, Speed190Pressed, Speed200Pressed;
 
         public MSTSLocomotive(Simulator simulator, string wagPath)
             : base(simulator, wagPath)
@@ -559,6 +575,31 @@ namespace Orts.Simulation.RollingStocks
                 interp[DynamicBrakeSpeed4MpS + 0.5f] = 0;
                 interp[100] = 0;
                 DynamicBrakeForceCurves[1] = interp;
+            }
+        }
+
+        protected float checkAccBitsPreviousSpeed = 0;
+        protected float checkAccBitsOffTime = 0;
+        protected void CheckAccelerationBits(float elapsedSeconds, float speed)
+        {
+            float delta = MpS.ToKpH(speed) - checkAccBitsPreviousSpeed;
+            if (delta > 0.5) // increased, blink the increasing speed sign
+            {
+                checkAccBitsPreviousSpeed = MpS.ToKpH(speed);
+                AccelerationBits = 2;
+                checkAccBitsOffTime = 0;
+            }
+            if (delta < -0.5) // decreased, blink the decreasing speed sign
+            {
+                checkAccBitsPreviousSpeed = MpS.ToKpH(speed);
+                AccelerationBits = 1;
+                checkAccBitsOffTime = 0;
+            }
+            checkAccBitsOffTime += elapsedSeconds;
+            if (checkAccBitsOffTime > 0.25f)
+            {
+                AccelerationBits = 0;
+                checkAccBitsOffTime = 0;
             }
         }
 
@@ -854,7 +895,7 @@ namespace Orts.Simulation.RollingStocks
                 case "engine(ortsbrakepipechargingrate": BrakePipeChargingRatePSIorInHgpS = stf.ReadFloatBlock(STFReader.UNITS.PressureRateDefaultPSIpS, null); break;
                 case "engine(ortsbrakepipequickchargingrate": BrakePipeQuickChargingRatePSIpS = stf.ReadFloatBlock(STFReader.UNITS.PressureRateDefaultPSIpS, null); break;
                 case "engine(ortsbrakepipedischargetimemult": BrakePipeDischargeTimeFactor = stf.ReadFloatBlock(STFReader.UNITS.None, null); break;
-                case "engine(ortsmaxtractiveforcecurves": TractiveForceCurves = new InterpolatorDiesel2D(stf, false); TractiveForceCurves.HasNegativeValue();  break;
+                case "engine(ortsmaxtractiveforcecurves": TractiveForceCurves = new InterpolatorDiesel2D(stf, false); TractiveForceCurves.HasNegativeValue(); break;
                 case "engine(ortstractioncharacteristics": TractiveForceCurves = new InterpolatorDiesel2D(stf, true); break;
                 case "engine(ortsdynamicbrakeforcecurves": DynamicBrakeForceCurves = new InterpolatorDiesel2D(stf, false); break;
                 case "engine(ortscontinuousforcetimefactor": ContinuousForceTimeFactor = stf.ReadFloatBlock(STFReader.UNITS.None, null); break;
@@ -896,7 +937,7 @@ namespace Orts.Simulation.RollingStocks
                         {
                             switch (brakesenginecontrollers)
                             {
-                                case "blended":                              
+                                case "blended":
                                     DynamicBrakeBlendingEnabled = true;
                                     break;
                                 case "dynamic":
@@ -913,13 +954,13 @@ namespace Orts.Simulation.RollingStocks
                     foreach (var brakestrainbraketype in stf.ReadStringBlock("").ToLower().Replace(" ", "").Split(','))
                     {
                         switch (brakestrainbraketype)
-                            {
-                                case "vacuum_single_pipe_eq":
-                                    VacuumBrakeEQFitted = true;
-                                    break;
-                                 default:
-                                    break;
-                            }
+                        {
+                            case "vacuum_single_pipe_eq":
+                                VacuumBrakeEQFitted = true;
+                                break;
+                            default:
+                                break;
+                        }
                     }
                     break;
 
@@ -952,8 +993,15 @@ namespace Orts.Simulation.RollingStocks
                 case "engine(ortsmaxtracksanderboxcapacity": MaxTrackSandBoxCapacityM3 = stf.ReadFloatBlock(STFReader.UNITS.Volume, null); break;
                 case "engine(ortsmaxtracksandersandconsumption": TrackSanderSandConsumptionM3pS = stf.ReadFloatBlock(STFReader.UNITS.Volume, null); break;
                 case "engine(ortsmaxtracksanderairconsumption": TrackSanderAirComsumptionM3pS = stf.ReadFloatBlock(STFReader.UNITS.Volume, null); break;
-                default: base.Parse(lowercasetoken, stf); break;
-                    
+                case "engine(ortscruisecontrol": SetUpCruiseControl(); break;
+                case "engine(ortsmultipositioncontroller": SetUpMPC(); break;
+                default:
+                    base.Parse(lowercasetoken, stf);
+                    if (CruiseControl != null)
+                        CruiseControl.Parse(lowercasetoken, stf);
+                    if (MultiPositionController != null)
+                        MultiPositionController.Parse(lowercasetoken, stf);
+                    break;
             }
         }
 
@@ -1054,6 +1102,8 @@ namespace Orts.Simulation.RollingStocks
             WaterScoopDepthM = locoCopy.WaterScoopDepthM;
             WaterScoopWidthM = locoCopy.WaterScoopWidthM;
             MoveParamsToAxle();
+            if (locoCopy.CruiseControl != null)
+                CruiseControl = locoCopy.CruiseControl;
 
 
         }
@@ -1117,6 +1167,8 @@ namespace Orts.Simulation.RollingStocks
 
             TrainControlSystem.Save(outf);
             LocomotiveAxle.Save(outf);
+            if (CruiseControl != null)
+                CruiseControl.Save(outf);
         }
 
         /// <summary>
@@ -1168,6 +1220,8 @@ namespace Orts.Simulation.RollingStocks
             MoveParamsToAxle();
             LocomotiveAxle.FilterMovingAverage.Initialize(AverageForceN);
             LocomotiveAxle.Reset(Simulator.GameTime, axleSpeedMpS);
+            if (CruiseControl != null)
+                CruiseControl.Restore(inf);
         }
 
         public bool IsLeadLocomotive()
@@ -1466,6 +1520,29 @@ namespace Orts.Simulation.RollingStocks
             DrvWheelWeightKg = InitialDrvWheelWeightKg;
         }
 
+        /// <summary>
+        /// Make instance of Cruise Control and Initialize it
+        /// </summary>
+        public void SetUpCruiseControl()
+        {
+            CruiseControl = new CruiseControl(this);
+            CruiseControl.Initialize();
+            CruiseControl.Equipped = true;
+        }
+
+        /// <summary>
+        /// Make instance of multi position controller
+        /// </summary>
+        public void SetUpMPC()
+        {
+            MultiPositionController = new MultiPositionController(this);
+            if (MultiPositionControllers == null)
+            {
+                MultiPositionControllers = new List<MultiPositionController>();
+            }
+            MultiPositionControllers.Add(MultiPositionController);
+        }
+
         //================================================================================================//
         /// <summary>
         /// Set starting conditions  when initial speed > 0 
@@ -1590,6 +1667,8 @@ namespace Orts.Simulation.RollingStocks
             UpdatePowerSupply(elapsedClockSeconds);
             UpdateControllers(elapsedClockSeconds);
 
+            elapsedTime = elapsedClockSeconds;
+
             // Train Heading - only check the lead locomotive otherwise flipped locomotives further in consist will overwrite the train direction
             if (IsLeadLocomotive())
             {
@@ -1617,7 +1696,53 @@ namespace Orts.Simulation.RollingStocks
             if (!AdvancedAdhesionModel)  // Advanced adhesion model turned off.
                AbsWheelSpeedMpS = AbsSpeedMpS;
 
-            UpdateTractiveForce(elapsedClockSeconds, t, AbsSpeedMpS, AbsWheelSpeedMpS);
+            // For the advanced adhesion model, a rudimentary form of slip control is incorporated by using the wheel speed to calculate tractive effort.
+            // As wheel speed is increased tractive effort is decreased. Hence wheel slip is "controlled" to a certain extent.
+            // This doesn't cover all types of locomotives, for example if DC traction motors and no slip control, then the tractive effort shouldn't be reduced.
+            // This won't eliminate slip, but limits its impact. 
+            // More modern locomotive have a more sophisticated system that eliminates slip in the majority (if not all circumstances).
+            // Simple adhesion control does not have any slip control feature built into it.
+            // TODO - a full review of slip/no slip control.
+            if (WheelSlip && AdvancedAdhesionModel)
+            {
+                AbsTractionSpeedMpS = AbsWheelSpeedMpS;
+            }
+            else
+            {
+                AbsTractionSpeedMpS = AbsSpeedMpS;
+            }
+
+            // Jindrich
+            //UpdateMotiveForce(elapsedClockSeconds, t, AbsSpeedMpS, AbsWheelSpeedMpS);
+            CheckAccelerationBits(elapsedClockSeconds, AbsWheelSpeedMpS);
+
+            if (CruiseControl != null && !TrainBrakeController.TCSEmergencyBraking)
+            {
+                if (!IsPlayerTrain || CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Manual || CruiseControl.UseThrottle)
+                {
+                    CruiseControl.WasForceReset = false;
+                    UpdateTractiveForce(elapsedClockSeconds, t, AbsSpeedMpS, AbsWheelSpeedMpS);
+                }
+                else if (CruiseControl.SelectedSpeedMpS > 0)
+                    CruiseControl.Update(elapsedClockSeconds, AbsWheelSpeedMpS);
+                else if (CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto)
+                    CruiseControl.Update(elapsedClockSeconds, AbsWheelSpeedMpS);
+                else
+                    UpdateTractiveForce(elapsedClockSeconds, t, AbsSpeedMpS, AbsWheelSpeedMpS);
+
+            }
+            else
+            {
+                if (CruiseControl != null && (TrainBrakeController.TCSEmergencyBraking || TrainBrakeController.TCSFullServiceBraking))
+                    CruiseControl.WasBraking = true;
+                UpdateTractiveForce(elapsedClockSeconds, t, AbsSpeedMpS, AbsWheelSpeedMpS);
+            }
+
+            if (MultiPositionControllers != null)
+            {
+                foreach (MultiPositionController mpc in MultiPositionControllers)
+                    mpc.Update(elapsedClockSeconds);
+            }
 
             ApplyDirectionToTractiveForce();
 
@@ -1711,6 +1836,9 @@ namespace Orts.Simulation.RollingStocks
                     }
                     else
                     {
+                        WheelSlip = false;
+                        WheelSpeedMpS = SpeedMpS;
+                        WheelSpeedSlipMpS = SpeedMpS;
                         SimpleAdhesion();  // Use simple adhesion model
                         AdvancedAdhesionModel = false; // Set flag to advise simple adhesion model is in use
                     }
@@ -1937,6 +2065,13 @@ namespace Orts.Simulation.RollingStocks
                         LocalDynamicBrakePercent = -1;
                     }
                     PreviousDynamicBrakeIntervention = DynamicBrakeIntervention;
+                    if (PreviousFullDynamicBrakingOrder && !TrainControlSystem.FullDynamicBrakingOrder && DynamicBrakeController.CurrentValue == 0 && DynamicBrakeIntervention < 0)
+                    {
+                        DynamicBrakePercent = -1;
+                        LocalDynamicBrakePercent = -1;
+                        DynamicBrake = false;
+                    }
+                    PreviousFullDynamicBrakingOrder = TrainControlSystem.FullDynamicBrakingOrder;
                 }
                 else if (DynamicBrakeController != null)
                     DynamicBrakeController.Update(elapsedClockSeconds);
@@ -2001,25 +2136,12 @@ namespace Orts.Simulation.RollingStocks
         {
             // Method to set force and power info
             // An alternative method in the steam locomotive will override this and input force and power info for it.
+
+            if (IsAPartOfPlayerTrain) t = ThrottleOverriden;
+            if (t > 1)
+                t = 1;
             if (PowerOn && Direction != Direction.N)
             {
-
-                // For the advanced adhesion model, a rudimentary form of slip control is incorporated by using the wheel speed to calculate tractive effort.
-                // As wheel speed is increased tractive effort is decreased. Hence wheel slip is "controlled" to a certain extent.
-                // This doesn't cover all types of locomotives, for example if DC traction motors and no slip control, then the tractive effort shouldn't be reduced.
-                // This won't eliminate slip, but limits its impact. 
-                // More modern locomotive have a more sophisticated system that eliminates slip in the majority (if not all circumstances).
-                // Simple adhesion control does not have any slip control feature built into it.
-                // TODO - a full review of slip/no slip control.
-                if (WheelSlip && AdvancedAdhesionModel)
-                {
-                    AbsTractionSpeedMpS = AbsWheelSpeedMpS;
-                }
-                else
-                {
-                    AbsTractionSpeedMpS = AbsSpeedMpS;
-                }
-
                 if (TractiveForceCurves == null)
                 {
                     float maxForceN = MaxForceN * t * (1 - PowerReduction);
@@ -2926,9 +3048,26 @@ namespace Orts.Simulation.RollingStocks
         #region ThrottleController
         public void StartThrottleIncrease(float? target)
         {
+            if (CruiseControl != null && target != null)
+            {
+                if (CruiseControl.DisableCruiseControlOnThrottleAndZeroSpeed && AbsSpeedMpS == 0 && CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto)
+                {
+                    if (CruiseControl.ZeroSelectedSpeedWhenPassingToThrottleMode) CruiseControl.SetSpeed(0);
+                    CruiseControl.SpeedRegMode = CruiseControl.SpeedRegulatorMode.Manual;
+                }
+                if (CruiseControl.DisableCruiseControlOnThrottleAndZeroForce && CruiseControl.SelectedMaxAccelerationPercent == 0 && CruiseControl.SelectedMaxAccelerationStep == 0 && CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto)
+                {
+                    if (CruiseControl.ZeroSelectedSpeedWhenPassingToThrottleMode) CruiseControl.SetSpeed(0);
+                    CruiseControl.SpeedRegMode = CruiseControl.SpeedRegulatorMode.Manual;
+                }
+                if (CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto && CruiseControl.UseThrottleAsSpeedSelector)
+                {
+                    CruiseControl.SpeedRegulatorSelectedSpeedStartIncrease();
+                    return;
+                }
+            }
             if (ThrottleController.CurrentValue >= ThrottleController.MaximumValue)
                 return;
-
             if (target != null) ThrottleController.StartIncrease(target);
             else new NotchedThrottleCommand(Simulator.Log, true);
 
@@ -2939,7 +3078,56 @@ namespace Orts.Simulation.RollingStocks
 
         public void StartThrottleIncrease()
         {
-            if (DynamicBrakeController != null && DynamicBrakeController.CurrentValue >= 0 && (DynamicBrakePercent >= 0 || !(DynamicBrakePercent == -1 && !DynamicBrake || DynamicBrakePercent >= 0 && DynamicBrake)))
+            if (CruiseControl?.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto && CruiseControl.SelectedMaxAccelerationStep != 0
+                && CruiseControl.HasIndependentThrottleDynamicBrakeLever)
+                return;
+            if (CruiseControl?.SelectedMaxAccelerationPercent == 0 && CruiseControl.DisableCruiseControlOnThrottleAndZeroForce && CruiseControl.SelectedMaxAccelerationStep == 0 && CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto)
+            {
+                if (CruiseControl.ZeroSelectedSpeedWhenPassingToThrottleMode) CruiseControl.SetSpeed(0);
+                if (ThrottleController.CurrentValue == 0)
+                    CruiseControl.SpeedRegMode = CruiseControl.SpeedRegulatorMode.Manual;
+                CruiseControl.SkipThrottleDisplay = false;
+            }
+            if (MultiPositionControllers != null)
+            {
+                foreach (MultiPositionController mpc in MultiPositionControllers)
+                {
+                    if (mpc.controllerBinding == MultiPositionController.ControllerBinding.Throttle)
+                    {
+                        if (!mpc.StateChanged)
+                        {
+                            mpc.StateChanged = true;
+                            mpc.DoMovement(MultiPositionController.Movement.Forward);
+                        }
+                        return;
+                    }
+                }
+            }
+            if (CruiseControl != null && CombinedControlType == CombinedControl.None)
+            {
+                if (CruiseControl.UseThrottleAsForceSelector && CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto)
+                {
+                    CruiseControl.SpeedRegulatorMaxForceStartIncrease();
+                    return;
+                }
+                else
+                {
+                    if (CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto)
+                    {
+                        if (!CruiseControl.UseThrottleAsSpeedSelector)
+                            return;
+                    }
+                }
+            }
+            bool checkBraking = true;
+            if (CruiseControl != null)
+            {
+                if (CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto && CruiseControl.UseThrottleAsSpeedSelector)
+                {
+                    checkBraking = false;
+                }
+            }
+            if (DynamicBrakeController != null && DynamicBrakeController.CurrentValue >= 0 && (DynamicBrakePercent >= 0 || !(DynamicBrakePercent == -1 && !DynamicBrake || DynamicBrakePercent >= 0 && DynamicBrake)) && checkBraking)
             {
                 if (!(CombinedControlType == CombinedControl.ThrottleDynamic
                     || CombinedControlType == CombinedControl.ThrottleAir && TrainBrakeController.CurrentValue > 0))
@@ -2959,6 +3147,37 @@ namespace Orts.Simulation.RollingStocks
 
         public void StopThrottleIncrease()
         {
+            if (MultiPositionControllers != null)
+            {
+                foreach (MultiPositionController mpc in MultiPositionControllers)
+                {
+                    if (mpc.controllerBinding == MultiPositionController.ControllerBinding.Throttle)
+                    {
+                        if (mpc.StateChanged)
+                        {
+                            mpc.StateChanged = false;
+                            mpc.DoMovement(MultiPositionController.Movement.Neutral);
+                        }
+                        return;
+                    }
+                }
+            }
+            if (CruiseControl != null)
+            {
+                if (CruiseControl.UseThrottleAsForceSelector && CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto)
+                {
+                    CruiseControl.SpeedRegulatorMaxForceStopIncrease();
+                    return;
+                }
+                else
+                {
+                    if (CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto && CruiseControl.UseThrottleAsSpeedSelector && CruiseControl.SelectedSpeedMpS > 0)
+                    {
+                        CruiseControl.SpeedRegulatorSelectedSpeedStopIncrease();
+                        return;
+                    }
+                }
+            }
             AlerterReset(TCSEvent.ThrottleChanged);
             ThrottleController.StopIncrease();
 
@@ -2972,6 +3191,15 @@ namespace Orts.Simulation.RollingStocks
 
         public void StartThrottleDecrease(float? target)
         {
+            if (CruiseControl != null)
+            {
+                if (CruiseControl.UseThrottleAsSpeedSelector && CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto && CruiseControl.SelectedSpeedMpS > 0)
+                {
+                    CruiseControl.SpeedRegulatorSelectedSpeedStartDecrease();
+                    return;
+                }
+            }
+
             if (ThrottleController.CurrentValue <= ThrottleController.MinimumValue)
                 return;
 
@@ -2983,8 +3211,53 @@ namespace Orts.Simulation.RollingStocks
             CommandStartTime = Simulator.ClockTime;
         }
 
+        protected bool speedSelectorModeDecreasing = false;
         public void StartThrottleDecrease()
         {
+            if (CruiseControl?.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto && CruiseControl.SelectedMaxAccelerationStep != 0
+                && CruiseControl.HasIndependentThrottleDynamicBrakeLever)
+                return;
+            if (CruiseControl?.SelectedMaxAccelerationPercent == 0 && CruiseControl.DisableCruiseControlOnThrottleAndZeroForce && CruiseControl.SelectedMaxAccelerationStep == 0 && CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto)
+            {
+                if (CruiseControl.ZeroSelectedSpeedWhenPassingToThrottleMode) CruiseControl.SetSpeed(0);
+                if (ThrottleController.CurrentValue == 0)
+                    CruiseControl.SpeedRegMode = CruiseControl.SpeedRegulatorMode.Manual;
+                CruiseControl.SkipThrottleDisplay = false;
+            }
+            if (MultiPositionControllers != null)
+            {
+                foreach (MultiPositionController mpc in MultiPositionControllers)
+                {
+                    if (mpc.controllerBinding == MultiPositionController.ControllerBinding.Throttle)
+                    {
+                        if (!mpc.StateChanged)
+                        {
+                            mpc.StateChanged = true;
+                            mpc.DoMovement(MultiPositionController.Movement.Aft);
+                        }
+                        return;
+                    }
+                }
+            }
+            if (CruiseControl != null && CombinedControlType == CombinedControl.None)
+            {
+                if (CruiseControl.UseThrottleAsForceSelector && CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto)
+                {
+                    CruiseControl.SpeedRegulatorMaxForceStartDecrease();
+                    return;
+                }
+                else
+                {
+                    if (CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto && !CruiseControl.UseThrottleAsSpeedSelector)
+                    {
+                        return;
+                    }
+                }
+            }
+            if (CruiseControl?.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto && CruiseControl.SelectedSpeedMpS > 0 && CruiseControl.UseThrottleAsSpeedSelector)
+            {
+                ThrottleController.CurrentValue = 1;
+            }
             if (CombinedControlType == CombinedControl.ThrottleDynamic && ThrottleController.CurrentValue <= 0)
                 StartDynamicBrakeIncrease(null);
             else if (CombinedControlType == CombinedControl.ThrottleAir && ThrottleController.CurrentValue <= 0)
@@ -2995,6 +3268,36 @@ namespace Orts.Simulation.RollingStocks
 
         public void StopThrottleDecrease()
         {
+            if (MultiPositionControllers != null)
+            {
+                foreach (MultiPositionController mpc in MultiPositionControllers)
+                {
+                    if (mpc.controllerBinding == MultiPositionController.ControllerBinding.Throttle)
+                    {
+                        if (mpc.StateChanged)
+                        {
+                            mpc.StateChanged = false;
+                            mpc.DoMovement(MultiPositionController.Movement.Neutral);
+                        }
+                        return;
+                    }
+                }
+            }
+            if (CruiseControl != null)
+            {
+                if (CruiseControl.UseThrottleAsSpeedSelector && CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto && CruiseControl.SelectedSpeedMpS > 0)
+                {
+                    CruiseControl.SpeedRegulatorSelectedSpeedStopDecrease();
+                    return;
+                }
+                else
+                {
+                    if (CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto && CruiseControl.SelectedSpeedMpS > 0)
+                    {
+                        speedSelectorModeDecreasing = false;
+                    }
+                }
+            }
             AlerterReset(TCSEvent.ThrottleChanged);
             ThrottleController.StopDecrease();
 
@@ -3100,6 +3403,13 @@ namespace Orts.Simulation.RollingStocks
         /// </summary>
         public void ThrottleChangeTo(bool increase, float? target)
         {
+            if (CruiseControl != null && target != 0 && CruiseControl.DisableCruiseControlOnThrottleAndZeroForce && CruiseControl.SelectedMaxAccelerationStep <= 0
+                && ThrottleController.CurrentValue == 0 && DynamicBrakeController.CurrentValue == 0)
+            {
+                if (CruiseControl.ZeroSelectedSpeedWhenPassingToThrottleMode) CruiseControl.SetSpeed(0);
+                CruiseControl.SpeedRegMode = CruiseControl.SpeedRegulatorMode.Manual;
+            }
+
             if (increase)
             {
                 if (target > ThrottleController.CurrentValue)
@@ -3136,6 +3446,19 @@ namespace Orts.Simulation.RollingStocks
 
         public void SetThrottleValue(float value)
         {
+            if (CruiseControl != null)
+            {
+                if (CruiseControl.UseThrottleAsForceSelector && CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto)
+                {
+                    CruiseControl.SetMaxForcePercent((float)Math.Round(value * 100, 0));
+                    return;
+                }
+                if (CruiseControl.UseThrottleAsSpeedSelector && CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto)
+                {
+                    CruiseControl.SetSpeed((float)Math.Round((MpS.ToKpH(MaxSpeedMpS) / 100) * value * 100, 0));
+                    return;
+                }
+            }
             var controller = ThrottleController;
             var oldValue = controller.IntermediateValue;
             var change = controller.SetValue(value);
@@ -3154,7 +3477,18 @@ namespace Orts.Simulation.RollingStocks
 
         public void SetThrottlePercent(float percent)
         {
-            ThrottleController.SetPercent(percent);
+            if (CruiseControl != null)
+            {
+                if (CruiseControl.UseThrottleAsForceSelector && CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto)
+                {
+                    CruiseControl.SetMaxForcePercent(percent);
+                    return;
+                }
+                else
+                    ThrottleController.SetPercent(percent);
+            }
+            else
+                ThrottleController.SetPercent(percent);
         }
 
         public void SetThrottlePercentWithSound(float percent)
@@ -3173,7 +3507,6 @@ namespace Orts.Simulation.RollingStocks
                 StartTrainBrakeIncrease(null);
             else
                 StartThrottleToZero(0.0f);
-
         }
 
         public void StartThrottleToZero(float? target)
@@ -3196,7 +3529,7 @@ namespace Orts.Simulation.RollingStocks
         /// </summary>
         public void SetCombinedHandleValue(float value)
         {
-            if (CombinedControlType == CombinedControl.ThrottleDynamic && DynamicBrake)
+            if (CombinedControlType == CombinedControl.ThrottleDynamic && DynamicBrake && !TrainControlSystem.FullDynamicBrakingOrder)
             {
                 if (DynamicBrakeController.CurrentValue == 0 && value < CombinedControlSplitPosition)
                     DynamicBrakeChangeActiveState(false);
@@ -3211,7 +3544,7 @@ namespace Orts.Simulation.RollingStocks
             {
                 if (CombinedControlType == CombinedControl.ThrottleDynamic && ThrottleController.CurrentValue == 0 && value > CombinedControlSplitPosition)
                     DynamicBrakeChangeActiveState(true);
-                else if (DynamicBrakePercent < 0)
+                else if (DynamicBrakePercent < 0 || TrainControlSystem.FullDynamicBrakingOrder)
                     SetThrottleValue(1 - MathHelper.Clamp(value, 0, CombinedControlSplitPosition) / CombinedControlSplitPosition);
             }
         }
@@ -3224,12 +3557,38 @@ namespace Orts.Simulation.RollingStocks
         /// <returns>Combined position into 0-1 range, where arrangement is [[1--throttle--0]split[0--dynamic|airbrake--1]]</returns>
         public float GetCombinedHandleValue(bool intermediateValue)
         {
-            if (CombinedControlType == CombinedControl.ThrottleDynamic && DynamicBrake)
-                return CombinedControlSplitPosition + (1 - CombinedControlSplitPosition) * (intermediateValue ? DynamicBrakeController.IntermediateValue : DynamicBrakeController.CurrentValue);
+            if (CruiseControl?.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto && CruiseControl.SelectedMaxAccelerationStep != 0
+                && CruiseControl.HasIndependentThrottleDynamicBrakeLever)
+                return CombinedControlSplitPosition;
+            if (CombinedControlType == CombinedControl.ThrottleDynamic && DynamicBrake && !TrainControlSystem.FullDynamicBrakingOrder)
+            {
+                if (CruiseControl != null)
+                {
+                    if (CruiseControl.SkipThrottleDisplay)
+                    {
+                        return CombinedControlSplitPosition;
+                    }
+                    else
+                    {
+                        return CombinedControlSplitPosition + (1 - CombinedControlSplitPosition) * (intermediateValue ? DynamicBrakeController.IntermediateValue : DynamicBrakeController.CurrentValue);
+                    }
+                }
+                else
+                {
+                    return CombinedControlSplitPosition + (1 - CombinedControlSplitPosition) * (intermediateValue ? DynamicBrakeController.IntermediateValue : DynamicBrakeController.CurrentValue);
+                }
+            }
             else if (CombinedControlType == CombinedControl.ThrottleAir && TrainBrakeController.CurrentValue > 0)
                 return CombinedControlSplitPosition + (1 - CombinedControlSplitPosition) * (intermediateValue ? TrainBrakeController.IntermediateValue : TrainBrakeController.CurrentValue);
-            else
+            else if (CruiseControl == null)
                 return CombinedControlSplitPosition * (1 - (intermediateValue ? ThrottleController.IntermediateValue : ThrottleController.CurrentValue));
+            else if (CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Manual)
+                return CombinedControlSplitPosition * (1 - (intermediateValue ? ThrottleController.IntermediateValue : ThrottleController.CurrentValue));
+            else if (CruiseControl.UseThrottleAsSpeedSelector)
+                return CombinedControlSplitPosition * (1 - (CruiseControl.SelectedSpeedMpS / MaxSpeedMpS));
+            else
+                return CombinedControlSplitPosition;
+
         }
         #endregion
 
@@ -3351,6 +3710,10 @@ namespace Orts.Simulation.RollingStocks
             AlerterReset(TCSEvent.TrainBrakeChanged);
             TrainBrakeController.StartIncrease(target);
             TrainBrakeController.CommandStartTime = Simulator.ClockTime;
+            if (CruiseControl != null)
+            {
+                CruiseControl.TrainBrakePriority = true;
+            }
             Simulator.Confirmer.Confirm(CabControl.TrainBrake, CabSetting.Increase, GetTrainBrakeStatus());
             SignalEvent(Event.TrainBrakeChange);
         }
@@ -3436,6 +3799,7 @@ namespace Orts.Simulation.RollingStocks
             if (change != 0)
             {
                 new TrainBrakeCommand(Simulator.Log, change > 0, controller.CurrentValue, Simulator.ClockTime);
+                if (change > 0 && CruiseControl != null) CruiseControl.TrainBrakePriority = true;
                 SignalEvent(Event.TrainBrakeChange);
                 AlerterReset(TCSEvent.TrainBrakeChanged);
             }
@@ -3460,6 +3824,7 @@ namespace Orts.Simulation.RollingStocks
             if (EngineBrakeController == null)
                 return;
 
+            EngineBrakePriority = true;
             EngineBrakeController.StartIncrease(target);
             Simulator.Confirmer.Confirm(CabControl.EngineBrake, CabSetting.Increase, GetEngineBrakeStatus());
             SignalEvent(Event.EngineBrakeChange);
@@ -3687,6 +4052,14 @@ namespace Orts.Simulation.RollingStocks
     public void StartDynamicBrakeIncrease(float? target)
         {
             AlerterReset(TCSEvent.DynamicBrakeChanged);
+            if (CruiseControl != null && (CruiseControl.DynamicBrakeCommandHasPriorityOverCruiseControl ||
+                CruiseControl.DisableCruiseControlOnThrottleAndZeroForce && CruiseControl.SelectedMaxAccelerationPercent == 0 && CruiseControl.SelectedMaxAccelerationStep == 0))
+            {
+                SetThrottlePercent(0);
+                CruiseControl.DynamicBrakePriority = true;
+            }
+ /*           else
+                return;*/
             if (!CanUseDynamicBrake())
                 return;
 
@@ -3725,6 +4098,8 @@ namespace Orts.Simulation.RollingStocks
             if (DynamicBrakePercent <= 0)
             {
                 DynamicBrakeChangeActiveState(false);
+                if (CruiseControl != null)
+                    CruiseControl.DynamicBrakePriority = false;
             }
             else if (DynamicBrake)
             {
@@ -3745,6 +4120,11 @@ namespace Orts.Simulation.RollingStocks
             {
                 DynamicBrakeController.StopDecrease();
                 new DynamicBrakeCommand(Simulator.Log, false, DynamicBrakeController.CurrentValue, DynamicBrakeController.CommandStartTime);
+                if (CruiseControl != null)
+                {
+                    if (DynamicBrakePercent < 1)
+                        CruiseControl.DynamicBrakePriority = false;
+                }
             }
         }
 
@@ -3814,6 +4194,8 @@ namespace Orts.Simulation.RollingStocks
             if (toState && !DynamicBrake && DynamicBrakePercent < 0)
             {
                 DynamicBrakePercent = 0;
+                if (CruiseControl != null)
+                    CruiseControl.DynamicBrakePriority = false;
                 DynamicBrakeController.CommandStartTime = Simulator.ClockTime;
                 StopDynamicBrakeIncrease();
             }
@@ -3821,6 +4203,8 @@ namespace Orts.Simulation.RollingStocks
             {
                 SignalEvent(Event.DynamicBrakeOff);
                 DynamicBrakePercent = -1;
+                if (CruiseControl != null)
+                    CruiseControl.DynamicBrakePriority = false;
                 DynamicBrakeController.CommandStartTime = Simulator.ClockTime;
                 StopDynamicBrakeIncrease();
             }
@@ -4015,6 +4399,13 @@ namespace Orts.Simulation.RollingStocks
             TrainControlSystem.AlerterPressed(pressed);
         }
 
+        public enum TrainType { Pax, Cargo };
+        public TrainType SelectedTrainType = TrainType.Pax;
+        public void ChangeTrainTypePaxCargo()
+        {
+            SelectedTrainType = SelectedTrainType == TrainType.Pax ? SelectedTrainType = TrainType.Cargo : TrainType.Pax;
+        }
+
         //put here because you can have diesel helpers and electric player locomotive
         public void ToggleHelpersEngine()
         {
@@ -4178,10 +4569,10 @@ namespace Orts.Simulation.RollingStocks
         }
 
         //used by remote train locomotives
- /*       public virtual void RemoteUpdate()
-        {
-        }*/
-
+        /*       public virtual void RemoteUpdate()
+               {
+               }*/
+        private float elapsedTime;
         public virtual float GetDataOf(CabViewControl cvc)
         {
             float data = 0;
@@ -4189,9 +4580,16 @@ namespace Orts.Simulation.RollingStocks
             {
                 case CABViewControlTypes.SPEEDOMETER:
                     {
+                        cvc.ElapsedTime += elapsedTime;
+                        if (cvc.ElapsedTime < cvc.UpdateTime)
+                        {
+                            data = cvc.PreviousData;
+                            break;
+                        }
+                        cvc.ElapsedTime = 0;
                         //data = SpeedMpS;
                         if (AdvancedAdhesionModel)
-                            data = WheelSpeedMpS;
+                            data = AbsWheelSpeedMpS;
                         else
                             data = SpeedMpS;
 
@@ -4200,6 +4598,13 @@ namespace Orts.Simulation.RollingStocks
                         else // MPH
                             data *= 2.2369f;
                         data = Math.Abs(data);
+                        if (cvc.Precision > 0)
+                        {
+                            data = data * cvc.Precision;
+                            data = (float)Math.Round(data, 0);
+                            data = data / cvc.Precision;
+                        }
+                        cvc.PreviousData = data;
                         break;
                     }
                 case CABViewControlTypes.SPEED_PROJECTED:
@@ -4553,6 +4958,8 @@ namespace Orts.Simulation.RollingStocks
                 case CABViewControlTypes.THROTTLE_DISPLAY:
                 case CABViewControlTypes.CPH_DISPLAY:
                     {
+                        if (CruiseControl != null)
+                            if (CruiseControl.SkipThrottleDisplay) break;
                         data = Train.TrainType == Train.TRAINTYPE.AI_PLAYERHOSTING? ThrottlePercent / 100f : LocalThrottlePercent / 100f;
                         break;
                     }
@@ -4943,12 +5350,16 @@ namespace Orts.Simulation.RollingStocks
                 case CABViewControlTypes.ORTS_TCS48:
                     data = TrainControlSystem.CabDisplayControls[(int)cvc.ControlType - (int)CABViewControlTypes.ORTS_TCS1];
                     break;
-
                 default:
-                    {
+                    if (CruiseControl != null)
+                        data = CruiseControl.GetDataOf(cvc);
+                    else
                         data = 0;
-                        break;
-                    }
+                    if (MultiPositionController != null && data == 0)
+                        data = MultiPositionController.GetDataOf(cvc);
+                    else if (data == 0)
+                        data = 0;
+                    break;
             }
             return data;
         }

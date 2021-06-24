@@ -381,8 +381,10 @@ namespace Orts.Simulation.RollingStocks
             {
                 if (AcceptMUSignals && Train != null)
                 {
-                    if (Train.LeadLocomotive != null && !((MSTSLocomotive)Train.LeadLocomotive).TrainControlSystem.TractionAuthorization && Train.MUThrottlePercent > 0)
-                    {
+//                    if (Train.LeadLocomotive != null && (!((MSTSLocomotive)Train.LeadLocomotive).TrainControlSystem.TractionAuthorization && Train.MUThrottlePercent > 0 ||
+//                        ((MSTSLocomotive)Train.LeadLocomotive).CruiseControl?.SpeedRegMode != CruiseControl.SpeedRegulatorMode.Manual))
+                    if (Train.LeadLocomotive != null && !((MSTSLocomotive)Train.LeadLocomotive).TrainControlSystem.TractionAuthorization && Train.MUThrottlePercent > 0 )
+                        {
                         return 0;
                     }
                     else

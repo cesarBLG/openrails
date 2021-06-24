@@ -1,5 +1,5 @@
-﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.99
-May 24th, 2021
+﻿Open Rails, Monogame version (unofficial) README - Release NewYear CC - Rev.99.1CC
+June 6th, 2021
 
 Please note that the installation and use of Open Rails software, even of its unofficial versions, is governed by the Open Rails End User License Agreement. 
 
@@ -11,7 +11,9 @@ INSTALLATION
 
 
 RELEASE NOTES
-This unofficial version has been derived from the latest official OpenRails testing revision X1.3.1-360, which already includes Monogame. 
+This unofficial version has been derived from the latest official OpenRails testing revision X1.3.1-363, which already includes Monogame. 
+
+This unofficial version includes the cruise control software written by Jindrich with final adaptations by myself.
 
 This version includes some features not (yet) available in the Open Rails testing official version, that is:
 - addition of track sounds in the sound debug window (by dennisat)
@@ -41,13 +43,12 @@ This version includes some features not (yet) available in the Open Rails testin
 - dynamic terrain and scenery loading strategy (useful for slower computers)
 - enable customized tooltips for cabview controls, by adding a Label ( "string" ) line in the cabview control block in the .cvf file, by Jindrich
 - commands to selectively throw facing or trailing switches, see http://www.elvastower.com/forums/index.php?/topic/34991-opposite-switch-throwing-with-g-key/page__view__findpost__p__270291
-- bug fix for https://bugs.launchpad.net/or/+bug/1922480 Wrong subpath selected after join and split
 - locomotive and train elevator, see http://www.elvastower.com/forums/index.php?/topic/35082-locomotive-and-train-elevator/#entry271012
 - preliminary bug fix for http://www.elvastower.com/forums/index.php?/topic/35112-problem-with-tcs-scripts-and-timetable-mode/
 - analog clocks list file no more needed, by jonas
 - max fog distance increased to 300 km
-- NEW: bug fix for http://www.elvastower.com/forums/index.php?/topic/32640-or-newyear-mg/page__view__findpost__p__272321 , by césarbl
-- NEW: bug fix for http://www.elvastower.com/forums/index.php?/topic/35096-issue-with-advanced-adhesion-after-saveload/ , by steamer_ctn
+- bug fix for http://www.elvastower.com/forums/index.php?/topic/32640-or-newyear-mg/page__view__findpost__p__272321 , by césarbl
+- Bug fix for missing shapes http://www.elvastower.com/forums/index.php?/topic/32640-or-newyear-mg/page__view__findpost__p__272585
 
 
 
@@ -62,6 +63,7 @@ This unofficial version couldn't have been created without following contributio
 - the Monogame Development Team
 - Peter Gulyas, who created the first Monogame version of Open Rails
 - perpetualKid
+- Jindrich
 - Dennis A T (dennisat)
 - Mauricio (mbm_OR)
 - cjakeman

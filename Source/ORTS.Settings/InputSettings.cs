@@ -97,7 +97,7 @@ namespace ORTS.Settings
 
         public override object GetDefaultValue(string name)
         {
-            return DefaultCommands[(int)GetCommand(name)].PersistentDescriptor;
+           return DefaultCommands[(int)GetCommand(name)].PersistentDescriptor;
         }
 
         protected override object GetValue(string name)
@@ -318,10 +318,10 @@ namespace ORTS.Settings
             Commands[(int)UserCommand.CameraJumpSeeSwitch] = new UserCommandKeyInput(0x22, KeyModifiers.Control | KeyModifiers.Alt);
             Commands[(int)UserCommand.CameraOutsideFront] = new UserCommandKeyInput(0x03);
             Commands[(int)UserCommand.CameraOutsideRear] = new UserCommandKeyInput(0x04);
-            Commands[(int)UserCommand.CameraPanDown] = new UserCommandModifiableKeyInput(0x50, Commands[(int)UserCommand.CameraMoveFast], Commands[(int)UserCommand.CameraMoveSlow]);
+            Commands[(int)UserCommand.CameraPanDown] = new UserCommandModifiableKeyInput(0x50, Commands[(int)UserCommand.CameraMoveSlow]);
             Commands[(int)UserCommand.CameraPanLeft] = new UserCommandModifiableKeyInput(0x4B, Commands[(int)UserCommand.CameraMoveFast], Commands[(int)UserCommand.CameraMoveSlow]);
             Commands[(int)UserCommand.CameraPanRight] = new UserCommandModifiableKeyInput(0x4D, Commands[(int)UserCommand.CameraMoveFast], Commands[(int)UserCommand.CameraMoveSlow]);
-            Commands[(int)UserCommand.CameraPanUp] = new UserCommandModifiableKeyInput(0x48, Commands[(int)UserCommand.CameraMoveFast], Commands[(int)UserCommand.CameraMoveSlow]);
+            Commands[(int)UserCommand.CameraPanUp] = new UserCommandModifiableKeyInput(0x48, Commands[(int)UserCommand.CameraMoveSlow]);
             Commands[(int)UserCommand.CameraPassenger] = new UserCommandKeyInput(0x06);
             Commands[(int)UserCommand.CameraPreviousFree] = new UserCommandKeyInput(0x09, KeyModifiers.Shift);
             Commands[(int)UserCommand.CameraReset] = new UserCommandKeyInput(0x09, KeyModifiers.Control);
@@ -433,6 +433,42 @@ namespace ORTS.Settings
 
             Commands[(int)UserCommand.ControlWaterScoop] = new UserCommandKeyInput(0x15);
             Commands[(int)UserCommand.ControlWiper] = new UserCommandKeyInput(0x2F);
+
+            // Jindrich
+            Commands[(int)UserCommand.ControlSpeedRegulatorModeIncrease] = new UserCommandKeyInput(0x11, KeyModifiers.Shift);
+            Commands[(int)UserCommand.ControlSpeedRegulatorModeDecrease] = new UserCommandKeyInput(0x1F, KeyModifiers.Shift);
+            Commands[(int)UserCommand.ControlSpeedRegulatorMaxAccelerationIncrease] = new UserCommandKeyInput(0x20, KeyModifiers.Control | KeyModifiers.Shift);
+            Commands[(int)UserCommand.ControlSpeedRegulatorMaxAccelerationDecrease] = new UserCommandKeyInput(0x1E, KeyModifiers.Control | KeyModifiers.Shift);
+            Commands[(int)UserCommand.ControlSpeedRegulatorSelectedSpeedIncrease] = new UserCommandKeyInput(0x20, KeyModifiers.Shift);
+            Commands[(int)UserCommand.ControlSpeedRegulatorSelectedSpeedDecrease] = new UserCommandKeyInput(0x1E, KeyModifiers.Shift);
+            Commands[(int)UserCommand.ControlNumberOfAxlesIncrease] = new UserCommandKeyInput(0x48, KeyModifiers.Control | KeyModifiers.Shift);
+            Commands[(int)UserCommand.ControlNumberOfAxlesDecrease] = new UserCommandKeyInput(0x50, KeyModifiers.Control | KeyModifiers.Shift);
+            Commands[(int)UserCommand.ControlRestrictedSpeedZoneActive] = new UserCommandKeyInput(0x13, KeyModifiers.Control | KeyModifiers.Shift);
+            Commands[(int)UserCommand.ControlCruiseControlModeDecrease] = new UserCommandKeyInput(0x1E, KeyModifiers.Control);
+            Commands[(int)UserCommand.ControlCruiseControlModeIncrease] = new UserCommandKeyInput(0x20, KeyModifiers.Control);
+            Commands[(int)UserCommand.ControlTrainTypePaxCargo] = new UserCommandKeyInput(0x31, KeyModifiers.Control | KeyModifiers.Shift);
+            Commands[(int)UserCommand.ControlSelectSpeed10] = new UserCommandKeyInput(0x3B, KeyModifiers.Control | KeyModifiers.Shift);
+            Commands[(int)UserCommand.ControlSelectSpeed20] = new UserCommandKeyInput(0x3C, KeyModifiers.Control | KeyModifiers.Shift);
+            Commands[(int)UserCommand.ControlSelectSpeed30] = new UserCommandKeyInput(0x3D, KeyModifiers.Control | KeyModifiers.Shift);
+            Commands[(int)UserCommand.ControlSelectSpeed40] = new UserCommandKeyInput(0x3E, KeyModifiers.Control | KeyModifiers.Shift);
+            Commands[(int)UserCommand.ControlSelectSpeed50] = new UserCommandKeyInput(0x3F, KeyModifiers.Control | KeyModifiers.Shift);
+            Commands[(int)UserCommand.ControlSelectSpeed60] = new UserCommandKeyInput(0x40, KeyModifiers.Control | KeyModifiers.Shift);
+            Commands[(int)UserCommand.ControlSelectSpeed70] = new UserCommandKeyInput(0x41, KeyModifiers.Control | KeyModifiers.Shift);
+            Commands[(int)UserCommand.ControlSelectSpeed80] = new UserCommandKeyInput(0x42, KeyModifiers.Control | KeyModifiers.Shift);
+            Commands[(int)UserCommand.ControlSelectSpeed90] = new UserCommandKeyInput(0x43, KeyModifiers.Control | KeyModifiers.Shift);
+            Commands[(int)UserCommand.ControlSelectSpeed100] = new UserCommandKeyInput(0x44, KeyModifiers.Control | KeyModifiers.Shift);
+            Commands[(int)UserCommand.ControlSelectSpeed110] = new UserCommandKeyInput(0x57, KeyModifiers.Control | KeyModifiers.Shift);
+            Commands[(int)UserCommand.ControlSelectSpeed120] = new UserCommandKeyInput(0x58, KeyModifiers.Control | KeyModifiers.Shift);
+            Commands[(int)UserCommand.ControlSelectSpeed110] = new UserCommandKeyInput(0x02, KeyModifiers.Control | KeyModifiers.Shift);
+            Commands[(int)UserCommand.ControlSelectSpeed120] = new UserCommandKeyInput(0x03, KeyModifiers.Control | KeyModifiers.Shift);
+            Commands[(int)UserCommand.ControlSelectSpeed130] = new UserCommandKeyInput(0x04, KeyModifiers.Control | KeyModifiers.Shift);
+            Commands[(int)UserCommand.ControlSelectSpeed140] = new UserCommandKeyInput(0x05, KeyModifiers.Control | KeyModifiers.Shift);
+            Commands[(int)UserCommand.ControlSelectSpeed150] = new UserCommandKeyInput(0x06, KeyModifiers.Control | KeyModifiers.Shift);
+            Commands[(int)UserCommand.ControlSelectSpeed160] = new UserCommandKeyInput(0x07, KeyModifiers.Control | KeyModifiers.Shift);
+            Commands[(int)UserCommand.ControlSelectSpeed170] = new UserCommandKeyInput(0x08, KeyModifiers.Control | KeyModifiers.Shift);
+            Commands[(int)UserCommand.ControlSelectSpeed180] = new UserCommandKeyInput(0x09, KeyModifiers.Control | KeyModifiers.Shift);
+            Commands[(int)UserCommand.ControlSelectSpeed190] = new UserCommandKeyInput(0x0A, KeyModifiers.Control | KeyModifiers.Shift);
+            Commands[(int)UserCommand.ControlSelectSpeed200] = new UserCommandKeyInput(0x0B, KeyModifiers.Control | KeyModifiers.Shift);
 
             Commands[(int)UserCommand.DebugClockBackwards] = new UserCommandKeyInput(0x0C);
             Commands[(int)UserCommand.DebugClockForwards] = new UserCommandKeyInput(0x0D);

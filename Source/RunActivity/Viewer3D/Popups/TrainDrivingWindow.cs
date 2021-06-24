@@ -840,6 +840,21 @@ namespace Orts.Viewer3D.Popups
             keyPressed = "";
             InfoToLabel(keyPressed, "Sprtr", "", "", true, keyPressed);
 
+            if ((Owner.Viewer.PlayerLocomotive as MSTSLocomotive).CruiseControl != null)
+            {
+                var cc = (Owner.Viewer.PlayerLocomotive as MSTSLocomotive).CruiseControl;
+                InfoToLabel(keyPressed, Viewer.Catalog.GetString("CCStatus"), cc.SpeedRegMode.ToString() + "%%%", "", false, keyPressed);
+                if (cc.SpeedRegMode == Simulation.RollingStocks.SubSystems.CruiseControl.SpeedRegulatorMode.Auto)
+                {
+                    InfoToLabel(keyPressed, Viewer.Catalog.GetString("Target"), 
+                        FormatStrings.FormatSpeedDisplay(cc.SelectedSpeedMpS, Owner.Viewer.PlayerLocomotive.IsMetric) + "%%%", "", false, keyPressed);
+                    InfoToLabel(keyPressed, Viewer.Catalog.GetString("MaxAccel"), (cc.SpeedRegulatorMaxForcePercentUnits ? cc.SelectedMaxAccelerationPercent.ToString("0") + "% " :
+                        cc.SelectedMaxAccelerationStep.ToString("0") + "% ") + "%%%", "", false, keyPressed);
+                }
+                keyPressed = "";
+                InfoToLabel(keyPressed, "Sprtr", "", "", true, keyPressed);
+            }
+
             keyPressed = "";
             if (StandardHUD)
                 InfoToLabel(keyPressed, Viewer.Catalog.GetString("FPS"), Owner.Viewer.RenderProcess.FrameRate.SmoothedValue.ToString("F0"), "", false, keyPressed);

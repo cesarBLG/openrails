@@ -212,6 +212,15 @@ namespace Orts.Common
         SmallEjectorOn,
         SmallEjectorOff,
 
+        // Cruise Control
+        CruiseControlSpeedRegulator,
+        CruiseControlSpeedSelector,
+        CruiseControlMaxForce,
+        Alert,
+        Alert1,
+
+        MPCChangePosition,
+
     }
 
     public static class Events
@@ -437,6 +446,16 @@ namespace Orts.Common
                         case 211: return Event.LargeEjectorOff;
                         case 212: return Event.SmallEjectorOn;
                         case 213: return Event.SmallEjectorOff;
+
+                        // Cruise Control
+                        case 300: return Event.CruiseControlSpeedRegulator;
+                        case 301: return Event.CruiseControlSpeedSelector;
+                        case 302: return Event.CruiseControlMaxForce;
+                        case 303: return Event.Alert;
+                        case 304: return Event.Alert1;
+
+                        case 310: return Event.MPCChangePosition;
+
 
                         default: return 0;
                     }
