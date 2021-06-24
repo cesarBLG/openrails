@@ -1,5 +1,5 @@
-﻿Open Rails, Monogame version (unofficial) README - Release NewYear CC - Rev.99.1CC
-June 6th, 2021
+﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.100
+June 24th, 2021
 
 Please note that the installation and use of Open Rails software, even of its unofficial versions, is governed by the Open Rails End User License Agreement. 
 
@@ -11,7 +11,7 @@ INSTALLATION
 
 
 RELEASE NOTES
-This unofficial version has been derived from the latest official OpenRails testing revision X1.3.1-363, which already includes Monogame. 
+This unofficial version has been derived from the latest official OpenRails testing revision X1.3.1-370 (not already published, which already includes Monogame. 
 
 This unofficial version includes the cruise control software written by Jindrich with final adaptations by myself.
 
@@ -47,8 +47,12 @@ This version includes some features not (yet) available in the Open Rails testin
 - preliminary bug fix for http://www.elvastower.com/forums/index.php?/topic/35112-problem-with-tcs-scripts-and-timetable-mode/
 - analog clocks list file no more needed, by jonas
 - max fog distance increased to 300 km
-- bug fix for http://www.elvastower.com/forums/index.php?/topic/32640-or-newyear-mg/page__view__findpost__p__272321 , by césarbl
-- Bug fix for missing shapes http://www.elvastower.com/forums/index.php?/topic/32640-or-newyear-mg/page__view__findpost__p__272585
+- bug fix for missing shapes http://www.elvastower.com/forums/index.php?/topic/32640-or-newyear-mg/page__view__findpost__p__272585
+- NEW: first cruise control implementation, by Jindrich and slightly adapted by me
+- NEW: fix ORNYMG bug of main window not precisely centered, see http://www.elvastower.com/forums/index.php?/topic/32640-or-newyear-mg/page__view__findpost__p__272638
+- NEW: added AIFireman info in web and main display TrainDrivingInfo, by mbm_OR
+- NEW: tentative improvement to sound deactivation in long player trains, see http://www.elvastower.com/forums/index.php?/topic/35244-problem-in-locomotive-sound/
+
 
 
 
