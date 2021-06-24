@@ -29,6 +29,11 @@ namespace Orts.Viewer3D.WebServices
 {
     public static class TrainDrivingDisplay
     {
+        private static bool ctrlAIFiremanOn = false; //AIFireman On
+        private static bool ctrlAIFiremanOff = false;//AIFireman Off
+        private static bool ctrlAIFiremanReset = false;//AIFireman Reset
+        private static double clockAIFireTime; //AIFireman reset timing
+
         /// <summary>
         /// A Train Driving row with data fields.
         /// </summary>
@@ -78,6 +83,7 @@ namespace Orts.Viewer3D.WebServices
 
         private static readonly Dictionary<string, string> FirstColToAbbreviated = new Dictionary<string, string>()
         {
+            {Viewer.Catalog.GetString("AI Fireman"), Viewer.Catalog.GetString("AIFR")},
             {Viewer.Catalog.GetString("Autopilot"), Viewer.Catalog.GetString("AUTO")},
             {Viewer.Catalog.GetString("Boiler pressure"), Viewer.Catalog.GetString("PRES")},
             {Viewer.Catalog.GetString("Boiler water glass"), Viewer.Catalog.GetString("WATR")},
@@ -629,6 +635,44 @@ namespace Orts.Viewer3D.WebServices
                 FirstCol = Viewer.Catalog.GetString("Autopilot"),
                 LastCol = autopilot ? Viewer.Catalog.GetString("On") + ColorCode[Color.Yellow] : Viewer.Catalog.GetString("Off"),
             });
+
+            //AI Fireman
+            if (locomotive is MSTSSteamLocomotive steamLocomotive3)
+            {
+                string aifireKey;
+                aifireKey = Symbols.ArrowToRight + ColorCode[Color.Yellow];
+                switch (GetPressedKey(UserCommand.ControlAIFireOn, UserCommand.ControlAIFireOff, UserCommand.ControlAIFireReset))
+                {
+                    case UserCommand.ControlAIFireOn:
+                        ctrlAIFiremanReset = ctrlAIFiremanOff = false;
+                        ctrlAIFiremanOn = true;
+                        break;
+                    case UserCommand.ControlAIFireOff:
+                        ctrlAIFiremanReset = ctrlAIFiremanOn = false;
+                        ctrlAIFiremanOff = true;
+                        break;
+                    case UserCommand.ControlAIFireReset:
+                        ctrlAIFiremanOn = ctrlAIFiremanOff = false;
+                        ctrlAIFiremanReset = true;
+                        clockAIFireTime = viewer.Simulator.ClockTime;
+                        break;
+                    default:
+                        aifireKey = "";
+                        break;
+                }
+
+                // Delay to hide the Reset label
+                if (ctrlAIFiremanReset && clockAIFireTime + 3 < viewer.Simulator.ClockTime)
+                    ctrlAIFiremanReset = false;
+
+                AddLabel(new ListLabel
+                {
+                    FirstCol = Viewer.Catalog.GetString("AI Fireman") + (!ctrlAIFiremanOn && !ctrlAIFiremanOff && !ctrlAIFiremanReset ? ColorCode[Color.Black] : ColorCode[Color.White]),
+                    LastCol = ctrlAIFiremanOn ? Viewer.Catalog.GetString("On") : ctrlAIFiremanOff ? Viewer.Catalog.GetString("Off") : ctrlAIFiremanReset ? Viewer.Catalog.GetString("Reset") + ColorCode[Color.Cyan] : "",
+                    KeyPressed = aifireKey,
+                    SymbolCol = aifireKey
+                });
+            }
 
             // Grate limit
             if (locomotive is MSTSSteamLocomotive steamLocomotive1)
