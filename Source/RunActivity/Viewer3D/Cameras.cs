@@ -814,7 +814,8 @@ namespace Orts.Viewer3D
 
         protected override void OnActivate(bool sameCamera)
         {
-            if (attachedCar == null || attachedCar.Train != Viewer.SelectedTrain)
+//            if (attachedCar == null || attachedCar.Train != Viewer.SelectedTrain)
+            if (attachedCar == null)
             {
                 if (Viewer.SelectedTrain.MUDirection != Direction.Reverse)
                     SetCameraCar(GetCameraCars().First());
@@ -855,13 +856,13 @@ namespace Orts.Viewer3D
         public virtual void NextCar()
         {
             var trainCars = GetCameraCars();
-            SetCameraCar(attachedCar == trainCars.First() ? attachedCar : trainCars[trainCars.IndexOf(attachedCar) - 1]);
+            SetCameraCar(attachedCar == trainCars.First() ? attachedCar : attachedCar.Train == Viewer.SelectedTrain ? trainCars[trainCars.IndexOf(attachedCar) - 1] : trainCars.First());
         }
 
         public virtual void PreviousCar()
         {
             var trainCars = GetCameraCars();
-            SetCameraCar(attachedCar == trainCars.Last() ? attachedCar : trainCars[trainCars.IndexOf(attachedCar) + 1]);
+            SetCameraCar(attachedCar == trainCars.Last() ? attachedCar : attachedCar.Train == Viewer.SelectedTrain ? trainCars[trainCars.IndexOf(attachedCar) + 1] : trainCars.Last());
         }
 
         public virtual void FirstCar()
@@ -1061,7 +1062,8 @@ namespace Orts.Viewer3D
         protected override void OnActivate(bool sameCamera)
         {
             BrowseMode = BrowseForwards = BrowseBackwards = false;
-            if (attachedCar == null || attachedCar.Train != Viewer.SelectedTrain)
+//            if (attachedCar == null || attachedCar.Train != Viewer.SelectedTrain)
+            if (attachedCar == null)
             {
                 if (Front)
                 {
