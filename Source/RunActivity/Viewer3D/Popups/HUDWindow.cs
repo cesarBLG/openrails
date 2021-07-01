@@ -502,7 +502,7 @@ namespace Orts.Viewer3D.Popups
                 {
                     TableAddLabelValue(table, Viewer.Catalog.GetString("Speed target"), "{0}", FormatStrings.FormatSpeedDisplay(cc.SelectedSpeedMpS, Viewer.PlayerLocomotive.IsMetric));
                     TableAddLabelValue(table, Viewer.Catalog.GetString("Max acceleration"), "{0:F0}%", cc.SpeedRegulatorMaxForcePercentUnits ?
-                        cc.SelectedMaxAccelerationPercent : cc.SelectedMaxAccelerationStep);
+                        cc.SelectedMaxAccelerationPercent : Math.Round(cc.MaxForceSelectorIsDiscrete ? (int)cc.SelectedMaxAccelerationStep : cc.SelectedMaxAccelerationStep) * 100 / cc.SpeedRegulatorMaxForceSteps);
                 }
             }
             TableAddLine(table);

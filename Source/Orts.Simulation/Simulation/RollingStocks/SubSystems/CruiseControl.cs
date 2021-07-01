@@ -43,6 +43,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
         public bool ForceRegulatorAutoWhenNonZeroSpeedSelected = false;
         public bool ForceRegulatorAutoWhenNonZeroForceSelected = false;
         public bool ForceRegulatorAutoWhenNonZeroSpeedSelectedAndThrottleAtZero = false;
+        public bool MaxForceSelectorIsDiscrete = false;
         public List<string> SpeedRegulatorOptions = new List<string>();
         public SpeedRegulatorMode SpeedRegMode = SpeedRegulatorMode.Manual;
         public SpeedSelectorMode SpeedSelMode = SpeedSelectorMode.Neutral;
@@ -144,6 +145,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                 case "engine(ortscruisecontrol(forceregulatorautowhennonzerospeedselected": ForceRegulatorAutoWhenNonZeroSpeedSelected = stf.ReadBoolBlock(false); break;
                 case "engine(ortscruisecontrol(forceregulatorautowhennonzeroforceselected": ForceRegulatorAutoWhenNonZeroForceSelected = stf.ReadBoolBlock(false); break;
                 case "engine(ortscruisecontrol(forceregulatorautowhennonzerospeedselectedandthrottleatzero": ForceRegulatorAutoWhenNonZeroSpeedSelectedAndThrottleAtZero = stf.ReadBoolBlock(false); break;
+                case "engine(ortscruisecontrol(maxforceselectorisdiscrete": MaxForceSelectorIsDiscrete = stf.ReadBoolBlock(false); break;
                 case "engine(ortscruisecontrol(continuousspeedincreasing": ContinuousSpeedIncreasing = stf.ReadBoolBlock(false); break;
                 case "engine(ortscruisecontrol(disablecruisecontrolonthrottleandzerospeed": DisableCruiseControlOnThrottleAndZeroSpeed = stf.ReadBoolBlock(false); break;
                 case "engine(ortscruisecontrol(disablecruisecontrolonthrottleandzeroforce": DisableCruiseControlOnThrottleAndZeroForce = stf.ReadBoolBlock(false); break;
@@ -447,7 +449,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
         {
             if (SelectedMaxAccelerationPercent == percent) return;
             SelectedMaxAccelerationPercent = percent;
-            SelectedMaxAccelerationPercent = (float)Math.Round(SelectedMaxAccelerationStep, 0);
+            SelectedMaxAccelerationPercent = (float)Math.Round(SelectedMaxAccelerationStep * 100 / SpeedRegulatorMaxForceSteps, 0);
             Simulator.Confirmer.Message(ConfirmLevel.Information, Simulator.Catalog.GetString("Speed regulator max acceleration percent changed to") + " " + Simulator.Catalog.GetString(SelectedMaxAccelerationPercent.ToString()) + "%");
         }
 
@@ -478,7 +480,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                 if (SelectedMaxAccelerationPercent == 100)
                     return;
                 SelectedMaxAccelerationPercent += 1f;
-                SelectedMaxAccelerationPercent = (float)Math.Round(SelectedMaxAccelerationStep, 0);
+                SelectedMaxAccelerationPercent = (float)Math.Round(SelectedMaxAccelerationStep * 100 / SpeedRegulatorMaxForceSteps, 0);
                 Simulator.Confirmer.Message(ConfirmLevel.Information, Simulator.Catalog.GetString("Speed regulator max acceleration percent changed to") + " " + Simulator.Catalog.GetString(SelectedMaxAccelerationPercent.ToString()) + "%");
             }
             else
@@ -487,7 +489,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                     return;
                 SelectedMaxAccelerationStep++;
                 SelectedMaxAccelerationStep = (float)Math.Round(SelectedMaxAccelerationStep, 0);
-                Simulator.Confirmer.Message(ConfirmLevel.Information, Simulator.Catalog.GetString("Speed regulator max acceleration changed to") + " " + Simulator.Catalog.GetString(SelectedMaxAccelerationStep.ToString()));
+                Simulator.Confirmer.Message(ConfirmLevel.Information, Simulator.Catalog.GetString("Speed regulator max acceleration changed to") + " " + Simulator.Catalog.GetString(Math.Round(SelectedMaxAccelerationStep * 100 / SpeedRegulatorMaxForceSteps, 0).ToString()));
             }
         }
 
@@ -516,7 +518,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
             }
             SelectedMaxAccelerationStep--;
             SelectedMaxAccelerationStep = (float)Math.Round(SelectedMaxAccelerationStep, 0);
-            Simulator.Confirmer.Message(ConfirmLevel.Information, Simulator.Catalog.GetString("Speed regulator max acceleration changed to") + " " + Simulator.Catalog.GetString(SelectedMaxAccelerationStep.ToString()));
+            Simulator.Confirmer.Message(ConfirmLevel.Information, Simulator.Catalog.GetString("Speed regulator max acceleration changed to") + " " + Simulator.Catalog.GetString(Math.Round(SelectedMaxAccelerationStep * 100 / SpeedRegulatorMaxForceSteps, 0).ToString()));
         }
 
         protected bool selectedSpeedIncreasing = false;
@@ -1029,7 +1031,8 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                                     {
                                         if (DynamicBrakeIsSelectedForceDependant)
                                         {
-                                            if (controllerVolts > -SelectedMaxAccelerationStep)
+                                            if (controllerVolts > 
+                                                -(MaxForceSelectorIsDiscrete ? (int)SelectedMaxAccelerationStep : SelectedMaxAccelerationStep) * 100 / SpeedRegulatorMaxForceSteps)
                                             {
                                                 float step = 100 / DynamicBrakeFullRangeIncreaseTimeSeconds;
                                                 step *= elapsedClockSeconds;
@@ -1185,7 +1188,8 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                                         {
                                             if (DynamicBrakeIsSelectedForceDependant)
                                             {
-                                                if (controllerVolts > -SelectedMaxAccelerationStep)
+                                                if (controllerVolts >
+                                                -(MaxForceSelectorIsDiscrete ? (int)SelectedMaxAccelerationStep : SelectedMaxAccelerationStep) * 100 / SpeedRegulatorMaxForceSteps)
                                                 {
                                                     float step = 100 / DynamicBrakeFullRangeIncreaseTimeSeconds;
                                                     step *= elapsedClockSeconds;
@@ -1229,9 +1233,9 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                                                 controllerVolts += step;
                                                 if (DynamicBrakeIsSelectedForceDependant)
                                                 {
-                                                    if (controllerVolts < -SelectedMaxAccelerationStep)
+                                                    if (controllerVolts < Math.Round(-(MaxForceSelectorIsDiscrete ? (int)SelectedMaxAccelerationStep : SelectedMaxAccelerationStep) * 100 / SpeedRegulatorMaxForceSteps, 0))
                                                     {
-                                                        controllerVolts = -SelectedMaxAccelerationStep;
+                                                        controllerVolts = (float)Math.Round(-(MaxForceSelectorIsDiscrete ? (int)SelectedMaxAccelerationStep : SelectedMaxAccelerationStep) * 100 / SpeedRegulatorMaxForceSteps, 0);
                                                     }
                                                 }
                                             }
@@ -1315,7 +1319,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                                         a = AccelerationTable[(int)SelectedMaxAccelerationStep - 1];
                                 }
                                 else
-                                    t = SelectedMaxAccelerationStep;
+                                    t = (MaxForceSelectorIsDiscrete ? (int)SelectedMaxAccelerationStep : SelectedMaxAccelerationStep) * 100 / SpeedRegulatorMaxForceSteps;
                                 if (t < newThrotte)
                                     t = newThrotte;
                                 t /= 100;
@@ -1596,7 +1600,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                 case CABViewControlTypes.ORTS_SELECTED_SPEED_MAXIMUM_ACCELERATION:
                     if (SpeedRegMode == SpeedRegulatorMode.Auto || MaxForceKeepSelectedStepWhenManualModeSet)
                     {
-                        data = (SelectedMaxAccelerationStep - 1) * (float)cvc.MaxValue / 100;
+                        data = SelectedMaxAccelerationStep * (float)cvc.MaxValue / SpeedRegulatorMaxForceSteps;
                     }
                     else
                         data = 0;

@@ -2190,7 +2190,19 @@ namespace Orts.Viewer3D.RollingStock
             switch (Control.ControlType)
             {
                 case CABViewControlTypes.REGULATOR:
-                case CABViewControlTypes.THROTTLE: Locomotive.SetThrottleValue(ChangedValue(Locomotive.ThrottleController.IntermediateValue)); break;
+                case CABViewControlTypes.THROTTLE:
+                    if (Locomotive.CruiseControl?.SelectedMaxAccelerationPercent == 0 && Locomotive.CruiseControl.DisableCruiseControlOnThrottleAndZeroForce && Locomotive.CruiseControl.SelectedMaxAccelerationStep == 0 && Locomotive.CruiseControl.SpeedRegMode == Simulation.RollingStocks.SubSystems.CruiseControl.SpeedRegulatorMode.Auto)
+                    {
+                        if (Locomotive.CruiseControl.ZeroSelectedSpeedWhenPassingToThrottleMode) Locomotive.CruiseControl.SetSpeed(0);
+                        if (Locomotive.ThrottleController.CurrentValue == 0)
+                            Locomotive.CruiseControl.SpeedRegMode = Simulation.RollingStocks.SubSystems.CruiseControl.SpeedRegulatorMode.Manual;
+                        Locomotive.CruiseControl.SkipThrottleDisplay = false;
+                    }
+                    if (Locomotive.CruiseControl?.SpeedRegMode == Simulation.RollingStocks.SubSystems.CruiseControl.SpeedRegulatorMode.Auto
+                        && Locomotive.CruiseControl.SelectedMaxAccelerationStep != 0 && Locomotive.CruiseControl.HasIndependentThrottleDynamicBrakeLever)
+                        break;
+                    Locomotive.SetThrottleValue(ChangedValue(Locomotive.ThrottleController.IntermediateValue));
+                    break;
                 case CABViewControlTypes.ENGINE_BRAKE: Locomotive.SetEngineBrakeValue(ChangedValue(Locomotive.EngineBrakeController.IntermediateValue)); break;
                 case CABViewControlTypes.BRAKEMAN_BRAKE: Locomotive.SetBrakemanBrakeValue(ChangedValue(Locomotive.BrakemanBrakeController.IntermediateValue)); break;
                 case CABViewControlTypes.TRAIN_BRAKE: Locomotive.SetTrainBrakeValue(ChangedValue(Locomotive.TrainBrakeController.IntermediateValue)); break;
@@ -2476,12 +2488,14 @@ namespace Orts.Viewer3D.RollingStock
                     }
                     if (ChangedValue(0) != 0)
                     {
+                        var pippo = ChangedValue(0);
                         Locomotive.CruiseControl.SelectedMaxAccelerationStep += ChangedValue(0) * (float)Control.MaxValue;
-                        if (Locomotive.CruiseControl.SelectedMaxAccelerationStep > 100)
-                            Locomotive.CruiseControl.SelectedMaxAccelerationStep = 100;
+                        if (Locomotive.CruiseControl.SelectedMaxAccelerationStep > Locomotive.CruiseControl.SpeedRegulatorMaxForceSteps)
+                            Locomotive.CruiseControl.SelectedMaxAccelerationStep = Locomotive.CruiseControl.SpeedRegulatorMaxForceSteps;
                         if (Locomotive.CruiseControl.SelectedMaxAccelerationStep < 0)
                             Locomotive.CruiseControl.SelectedMaxAccelerationStep = 0;
-                        Locomotive.Simulator.Confirmer.Information("Selected maximum acceleration was changed to " + Math.Round(Locomotive.CruiseControl.SelectedMaxAccelerationStep, 0).ToString() + " percent");
+                        Locomotive.Simulator.Confirmer.Information("Selected maximum acceleration was changed to " + Math.Round((Locomotive.CruiseControl.MaxForceSelectorIsDiscrete ?
+                            (int)Locomotive.CruiseControl.SelectedMaxAccelerationStep : Locomotive.CruiseControl.SelectedMaxAccelerationStep) * 100 / Locomotive.CruiseControl.SpeedRegulatorMaxForceSteps, 0).ToString() + " percent");
                     }
                     break;
                 case CABViewControlTypes.ORTS_MULTI_POSITION_CONTROLLER:

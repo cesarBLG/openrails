@@ -849,7 +849,7 @@ namespace Orts.Viewer3D.Popups
                     InfoToLabel(keyPressed, Viewer.Catalog.GetString("Target"), 
                         FormatStrings.FormatSpeedDisplay(cc.SelectedSpeedMpS, Owner.Viewer.PlayerLocomotive.IsMetric) + "%%%", "", false, keyPressed);
                     InfoToLabel(keyPressed, Viewer.Catalog.GetString("MaxAccel"), (cc.SpeedRegulatorMaxForcePercentUnits ? cc.SelectedMaxAccelerationPercent.ToString("0") + "% " :
-                        cc.SelectedMaxAccelerationStep.ToString("0") + "% ") + "%%%", "", false, keyPressed);
+                        Math.Round((cc.MaxForceSelectorIsDiscrete ? (int)cc.SelectedMaxAccelerationStep : cc.SelectedMaxAccelerationStep) * 100 / cc.SpeedRegulatorMaxForceSteps).ToString("0") + "% ") + "%%%", "", false, keyPressed);
                 }
                 keyPressed = "";
                 InfoToLabel(keyPressed, "Sprtr", "", "", true, keyPressed);
