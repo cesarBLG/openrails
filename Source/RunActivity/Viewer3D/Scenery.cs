@@ -51,6 +51,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace Orts.Viewer3D
 {
@@ -492,35 +493,22 @@ namespace Orts.Viewer3D
                     }
                     else if (worldObject.GetType() == typeof(StaticObj))
                     {
-                        var isAnalogClock = false;                                                            //Declare and preset
-                        //          preTestShape for lookup if it is an analog clock shape with clock hands
-                        StaticShape preTestShape  = (new StaticShape(viewer, shapeFilePath, worldMatrix, shadowCaster ? ShapeFlags.ShadowCaster : ShapeFlags.None));
-                        if (preTestShape.SharedShape.Animations?.Count > 0)                                      // shape has an Animation at all
+                        //          preTestShape for lookup if it is an animated clock shape with subobjects named as clock hands 
+                        StaticShape preTestShape = (new StaticShape(viewer, shapeFilePath, worldMatrix, shadowCaster ? ShapeFlags.ShadowCaster : ShapeFlags.None));
+                        var animNodes = preTestShape.SharedShape.Animations?[0]?.anim_nodes ?? new List<anim_node>();
+                        var isAnimatedClock = animNodes.Exists(node => Regex.IsMatch(node.Name, @"^orts_[hmsc]hand_clock", RegexOptions.IgnoreCase));
+                        if (isAnimatedClock)
                         {
-                            if (preTestShape.SharedShape.Animations[0].anim_nodes.Count > 1)                  // shape has more than 1 anim_nodes
-                            {
-                                var strAnimNodeName = "";                                         			//Declare and preset
-                                //lookup all shapes anim nodes by name if they are OR-clocks hands
-                                for (var i = 0; i <= preTestShape.SharedShape.Animations[0].anim_nodes.Count - 1; i++)
-                                {
-                                    strAnimNodeName = preTestShape.SharedShape.Animations[0].anim_nodes[i].Name.ToLowerInvariant();
-                                    if (strAnimNodeName.IndexOf("hand_clock") == 6)   	//Shape anim node name contains "hand_clock"
-                                    {
-                                        if (strAnimNodeName.IndexOf("orts_") == 0)        //Shape anim node name begins with "ORTS_"
-                                        {
-                                            isAnalogClock = true;                                            //Shape is OR-Clock
-                                            break;                                               			
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        if (isAnalogClock) //worldObject of type StaticObj is analog OR-Clock
                             sceneryObjects.Add(new AnalogClockShape(viewer, shapeFilePath, worldMatrix, shadowCaster ? ShapeFlags.ShadowCaster : ShapeFlags.None));
+                        }
                         else if (animated)
+                        {
                             sceneryObjects.Add(new AnimatedShape(viewer, shapeFilePath, worldMatrix, shadowCaster ? ShapeFlags.ShadowCaster : ShapeFlags.None));
+                        }
                         else
+                        {
                             sceneryObjects.Add(new StaticShape(viewer, shapeFilePath, worldMatrix, shadowCaster ? ShapeFlags.ShadowCaster : ShapeFlags.None));
+                        }
                     }
                     else if (worldObject.GetType() == typeof(PickupObj))
                     {

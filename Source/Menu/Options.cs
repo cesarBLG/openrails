@@ -203,6 +203,7 @@ namespace ORTS
             checkHotStart.Checked = Settings.HotStart;
             checkForcedRedAtStationStops.Checked = !Settings.NoForcedRedAtStationStops;
             checkDoorsAITrains.Checked = Settings.OpenDoorsInAITrains;
+            checkBoxNoDieselEngineStart.Checked = Settings.NoDieselEngineStart;
 
             // Keyboard tab
             InitializeKeyboardSettings();
@@ -505,6 +506,7 @@ private async void OptionsForm_Shown(object sender, EventArgs e)
             Settings.HotStart = checkHotStart.Checked;
             Settings.NoForcedRedAtStationStops = !checkForcedRedAtStationStops.Checked;
             Settings.OpenDoorsInAITrains = checkDoorsAITrains.Checked;
+            Settings.NoDieselEngineStart = checkBoxNoDieselEngineStart.Checked;
 
             // Keyboard tab
             // These are edited live.
@@ -816,7 +818,6 @@ private async void OptionsForm_Shown(object sender, EventArgs e)
             numericPerformanceTunerTarget.Enabled = checkPerformanceTuner.Checked;
             labelPerformanceTunerTarget.Enabled = checkPerformanceTuner.Checked;
         }
-
 
         #region Help for General Options
         /// <summary>

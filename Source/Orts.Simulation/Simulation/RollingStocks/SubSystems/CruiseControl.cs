@@ -1306,7 +1306,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                         }
                     }
                     float a = 0;
-                    if (Locomotive.PowerOn && Locomotive.Direction != Direction.N)
+                    if (Locomotive.LocomotivePowerSupply.MainPowerSupplyOn && Locomotive.Direction != Direction.N)
                     {
                         if (Locomotive.DynamicBrakePercent < 0)
                         {
@@ -1524,7 +1524,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                     }
                 }
 
-                if (!Locomotive.PowerOn) // || Locomotive.Mirel.NZ1 || Locomotive.Mirel.NZ2 || Locomotive.Mirel.NZ3 || Locomotive.Mirel.NZ4 || Locomotive.Mirel.NZ5)
+                if (!Locomotive.LocomotivePowerSupply.MainPowerSupplyOn) // || Locomotive.Mirel.NZ1 || Locomotive.Mirel.NZ2 || Locomotive.Mirel.NZ3 || Locomotive.Mirel.NZ4 || Locomotive.Mirel.NZ5)
                 {
                     controllerVolts = 0;
                     Locomotive.ThrottleController.SetPercent(0);
@@ -1549,7 +1549,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                 //Simulator.Confirmer.MSG(locoPercent.ToString());
                 foreach (MSTSLocomotive lc in playerNotDriveableTrainLocomotives)
                 {
-                    if (Locomotive.PowerOn)
+                    if (Locomotive.LocomotivePowerSupply.MainPowerSupplyOn)
                     {
                         if (UseThrottle)
                         {
