@@ -1597,6 +1597,10 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                 case CABViewControlTypes.ORTS_SELECTED_SPEED_REGULATOR_MODE:
                     data = (float)SpeedRegMode;
                     break;
+                case CABViewControlTypes.ORTS_SELECTED_SPEED_SELECTOR:
+                    metric = cvc.Units == CABViewControlUnits.KM_PER_HOUR;
+                    data = (float)Math.Round(RestrictedSpeedActive ? MpS.FromMpS(CurrentSelectedSpeedMpS, metric) : MpS.FromMpS(SelectedSpeedMpS, metric));
+                    break;
                 case CABViewControlTypes.ORTS_SELECTED_SPEED_MAXIMUM_ACCELERATION:
                     if (SpeedRegMode == SpeedRegulatorMode.Auto || MaxForceKeepSelectedStepWhenManualModeSet)
                     {
