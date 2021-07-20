@@ -22,6 +22,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Orts.Simulation.Physics;
 using Orts.Simulation.RollingStocks;
 using ORTS.Common;
+using ORTS.Common.Input;
 using System;
 using System.Linq;
 
@@ -120,7 +121,7 @@ namespace Orts.Viewer3D.Popups
             }
             else
             {
-                new UncoupleCommand(Viewer.Log, CarPosition);
+                new UncoupleCommand(Viewer.Log, CarPosition, UserInput.IsDown(UserCommand.CameraFollowCutCar));
                 if (Viewer.CarOperationsWindow.CarPosition > CarPosition)
                     Viewer.CarOperationsWindow.Visible = false;
             }

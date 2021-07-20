@@ -162,12 +162,12 @@ namespace Orts.Viewer3D
 
         // This is the train we are viewing
         public Train SelectedTrain { get; private set; }
-        void CameraActivate()
+        void CameraActivate(bool cameraFollowCutCar = false)
         {
             if (Camera == null || !Camera.IsAvailable) //passenger camera may jump to a train without passenger view
-                FrontCamera.Activate();
+                FrontCamera.Activate(cameraFollowCutCar);
             else
-                Camera.Activate();
+                Camera.Activate(cameraFollowCutCar);
         }
 
         bool ForceMouseVisible;
@@ -1840,12 +1840,12 @@ namespace Orts.Viewer3D
             }
         }
 
-        internal void UncoupleBehind(int carPosition)
+        internal void UncoupleBehind(int carPosition, bool cameraFollowCutCar = false)
         {
             Simulator.UncoupleBehind(carPosition);
             //make the camera train to be the player train
             if (PlayerLocomotive != null && PlayerLocomotive.Train != null) this.SelectedTrain = PlayerLocomotive.Train;
-            CameraActivate();
+            CameraActivate(cameraFollowCutCar);
         }
 
         internal void BeginRender(RenderFrame frame)
