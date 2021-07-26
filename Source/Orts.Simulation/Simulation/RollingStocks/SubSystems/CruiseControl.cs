@@ -120,6 +120,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
         public bool ZeroSelectedSpeedWhenPassingToThrottleMode = false;
         public bool DynamicBrakeCommandHasPriorityOverCruiseControl = true;
         public bool HasIndependentThrottleDynamicBrakeLever = false;
+        public bool HasProportionalSpeedSelector = false;
         public bool DoComputeNumberOfAxles = false;
 
         public void Parse(string lowercasetoken, STFReader stf)
@@ -187,6 +188,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                 case "engine(ortscruisecontrol(zeroselectedspeedwhenpassingtothrottlemode": ZeroSelectedSpeedWhenPassingToThrottleMode = stf.ReadBoolBlock(false); break;
                 case "engine(ortscruisecontrol(dynamicbrakecommandhaspriorityovercruisecontrol": DynamicBrakeCommandHasPriorityOverCruiseControl = stf.ReadBoolBlock(true); break;
                 case "engine(ortscruisecontrol(hasindependentthrottledynamicbrakelever": HasIndependentThrottleDynamicBrakeLever = stf.ReadBoolBlock(false); break;
+                case "engine(ortscruisecontrol(hasproportionalspeedselector": HasProportionalSpeedSelector = stf.ReadBoolBlock(false); break;
                 case "engine(ortscruisecontrol(docomputenumberofaxles": DoComputeNumberOfAxles = stf.ReadBoolBlock(false); break;
                 case "engine(ortscruisecontrol(options":
                     foreach (var speedRegulatorOption in stf.ReadStringBlock("").ToLower().Replace(" ", "").Split(','))
@@ -549,7 +551,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
             {
                 SpeedRegMode = SpeedRegulatorMode.Auto;
             }
-            if (UseThrottleAsSpeedSelector)
+            if (UseThrottleAsSpeedSelector || HasProportionalSpeedSelector)
                 selectedSpeedIncreasing = true;
             else
                 SpeedSelectorModeStartIncrease();
@@ -567,7 +569,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                     return;
                 }
             }
-            if (UseThrottleAsSpeedSelector)
+            if (UseThrottleAsSpeedSelector || HasProportionalSpeedSelector)
                 selectedSpeedIncreasing = false;
             else
                 SpeedSelectorModeStopIncrease();
@@ -605,7 +607,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                     }
                 }
             }
-            if (UseThrottleAsSpeedSelector)
+            if (UseThrottleAsSpeedSelector || HasProportionalSpeedSelector)
                 SelectedSpeedDecreasing = true;
             else
                 SpeedSelectorModeDecrease();

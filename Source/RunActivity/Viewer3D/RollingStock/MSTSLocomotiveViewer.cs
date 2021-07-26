@@ -2145,7 +2145,6 @@ namespace Orts.Viewer3D.RollingStock
                 case CABViewControlTypes.ORTS_RESTRICTED_SPEED_ZONE_ACTIVE:
                 case CABViewControlTypes.ORTS_SELECTED_SPEED_MODE:
                 case CABViewControlTypes.ORTS_SELECTED_SPEED_REGULATOR_MODE:
-                case CABViewControlTypes.ORTS_SELECTED_SPEED_SELECTOR:
                 case CABViewControlTypes.ORTS_SELECTED_SPEED_MAXIMUM_ACCELERATION:
                 case CABViewControlTypes.ORTS_NUMBER_OF_AXES_DISPLAY_UNITS:
                 case CABViewControlTypes.ORTS_NUMBER_OF_AXES_DISPLAY_TENS:
@@ -2186,6 +2185,10 @@ namespace Orts.Viewer3D.RollingStock
                 case CABViewControlTypes.ORTS_CC_SPEED_190:
                 case CABViewControlTypes.ORTS_CC_SPEED_200:
                     index = (int)data;
+                    break;
+                case CABViewControlTypes.ORTS_SELECTED_SPEED_SELECTOR:
+                    var fraction = data / (float)(ControlDiscrete.MaxValue);
+                    index = (int)MathHelper.Clamp(0, (int)(fraction * ((ControlDiscrete as CVCDiscrete).FramesCount - 1)), (ControlDiscrete as CVCDiscrete).FramesCount - 1);
                     break;
             }
             // If it is a control with NumPositions and NumValues, the index becomes the reference to the Positions entry, which in turn is the frame index within the .ace file
@@ -2547,17 +2550,18 @@ namespace Orts.Viewer3D.RollingStock
                     if (p != 0 && Locomotive.CruiseControl.SelectedMaxAccelerationStep == 0 && Locomotive.CruiseControl.DisableCruiseControlOnThrottleAndZeroForce && Locomotive.CruiseControl.ForceRegulatorAutoWhenNonZeroSpeedSelectedAndThrottleAtZero &&
 Locomotive.ThrottleController.CurrentValue == 0 && Locomotive.DynamicBrakeController.CurrentValue == 0 && Locomotive.CruiseControl.SpeedRegMode == Simulation.RollingStocks.SubSystems.CruiseControl.SpeedRegulatorMode.Manual)
                         Locomotive.CruiseControl.SpeedRegMode = Simulation.RollingStocks.SubSystems.CruiseControl.SpeedRegulatorMode.Auto;
-                    if (p == 1)
+/*                    if (p == 1)
                     {
-                        Locomotive.CruiseControl.SelectedSpeedMpS += 1;
+                        Locomotive.CruiseControl.SelectedSpeedMpS += Control.Units == CABViewControlUnits.KM_PER_HOUR ? MpS.FromKpH(1f) : MpS.FromMpH(1f);
                     }
                     if (p == -1)
                     {
-                        Locomotive.CruiseControl.SelectedSpeedMpS -= 1;
-                    }
+                        Locomotive.CruiseControl.SelectedSpeedMpS -= Control.Units == CABViewControlUnits.KM_PER_HOUR ? MpS.FromKpH(1f) : MpS.FromMpH(1f);
+                    }*/
                     if (p != 0)
                     {
-                        Locomotive.CruiseControl.SelectedSpeedMpS += p * (float)Control.MaxValue;
+                        Locomotive.CruiseControl.SelectedSpeedMpS += Control.Units == CABViewControlUnits.KM_PER_HOUR ? MpS.FromKpH((float)Math.Round(p * (float)Control.MaxValue)) :
+                            MpS.FromMpH((float)Math.Round(p * (float)Control.MaxValue));
                         if (Locomotive.CruiseControl.SelectedSpeedMpS > Locomotive.MaxSpeedMpS)
                             Locomotive.CruiseControl.SelectedSpeedMpS = Locomotive.MaxSpeedMpS;
                         if (Locomotive.CruiseControl.SelectedSpeedMpS < 0)
