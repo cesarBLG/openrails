@@ -117,6 +117,7 @@
         [GetString("Camera Scroll Left")] CameraScrollLeft,
         [GetString("Camera Browse Backwards")] CameraBrowseBackwards,
         [GetString("Camera Browse Forwards")] CameraBrowseForwards,
+        [GetString("Camera Follow Cut Car")] CameraFollowCutCar,
 
         [GetString("Control Forwards")] ControlForwards,
         [GetString("Control Backwards")] ControlBackwards,

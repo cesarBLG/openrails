@@ -171,17 +171,19 @@ namespace Orts.Viewer3D
     {
         public static Viewer Receiver { get; set; }
         int CarPosition;    // 0 for head of train
+        bool CameraFollowCutCar;
 
-        public UncoupleCommand( CommandLog log, int carPosition ) 
+        public UncoupleCommand( CommandLog log, int carPosition, bool cameraFollowCutCar = false ) 
             : base(log)
         {
             CarPosition = carPosition;
+            CameraFollowCutCar = cameraFollowCutCar;
             Redo();
         }
 
         public override void Redo()
         {
-            Receiver.UncoupleBehind( CarPosition );
+            Receiver.UncoupleBehind( CarPosition, CameraFollowCutCar );
             // Report();
         }
 

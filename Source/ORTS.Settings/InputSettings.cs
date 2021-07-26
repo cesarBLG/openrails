@@ -298,6 +298,7 @@ namespace ORTS.Settings
             Commands[(int)UserCommand.CameraMoveFast] = new UserCommandModifierInput(KeyModifiers.Shift);
             Commands[(int)UserCommand.GameSuspendOldPlayer] = new UserCommandModifierInput(KeyModifiers.Shift);
             Commands[(int)UserCommand.CameraMoveSlow] = new UserCommandModifierInput(KeyModifiers.Control);
+            Commands[(int)UserCommand.CameraFollowCutCar] = new UserCommandModifierInput(KeyModifiers.Control);
 
             // Everything else goes here, sorted alphabetically please (and grouped by first word of name).
             Commands[(int)UserCommand.CameraBrakeman] = new UserCommandKeyInput(0x07);

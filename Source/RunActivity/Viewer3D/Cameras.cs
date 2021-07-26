@@ -126,10 +126,10 @@ namespace Orts.Viewer3D
         /// <summary>
         /// Switches the <see cref="Viewer3D"/> to this camera, updating the view information.
         /// </summary>
-        public void Activate()
+        public void Activate(bool cameraFollowCutCar = false)
         {
             ScreenChanged();
-            OnActivate(Viewer.Camera == this);
+            OnActivate(Viewer.Camera == this, cameraFollowCutCar);
             Viewer.Camera = this;
             Viewer.Simulator.PlayerIsInCab = Style == Styles.Cab || Style == Styles.ThreeDimCab;
             Update(ElapsedTime.Zero);
@@ -140,7 +140,7 @@ namespace Orts.Viewer3D
         /// <summary>
         /// A camera can use this method to handle any preparation when being activated.
         /// </summary>
-        protected virtual void OnActivate(bool sameCamera)
+        protected virtual void OnActivate(bool sameCamera, bool cameraFollowCutCar = false)
         {
         }
 
@@ -812,10 +812,10 @@ namespace Orts.Viewer3D
             attachedLocation.Z = inf.ReadSingle();
         }
 
-        protected override void OnActivate(bool sameCamera)
+        protected override void OnActivate(bool sameCamera, bool cameraFollowCutCar = false)
         {
 //            if (attachedCar == null || attachedCar.Train != Viewer.SelectedTrain)
-            if (attachedCar == null)
+            if (attachedCar == null || attachedCar.Train != Viewer.SelectedTrain && !cameraFollowCutCar)
             {
                 if (Viewer.SelectedTrain.MUDirection != Direction.Reverse)
                     SetCameraCar(GetCameraCars().First());
@@ -1059,11 +1059,11 @@ namespace Orts.Viewer3D
             RotationYRadians = PositionYRadians - MathHelper.Pi;
         }
 
-        protected override void OnActivate(bool sameCamera)
+        protected override void OnActivate(bool sameCamera, bool cameraFollowCutCar = false)
         {
             BrowseMode = BrowseForwards = BrowseBackwards = false;
 //            if (attachedCar == null || attachedCar.Train != Viewer.SelectedTrain)
-            if (attachedCar == null)
+            if (attachedCar == null || attachedCar.Train != Viewer.SelectedTrain && !cameraFollowCutCar)
             {
                 if (Front)
                 {
@@ -1084,7 +1084,7 @@ namespace Orts.Viewer3D
                 }
                 BrowseDistance = attachedCar.CarLengthM * 0.5f;
             }
-            base.OnActivate(sameCamera);
+            base.OnActivate(sameCamera, cameraFollowCutCar);
         }
 
         protected override bool IsCameraFlipped()
@@ -1583,7 +1583,7 @@ namespace Orts.Viewer3D
         /// <summary>
         /// A camera can use this method to handle any preparation when being activated.
         /// </summary>
-        protected override void OnActivate(bool sameCamera)
+        protected override void OnActivate(bool sameCamera, bool cameraFollowCutCar = false)
         {
             var trainCars = GetCameraCars();
             if (trainCars.Count == 0) return;//may not have passenger or 3d cab viewpoints
@@ -2056,7 +2056,7 @@ namespace Orts.Viewer3D
             ScreenChanged();
         }
 
-        protected override void OnActivate(bool sameCamera)
+        protected override void OnActivate(bool sameCamera, bool cameraFollowCutCar = false)
         {
             // Cab camera is only possible on the player locomotive.
             SetCameraCar(GetCameraCars().First());
@@ -2269,21 +2269,21 @@ namespace Orts.Viewer3D
             CameraAltitudeOffset = 0;
         }
 
-        protected override void OnActivate(bool sameCamera)
+        protected override void OnActivate(bool sameCamera, bool cameraFollowCutCar = false)
         {
             if (sameCamera)
             {
                 cameraLocation.TileX = 0;
                 cameraLocation.TileZ = 0;
             }
-            if (attachedCar == null || attachedCar.Train != Viewer.SelectedTrain)
+            if (attachedCar == null || attachedCar.Train != Viewer.SelectedTrain && !cameraFollowCutCar)
             {
                 if (Viewer.SelectedTrain.MUDirection != Direction.Reverse)
                     attachedCar = Viewer.SelectedTrain.Cars.First();
                 else
                     attachedCar = Viewer.SelectedTrain.Cars.Last();
             }
-            base.OnActivate(sameCamera);
+            base.OnActivate(sameCamera, cameraFollowCutCar);
         }
 
         public override void HandleUserInput(ElapsedTime elapsedTime)
@@ -2437,10 +2437,10 @@ namespace Orts.Viewer3D
         {
         }
 
-        protected override void OnActivate(bool sameCamera)
+        protected override void OnActivate(bool sameCamera, bool cameraFollowCutCar = false)
         {
             DistanceRunM = 0;
-            base.OnActivate(sameCamera);
+            base.OnActivate(sameCamera, cameraFollowCutCar);
             FirstUpdateLoop = Math.Abs(AttachedCar.Train.SpeedMpS) <= 0.2f || sameCamera;
             if (sameCamera)
             {

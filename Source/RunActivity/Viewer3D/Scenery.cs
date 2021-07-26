@@ -495,7 +495,7 @@ namespace Orts.Viewer3D
                     {
                         //          preTestShape for lookup if it is an animated clock shape with subobjects named as clock hands 
                         StaticShape preTestShape = (new StaticShape(viewer, shapeFilePath, worldMatrix, shadowCaster ? ShapeFlags.ShadowCaster : ShapeFlags.None));
-                        var animNodes = preTestShape.SharedShape.Animations?[0]?.anim_nodes ?? new List<anim_node>();
+                        var animNodes = preTestShape.SharedShape.Animations?.Count > 0 ? preTestShape.SharedShape.Animations?[0]?.anim_nodes ?? new List<anim_node>() : new List<anim_node>();
                         var isAnimatedClock = animNodes.Exists(node => Regex.IsMatch(node.Name, @"^orts_[hmsc]hand_clock", RegexOptions.IgnoreCase));
                         if (isAnimatedClock)
                         {
