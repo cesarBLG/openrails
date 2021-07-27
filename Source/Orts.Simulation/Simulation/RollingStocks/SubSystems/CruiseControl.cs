@@ -547,7 +547,9 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                     }
                 }
             }
-            if (SpeedRegMode != SpeedRegulatorMode.Auto && ForceRegulatorAutoWhenNonZeroSpeedSelected)
+            if (SpeedRegMode != SpeedRegulatorMode.Auto && ( ForceRegulatorAutoWhenNonZeroSpeedSelected || HasProportionalSpeedSelector &&
+                SelectedMaxAccelerationStep == 0 && DisableCruiseControlOnThrottleAndZeroForce && ForceRegulatorAutoWhenNonZeroSpeedSelectedAndThrottleAtZero &&
+                            Locomotive.ThrottleController.CurrentValue == 0 && Locomotive.DynamicBrakeController.CurrentValue == 0))
             {
                 SpeedRegMode = SpeedRegulatorMode.Auto;
             }
