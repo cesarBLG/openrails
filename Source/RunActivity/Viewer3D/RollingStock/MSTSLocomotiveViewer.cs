@@ -2547,55 +2547,11 @@ namespace Orts.Viewer3D.RollingStock
                     break;
                 case CABViewControlTypes.ORTS_SELECTED_SPEED_SELECTOR:
                     p = ChangedValue(0);
-                    if (p != 0 && Locomotive.CruiseControl.SelectedMaxAccelerationStep == 0 && Locomotive.CruiseControl.DisableCruiseControlOnThrottleAndZeroForce && Locomotive.CruiseControl.ForceRegulatorAutoWhenNonZeroSpeedSelectedAndThrottleAtZero &&
-Locomotive.ThrottleController.CurrentValue == 0 && Locomotive.DynamicBrakeController.CurrentValue == 0 && Locomotive.CruiseControl.SpeedRegMode == Simulation.RollingStocks.SubSystems.CruiseControl.SpeedRegulatorMode.Manual)
-                        Locomotive.CruiseControl.SpeedRegMode = Simulation.RollingStocks.SubSystems.CruiseControl.SpeedRegulatorMode.Auto;
-/*                    if (p == 1)
-                    {
-                        Locomotive.CruiseControl.SelectedSpeedMpS += Control.Units == CABViewControlUnits.KM_PER_HOUR ? MpS.FromKpH(1f) : MpS.FromMpH(1f);
-                    }
-                    if (p == -1)
-                    {
-                        Locomotive.CruiseControl.SelectedSpeedMpS -= Control.Units == CABViewControlUnits.KM_PER_HOUR ? MpS.FromKpH(1f) : MpS.FromMpH(1f);
-                    }*/
-                    if (p != 0)
-                    {
-                        Locomotive.CruiseControl.SelectedSpeedMpS += Control.Units == CABViewControlUnits.KM_PER_HOUR ? MpS.FromKpH((float)Math.Round(p * (float)Control.MaxValue)) :
-                            MpS.FromMpH((float)Math.Round(p * (float)Control.MaxValue));
-                        if (Locomotive.CruiseControl.SelectedSpeedMpS > Locomotive.MaxSpeedMpS)
-                            Locomotive.CruiseControl.SelectedSpeedMpS = Locomotive.MaxSpeedMpS;
-                        if (Locomotive.CruiseControl.SelectedSpeedMpS < 0)
-                            Locomotive.CruiseControl.SelectedSpeedMpS = 0;
-                        Locomotive.Simulator.Confirmer.Information("Selected maximum speed was changed to " +
-                            ((int)Locomotive.CruiseControl.SelectedSpeedMpS).ToString());
-                    }
+                    Locomotive.CruiseControl.SpeedRegulatorSelectedSpeedChangeByMouse(p, Control.Units == CABViewControlUnits.KM_PER_HOUR, (float)Control.MaxValue);
                     break;
                 case CABViewControlTypes.ORTS_SELECTED_SPEED_MAXIMUM_ACCELERATION:
-                    if (ChangedValue(0) != 0 && Locomotive.CruiseControl.SelectedMaxAccelerationStep == 0 && Locomotive.CruiseControl.DisableCruiseControlOnThrottleAndZeroForce && Locomotive.CruiseControl.ForceRegulatorAutoWhenNonZeroForceSelected &&
-                        Locomotive.ThrottleController.CurrentValue == 0 && Locomotive.DynamicBrakeController.CurrentValue == 0 && Locomotive.CruiseControl.SpeedRegMode == Simulation.RollingStocks.SubSystems.CruiseControl.SpeedRegulatorMode.Manual)
-                    {
-                        Locomotive.CruiseControl.SpeedRegMode = Simulation.RollingStocks.SubSystems.CruiseControl.SpeedRegulatorMode.Auto;
-                        Locomotive.CruiseControl.WasForceReset = true;
-                    }
-                    if (ChangedValue(0) == 1)
-                    {
-                        Locomotive.CruiseControl.SelectedMaxAccelerationStep += 1;
-                    }
-                    if (ChangedValue(0) == -1)
-                    {
-                        Locomotive.CruiseControl.SelectedMaxAccelerationStep -= 1;
-                    }
-                    if (ChangedValue(0) != 0)
-                    {
-                        var pippo = ChangedValue(0);
-                        Locomotive.CruiseControl.SelectedMaxAccelerationStep += ChangedValue(0) * (float)Control.MaxValue;
-                        if (Locomotive.CruiseControl.SelectedMaxAccelerationStep > Locomotive.CruiseControl.SpeedRegulatorMaxForceSteps)
-                            Locomotive.CruiseControl.SelectedMaxAccelerationStep = Locomotive.CruiseControl.SpeedRegulatorMaxForceSteps;
-                        if (Locomotive.CruiseControl.SelectedMaxAccelerationStep < 0)
-                            Locomotive.CruiseControl.SelectedMaxAccelerationStep = 0;
-                        Locomotive.Simulator.Confirmer.Information("Selected maximum acceleration was changed to " + Math.Round((Locomotive.CruiseControl.MaxForceSelectorIsDiscrete ?
-                            (int)Locomotive.CruiseControl.SelectedMaxAccelerationStep : Locomotive.CruiseControl.SelectedMaxAccelerationStep) * 100 / Locomotive.CruiseControl.SpeedRegulatorMaxForceSteps, 0).ToString() + " percent");
-                    }
+                    p = ChangedValue(0);
+                    Locomotive.CruiseControl.SpeedRegulatorMaxForceChangeByMouse(p, (float)Control.MaxValue);
                     break;
                 case CABViewControlTypes.ORTS_MULTI_POSITION_CONTROLLER:
                     {

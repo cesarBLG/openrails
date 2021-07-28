@@ -458,6 +458,10 @@ namespace Orts.Simulation.RollingStocks.SubSystems
         bool maxForceIncreasing = false;
         public void SpeedRegulatorMaxForceStartIncrease()
         {
+            if (SelectedMaxAccelerationStep == 0)
+            {
+                Locomotive.SignalEvent(Common.Event.LeverFromZero);
+            }
             Locomotive.SignalEvent(Common.Event.CruiseControlMaxForce);
             if (SelectedMaxAccelerationStep == 0 && DisableCruiseControlOnThrottleAndZeroForce && ForceRegulatorAutoWhenNonZeroForceSelected &&
                 Locomotive.ThrottleController.CurrentValue == 0 && Locomotive.DynamicBrakeController.CurrentValue == 0 && Locomotive.CruiseControl.SpeedRegMode == SpeedRegulatorMode.Manual)
@@ -512,15 +516,72 @@ namespace Orts.Simulation.RollingStocks.SubSystems
             if (!Equipped) return;
             if (DisableZeroForceStep)
             {
-                if (SelectedMaxAccelerationStep <= 1) return;
+                if (SelectedMaxAccelerationStep <= 1)
+                    return;
             }
             else
             {
-                if (SelectedMaxAccelerationStep <= 0) return;
+                if (SelectedMaxAccelerationStep <= 0)
+                    return;
             }
             SelectedMaxAccelerationStep--;
             SelectedMaxAccelerationStep = (float)Math.Round(SelectedMaxAccelerationStep, 0);
+            if (DisableZeroForceStep)
+            {
+                if (SelectedMaxAccelerationStep <= 1)
+                {
+                    Locomotive.SignalEvent(Common.Event.LeverToZero);
+                }
+            }
+            else
+            {
+                if (SelectedMaxAccelerationStep <= 0)
+                {
+                    Locomotive.SignalEvent(Common.Event.LeverToZero);
+                }
+            }
             Simulator.Confirmer.Message(ConfirmLevel.Information, Simulator.Catalog.GetString("Speed regulator max acceleration changed to") + " " + Simulator.Catalog.GetString(Math.Round(SelectedMaxAccelerationStep * 100 / SpeedRegulatorMaxForceSteps, 0).ToString()));
+        }
+
+        public void SpeedRegulatorMaxForceChangeByMouse(float movExtension, float maxValue)
+        {
+            if (movExtension != 0 && SelectedMaxAccelerationStep == 0 && DisableCruiseControlOnThrottleAndZeroForce && ForceRegulatorAutoWhenNonZeroForceSelected &&
+                Locomotive.ThrottleController.CurrentValue == 0 && Locomotive.DynamicBrakeController.CurrentValue == 0 && SpeedRegMode == SpeedRegulatorMode.Manual)
+            {
+                SpeedRegMode = SpeedRegulatorMode.Auto;
+                WasForceReset = true;
+            }
+            if (SelectedMaxAccelerationStep == 0)
+            {
+                if (movExtension > 0)
+                {
+                    Locomotive.SignalEvent(Common.Event.LeverFromZero);
+                }
+                else if (movExtension < 0)
+                    return;
+            }
+            if (movExtension == 1)
+            {
+                SelectedMaxAccelerationStep += 1;
+            }
+            if (movExtension == -1)
+            {
+                SelectedMaxAccelerationStep -= 1;
+            }
+            if (movExtension != 0)
+            {
+                SelectedMaxAccelerationStep += movExtension * maxValue;
+                if (SelectedMaxAccelerationStep > SpeedRegulatorMaxForceSteps)
+                    SelectedMaxAccelerationStep = SpeedRegulatorMaxForceSteps;
+                if (SelectedMaxAccelerationStep < 0)
+                    SelectedMaxAccelerationStep = 0;
+                if (SelectedMaxAccelerationStep == 0)
+                {
+                    Locomotive.SignalEvent(Common.Event.LeverToZero);
+                }
+                Locomotive.Simulator.Confirmer.Information("Selected maximum acceleration was changed to " + Math.Round((MaxForceSelectorIsDiscrete ?
+                    (int)SelectedMaxAccelerationStep : SelectedMaxAccelerationStep) * 100 / SpeedRegulatorMaxForceSteps, 0).ToString() + " percent");
+            }
         }
 
         protected bool selectedSpeedIncreasing = false;
@@ -554,7 +615,13 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                 SpeedRegMode = SpeedRegulatorMode.Auto;
             }
             if (UseThrottleAsSpeedSelector || HasProportionalSpeedSelector)
+            {
                 selectedSpeedIncreasing = true;
+                if (SelectedSpeedMpS == 0)
+                {
+                    Locomotive.SignalEvent(Common.Event.LeverFromZero);
+                }
+            }
             else
                 SpeedSelectorModeStartIncrease();
         }
@@ -636,7 +703,8 @@ namespace Orts.Simulation.RollingStocks.SubSystems
             if (selectedSpeedLeverHoldTime + SpeedSelectorStepTimeSeconds > elapsedTime)
                 return;
             selectedSpeedLeverHoldTime = elapsedTime;
-
+            if (SelectedSpeedMpS == 0)
+                return;
             SelectedSpeedMpS -= SpeedRegulatorNominalSpeedStepMpS;
             if (SelectedSpeedMpS < 0)
                 SelectedSpeedMpS = 0f;
@@ -649,9 +717,47 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                 Locomotive.DynamicBrakeChangeActiveState(false);
             }
             if (SelectedSpeedMpS == 0)
+            {
+                if (HasProportionalSpeedSelector)
+                {
+                    Locomotive.SignalEvent(Common.Event.LeverToZero);
+                }
                 SelectedSpeedDecreasing = false;
+            }
             Simulator.Confirmer.Message(ConfirmLevel.Information, Simulator.Catalog.GetString("Selected speed changed to ") + Math.Round(MpS.FromMpS(SelectedSpeedMpS, true), 0, MidpointRounding.AwayFromZero).ToString() + " km/h");
         }
+
+        public void SpeedRegulatorSelectedSpeedChangeByMouse(float movExtension, bool metric, float maxValue)
+        {
+            if (movExtension != 0 && SelectedMaxAccelerationStep == 0 && DisableCruiseControlOnThrottleAndZeroForce && ForceRegulatorAutoWhenNonZeroSpeedSelectedAndThrottleAtZero &&
+            Locomotive.ThrottleController.CurrentValue == 0 && Locomotive.DynamicBrakeController.CurrentValue == 0 && SpeedRegMode == SpeedRegulatorMode.Manual)
+                SpeedRegMode = SpeedRegulatorMode.Auto;
+            if (movExtension != 0)
+            {
+                if (SelectedSpeedMpS == 0)
+                {
+                    if (movExtension > 0)
+                    {
+                        Locomotive.SignalEvent(Common.Event.LeverFromZero);
+                    }
+                    else if (movExtension < 0)
+                        return;
+                }
+                SelectedSpeedMpS += metric ? MpS.FromKpH((float)Math.Round(movExtension * maxValue)) :
+                    MpS.FromMpH((float)Math.Round(movExtension * maxValue));
+                if (SelectedSpeedMpS > Locomotive.MaxSpeedMpS)
+                    SelectedSpeedMpS = Locomotive.MaxSpeedMpS;
+                if (SelectedSpeedMpS < 0)
+                    SelectedSpeedMpS = 0;
+                if (SelectedSpeedMpS == 0 && movExtension < 0)
+                {
+                    Locomotive.SignalEvent(Common.Event.LeverToZero);
+                }
+                Locomotive.Simulator.Confirmer.Information("Selected maximum speed was changed to " +
+                    ((int)SelectedSpeedMpS).ToString());
+            }
+        }
+
         public void NumerOfAxlesIncrease()
         {
             NumerOfAxlesIncrease(1);
