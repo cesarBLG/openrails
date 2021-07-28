@@ -245,6 +245,8 @@ namespace Orts.Common
         AirConditioningOff,
         AirConditioningOn,
         // Cruise Control
+        LeverFromZero,
+        LeverToZero,
         CruiseControlSpeedRegulator,
         CruiseControlSpeedSelector,
         CruiseControlMaxForce,
@@ -252,6 +254,7 @@ namespace Orts.Common
         Alert1,
 
         MPCChangePosition,
+
 
     }
 
@@ -515,6 +518,8 @@ namespace Orts.Common
                         case 235: return Event.AirConditioningOff;
 
                         // Cruise Control
+                        case 298: return Event.LeverFromZero;
+                        case 299: return Event.LeverToZero;
                         case 300: return Event.CruiseControlSpeedRegulator;
                         case 301: return Event.CruiseControlSpeedSelector;
                         case 302: return Event.CruiseControlMaxForce;

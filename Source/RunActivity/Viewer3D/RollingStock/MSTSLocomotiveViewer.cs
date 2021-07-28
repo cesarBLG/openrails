@@ -2186,6 +2186,10 @@ namespace Orts.Viewer3D.RollingStock
                 case CABViewControlTypes.ORTS_CC_SPEED_200:
                     index = (int)data;
                     break;
+                case CABViewControlTypes.ORTS_SELECTED_SPEED_SELECTOR:
+                    var fraction = data / (float)(ControlDiscrete.MaxValue);
+                    index = (int)MathHelper.Clamp(0, (int)(fraction * ((ControlDiscrete as CVCDiscrete).FramesCount - 1)), (ControlDiscrete as CVCDiscrete).FramesCount - 1);
+                    break;
             }
             // If it is a control with NumPositions and NumValues, the index becomes the reference to the Positions entry, which in turn is the frame index within the .ace file
             if (ControlDiscrete is CVCDiscrete && !(ControlDiscrete is CVCSignal) && (ControlDiscrete as CVCDiscrete).Positions.Count > index &&
@@ -2541,32 +2545,13 @@ namespace Orts.Viewer3D.RollingStock
                         Locomotive.CruiseControl.NumberOfAxlesDecrease();
                     }
                     break;
+                case CABViewControlTypes.ORTS_SELECTED_SPEED_SELECTOR:
+                    p = ChangedValue(0);
+                    Locomotive.CruiseControl.SpeedRegulatorSelectedSpeedChangeByMouse(p, Control.Units == CABViewControlUnits.KM_PER_HOUR, (float)Control.MaxValue);
+                    break;
                 case CABViewControlTypes.ORTS_SELECTED_SPEED_MAXIMUM_ACCELERATION:
-                    if (ChangedValue(0) != 0 && Locomotive.CruiseControl.SelectedMaxAccelerationStep == 0 && Locomotive.CruiseControl.DisableCruiseControlOnThrottleAndZeroForce && Locomotive.CruiseControl.ForceRegulatorAutoWhenNonZeroForceSelected &&
-                        Locomotive.ThrottleController.CurrentValue == 0 && Locomotive.DynamicBrakeController.CurrentValue == 0 && Locomotive.CruiseControl.SpeedRegMode == Simulation.RollingStocks.SubSystems.CruiseControl.SpeedRegulatorMode.Manual)
-                    {
-                        Locomotive.CruiseControl.SpeedRegMode = Simulation.RollingStocks.SubSystems.CruiseControl.SpeedRegulatorMode.Auto;
-                        Locomotive.CruiseControl.WasForceReset = true;
-                    }
-                    if (ChangedValue(0) == 1)
-                    {
-                        Locomotive.CruiseControl.SelectedMaxAccelerationStep += 1;
-                    }
-                    if (ChangedValue(0) == -1)
-                    {
-                        Locomotive.CruiseControl.SelectedMaxAccelerationStep -= 1;
-                    }
-                    if (ChangedValue(0) != 0)
-                    {
-                        var pippo = ChangedValue(0);
-                        Locomotive.CruiseControl.SelectedMaxAccelerationStep += ChangedValue(0) * (float)Control.MaxValue;
-                        if (Locomotive.CruiseControl.SelectedMaxAccelerationStep > Locomotive.CruiseControl.SpeedRegulatorMaxForceSteps)
-                            Locomotive.CruiseControl.SelectedMaxAccelerationStep = Locomotive.CruiseControl.SpeedRegulatorMaxForceSteps;
-                        if (Locomotive.CruiseControl.SelectedMaxAccelerationStep < 0)
-                            Locomotive.CruiseControl.SelectedMaxAccelerationStep = 0;
-                        Locomotive.Simulator.Confirmer.Information("Selected maximum acceleration was changed to " + Math.Round((Locomotive.CruiseControl.MaxForceSelectorIsDiscrete ?
-                            (int)Locomotive.CruiseControl.SelectedMaxAccelerationStep : Locomotive.CruiseControl.SelectedMaxAccelerationStep) * 100 / Locomotive.CruiseControl.SpeedRegulatorMaxForceSteps, 0).ToString() + " percent");
-                    }
+                    p = ChangedValue(0);
+                    Locomotive.CruiseControl.SpeedRegulatorMaxForceChangeByMouse(p, (float)Control.MaxValue);
                     break;
                 case CABViewControlTypes.ORTS_MULTI_POSITION_CONTROLLER:
                     {
