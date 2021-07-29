@@ -1,5 +1,5 @@
-﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.101
-July 14th, 2021
+﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.102
+July 29th, 2021
 
 Please note that the installation and use of Open Rails software, even of its unofficial versions, is governed by the Open Rails End User License Agreement. 
 
@@ -11,7 +11,7 @@ INSTALLATION
 
 
 RELEASE NOTES
-This unofficial version has been derived from the latest official OpenRails testing revision X1.3.1-377 (not already published, which already includes Monogame. 
+This unofficial version has been derived from the latest official OpenRails testing revision T1.3.1-1883, which already includes Monogame. 
 
 This unofficial version includes the cruise control software written by Jindrich with final adaptations by myself.
 
@@ -47,17 +47,15 @@ This version includes some features not (yet) available in the Open Rails testin
 - preliminary bug fix for http://www.elvastower.com/forums/index.php?/topic/35112-problem-with-tcs-scripts-and-timetable-mode/
 - analog clocks list file no more needed, by jonas
 - max fog distance increased to 300 km
-- bug fix for missing shapes http://www.elvastower.com/forums/index.php?/topic/32640-or-newyear-mg/page__view__findpost__p__272585
 - first cruise control implementation, by Jindrich and slightly adapted by me
 - added AIFireman info in web and main display TrainDrivingInfo, by mbm_OR
 - tentative improvement to sound deactivation in long player trains, see http://www.elvastower.com/forums/index.php?/topic/35244-problem-in-locomotive-sound/
-- NEW: reintroduced camera commands for fast pan up-pan down and changed keys for axle number increase-decrease in cruise control
-- NEW: notched forced selector support in cruise control
-- NEW: camera following detached wagons in hump yard operation
-- NEW: bug fix that didn't check for null label text, see http://www.elvastower.com/forums/index.php?/topic/32640-or-newyear-mg/page__view__findpost__p__273496
-- NEW: bug fix for missing null check, see http://www.elvastower.com/forums/index.php?/topic/35300-constant-crashes-on-most-routes/
+- camera following detached wagons in hump yard operation by pressing Ctrl key while clicking with mouse on coupler in Train Operations Window to uncouple wagon
+- bug fix that didn't check for null label text, see http://www.elvastower.com/forums/index.php?/topic/32640-or-newyear-mg/page__view__findpost__p__273496
+- re-introduced bug fix for missing shapes http://www.elvastower.com/forums/index.php?/topic/32640-or-newyear-mg/page__view__findpost__p__272585
+- NEW: Cruise control: support for proportional set speed controller, independent from throttle controller
 
-- 
+
 
 
 
