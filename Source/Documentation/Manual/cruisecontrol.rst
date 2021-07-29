@@ -98,7 +98,8 @@ Multi Position Controller (MPC)
 -------------------------------
 
 It is possible to manage a CC also without a MPC, in case the throttle 
-controller is used for CC. However in general a MPC is needed.
+controller is used for CC, or a proportional speed selector is available. 
+In the other cases in general a MPC is needed.
 
 The Multi Position Controller(s) (more than one can be defined) is 
 defined in the .eng file too with an *ORTSMultiPositionController* block, 
@@ -232,10 +233,29 @@ and 2 are in the zero position and lever 3 is in the neutral position. If
 at that point lever 1 is moved, CC switches to (or remains in) manual mode. 
 If at that point lever 2 is moved, CC switches to (or remains in) auto mode.
 
-The cvf file for the E464 equipped with CC (and also with customized TCS can be 
+The cvf file for the E464 equipped with CC (and also with customized TCS) can be 
 found `here <samplefiles/e464_V2SCMT_SCMTscript_alias_CC.zip>`_.
 
 The eng file for the E464 can be found `here <samplefiles/Fs-E464-390.zip>`_.
+
+Sample files of a CC equipped locomotive with proportional speed selector
+=========================================================================
+
+The E652 is one of the first Italian electric locomotives which was 
+equipped with power electronics.
+Differently from the E464, the preset speed is not set by a multiposition 
+controller, but by a proportional lever, situated at the right of the cabview. 
+"Proportional" means that at every position of the lever a different preset speed 
+corresponds. Zero speed is set when the lever is at the "lowest" position, and the 
+maximum speed is set when the lever is at the "highest" position. 
+The lever is named "ORTS_SELECTED_SPEED_SELECTOR" in the cvf file.
+
+The cvf file for the E652 equipped with CC (and also with customized TCS) can be 
+found `here <samplefiles/E652_CC.zip>`_.
+
+The eng file for the E652 can be found `here <samplefiles/FS_E652_143MIR.zip>`_.
+
+
 
 
 
