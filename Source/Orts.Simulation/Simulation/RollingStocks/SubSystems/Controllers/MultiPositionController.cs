@@ -428,6 +428,16 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Controllers
                             Locomotive.SetDynamicBrakePercent(100);
                     }
                 }
+                if (controllerPosition == ControllerPosition.SelectedSpeedIncrease)
+                {
+                    if (Locomotive.CruiseControl.ForceRegulatorAutoWhenNonZeroSpeedSelectedAndThrottleAtZero &&
+                        Locomotive.CruiseControl.SelectedMaxAccelerationStep == 0 && Locomotive.CruiseControl.DisableCruiseControlOnThrottleAndZeroForceAndZeroSpeed &&
+                           Locomotive.ThrottleController.CurrentValue == 0 && Locomotive.DynamicBrakeController.CurrentValue == 0)
+                    {
+                        Locomotive.CruiseControl.SpeedRegMode = CruiseControl.SpeedRegulatorMode.Auto;
+                        Locomotive.CruiseControl.SpeedRegulatorSelectedSpeedIncrease();
+                    }
+                }
             }
             else if (haveCruiseControl && ccAutoMode)
             {

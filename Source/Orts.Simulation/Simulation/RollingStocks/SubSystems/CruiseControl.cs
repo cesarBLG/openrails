@@ -56,6 +56,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
         public float MaxAccelerationMpSS = 0;
         public float MaxDecelerationMpSS = 0;
         public bool UseThrottle = false;
+        public bool UseThrottleInCombinedControl = false;
         public bool AntiWheelSpinEquipped = false;
         public float AntiWheelSpinSpeedDiffThreshold = 0.5f;
         public float DynamicBrakeMaxForceAtSelectorStep = 0;
@@ -115,6 +116,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
         protected float elapsedTime = 0;
         public bool DisableCruiseControlOnThrottleAndZeroSpeed = false;
         public bool DisableCruiseControlOnThrottleAndZeroForce = false;
+        public bool DisableCruiseControlOnThrottleAndZeroForceAndZeroSpeed = false;
         public bool ForceResetRequiredAfterBraking = false;
         public bool ForceResetIncludeDynamicBrake = false;
         public bool ZeroSelectedSpeedWhenPassingToThrottleMode = false;
@@ -129,6 +131,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
             {
                 case "engine(ortscruisecontrol(speedismph": SpeedIsMph = stf.ReadBoolBlock(false); break;
                 case "engine(ortscruisecontrol(usethrottle": UseThrottle = stf.ReadBoolBlock(false); break;
+                case "engine(ortscruisecontrol(usethrottleincombinedcontrol": UseThrottleInCombinedControl = stf.ReadBoolBlock(false); break;
                 case "engine(ortscruisecontrol(speedselectorsteptimeseconds": SpeedSelectorStepTimeSeconds = stf.ReadFloatBlock(STFReader.UNITS.Any, 0.1f); break;
                 case "engine(ortscruisecontrol(throttlefullrangeincreasetimeseconds": ThrottleFullRangeIncreaseTimeSeconds = stf.ReadFloatBlock(STFReader.UNITS.Any, 5); break;
                 case "engine(ortscruisecontrol(throttlefullrangedecreasetimeseconds": ThrottleFullRangeDecreaseTimeSeconds = stf.ReadFloatBlock(STFReader.UNITS.Any, 5); break;
@@ -150,6 +153,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                 case "engine(ortscruisecontrol(continuousspeedincreasing": ContinuousSpeedIncreasing = stf.ReadBoolBlock(false); break;
                 case "engine(ortscruisecontrol(disablecruisecontrolonthrottleandzerospeed": DisableCruiseControlOnThrottleAndZeroSpeed = stf.ReadBoolBlock(false); break;
                 case "engine(ortscruisecontrol(disablecruisecontrolonthrottleandzeroforce": DisableCruiseControlOnThrottleAndZeroForce = stf.ReadBoolBlock(false); break;
+                case "engine(ortscruisecontrol(disablecruisecontrolonthrottleandzeroforceandzerospeed": DisableCruiseControlOnThrottleAndZeroForceAndZeroSpeed = stf.ReadBoolBlock(false); break;
 
                 case "engine(ortscruisecontrol(forcestepsthrottletable":
                     foreach (var forceStepThrottleValue in stf.ReadStringBlock("").Replace(" ", "").Split(','))
@@ -451,7 +455,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
         {
             if (SelectedMaxAccelerationPercent == percent) return;
             SelectedMaxAccelerationPercent = percent;
-            SelectedMaxAccelerationPercent = (float)Math.Round(SelectedMaxAccelerationStep * 100 / SpeedRegulatorMaxForceSteps, 0);
+            SelectedMaxAccelerationStep = (float)Math.Round(SelectedMaxAccelerationPercent * SpeedRegulatorMaxForceSteps / 100, 0);
             Simulator.Confirmer.Message(ConfirmLevel.Information, Simulator.Catalog.GetString("Speed regulator max acceleration percent changed to") + " " + Simulator.Catalog.GetString(SelectedMaxAccelerationPercent.ToString()) + "%");
         }
 
@@ -486,7 +490,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                 if (SelectedMaxAccelerationPercent == 100)
                     return;
                 SelectedMaxAccelerationPercent += 1f;
-                SelectedMaxAccelerationPercent = (float)Math.Round(SelectedMaxAccelerationStep * 100 / SpeedRegulatorMaxForceSteps, 0);
+//                SelectedMaxAccelerationPercent = (float)Math.Round(SelectedMaxAccelerationStep * 100 / SpeedRegulatorMaxForceSteps, 0);
                 Simulator.Confirmer.Message(ConfirmLevel.Information, Simulator.Catalog.GetString("Speed regulator max acceleration percent changed to") + " " + Simulator.Catalog.GetString(SelectedMaxAccelerationPercent.ToString()) + "%");
             }
             else
@@ -610,6 +614,12 @@ namespace Orts.Simulation.RollingStocks.SubSystems
             }
             if (SpeedRegMode != SpeedRegulatorMode.Auto && ( ForceRegulatorAutoWhenNonZeroSpeedSelected || HasProportionalSpeedSelector &&
                 SelectedMaxAccelerationStep == 0 && DisableCruiseControlOnThrottleAndZeroForce && ForceRegulatorAutoWhenNonZeroSpeedSelectedAndThrottleAtZero &&
+                            Locomotive.ThrottleController.CurrentValue == 0 && Locomotive.DynamicBrakeController.CurrentValue == 0))
+            {
+                SpeedRegMode = SpeedRegulatorMode.Auto;
+            }
+            if (SpeedRegMode != SpeedRegulatorMode.Auto && (ForceRegulatorAutoWhenNonZeroSpeedSelectedAndThrottleAtZero &&
+                SelectedMaxAccelerationStep == 0 && DisableCruiseControlOnThrottleAndZeroForceAndZeroSpeed &&
                             Locomotive.ThrottleController.CurrentValue == 0 && Locomotive.DynamicBrakeController.CurrentValue == 0))
             {
                 SpeedRegMode = SpeedRegulatorMode.Auto;
@@ -808,7 +818,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
         public void SetSpeed(float Speed)
         {
             if (!Equipped) return;
-            if (SpeedRegMode == SpeedRegulatorMode.Manual && ForceRegulatorAutoWhenNonZeroSpeedSelected)
+            if (SpeedRegMode == SpeedRegulatorMode.Manual && (ForceRegulatorAutoWhenNonZeroSpeedSelected || ForceRegulatorAutoWhenNonZeroSpeedSelectedAndThrottleAtZero))
                 SpeedRegMode = SpeedRegulatorMode.Auto;
             if (SpeedRegMode == SpeedRegulatorMode.Manual)
                 return;

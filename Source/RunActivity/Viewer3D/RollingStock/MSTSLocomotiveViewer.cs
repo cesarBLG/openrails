@@ -2238,7 +2238,8 @@ namespace Orts.Viewer3D.RollingStock
             {
                 case CABViewControlTypes.REGULATOR:
                 case CABViewControlTypes.THROTTLE:
-                    if (Locomotive.CruiseControl?.SelectedMaxAccelerationPercent == 0 && Locomotive.CruiseControl.DisableCruiseControlOnThrottleAndZeroForce && Locomotive.CruiseControl.SelectedMaxAccelerationStep == 0 && Locomotive.CruiseControl.SpeedRegMode == Simulation.RollingStocks.SubSystems.CruiseControl.SpeedRegulatorMode.Auto)
+                    if ((Locomotive.CruiseControl?.SelectedMaxAccelerationPercent == 0 && Locomotive.CruiseControl.SelectedMaxAccelerationStep == 0 && Locomotive.CruiseControl.SpeedRegMode == Simulation.RollingStocks.SubSystems.CruiseControl.SpeedRegulatorMode.Auto)
+                        && (Locomotive.CruiseControl.DisableCruiseControlOnThrottleAndZeroForce || Locomotive.CruiseControl.DisableCruiseControlOnThrottleAndZeroForceAndZeroSpeed && Locomotive.CruiseControl.SelectedSpeedMpS == 0))
                     {
                         if (Locomotive.CruiseControl.ZeroSelectedSpeedWhenPassingToThrottleMode) Locomotive.CruiseControl.SetSpeed(0);
                         if (Locomotive.ThrottleController.CurrentValue == 0)
@@ -2329,7 +2330,8 @@ namespace Orts.Viewer3D.RollingStock
                 case CABViewControlTypes.ORTS_OVERCHARGE: new BrakeOverchargeCommand(Viewer.Log, ChangedValue(Locomotive.TrainBrakeController.OverchargeButtonPressed ? 1 : 0) > 0); break;
                 case CABViewControlTypes.RESET: new AlerterCommand(Viewer.Log, ChangedValue(Locomotive.TrainControlSystem.AlerterButtonPressed ? 1 : 0) > 0); break;
                 case CABViewControlTypes.CP_HANDLE:
-                    if (Locomotive.CruiseControl?.SelectedMaxAccelerationPercent == 0 && Locomotive.CruiseControl.DisableCruiseControlOnThrottleAndZeroForce && Locomotive.CruiseControl.SelectedMaxAccelerationStep == 0 && Locomotive.CruiseControl.SpeedRegMode == Simulation.RollingStocks.SubSystems.CruiseControl.SpeedRegulatorMode.Auto)
+                    if ((Locomotive.CruiseControl?.SelectedMaxAccelerationPercent == 0 && Locomotive.CruiseControl.SelectedMaxAccelerationStep == 0 && Locomotive.CruiseControl.SpeedRegMode == Simulation.RollingStocks.SubSystems.CruiseControl.SpeedRegulatorMode.Auto)
+                         && (Locomotive.CruiseControl.DisableCruiseControlOnThrottleAndZeroForce || Locomotive.CruiseControl.DisableCruiseControlOnThrottleAndZeroForceAndZeroSpeed && Locomotive.CruiseControl.SelectedSpeedMpS == 0))
                     {
                         if (Locomotive.CruiseControl.ZeroSelectedSpeedWhenPassingToThrottleMode) Locomotive.CruiseControl.SetSpeed(0);
                         if (Locomotive.ThrottleController.CurrentValue == 0)
