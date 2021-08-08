@@ -2243,7 +2243,10 @@ namespace Orts.Viewer3D.RollingStock
                     {
                         if (Locomotive.CruiseControl.ZeroSelectedSpeedWhenPassingToThrottleMode) Locomotive.CruiseControl.SetSpeed(0);
                         if (Locomotive.ThrottleController.CurrentValue == 0)
+                        {
                             Locomotive.CruiseControl.SpeedRegMode = Simulation.RollingStocks.SubSystems.CruiseControl.SpeedRegulatorMode.Manual;
+                            Locomotive.CruiseControl.DynamicBrakePriority = false;
+                        }
                         Locomotive.CruiseControl.SkipThrottleDisplay = false;
                     }
                     if (Locomotive.CruiseControl?.SpeedRegMode == Simulation.RollingStocks.SubSystems.CruiseControl.SpeedRegulatorMode.Auto
@@ -2335,7 +2338,10 @@ namespace Orts.Viewer3D.RollingStock
                     {
                         if (Locomotive.CruiseControl.ZeroSelectedSpeedWhenPassingToThrottleMode) Locomotive.CruiseControl.SetSpeed(0);
                         if (Locomotive.ThrottleController.CurrentValue == 0)
+                        {
                             Locomotive.CruiseControl.SpeedRegMode = Simulation.RollingStocks.SubSystems.CruiseControl.SpeedRegulatorMode.Manual;
+                            Locomotive.CruiseControl.DynamicBrakePriority = false;
+                        }
                         Locomotive.CruiseControl.SkipThrottleDisplay = false;
                     }
                     if (Locomotive.CruiseControl?.SpeedRegMode == Simulation.RollingStocks.SubSystems.CruiseControl.SpeedRegulatorMode.Auto

@@ -245,7 +245,15 @@ namespace Orts.Simulation.RollingStocks.SubSystems
         {
             elapsedTime += elapsedClockSeconds;
             if (maxForceIncreasing) SpeedRegulatorMaxForceIncrease();
-            if (maxForceDecreasing) SpeedRegulatorMaxForceDecrease();
+            if (maxForceDecreasing)
+            {
+                if (SelectedMaxAccelerationStep <= 0)
+                {
+                    maxForceDecreasing = false;
+                }
+                else
+                    SpeedRegulatorMaxForceDecrease();
+            }
             if (SpeedRegMode == SpeedRegulatorMode.Manual)
             {
                 return;
@@ -722,6 +730,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
             {
                 // return back to manual, clear all we have controlled before and let the driver to set up new stuff
                 SpeedRegMode = SpeedRegulatorMode.Manual;
+                DynamicBrakePriority = false;
 //                Locomotive.ThrottleController.SetPercent(0);
 //                Locomotive.SetDynamicBrakePercent(0);
                 Locomotive.DynamicBrakeChangeActiveState(false);
@@ -928,6 +937,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
             if (SelectedMaxAccelerationPercent == 0 && SelectedMaxAccelerationStep == 0)
             {
                 WasBraking = false;
+                if (SpeedRegMode == SpeedRegulatorMode.Auto && UseThrottleAsForceSelector) Locomotive.ThrottleController.SetPercent(0);
                 Locomotive.SetThrottlePercent(0);
             }
             if (ResetForceAfterAnyBraking && WasBraking && (SelectedMaxAccelerationStep > 0 || SelectedMaxAccelerationPercent > 0))
@@ -993,7 +1003,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                 SkipThrottleDisplay = true;
                 reducingForce = false;
             }
-            if (SpeedRegulatorOptions.Contains("engageforceonnonzerospeed") && SelectedSpeedMpS == 0)
+ /*           if (SpeedRegulatorOptions.Contains("engageforceonnonzerospeed") && SelectedSpeedMpS == 0)
             {
                 if (playerNotDriveableTrainLocomotives.Count > 0) // update any other than the player's locomotive in the consist throttles to percentage of the current force and the max force
                 {
@@ -1013,7 +1023,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                 Locomotive.TractiveForceN = Locomotive.MotiveForceN = 0;
                 Locomotive.SetThrottlePercent(0);
                 return;
-            }
+            }*/
 
             float t = 0;
             if (SpeedRegMode == SpeedRegulatorMode.Manual)
