@@ -27,10 +27,6 @@ namespace Orts.Simulation.RollingStocks.SubSystems
     public class CruiseControl
 
     {
-        public CruiseControl(MSTSLocomotive locomotive)
-        {
-            Locomotive = locomotive;
-        }
         MSTSLocomotive Locomotive;
         Simulator Simulator;
 
@@ -124,6 +120,12 @@ namespace Orts.Simulation.RollingStocks.SubSystems
         public bool HasIndependentThrottleDynamicBrakeLever = false;
         public bool HasProportionalSpeedSelector = false;
         public bool DoComputeNumberOfAxles = false;
+
+        public CruiseControl(MSTSLocomotive locomotive)
+        {
+            Locomotive = locomotive;
+        }
+ 
 
         public void Parse(string lowercasetoken, STFReader stf)
         {
@@ -219,6 +221,78 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                         break;
                     }
             }
+        }
+
+        public CruiseControl Clone(MSTSLocomotive locomotive)
+        {
+            return new CruiseControl(this, locomotive);
+        }
+
+        public CruiseControl(CruiseControl other, MSTSLocomotive locomotive)
+        {
+            Simulator = locomotive.Simulator;
+            Locomotive = locomotive;
+
+            Equipped = other.Equipped;
+            SpeedIsMph = other.SpeedIsMph;
+            SpeedRegulatorMaxForcePercentUnits = other.SpeedRegulatorMaxForcePercentUnits;
+            SpeedRegulatorMaxForceSteps = other.SpeedRegulatorMaxForceSteps;
+            MaxForceSetSingleStep = other.MaxForceSetSingleStep;
+            MaxForceKeepSelectedStepWhenManualModeSet = other.MaxForceKeepSelectedStepWhenManualModeSet;
+            ForceRegulatorAutoWhenNonZeroSpeedSelected = other.ForceRegulatorAutoWhenNonZeroSpeedSelected;
+            ForceRegulatorAutoWhenNonZeroForceSelected = other.ForceRegulatorAutoWhenNonZeroForceSelected;
+            ForceRegulatorAutoWhenNonZeroSpeedSelectedAndThrottleAtZero = other.ForceRegulatorAutoWhenNonZeroSpeedSelectedAndThrottleAtZero;
+            MaxForceSelectorIsDiscrete = other.MaxForceSelectorIsDiscrete;
+            SpeedRegulatorOptions = other.SpeedRegulatorOptions;
+            CruiseControlLogic = other.CruiseControlLogic;
+            SpeedRegulatorNominalSpeedStepMpS = other.SpeedRegulatorNominalSpeedStepMpS;
+            MaxAccelerationMpSS = other.MaxAccelerationMpSS;
+            MaxDecelerationMpSS = other.MaxDecelerationMpSS;
+            UseThrottle = other.UseThrottle;
+            UseThrottleInCombinedControl = other.UseThrottleInCombinedControl;
+            AntiWheelSpinEquipped = other.AntiWheelSpinEquipped;
+            AntiWheelSpinSpeedDiffThreshold = other.AntiWheelSpinSpeedDiffThreshold;
+            DynamicBrakeMaxForceAtSelectorStep = other.DynamicBrakeMaxForceAtSelectorStep;
+            StartReducingSpeedDelta = other.StartReducingSpeedDelta;
+            ForceStepsThrottleTable = other.ForceStepsThrottleTable;
+            AccelerationTable = other.AccelerationTable;
+            DynamicBrakeIncreaseSpeed = other.DynamicBrakeIncreaseSpeed;
+            DynamicBrakeDecreaseSpeed = other.DynamicBrakeDecreaseSpeed;
+            AccelerationRampMaxMpSSS = other.AccelerationRampMaxMpSSS;
+            AccelerationRampMinMpSSS = other.AccelerationRampMinMpSSS;
+            ResetForceAfterAnyBraking = other.ResetForceAfterAnyBraking;
+            ThrottleFullRangeIncreaseTimeSeconds = other.ThrottleFullRangeIncreaseTimeSeconds;
+            ThrottleFullRangeDecreaseTimeSeconds = other.ThrottleFullRangeDecreaseTimeSeconds;
+            DynamicBrakeFullRangeIncreaseTimeSeconds = other.DynamicBrakeFullRangeIncreaseTimeSeconds;
+            DynamicBrakeFullRangeDecreaseTimeSeconds = other.DynamicBrakeFullRangeDecreaseTimeSeconds;
+            ParkingBrakeEngageSpeed = other.ParkingBrakeEngageSpeed;
+            ParkingBrakePercent = other.ParkingBrakePercent;
+            DisableZeroForceStep = other.DisableZeroForceStep;
+            DynamicBrakeIsSelectedForceDependant = other.DynamicBrakeIsSelectedForceDependant;
+            UseThrottleAsSpeedSelector = other.UseThrottleAsSpeedSelector;
+            UseThrottleAsForceSelector = other.UseThrottleAsForceSelector;
+            ContinuousSpeedIncreasing = other.ContinuousSpeedIncreasing;
+            ContinuousSpeedDecreasing = other.ContinuousSpeedDecreasing;
+            PowerBreakoutAmpers = other.PowerBreakoutAmpers;
+            PowerBreakoutSpeedDelta = other.PowerBreakoutSpeedDelta;
+            PowerResumeSpeedDelta = other.PowerResumeSpeedDelta;
+            PowerReductionDelayPaxTrain = other.PowerReductionDelayPaxTrain;
+            PowerReductionDelayCargoTrain = other.PowerReductionDelayCargoTrain;
+            PowerReductionValue = other.PowerReductionValue;
+            MaxPowerThreshold = other.MaxPowerThreshold;
+            SafeSpeedForAutomaticOperationMpS = other.SafeSpeedForAutomaticOperationMpS;
+            SpeedSelectorStepTimeSeconds = other.SpeedSelectorStepTimeSeconds;
+            DisableCruiseControlOnThrottleAndZeroSpeed = other.DisableCruiseControlOnThrottleAndZeroSpeed;
+            DisableCruiseControlOnThrottleAndZeroForce = other.DisableCruiseControlOnThrottleAndZeroForce;
+            DisableCruiseControlOnThrottleAndZeroForceAndZeroSpeed = other.DisableCruiseControlOnThrottleAndZeroForceAndZeroSpeed;
+            ForceResetRequiredAfterBraking = other.ForceResetRequiredAfterBraking;
+            ForceResetIncludeDynamicBrake = other.ForceResetIncludeDynamicBrake;
+            ZeroSelectedSpeedWhenPassingToThrottleMode = other.ZeroSelectedSpeedWhenPassingToThrottleMode;
+            DynamicBrakeCommandHasPriorityOverCruiseControl = other.DynamicBrakeCommandHasPriorityOverCruiseControl;
+            HasIndependentThrottleDynamicBrakeLever = other.HasIndependentThrottleDynamicBrakeLever;
+            HasProportionalSpeedSelector = other.HasProportionalSpeedSelector;
+            DoComputeNumberOfAxles = other.DoComputeNumberOfAxles;
+            SpeedRegulatorOptions = other.SpeedRegulatorOptions;
         }
 
         public void Initialize()
@@ -1606,7 +1680,12 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                         else
                         {
                             if (Locomotive.TractiveForceCurves == null)
+                            {
                                 maxForceN = Locomotive.MaxForceN * (controllerVolts / 100);
+                                float maxPowerW = Locomotive.MaxPowerW * t * t * (1 - Locomotive.PowerReduction);
+                                if (maxForceN * AbsWheelSpeedMpS > maxPowerW)
+                                    maxForceN = maxPowerW / AbsWheelSpeedMpS;
+                            }
                             else
                                 maxForceN = Locomotive.TractiveForceCurves.Get(controllerVolts / 100, AbsWheelSpeedMpS) * (1 - Locomotive.PowerReduction);
                         }

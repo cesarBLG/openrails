@@ -26,12 +26,6 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Controllers
 {
     public class MultiPositionController
     {
-        public MultiPositionController(MSTSLocomotive locomotive)
-        {
-            Locomotive = locomotive;
-            Simulator = Locomotive.Simulator;
-            controllerPosition = ControllerPosition.Neutral;
-        }
         MSTSLocomotive Locomotive;
         Simulator Simulator;
 
@@ -57,6 +51,25 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Controllers
         protected bool haveCruiseControl = false;
         public int ControllerId = 0;
         public bool MouseInputActive = false;
+
+        public MultiPositionController(MSTSLocomotive locomotive)
+        {
+            Locomotive = locomotive;
+            Simulator = Locomotive.Simulator;
+            controllerPosition = ControllerPosition.Neutral;
+        }
+
+        public MultiPositionController(MultiPositionController other, MSTSLocomotive locomotive)
+        {
+            Simulator = locomotive.Simulator;
+            Locomotive = locomotive;
+
+            PositionsList = other.PositionsList;
+            controllerBinding = other.controllerBinding;
+            ControllerId = other.ControllerId;
+            CanControlTrainBrake = other.CanControlTrainBrake;
+        }
+  
 
         public void Save(BinaryWriter outf)
         {
@@ -91,13 +104,17 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Controllers
         }
         public void Parse(string lowercasetoken, STFReader stf)
         {
-            switch (lowercasetoken)
+            stf.MustMatch("(");
+            while (!stf.EndOfBlock())
             {
-                case "engine(ortsmultipositioncontroller(positions":
-                    stf.MustMatch("(");
-                    while (!stf.EndOfBlock())
-                    {
-                        stf.ParseBlock(new STFReader.TokenProcessor[] {
+                stf.ReadItem();
+                switch (stf.Tree.ToLower())
+                {
+                    case "engine(ortsmultipositioncontroller(positions":
+                        stf.MustMatch("(");
+                        while (!stf.EndOfBlock())
+                        {
+                            stf.ParseBlock(new STFReader.TokenProcessor[] {
                         new STFReader.TokenProcessor("position", ()=>{
                             stf.MustMatch("(");
                             string positionType = stf.ReadString();
@@ -106,22 +123,23 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Controllers
                             PositionsList.Add(new Position(positionType, positionFlag, positionName));
                         }),
                     });
-                    }
-                    break;
-                case "engine(ortsmultipositioncontroller(controllerbinding":
-                    String binding = stf.ReadStringBlock("null").ToLower();
-                    switch (binding)
-                    {
-                        case "throttle":
-                            controllerBinding = ControllerBinding.Throttle;
-                            break;
-                        case "selectedspeed":
-                            controllerBinding = ControllerBinding.SelectedSpeed;
-                            break;
-                    }
-                    break;
-                case "engine(ortsmultipositioncontroller(controllerid": ControllerId = stf.ReadIntBlock(0); break;
-                case "engine(ortsmultipositioncontrollercancontroltrainbrake": CanControlTrainBrake = stf.ReadBoolBlock(false); break;
+                        }
+                        break;
+                    case "engine(ortsmultipositioncontroller(controllerbinding":
+                        String binding = stf.ReadStringBlock("null").ToLower();
+                        switch (binding)
+                        {
+                            case "throttle":
+                                controllerBinding = ControllerBinding.Throttle;
+                                break;
+                            case "selectedspeed":
+                                controllerBinding = ControllerBinding.SelectedSpeed;
+                                break;
+                        }
+                        break;
+                    case "engine(ortsmultipositioncontroller(controllerid": ControllerId = stf.ReadIntBlock(0); break;
+                    case "engine(ortsmultipositioncontrollercancontroltrainbrake": CanControlTrainBrake = stf.ReadBoolBlock(false); break;
+                }
             }
         }
         public void Update(float elapsedClockSeconds)

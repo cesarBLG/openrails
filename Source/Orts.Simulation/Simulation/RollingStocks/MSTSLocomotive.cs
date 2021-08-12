@@ -437,7 +437,7 @@ namespace Orts.Simulation.RollingStocks
 
         // Jindrich
         public CruiseControl CruiseControl;
-        public MultiPositionController MultiPositionController;
+ //       public MultiPositionController MultiPositionController;
         public List<MultiPositionController> MultiPositionControllers;
         public bool SelectingSpeedPressed = false;
         public bool EngineBrakePriority = false;
@@ -994,13 +994,13 @@ namespace Orts.Simulation.RollingStocks
                 case "engine(ortsmaxtracksandersandconsumption": TrackSanderSandConsumptionM3pS = stf.ReadFloatBlock(STFReader.UNITS.Volume, null); break;
                 case "engine(ortsmaxtracksanderairconsumption": TrackSanderAirComsumptionM3pS = stf.ReadFloatBlock(STFReader.UNITS.Volume, null); break;
                 case "engine(ortscruisecontrol": SetUpCruiseControl(); break;
-                case "engine(ortsmultipositioncontroller": SetUpMPC(); break;
+                case "engine(ortsmultipositioncontroller": SetUpMPC(lowercasetoken, stf); break;
                 default:
                     base.Parse(lowercasetoken, stf);
                     if (CruiseControl != null)
                         CruiseControl.Parse(lowercasetoken, stf);
-                    if (MultiPositionController != null)
-                        MultiPositionController.Parse(lowercasetoken, stf);
+//                    if (MultiPositionController != null)
+//                        MultiPositionController.Parse(lowercasetoken, stf);
                     break;
             }
         }
@@ -1074,6 +1074,7 @@ namespace Orts.Simulation.RollingStocks
 
             DynamicBrakeBlended = locoCopy.DynamicBrakeBlended;
             DynamicBrakeBlendingEnabled = locoCopy.DynamicBrakeBlendingEnabled;
+            DynamicBrakeAvailable = locoCopy.DynamicBrakeAvailable;
             airPipeSystem = locoCopy.airPipeSystem;
             DynamicBrakeCommandStartTime = locoCopy.DynamicBrakeCommandStartTime;
             DynamicBrakeBlendingOverride = locoCopy.DynamicBrakeBlendingOverride;
@@ -1105,7 +1106,9 @@ namespace Orts.Simulation.RollingStocks
             WaterScoopWidthM = locoCopy.WaterScoopWidthM;
             MoveParamsToAxle();
             if (locoCopy.CruiseControl != null)
-                CruiseControl = locoCopy.CruiseControl;
+                CruiseControl = locoCopy.CruiseControl.Clone(this);
+            if (locoCopy.MultiPositionControllers != null)
+                MultiPositionControllers = locoCopy.CloneMPC(this);
         }
 
         /// <summary>
@@ -1537,14 +1540,25 @@ namespace Orts.Simulation.RollingStocks
         /// <summary>
         /// Make instance of multi position controller
         /// </summary>
-        public void SetUpMPC()
+        public void SetUpMPC(string lowercasetoken, STFReader stf)
         {
-            MultiPositionController = new MultiPositionController(this);
+            var multiPositionController = new MultiPositionController(this);
+            multiPositionController.Parse(lowercasetoken, stf);
             if (MultiPositionControllers == null)
             {
                 MultiPositionControllers = new List<MultiPositionController>();
             }
-            MultiPositionControllers.Add(MultiPositionController);
+            MultiPositionControllers.Add(multiPositionController);
+        }
+
+        public List<MultiPositionController> CloneMPC(MSTSLocomotive locomotive)
+        {
+            var multiPositionControllers = new List<MultiPositionController>();
+            foreach (var mPC in MultiPositionControllers)
+            {
+                multiPositionControllers.Add(new MultiPositionController(mPC, locomotive));
+            }
+            return multiPositionControllers;
         }
 
         //================================================================================================//
@@ -5426,8 +5440,15 @@ namespace Orts.Simulation.RollingStocks
                         data = CruiseControl.GetDataOf(cvc);
                     else
                         data = 0;
-                    if (MultiPositionController != null && data == 0)
-                        data = MultiPositionController.GetDataOf(cvc);
+                    if (MultiPositionControllers != null && data == 0)
+                    {
+                        foreach (var mpc in MultiPositionControllers)
+                            if (mpc.ControllerId == cvc.ControlId)
+                            {
+                                data = mpc.GetDataOf(cvc);
+                                break;
+                            }
+                    }
                     else if (data == 0)
                         data = 0;
                     break;
