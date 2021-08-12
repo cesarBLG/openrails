@@ -50,6 +50,15 @@ namespace Orts.Viewer3D.Popups
         bool ctrlAIFiremanReset = false;//AIFireman Reset
         double clockAIFireTime; //AIFireman reset timing
 
+        bool grateLabelVisible = false;// Grate label visible
+        double clockGrateTime; // Grate hide timing
+
+        bool wheelLabelVisible = false;// Wheel label visible
+        double clockWheelTime; // Wheel hide timing
+
+        bool doorsLabelVisible = false; // Doors label visible
+        double clockDoorsTime; // Doors hide timing
+
         public bool StandardHUD = true;// Standard text
         public bool TrainDrivingUpdating = false;
 
@@ -57,10 +66,12 @@ namespace Orts.Viewer3D.Popups
         int WindowHeightMax = 0;
         int WindowWidthMin = 0;
         int WindowWidthMax = 0;
+        int maxFirstColWidth = 0;
+        int maxLastColWidth = 0;
 
         char expandWindow;
         string keyPressed;// display a symbol when a control key is pressed.
-        string Gradient;
+        string gradientIndicator;
         public int OffSetX = 0;
         const int TextSize = 15;
         public int keyPresLenght;
@@ -100,53 +111,61 @@ namespace Orts.Viewer3D.Popups
 
         readonly Dictionary<string, string> FirstColToAbbreviated = new Dictionary<string, string>()
         {
-            {Viewer.Catalog.GetString("AI Fireman"), Viewer.Catalog.GetString("AIFR")},
-            {Viewer.Catalog.GetString("Autopilot"), Viewer.Catalog.GetString("AUTO")},
-            {Viewer.Catalog.GetString("Boiler pressure"), Viewer.Catalog.GetString("PRES")},
-            {Viewer.Catalog.GetString("Boiler water glass"), Viewer.Catalog.GetString("WATR")},
-            {Viewer.Catalog.GetString("Boiler water level"), Viewer.Catalog.GetString("LEVL")},
-            {Viewer.Catalog.GetString("Circuit breaker"), Viewer.Catalog.GetString("CIRC")},
-            {Viewer.Catalog.GetString("Cylinder cocks"), Viewer.Catalog.GetString("CCOK")},
-            {Viewer.Catalog.GetString("Direction"), Viewer.Catalog.GetString("DIRC")},
-            {Viewer.Catalog.GetString("Doors open"), Viewer.Catalog.GetString("DOOR")},
-            {Viewer.Catalog.GetString("Dynamic brake"), Viewer.Catalog.GetString("BDYN")},
-            {Viewer.Catalog.GetString("Engine brake"), Viewer.Catalog.GetString("BLOC")},
-            {Viewer.Catalog.GetString("Engine"), Viewer.Catalog.GetString("ENGN")},
-            {Viewer.Catalog.GetString("Fire mass"), Viewer.Catalog.GetString("FIRE")},
-            {Viewer.Catalog.GetString("Fixed gear"), Viewer.Catalog.GetString("GEAR")},
-            {Viewer.Catalog.GetString("Fuel levels"), Viewer.Catalog.GetString("FUEL")},
-            {Viewer.Catalog.GetString("Gear"), Viewer.Catalog.GetString("GEAR")},
-            {Viewer.Catalog.GetString("Gradient"), Viewer.Catalog.GetString("GRAD")},
-            {Viewer.Catalog.GetString("Grate limit"), Viewer.Catalog.GetString("GRAT")},
-            {Viewer.Catalog.GetString("Pantographs"), Viewer.Catalog.GetString("PANT")},
-            {Viewer.Catalog.GetString("Power"), Viewer.Catalog.GetString("POWR")},
-            {Viewer.Catalog.GetString("Regulator"), Viewer.Catalog.GetString("REGL")},
-            {Viewer.Catalog.GetString("Replay"), Viewer.Catalog.GetString("RPLY")},
-            {Viewer.Catalog.GetString("Retainers"), Viewer.Catalog.GetString("RETN")},
-            {Viewer.Catalog.GetString("Reverser"), Viewer.Catalog.GetString("REVR")},
-            {Viewer.Catalog.GetString("Sander"), Viewer.Catalog.GetString("SAND")},
-            {Viewer.Catalog.GetString("Speed"), Viewer.Catalog.GetString("SPED")},
-            {Viewer.Catalog.GetString("Steam usage"), Viewer.Catalog.GetString("STEM")},
-            {Viewer.Catalog.GetString("Throttle"), Viewer.Catalog.GetString("THRO")},
-            {Viewer.Catalog.GetString("Time"), Viewer.Catalog.GetString("TIME")},
-            {Viewer.Catalog.GetString("Train brake"), Viewer.Catalog.GetString("BTRN")},
-            {Viewer.Catalog.GetString("Wheel"), Viewer.Catalog.GetString("WHEL")},
+            [Viewer.Catalog.GetString("AI Fireman")] = Viewer.Catalog.GetString("AIFR"),
+            [Viewer.Catalog.GetString("Autopilot")] = Viewer.Catalog.GetString("AUTO"),
+            [Viewer.Catalog.GetString("Battery switch")] = Viewer.Catalog.GetString("BATT"),
+            [Viewer.Catalog.GetString("Boiler pressure")] = Viewer.Catalog.GetString("PRES"),
+            [Viewer.Catalog.GetString("Boiler water glass")] = Viewer.Catalog.GetString("WATR"),
+            [Viewer.Catalog.GetString("Boiler water level")] = Viewer.Catalog.GetString("LEVL"),
+            [Viewer.Catalog.GetString("CCStatus")] = Viewer.Catalog.GetString("CCST"),
+            [Viewer.Catalog.GetString("Circuit breaker")] = Viewer.Catalog.GetString("CIRC"),
+            [Viewer.Catalog.GetString("Cylinder cocks")] = Viewer.Catalog.GetString("CCOK"),
+            [Viewer.Catalog.GetString("Direction")] = Viewer.Catalog.GetString("DIRC"),
+            [Viewer.Catalog.GetString("Doors open")] = Viewer.Catalog.GetString("DOOR"),
+            [Viewer.Catalog.GetString("Dynamic brake")] = Viewer.Catalog.GetString("BDYN"),
+            [Viewer.Catalog.GetString("Electric train supply")] = Viewer.Catalog.GetString("TSUP"),
+            [Viewer.Catalog.GetString("Engine brake")] = Viewer.Catalog.GetString("BLOC"),
+            [Viewer.Catalog.GetString("Engine")] = Viewer.Catalog.GetString("ENGN"),
+            [Viewer.Catalog.GetString("Fire mass")] = Viewer.Catalog.GetString("FIRE"),
+            [Viewer.Catalog.GetString("Fixed gear")] = Viewer.Catalog.GetString("GEAR"),
+            [Viewer.Catalog.GetString("Fuel levels")] = Viewer.Catalog.GetString("FUEL"),
+            [Viewer.Catalog.GetString("Gear")] = Viewer.Catalog.GetString("GEAR"),
+            [Viewer.Catalog.GetString("Gradient")] = Viewer.Catalog.GetString("GRAD"),
+            [Viewer.Catalog.GetString("Grate limit")] = Viewer.Catalog.GetString("GRAT"),
+            [Viewer.Catalog.GetString("Master key")] = Viewer.Catalog.GetString("MAST"),
+            [Viewer.Catalog.GetString("MaxAccel")] = Viewer.Catalog.GetString("MACC"),
+            [Viewer.Catalog.GetString("Pantographs")] = Viewer.Catalog.GetString("PANT"),
+            [Viewer.Catalog.GetString("Power")] = Viewer.Catalog.GetString("POWR"),
+            [Viewer.Catalog.GetString("Regulator")] = Viewer.Catalog.GetString("REGL"),
+            [Viewer.Catalog.GetString("Replay")] = Viewer.Catalog.GetString("RPLY"),
+            [Viewer.Catalog.GetString("Retainers")] = Viewer.Catalog.GetString("RETN"),
+            [Viewer.Catalog.GetString("Reverser")] = Viewer.Catalog.GetString("REVR"),
+            [Viewer.Catalog.GetString("Sander")] = Viewer.Catalog.GetString("SAND"),
+            [Viewer.Catalog.GetString("Speed")] = Viewer.Catalog.GetString("SPED"),
+            [Viewer.Catalog.GetString("Steam usage")] = Viewer.Catalog.GetString("STEM"),
+            [Viewer.Catalog.GetString("Target")] = Viewer.Catalog.GetString("TARG"),
+            [Viewer.Catalog.GetString("Throttle")] = Viewer.Catalog.GetString("THRO"),
+            [Viewer.Catalog.GetString("Time")] = Viewer.Catalog.GetString("TIME"),
+            [Viewer.Catalog.GetString("Traction cut-off relay")] = Viewer.Catalog.GetString("TRAC"),
+            [Viewer.Catalog.GetString("Train brake")] = Viewer.Catalog.GetString("BTRN"),
+            [Viewer.Catalog.GetString("Wheel")] = Viewer.Catalog.GetString("WHEL")
         };
 
         readonly Dictionary<string, string> LastColToAbbreviated = new Dictionary<string, string>()
         {
-            { Viewer.Catalog.GetString("apply Service"), Viewer.Catalog.GetString("Apply")},
-            {Viewer.Catalog.GetString("Apply Quick"), Viewer.Catalog.GetString("ApplQ")},
-            {Viewer.Catalog.GetString("Apply Slow"), Viewer.Catalog.GetString("ApplS")},
-            {Viewer.Catalog.GetString("coal"), Viewer.Catalog.GetString("c")},
-            {Viewer.Catalog.GetString("Emergency Braking Push Button"), Viewer.Catalog.GetString("EmerBPB")},
-            {Viewer.Catalog.GetString("Lap Self"), Viewer.Catalog.GetString("LapS")},
-            {Viewer.Catalog.GetString("Minimum Reduction"), Viewer.Catalog.GetString("MRedc")},
-            {Viewer.Catalog.GetString("safe range"), Viewer.Catalog.GetString("safe")},
-            {Viewer.Catalog.GetString("skid"), Viewer.Catalog.GetString("Skid")},
-            {Viewer.Catalog.GetString("slip warning"), Viewer.Catalog.GetString("Warning")},
-            {Viewer.Catalog.GetString("slip"), Viewer.Catalog.GetString("Slip")},
-            {Viewer.Catalog.GetString("water"), Viewer.Catalog.GetString("w")},
+            [Viewer.Catalog.GetString("(absolute)")] = Viewer.Catalog.GetString("(Abs.)"),
+            [Viewer.Catalog.GetString("apply Service")] = Viewer.Catalog.GetString("Apply"),
+            [Viewer.Catalog.GetString("Apply Quick")] = Viewer.Catalog.GetString("ApplQ"),
+            [Viewer.Catalog.GetString("Apply Slow")] = Viewer.Catalog.GetString("ApplS"),
+            [Viewer.Catalog.GetString("coal")] = Viewer.Catalog.GetString("c"),
+            [Viewer.Catalog.GetString("Emergency Braking Push Button")] = Viewer.Catalog.GetString("EmerBPB"),
+            [Viewer.Catalog.GetString("Lap Self")] = Viewer.Catalog.GetString("LapS"),
+            [Viewer.Catalog.GetString("Minimum Reduction")] = Viewer.Catalog.GetString("MRedc"),
+            [Viewer.Catalog.GetString("(safe range)")] = Viewer.Catalog.GetString("(safe)"),
+            [Viewer.Catalog.GetString("skid")] = Viewer.Catalog.GetString("Skid"),
+            [Viewer.Catalog.GetString("slip warning")] = Viewer.Catalog.GetString("Warning"),
+            [Viewer.Catalog.GetString("slip")] = Viewer.Catalog.GetString("Slip"),
+            [Viewer.Catalog.GetString("water")] = Viewer.Catalog.GetString("w")
         };
 
         public TrainDrivingWindow(WindowManager owner)
@@ -204,7 +223,7 @@ namespace Orts.Viewer3D.Popups
             var vbox = base.Layout(layout).AddLayoutVertical();
             if (ListToLabel.Count > 0)
             {
-                var colWidth = ListToLabel.Max(x => x.FirstColWidth) + (StandardHUD ? FontToBold ? 19 : 16 : 8);
+                var colWidth = ListToLabel.Max(x => x.FirstColWidth) + (StandardHUD ? 15 : 20);
                 var TimeHboxPositionY = 0;
                 foreach (var data in ListToLabel.ToList())
                 {
@@ -350,10 +369,13 @@ namespace Orts.Viewer3D.Popups
                 FirstColLenght = ListToLabel.Max(x => x.FirstColWidth);
                 LastColLenght = ListToLabel.Max(x => x.LastColWidth);
 
-                var desiredHeight = FontToBold ? Owner.TextFontDefaultBold.Height * ListToLabel.Count(x => x.LastCol != null)
-                    : Owner.TextFontDefault.Height * ListToLabel.Count(x => x.LastCol != null);
+                // Valid rows
+                var adjustBottomLimit = (Owner.Viewer.PlayerLocomotive as MSTSLocomotive).CruiseControl != null ? 2 : 1;
+                var rowCount = ListToLabel.Where(x => !string.IsNullOrWhiteSpace(x.FirstCol.ToString()) || !string.IsNullOrWhiteSpace(x.LastCol.ToString())).Count() - adjustBottomLimit;
+                var desiredHeight = FontToBold ? Owner.TextFontDefaultBold.Height * rowCount
+                    : Owner.TextFontDefault.Height * rowCount;
 
-                var desiredWidth = FirstColLenght + LastColLenght + (StandardHUD ? FontToBold ? 43 : 41 : 31);
+                var desiredWidth = FirstColLenght + LastColLenght + 45;// interval between firstcol and lastcol
 
                 var newHeight = (int)MathHelper.Clamp(desiredHeight, (StandardHUD ? WindowHeightMin : 100), WindowHeightMax);
                 var newWidth = (int)MathHelper.Clamp(desiredWidth, (StandardHUD ? WindowWidthMin : 100), WindowWidthMax);
@@ -404,21 +426,25 @@ namespace Orts.Viewer3D.Popups
                 if (!firstcol.Contains("Sprtr"))
                 {
 
-                    if (firstcol.Contains("?") || firstcol.Contains("!") || firstcol.Contains("$"))
+                    if (ColorCode.Keys.Any(firstcol.EndsWith))
                     {
-                        firstColWidth = FontToBold ? Owner.TextFontDefaultBold.MeasureString(firstcol.Replace("?", "").Replace("!", "").Replace("$", "").TrimEnd())
-                            : Owner.TextFontDefault.MeasureString(firstcol.Replace("?", "").Replace("!", "").Replace("$", "").TrimEnd());
+                        var tempFirstCol = firstcol.Substring(0, firstcol.Length - 3);
+                        firstColWidth = !StandardHUD ? Owner.TextFontMonoSpacedBold.MeasureString(tempFirstCol.TrimEnd())
+                            : FontToBold ? Owner.TextFontDefaultBold.MeasureString(tempFirstCol.TrimEnd())
+                            : Owner.TextFontDefault.MeasureString(tempFirstCol.TrimEnd());
                     }
                     else
                     {
-                        firstColWidth = FontToBold ? Owner.TextFontDefaultBold.MeasureString(firstcol.TrimEnd())
+                        firstColWidth = !StandardHUD ? Owner.TextFontMonoSpacedBold.MeasureString(firstcol.TrimEnd())
+                            : FontToBold ? Owner.TextFontDefaultBold.MeasureString(firstcol.TrimEnd())
                             : Owner.TextFontDefault.MeasureString(firstcol.TrimEnd());
                     }
 
-                    if (lastcol.Contains("?") || lastcol.Contains("!") || lastcol.Contains("$"))
+                    if (ColorCode.Keys.Any(lastcol.EndsWith))
                     {
-                        lastColWidth = FontToBold ? Owner.TextFontDefaultBold.MeasureString(lastcol.Replace("?", "").Replace("!", "").Replace("$", "").TrimEnd())
-                            : Owner.TextFontDefault.MeasureString(lastcol.Replace("?", "").Replace("!", "").Replace("$", "").TrimEnd());
+                        var tempLastCol = lastcol.Substring(0, lastcol.Length - 3);
+                        lastColWidth = FontToBold ? Owner.TextFontDefaultBold.MeasureString(tempLastCol.TrimEnd())
+                            : Owner.TextFontDefault.MeasureString(tempLastCol.TrimEnd());
                     }
                     else
                     {
@@ -431,10 +457,10 @@ namespace Orts.Viewer3D.Popups
                     {
                         lastColWidth = ListToLabel.First().LastColWidth + 15;// time value + clickable symbol
                     }
-                    // Ajuste the text lenght because MeasureString was not accuracy
-                    lastColWidth = lastColWidth > 180 ? lastColWidth + 10 : lastColWidth;
-                }
 
+                    // Avoids text overlapping
+                    firstColWidth = firstColWidth + 5;// avoids the symbol/keypressed from overlapping with the text
+                }
                 ListToLabel.Add(new ListLabel
                 {
                     FirstCol = firstcol,
@@ -445,6 +471,14 @@ namespace Orts.Viewer3D.Popups
                     ChangeColWidth = changecolwidth,
                     keyPressed = keyPressed
                 });
+
+                //ResizeWindow, when the string spans over the right boundary of the window
+                if (!ResizeWindow)
+                {
+                    if (maxFirstColWidth < firstColWidth) FirstColOverFlow = maxFirstColWidth;
+                    if (maxLastColWidth < lastColWidth) LastColOverFlow = maxLastColWidth;
+                    ResizeWindow = true;
+                }
             }
             else
             {
@@ -454,8 +488,8 @@ namespace Orts.Viewer3D.Popups
                     var AutopilotOn = Owner.Viewer.PlayerLocomotive.Train.TrainType == Train.TRAINTYPE.AI_PLAYERHOSTING ? true : false;
 
                     //ResizeWindow, when the string spans over the right boundary of the window
-                    var maxFirstColWidth = ListToLabel.Max(x => x.FirstColWidth);
-                    var maxLastColWidth = ListToLabel.Max(x => x.LastColWidth);
+                    maxFirstColWidth = ListToLabel.Max(x => x.FirstColWidth);
+                    maxLastColWidth = ListToLabel.Max(x => x.LastColWidth);
 
                     if (!ResizeWindow & (FirstColOverFlow != maxFirstColWidth || (!AutopilotOn && LastColOverFlow != maxLastColWidth)))
                     {
@@ -478,21 +512,20 @@ namespace Orts.Viewer3D.Popups
             var arrowToRight = '\u25BA'; // ►
             var smallDiamond = '\u25C6'; // ●
 
-            var PlayerTrain = Owner.Viewer.PlayerLocomotive.Train;
-            var BrakeStatus = Owner.Viewer.PlayerLocomotive.GetTrainBrakeStatus();
-            var DynamicBrakePercent = Owner.Viewer.PlayerLocomotive.DynamicBrakePercent;
-            var DynamicBrakeStatus = Owner.Viewer.PlayerLocomotive.GetDynamicBrakeStatus();
-            var EngineBrakeStatus = Owner.Viewer.PlayerLocomotive.GetEngineBrakeStatus();
-            var Locomotive = Owner.Viewer.PlayerLocomotive as MSTSLocomotive;
-            var LocomotiveDebugStatus = Owner.Viewer.PlayerLocomotive.GetDebugStatus();
-            var LocomotiveStatus = Owner.Viewer.PlayerLocomotive.GetStatus();
-            var LocomotiveSteam = Owner.Viewer.PlayerLocomotive as MSTSSteamLocomotive;
-            var CombinedCT = Locomotive.CombinedControlType == MSTSLocomotive.CombinedControl.ThrottleDynamic ? true : false;
-            var ShowMUReverser = Math.Abs(PlayerTrain.MUReverserPercent) != 100;
-            var ShowRetainers = PlayerTrain.RetainerSetting != RetainerSetting.Exhaust;
-            var Stretched = PlayerTrain.Cars.Count > 1 && PlayerTrain.NPull == PlayerTrain.Cars.Count - 1;
-            var Bunched = !Stretched && PlayerTrain.Cars.Count > 1 && PlayerTrain.NPush == PlayerTrain.Cars.Count - 1;
-            var ThisInfo = Owner.Viewer.PlayerTrain.GetTrainInfo();
+            var playerTrain = Owner.Viewer.PlayerLocomotive.Train;
+            var trainBrakeStatus = Owner.Viewer.PlayerLocomotive.GetTrainBrakeStatus();
+            var dynamicBrakePercent = Owner.Viewer.PlayerLocomotive.DynamicBrakePercent;
+            var dynamicBrakeStatus = Owner.Viewer.PlayerLocomotive.GetDynamicBrakeStatus();
+            var engineBrakeStatus = Owner.Viewer.PlayerLocomotive.GetEngineBrakeStatus();
+            var locomotive = Owner.Viewer.PlayerLocomotive as MSTSLocomotive;
+            var locomotiveStatus = Owner.Viewer.PlayerLocomotive.GetStatus();
+            var locomotiveSteam = Owner.Viewer.PlayerLocomotive as MSTSSteamLocomotive;
+            var combinedControlType = locomotive.CombinedControlType == MSTSLocomotive.CombinedControl.ThrottleDynamic ? true : false;
+            var showMUReverser = Math.Abs(playerTrain.MUReverserPercent) != 100f;
+            var showRetainers = playerTrain.RetainerSetting != RetainerSetting.Exhaust;
+            var stretched = playerTrain.Cars.Count > 1 && playerTrain.NPull == playerTrain.Cars.Count - 1;
+            var bunched = !stretched && playerTrain.Cars.Count > 1 && playerTrain.NPush == playerTrain.Cars.Count - 1;
+            var playerTrainInfo = Owner.Viewer.PlayerTrain.GetTrainInfo();
             expandWindow = '\u23FA';// ⏺ toggle window
 
             keyPressed = "";
@@ -501,8 +534,8 @@ namespace Orts.Viewer3D.Popups
 
             if (!StandardHUD)
             {
-                var newBrakeStatus = new StringBuilder(BrakeStatus);
-                BrakeStatus = newBrakeStatus
+                var newBrakeStatus = new StringBuilder(trainBrakeStatus);
+                trainBrakeStatus = newBrakeStatus
                       .Replace(Viewer.Catalog.GetString("bar"), string.Empty)
                       .Replace(Viewer.Catalog.GetString("inHg"), string.Empty)
                       .Replace(Viewer.Catalog.GetString("kgf/cm²"), string.Empty)
@@ -513,47 +546,47 @@ namespace Orts.Viewer3D.Popups
                       .ToString();
             }
 
-            //if (StandardHUD)
-            //    InfoToLabel(Viewer.Catalog.GetString("Version"), VersionInfo.VersionOrBuild.ToString(), false);
-
             // First Block
             // Client and server may have a time difference.
             keyPressed = "";
-            if (Orts.MultiPlayer.MPManager.IsClient())
-                InfoToLabel(keyPressed, Viewer.Catalog.GetString("Time"), FormatStrings.FormatTime(Owner.Viewer.Simulator.ClockTime + Orts.MultiPlayer.MPManager.Instance().serverTimeDifference), "", false, keyPressed);
-            else
-            {
-                InfoToLabel(keyPressed, Viewer.Catalog.GetString("Time"), FormatStrings.FormatTime(Owner.Viewer.Simulator.ClockTime), "", false, keyPressed);
-            }
+            InfoToLabel(keyPressed, Viewer.Catalog.GetString("Time"), FormatStrings.FormatTime(Owner.Viewer.Simulator.ClockTime + (MultiPlayer.MPManager.IsClient() ? Orts.MultiPlayer.MPManager.Instance().serverTimeDifference : 0)), "", false, keyPressed);
             if (Owner.Viewer.Simulator.IsReplaying)
             {
                 InfoToLabel(keyPressed, Viewer.Catalog.GetString("Replay"), FormatStrings.FormatTime(Owner.Viewer.Log.ReplayEndsAt - Owner.Viewer.Simulator.ClockTime), "", false, keyPressed);
                 keyPressed = "";
             }
 
-            InfoToLabel(keyPressed, Viewer.Catalog.GetString("Speed"),
-                FormatStrings.FormatSpeedDisplay(Owner.Viewer.PlayerLocomotive.SpeedMpS, Owner.Viewer.PlayerLocomotive.IsMetric) +
-                (ThisInfo.speedMpS < ThisInfo.allowedSpeedMpS - 1.0f ? "!??" :        // White
-                ThisInfo.speedMpS < ThisInfo.allowedSpeedMpS + 0.0f ? "?!!" :         // PaleGreen
-                ThisInfo.speedMpS < ThisInfo.allowedSpeedMpS + 5.0f ? "!!?" : "!!!"), "", false, keyPressed);// Orange : Red
+            // Speed
             keyPressed = "";
+            var speedColor = "";
+            if (locomotive.SpeedMpS < playerTrainInfo.allowedSpeedMpS - 1f)
+                speedColor = "!??";// White
+            else if (locomotive.SpeedMpS < playerTrainInfo.allowedSpeedMpS)
+                speedColor = "?!!";// PaleGreen
+            else if (locomotive.SpeedMpS < playerTrainInfo.allowedSpeedMpS + 5f)
+                speedColor = "!!?";// Orange
+            else
+                speedColor = "!!!";// Red
+            InfoToLabel(keyPressed, Viewer.Catalog.GetString("Speed"), FormatStrings.FormatSpeedDisplay(Owner.Viewer.PlayerLocomotive.SpeedMpS, Owner.Viewer.PlayerLocomotive.IsMetric) + speedColor, "", false, keyPressed);
 
             // Gradient info
             if (StandardHUD)
             {
-                if (-ThisInfo.currentElevationPercent < -0.00015)
+                float gradient = -playerTrainInfo.currentElevationPercent;
+                if (gradient < -0.00015f)
                 {
                     var c = '\u2198';
-                    Gradient = String.Format("{0:F1}%{1}", -ThisInfo.currentElevationPercent, c) + "$$$";
+                    gradientIndicator = $"{gradient:F1}%{c + "$$$"}";// LightSkyBlue
                 }
-                else if (-ThisInfo.currentElevationPercent > 0.00015)
+                else if (gradient > 0.00015f)
                 {
                     var c = '\u2197';
-                    Gradient = String.Format("{0:F1}%{1}", -ThisInfo.currentElevationPercent, c) + "???";
+                    gradientIndicator = $"{gradient:F1}%{c + "???"}";// Yellow
                 }
-                else Gradient = String.Format("{0:F1}%", -ThisInfo.currentElevationPercent);
+                else
+                    gradientIndicator = $"{gradient:F1}%";
 
-                InfoToLabel(keyPressed, Viewer.Catalog.GetString("Gradient"), Gradient, "", false, keyPressed);
+                InfoToLabel(keyPressed, Viewer.Catalog.GetString("Gradient"), gradientIndicator, "", false, keyPressed);
                 keyPressed = "";
             }
 
@@ -563,152 +596,161 @@ namespace Orts.Viewer3D.Popups
 
             // Second block
             // Direction
-            if (UserInput.IsDown(UserCommand.ControlBackwards) || UserInput.IsDown(UserCommand.ControlForwards))
             {
-                if ((Owner.Viewer.PlayerLocomotive.EngineType != TrainCar.EngineTypes.Steam &&
-                    (Owner.Viewer.PlayerLocomotive.Direction != Direction.Forward
-                    || Owner.Viewer.PlayerLocomotive.Direction != Direction.Reverse)
-                    && (Owner.Viewer.PlayerLocomotive.ThrottlePercent >= 1
-                    || Math.Abs(Owner.Viewer.PlayerLocomotive.SpeedMpS) > 1))
-                    || (Owner.Viewer.PlayerLocomotive.EngineType == TrainCar.EngineTypes.Steam && LocomotiveSteam.CutoffController.MaximumValue == Math.Abs(PlayerTrain.MUReverserPercent / 100))
-                    )
+                UserCommand? reverserCommand = GetPressedKey(UserCommand.ControlBackwards, UserCommand.ControlForwards);
+                if (reverserCommand == UserCommand.ControlBackwards || reverserCommand == UserCommand.ControlForwards)
+                {
+                    bool moving = Math.Abs(playerTrain.SpeedMpS) > 1;
+                    bool nonSteamEnd = locomotive.EngineType != TrainCar.EngineTypes.Steam && locomotive.Direction == Direction.N && (locomotive.ThrottlePercent >= 1 || moving);
+                    bool steamEnd = locomotive is MSTSSteamLocomotive steamLocomotive2 && steamLocomotive2.CutoffController.MaximumValue == Math.Abs(playerTrain.MUReverserPercent / 100);
+
+                    if (reverserCommand != null && (nonSteamEnd || steamEnd))
+                        keyPressed = end.ToString() + "???";
+                    else if (reverserCommand == UserCommand.ControlBackwards)
+                        keyPressed = arrowDown.ToString() + "???";
+                    else if (reverserCommand == UserCommand.ControlForwards)
+                        keyPressed = arrowUp.ToString() + "???";
+                    else
+                        keyPressed = "";
+                }
+                var reverserIndicator = showMUReverser ? $"{Round(Math.Abs(playerTrain.MUReverserPercent))}% " : "";
+                InfoToLabel(keyPressed, Viewer.Catalog.GetString(locomotive.EngineType == TrainCar.EngineTypes.Steam ? "Reverser" : "Direction"),
+                    $"{reverserIndicator}{FormatStrings.Catalog.GetParticularString("Reverser", GetStringAttribute.GetPrettyName(locomotive.Direction))}", "", false, keyPressed);
+                keyPressed = "";
+            }
+
+            // Throttle
+            {
+                UserCommand? throttleCommand = GetPressedKey(UserCommand.ControlThrottleDecrease, UserCommand.ControlThrottleIncrease);
+                bool upperLimit = throttleCommand == UserCommand.ControlThrottleIncrease && locomotive.ThrottleController.MaximumValue == locomotive.ThrottlePercent / 100;
+                bool lowerLimit = throttleCommand == UserCommand.ControlThrottleDecrease && locomotive.ThrottlePercent == 0;
+
+                if (locomotive.DynamicBrakePercent < 1 && (upperLimit || lowerLimit))
                 {
                     keyPressed = end.ToString() + "???";
                 }
-                else
+                else if (locomotive.DynamicBrakePercent > -1)
                 {
-                    keyPressed = (UserInput.IsDown(UserCommand.ControlBackwards) ? arrowDown.ToString() + "???" : UserInput.IsDown(UserCommand.ControlForwards) ? arrowUp.ToString() + "???" : " ");
+                    keyPressed = endLower.ToString() + "???";
                 }
-            }
-            InfoToLabel(keyPressed, (Owner.Viewer.PlayerLocomotive.EngineType == TrainCar.EngineTypes.Steam ? Viewer.Catalog.GetString("Reverser") : Viewer.Catalog.GetString("Direction")),
-                (ShowMUReverser ? Math.Abs(PlayerTrain.MUReverserPercent).ToString("0") + "% " : "") + FormatStrings.Catalog.GetParticularString("Reverser", GetStringAttribute.GetPrettyName(Owner.Viewer.PlayerLocomotive.Direction)), "", false, keyPressed);
-            keyPressed = "";
+                else if (throttleCommand == UserCommand.ControlThrottleIncrease)
+                {
+                    keyPressed = arrowUp.ToString() + "???";
+                }
+                else if (throttleCommand == UserCommand.ControlThrottleDecrease)
+                {
+                    keyPressed = arrowDown.ToString() + "???";
+                }
+                else
+                    keyPressed = "";
 
-            // Throttle
-            if (DynamicBrakePercent < 1 && ((UserInput.IsDown(UserCommand.ControlThrottleIncrease) && Locomotive.ThrottleController.MaximumValue == Owner.Viewer.PlayerLocomotive.ThrottlePercent / 100)
-               || (UserInput.IsDown(UserCommand.ControlThrottleDecrease) && Owner.Viewer.PlayerLocomotive.ThrottlePercent == 0)))
-            {
-                keyPressed = end.ToString() + "???";
+                InfoToLabel(keyPressed, Viewer.Catalog.GetString(locomotive is MSTSSteamLocomotive ? "Regulator" : "Throttle"), locomotive.ThrottlePercent.ToString("0") + "%", "", false, keyPressed);
+                keyPressed = "";
             }
-            else if (DynamicBrakePercent > -1)
-            {
-                keyPressed = endLower.ToString() + "???";
-            }
-            else
-            {
-                keyPressed = UserInput.IsDown(UserCommand.ControlThrottleIncrease) ? arrowUp.ToString() + "???"
-                    : UserInput.IsDown(UserCommand.ControlThrottleDecrease) ? arrowDown.ToString() + "???"
-                    : "";
-            }
-            InfoToLabel(keyPressed, (Owner.Viewer.PlayerLocomotive is MSTSSteamLocomotive ? Viewer.Catalog.GetString("Regulator") : Viewer.Catalog.GetString("Throttle")), Owner.Viewer.PlayerLocomotive.ThrottlePercent.ToString("0") + "%", "", false, keyPressed);
-            keyPressed = "";
 
             // Cylinder Cocks
-            if (Owner.Viewer.PlayerLocomotive is MSTSSteamLocomotive)
+            if (locomotive is MSTSSteamLocomotive steamLocomotive)
             {
-                keyPressed = (UserInput.IsDown(UserCommand.ControlCylinderCocks) || (Owner.Viewer.PlayerLocomotive as MSTSSteamLocomotive).CylinderCocksAreOpen) ? arrowToRight.ToString() + "???" : "";
-                InfoToLabel(keyPressed, Viewer.Catalog.GetString("Cylinder cocks"), (Owner.Viewer.PlayerLocomotive as MSTSSteamLocomotive).CylinderCocksAreOpen ? Viewer.Catalog.GetString("Open") + "!!?" : Viewer.Catalog.GetString("Closed") + "!??", "", false, keyPressed);
+                if (steamLocomotive.CylinderCocksAreOpen)
+                {
+                    keyPressed = arrowToRight.ToString() + "???";
+                    InfoToLabel(keyPressed, Viewer.Catalog.GetString("Cylinder cocks"), Viewer.Catalog.GetString("Open") + "!!?", "", false, keyPressed);
+                }
+                else{
+                    keyPressed = "";
+                    InfoToLabel(keyPressed, Viewer.Catalog.GetString("Cylinder cocks"), Viewer.Catalog.GetString("Closed") + "!??", "", false, keyPressed);
+                }
             }
 
             // Sander
             keyPressed = UserInput.IsDown(UserCommand.ControlSander) || UserInput.IsDown(UserCommand.ControlSanderToggle) ? arrowDown.ToString() + "???" : " ";
-            if (Owner.Viewer.PlayerLocomotive.GetSanderOn())
+            if (locomotive.GetSanderOn())
             {
-                var sanderBlocked = Owner.Viewer.PlayerLocomotive is MSTSLocomotive && Math.Abs(PlayerTrain.SpeedMpS) > ((MSTSLocomotive)Owner.Viewer.PlayerLocomotive).SanderSpeedOfMpS;
-                if (sanderBlocked)
-                {
-                    InfoToLabel(keyPressed, Viewer.Catalog.GetString("Sander"), Viewer.Catalog.GetString("Blocked") + "!!!", "", StandardHUD ? true : false, keyPressed);
-                    keyPressed = "";
-                }
-                else
-                {
-                    keyPressed = arrowToRight.ToString() + "???";
-                    InfoToLabel(keyPressed, Viewer.Catalog.GetString("Sander"), Viewer.Catalog.GetString("On") + "!!?", "", StandardHUD ? true : false, keyPressed);
-                    keyPressed = "";
-                }
+                var sanderBlocked = locomotive is MSTSLocomotive && Math.Abs(playerTrain.SpeedMpS) > locomotive.SanderSpeedOfMpS;
+                keyPressed = sanderBlocked ? "" : arrowToRight.ToString() + "???";
+                InfoToLabel(keyPressed, Viewer.Catalog.GetString("Sander"), sanderBlocked ? Viewer.Catalog.GetString("Blocked") + "!!!": Viewer.Catalog.GetString("On") + "!!?", "", StandardHUD ? true : false, keyPressed);
             }
             else
             {
                 keyPressed = "";
-                InfoToLabel(keyPressed, Viewer.Catalog.GetString("Sander"), "Off", "", false, keyPressed);
+                InfoToLabel(keyPressed, Viewer.Catalog.GetString("Sander"), Viewer.Catalog.GetString("Off"), "", false, keyPressed);
             }
 
             InfoToLabel("", "Sprtr", "", "", false, keyPressed);
 
             // Train Brake multi-lines
             // TO DO: A better algorithm
-            //var brakeStatus = Owner.Viewer.PlayerLocomotive.GetTrainBrakeStatus();
             //steam loco
             keyPressed = UserInput.IsDown(UserCommand.ControlTrainBrakeDecrease) ? arrowDown.ToString() + "???" : UserInput.IsDown(UserCommand.ControlTrainBrakeIncrease) ? arrowUp.ToString() + "???" : "";
 
             var brakeInfoValue = "";
             var index = 0;
 
-            if (BrakeStatus.Contains(Viewer.Catalog.GetString("EQ")))
+            if (trainBrakeStatus.Contains(Viewer.Catalog.GetString("EQ")))
             {
-                brakeInfoValue = BrakeStatus.Substring(0, BrakeStatus.IndexOf(Viewer.Catalog.GetString("EQ"))).TrimEnd();
+                brakeInfoValue = trainBrakeStatus.Substring(0, trainBrakeStatus.IndexOf(Viewer.Catalog.GetString("EQ"))).TrimEnd();
                 InfoToLabel(keyPressed, Viewer.Catalog.GetString("Train brake"), brakeInfoValue + "%%%", "", false, keyPressed);
                 keyPressed = "";
-                index = BrakeStatus.IndexOf(Viewer.Catalog.GetString("EQ"));
-                brakeInfoValue = BrakeStatus.Substring(index, BrakeStatus.IndexOf(Viewer.Catalog.GetString("BC")) - index).TrimEnd();
+                index = trainBrakeStatus.IndexOf(Viewer.Catalog.GetString("EQ"));
+                brakeInfoValue = trainBrakeStatus.Substring(index, trainBrakeStatus.IndexOf(Viewer.Catalog.GetString("BC")) - index).TrimEnd();
 
                 InfoToLabel(keyPressed, "", brakeInfoValue, "", false, keyPressed);
                 keyPressed = "";
-                if (BrakeStatus.Contains(Viewer.Catalog.GetString("EOT")))
+                if (trainBrakeStatus.Contains(Viewer.Catalog.GetString("EOT")))
                 {
                     var IndexOffset = Viewer.Catalog.GetString("EOT").Length + 1;
-                    index = BrakeStatus.IndexOf(Viewer.Catalog.GetString("BC"));
-                    brakeInfoValue = BrakeStatus.Substring(index, BrakeStatus.IndexOf(Viewer.Catalog.GetString("EOT")) - index).TrimEnd();
+                    index = trainBrakeStatus.IndexOf(Viewer.Catalog.GetString("BC"));
+                    brakeInfoValue = trainBrakeStatus.Substring(index, trainBrakeStatus.IndexOf(Viewer.Catalog.GetString("EOT")) - index).TrimEnd();
                     keyPressed = "";
                     InfoToLabel(keyPressed, "", brakeInfoValue, "", false, keyPressed);
                     keyPressed = "";
-                    index = BrakeStatus.IndexOf(Viewer.Catalog.GetString("EOT")) + IndexOffset;
-                    brakeInfoValue = BrakeStatus.Substring(index, BrakeStatus.Length - index).TrimStart();
+                    index = trainBrakeStatus.IndexOf(Viewer.Catalog.GetString("EOT")) + IndexOffset;
+                    brakeInfoValue = trainBrakeStatus.Substring(index, trainBrakeStatus.Length - index).TrimStart();
                     keyPressed = "";
                     InfoToLabel(keyPressed, "", brakeInfoValue, "", false, keyPressed);
                     keyPressed = "";
                 }
                 else
                 {
-                    index = BrakeStatus.IndexOf(Viewer.Catalog.GetString("BC"));
-                    brakeInfoValue = BrakeStatus.Substring(index, BrakeStatus.Length - index).TrimEnd();
+                    index = trainBrakeStatus.IndexOf(Viewer.Catalog.GetString("BC"));
+                    brakeInfoValue = trainBrakeStatus.Substring(index, trainBrakeStatus.Length - index).TrimEnd();
                     keyPressed = "";
                     InfoToLabel(keyPressed, "", brakeInfoValue, "", false, keyPressed);
                     keyPressed = "";
                 }
             }
-            else if (BrakeStatus.Contains(Viewer.Catalog.GetString("Lead")))
+            else if (trainBrakeStatus.Contains(Viewer.Catalog.GetString("Lead")))
             {
                 var IndexOffset = Viewer.Catalog.GetString("Lead").Length + 1;
-                brakeInfoValue = BrakeStatus.Substring(0, BrakeStatus.IndexOf(Viewer.Catalog.GetString("Lead"))).TrimEnd();
+                brakeInfoValue = trainBrakeStatus.Substring(0, trainBrakeStatus.IndexOf(Viewer.Catalog.GetString("Lead"))).TrimEnd();
                 InfoToLabel(keyPressed, Viewer.Catalog.GetString("Train brake"), brakeInfoValue + "%%%", "", false, keyPressed);
 
                 keyPressed = "";
-                index = BrakeStatus.IndexOf(Viewer.Catalog.GetString("Lead")) + IndexOffset;
-                if (BrakeStatus.Contains(Viewer.Catalog.GetString("EOT")))
+                index = trainBrakeStatus.IndexOf(Viewer.Catalog.GetString("Lead")) + IndexOffset;
+                if (trainBrakeStatus.Contains(Viewer.Catalog.GetString("EOT")))
                 {
-                    brakeInfoValue = BrakeStatus.Substring(index, BrakeStatus.IndexOf(Viewer.Catalog.GetString("EOT")) - index).TrimEnd();
+                    brakeInfoValue = trainBrakeStatus.Substring(index, trainBrakeStatus.IndexOf(Viewer.Catalog.GetString("EOT")) - index).TrimEnd();
                     InfoToLabel(keyPressed, "", brakeInfoValue, "", false, keyPressed);
 
                     keyPressed = "";
-                    index = BrakeStatus.IndexOf(Viewer.Catalog.GetString("EOT")) + IndexOffset;
-                    brakeInfoValue = BrakeStatus.Substring(index, BrakeStatus.Length - index).TrimEnd();
+                    index = trainBrakeStatus.IndexOf(Viewer.Catalog.GetString("EOT")) + IndexOffset;
+                    brakeInfoValue = trainBrakeStatus.Substring(index, trainBrakeStatus.Length - index).TrimEnd();
                     InfoToLabel(keyPressed, "", brakeInfoValue, "", false, keyPressed);
                 }
                 else
                 {
-                    brakeInfoValue = BrakeStatus.Substring(index, BrakeStatus.Length - index).TrimEnd();
+                    brakeInfoValue = trainBrakeStatus.Substring(index, trainBrakeStatus.Length - index).TrimEnd();
                     InfoToLabel(keyPressed, "", brakeInfoValue, "", false, keyPressed);
                 }
             }
-            else if (BrakeStatus.Contains(Viewer.Catalog.GetString("BC")))
+            else if (trainBrakeStatus.Contains(Viewer.Catalog.GetString("BC")))
             {
-                brakeInfoValue = BrakeStatus.Substring(0, BrakeStatus.IndexOf(Viewer.Catalog.GetString("BC"))).TrimEnd();
+                brakeInfoValue = trainBrakeStatus.Substring(0, trainBrakeStatus.IndexOf(Viewer.Catalog.GetString("BC"))).TrimEnd();
                 InfoToLabel(keyPressed, Viewer.Catalog.GetString("Train brake"), brakeInfoValue + "%%%", "", false, keyPressed);
 
                 keyPressed = "";
-                index = BrakeStatus.IndexOf(Viewer.Catalog.GetString("BC"));
-                brakeInfoValue = BrakeStatus.Substring(index, BrakeStatus.Length - index).TrimEnd();
+                index = trainBrakeStatus.IndexOf(Viewer.Catalog.GetString("BC"));
+                brakeInfoValue = trainBrakeStatus.Substring(index, trainBrakeStatus.Length - index).TrimEnd();
 
                 keyPressed = "";
                 InfoToLabel(keyPressed, "", brakeInfoValue, "", false, keyPressed);
@@ -716,32 +758,32 @@ namespace Orts.Viewer3D.Popups
             }
 
             keyPressed = "";
-            if (ShowRetainers)
-                InfoToLabel(keyPressed, Viewer.Catalog.GetString("Retainers"), (PlayerTrain.RetainerPercent + " " + Viewer.Catalog.GetString(GetStringAttribute.GetPrettyName(PlayerTrain.RetainerSetting))), "", false, keyPressed);
+            if (showRetainers)
+                InfoToLabel(keyPressed, Viewer.Catalog.GetString("Retainers"), (playerTrain.RetainerPercent + " " + Viewer.Catalog.GetString(GetStringAttribute.GetPrettyName(playerTrain.RetainerSetting))), "", false, keyPressed);
 
             keyPressed = "";
             if ((Owner.Viewer.PlayerLocomotive as MSTSLocomotive).EngineBrakeFitted) // ideally this test should be using "engineBrakeStatus != null", but this currently does not work, as a controller is defined by default
             {
             }
             keyPressed = UserInput.IsDown(UserCommand.ControlEngineBrakeDecrease) ? arrowDown.ToString() + "???" : UserInput.IsDown(UserCommand.ControlEngineBrakeIncrease) ? arrowUp.ToString() + "???" : "";
-            if (EngineBrakeStatus.Contains(Viewer.Catalog.GetString("BC")))
+            if (engineBrakeStatus.Contains(Viewer.Catalog.GetString("BC")))
             {
-                InfoToLabel(keyPressed, Viewer.Catalog.GetString("Engine brake"), EngineBrakeStatus.Substring(0, EngineBrakeStatus.IndexOf("BC")) + "%%%", "", false, keyPressed);
+                InfoToLabel(keyPressed, Viewer.Catalog.GetString("Engine brake"), engineBrakeStatus.Substring(0, engineBrakeStatus.IndexOf("BC")) + "%%%", "", false, keyPressed);
                 keyPressed = "";
-                index = EngineBrakeStatus.IndexOf(Viewer.Catalog.GetString("BC"));
-                brakeInfoValue = EngineBrakeStatus.Substring(index, EngineBrakeStatus.Length - index).TrimEnd();
+                index = engineBrakeStatus.IndexOf(Viewer.Catalog.GetString("BC"));
+                brakeInfoValue = engineBrakeStatus.Substring(index, engineBrakeStatus.Length - index).TrimEnd();
                 InfoToLabel(keyPressed, Viewer.Catalog.GetString(""), brakeInfoValue + "!??", "", false, keyPressed);
             }
             else
-                InfoToLabel(keyPressed, Viewer.Catalog.GetString("Engine brake"), EngineBrakeStatus + "%%%", "", false, keyPressed);
+                InfoToLabel(keyPressed, Viewer.Catalog.GetString("Engine brake"), engineBrakeStatus + "%%%", "", false, keyPressed);
 
             keyPressed = "";
-            if (DynamicBrakeStatus != null && Locomotive.IsLeadLocomotive())
+            if ( dynamicBrakeStatus != null && locomotive.IsLeadLocomotive())
             {
-                if (!DynBrakeSetup && (UserInput.IsDown(UserCommand.ControlDynamicBrakeIncrease) && DynamicBrakePercent == 0)
-                    || (CombinedCT && UserInput.IsDown(UserCommand.ControlThrottleDecrease) && Owner.Viewer.PlayerLocomotive.ThrottlePercent == 0 && DynamicBrakeStatus == "0%"))
+                if (!DynBrakeSetup && (UserInput.IsDown(UserCommand.ControlDynamicBrakeIncrease) && dynamicBrakePercent == 0)
+                    || (combinedControlType && UserInput.IsDown(UserCommand.ControlThrottleDecrease) && Owner.Viewer.PlayerLocomotive.ThrottlePercent == 0 && dynamicBrakeStatus == "0%"))
                 {
-                    StartTime = Locomotive.DynamicBrakeCommandStartTime + Locomotive.DynamicBrakeDelayS;
+                    StartTime = locomotive.DynamicBrakeCommandStartTime + locomotive.DynamicBrakeDelayS;
                     DynBrakeSetup = true;
                     keyPressed = arrowToRight.ToString() + "???";
                     InfoToLabel(keyPressed, Viewer.Catalog.GetString("Dynamic brake"), Viewer.Catalog.GetString("Setup") + "%%%", "", false, keyPressed);
@@ -749,16 +791,16 @@ namespace Orts.Viewer3D.Popups
                 else if (DynBrakeSetup && StartTime < Owner.Viewer.Simulator.ClockTime)
                 {
                     DynBrakeSetup = false;
-                    InfoToLabel(keyPressed, Viewer.Catalog.GetString("Dynamic brake"), DynamicBrakePercent + "% " + "%%%", "", false, keyPressed);
+                    InfoToLabel(keyPressed, Viewer.Catalog.GetString("Dynamic brake"), dynamicBrakePercent + "% " + "%%%", "", false, keyPressed);
                 }
                 else if (DynBrakeSetup && StartTime > Owner.Viewer.Simulator.ClockTime)
                 {
                     keyPressed = arrowToRight.ToString() + "???";
                     InfoToLabel(keyPressed, Viewer.Catalog.GetString("Dynamic brake"), Viewer.Catalog.GetString("Setup") + "%%%", "", false, keyPressed);
                 }
-                else if (!DynBrakeSetup && DynamicBrakePercent > -1)
+                else if (!DynBrakeSetup && dynamicBrakePercent > -1)
                 {
-                    if (CombinedCT)
+                    if (combinedControlType)
                     {
                         keyPressed = UserInput.IsDown(UserCommand.ControlThrottleIncrease) || UserInput.IsDown(UserCommand.ControlDynamicBrakeDecrease) ? arrowDown.ToString() + "???"
                            : UserInput.IsDown(UserCommand.ControlThrottleDecrease) || UserInput.IsDown(UserCommand.ControlDynamicBrakeIncrease) ? arrowUp.ToString() + "???"
@@ -770,9 +812,9 @@ namespace Orts.Viewer3D.Popups
                             : UserInput.IsDown(UserCommand.ControlDynamicBrakeIncrease) ? arrowUp.ToString() + "???"
                             : "";
                     }
-                    InfoToLabel(keyPressed, Viewer.Catalog.GetString("Dynamic brake"), DynamicBrakeStatus + "%%%", "", false, keyPressed);
+                    InfoToLabel(keyPressed, Viewer.Catalog.GetString("Dynamic brake"), dynamicBrakeStatus + "%%%", "", false, keyPressed);
                 }
-                else if (DynamicBrakeStatus == "" && DynamicBrakePercent < 0)
+                else if (dynamicBrakeStatus == "" && dynamicBrakePercent < 0)
                 {
                     InfoToLabel(keyPressed, Viewer.Catalog.GetString("Dynamic brake"), Viewer.Catalog.GetString("Off"), "", false, keyPressed);
                 }
@@ -780,59 +822,55 @@ namespace Orts.Viewer3D.Popups
             keyPressed = "";
             InfoToLabel(keyPressed, "Sprtr", "", "", false, keyPressed);
 
-            if (LocomotiveStatus != null)
+            if (locomotiveStatus != null)
             {
-                var lines = LocomotiveStatus.Split('\n');
-                foreach (var data in lines)
+                foreach (var data in locomotiveStatus.Split('\n').Where((string d) => !string.IsNullOrWhiteSpace(d)))
                 {
-                    if (data.Length > 0)
+                    var parts = data.Split(new[] { " = " }, 2, StringSplitOptions.None);
+                    var HeatColor = "!??"; // Color.White
+                    keyPressed = "";
+                    if (!StandardHUD && Viewer.Catalog.GetString(parts[0]).StartsWith(Viewer.Catalog.GetString("Steam usage")))
                     {
-                        var parts = data.Split(new[] { " = " }, 2, StringSplitOptions.None);
-                        var HeatColor = "!??"; // Color.White
+                    }
+                    else if (Viewer.Catalog.GetString(parts[0]).StartsWith(Viewer.Catalog.GetString("Boiler pressure")))
+                    {
+                        MSTSSteamLocomotive steamloco = (MSTSSteamLocomotive)Owner.Viewer.PlayerLocomotive;
+                        var bandUpper = steamloco.PreviousBoilerHeatOutBTUpS * 1.025f; // find upper bandwidth point
+                        var bandLower = steamloco.PreviousBoilerHeatOutBTUpS * 0.975f; // find lower bandwidth point - gives a total 5% bandwidth
+
+                        if (steamloco.BoilerHeatInBTUpS > bandLower && steamloco.BoilerHeatInBTUpS < bandUpper) HeatColor = smallDiamond.ToString() + "!??";
+                        else if (steamloco.BoilerHeatInBTUpS < bandLower) HeatColor = smallArrowDown.ToString() + "%%%"; // Color.Cyan
+                        else if (steamloco.BoilerHeatInBTUpS > bandUpper) HeatColor = smallArrowUp.ToString() + "!!?"; // Color.Orange
+
                         keyPressed = "";
-                        if (!StandardHUD && Viewer.Catalog.GetString(parts[0]).StartsWith(Viewer.Catalog.GetString("Steam usage")))
-                        {
-                        }
-                        else if (Viewer.Catalog.GetString(parts[0]).StartsWith(Viewer.Catalog.GetString("Boiler pressure")))
-                        {
-                            MSTSSteamLocomotive steamloco = (MSTSSteamLocomotive)Owner.Viewer.PlayerLocomotive;
-                            var bandUpper = steamloco.PreviousBoilerHeatOutBTUpS * 1.025f; // find upper bandwidth point
-                            var bandLower = steamloco.PreviousBoilerHeatOutBTUpS * 0.975f; // find lower bandwidth point - gives a total 5% bandwidth
-
-                            if (steamloco.BoilerHeatInBTUpS > bandLower && steamloco.BoilerHeatInBTUpS < bandUpper) HeatColor = smallDiamond.ToString() + "!??";
-                            else if (steamloco.BoilerHeatInBTUpS < bandLower) HeatColor = smallArrowDown.ToString() + "%%%"; // Color.Cyan
-                            else if (steamloco.BoilerHeatInBTUpS > bandUpper) HeatColor = smallArrowUp.ToString() + "!!?"; // Color.Orange
-
-                            keyPressed = "";
-                            InfoToLabel(keyPressed, Viewer.Catalog.GetString("Boiler pressure"), Viewer.Catalog.GetString(parts[1]), HeatColor, false, keyPressed);
-                        }
-                        else if (!StandardHUD && Viewer.Catalog.GetString(parts[0]).StartsWith(Viewer.Catalog.GetString("Fuel levels")))
-                        {
-                            keyPressed = "";
-                            InfoToLabel(keyPressed, parts[0].EndsWith("?") || parts[0].EndsWith("!") ? Viewer.Catalog.GetString(parts[0].Substring(0, parts[0].Length - 3)) : Viewer.Catalog.GetString(parts[0]), (parts.Length > 1 ? Viewer.Catalog.GetString(parts[1].Replace(" ", string.Empty)) : ""), "", false, keyPressed);
-                        }
-                        else if (parts[0].StartsWith(Viewer.Catalog.GetString("Gear")))
-                        {
-                            keyPressed = UserInput.IsDown(UserCommand.ControlGearDown) ? arrowDown.ToString() + "???" : UserInput.IsDown(UserCommand.ControlGearUp) ? arrowUp.ToString() + "???" : "";
-                            InfoToLabel(keyPressed, Viewer.Catalog.GetString(parts[0]), (parts.Length > 1 ? Viewer.Catalog.GetString(parts[1]) : ""), "", false, keyPressed);
-                            keyPressed = "";
-                        }
-                        else if (parts.Contains(Viewer.Catalog.GetString("Pantographs")))
-                        {
-                            keyPressed = UserInput.IsDown(UserCommand.ControlPantograph1) ? parts[1].StartsWith(Viewer.Catalog.GetString("Up")) ? arrowUp.ToString() + "???" : arrowDown.ToString() + "???" : "";
-                            InfoToLabel(keyPressed, Viewer.Catalog.GetString(parts[0]), (parts.Length > 1 ? Viewer.Catalog.GetString(parts[1]) : ""), "", false, keyPressed);
-                            keyPressed = "";
-                        }
-                        else if (parts.Contains(Viewer.Catalog.GetString("Engine")))
-                        {
-                            keyPressed = "";
-                            InfoToLabel(keyPressed, Viewer.Catalog.GetString(parts[0]), (parts.Length > 1 ? Viewer.Catalog.GetString(parts[1]) + "!??" : ""), "", false, keyPressed);
-                            keyPressed = "";
-                        }
-                        else
-                        {
-                            InfoToLabel("", parts[0].EndsWith("?") || parts[0].EndsWith("!") ? Viewer.Catalog.GetString(parts[0].Substring(0, parts[0].Length - 3)) : Viewer.Catalog.GetString(parts[0]), (parts.Length > 1 ? Viewer.Catalog.GetString(parts[1]) : ""), "", false, keyPressed);
-                        }
+                        InfoToLabel(keyPressed, Viewer.Catalog.GetString("Boiler pressure"), Viewer.Catalog.GetString(parts[1]), HeatColor, false, keyPressed);
+                    }
+                    else if (!StandardHUD && Viewer.Catalog.GetString(parts[0]).StartsWith(Viewer.Catalog.GetString("Fuel levels")))
+                    {
+                        keyPressed = "";
+                        InfoToLabel(keyPressed, parts[0].EndsWith("?") || parts[0].EndsWith("!") ? Viewer.Catalog.GetString(parts[0].Substring(0, parts[0].Length - 3)) : Viewer.Catalog.GetString(parts[0]), (parts.Length > 1 ? Viewer.Catalog.GetString(parts[1].Replace(" ", string.Empty)) : ""), "", false, keyPressed);
+                    }
+                    else if (parts[0].StartsWith(Viewer.Catalog.GetString("Gear")))
+                    {
+                        keyPressed = UserInput.IsDown(UserCommand.ControlGearDown) ? arrowDown.ToString() + "???" : UserInput.IsDown(UserCommand.ControlGearUp) ? arrowUp.ToString() + "???" : "";
+                        InfoToLabel(keyPressed, Viewer.Catalog.GetString(parts[0]), (parts.Length > 1 ? Viewer.Catalog.GetString(parts[1]) : ""), "", false, keyPressed);
+                        keyPressed = "";
+                    }
+                    else if (parts.Contains(Viewer.Catalog.GetString("Pantographs")))
+                    {
+                        keyPressed = UserInput.IsDown(UserCommand.ControlPantograph1) ? parts[1].StartsWith(Viewer.Catalog.GetString("Up")) ? arrowUp.ToString() + "???" : arrowDown.ToString() + "???" : "";
+                        InfoToLabel(keyPressed, Viewer.Catalog.GetString(parts[0]), (parts.Length > 1 ? Viewer.Catalog.GetString(parts[1]) : ""), "", false, keyPressed);
+                        keyPressed = "";
+                    }
+                    else if (parts.Contains(Viewer.Catalog.GetString("Engine")))
+                    {
+                        keyPressed = "";
+                        InfoToLabel(keyPressed, Viewer.Catalog.GetString(parts[0]), (parts.Length > 1 ? Viewer.Catalog.GetString(parts[1]) + "!??" : ""), "", false, keyPressed);
+                        keyPressed = "";
+                    }
+                    else
+                    {
+                        InfoToLabel("", parts[0].EndsWith("?") || parts[0].EndsWith("!") ? Viewer.Catalog.GetString(parts[0].Substring(0, parts[0].Length - 3)) : Viewer.Catalog.GetString(parts[0]), (parts.Length > 1 ? Viewer.Catalog.GetString(parts[1]) : ""), "", false, keyPressed);
                     }
                 }
             }
@@ -840,6 +878,7 @@ namespace Orts.Viewer3D.Popups
             keyPressed = "";
             InfoToLabel(keyPressed, "Sprtr", "", "", true, keyPressed);
 
+            // Control Cruise
             if ((Owner.Viewer.PlayerLocomotive as MSTSLocomotive).CruiseControl != null)
             {
                 var cc = (Owner.Viewer.PlayerLocomotive as MSTSLocomotive).CruiseControl;
@@ -877,7 +916,7 @@ namespace Orts.Viewer3D.Popups
                 InfoToLabel("", Viewer.Catalog.GetString("Autopilot"), Viewer.Catalog.GetString("Off"), "", false, keyPressed);
 
             //AI Fireman
-            if (Locomotive is MSTSSteamLocomotive steamLocomotive)
+            if (locomotive is MSTSSteamLocomotive)
             {
                 keyPressed = "";
                 if (UserInput.IsDown(UserCommand.ControlAIFireOn))
@@ -900,63 +939,92 @@ namespace Orts.Viewer3D.Popups
                     keyPressed = arrowToRight.ToString() + "???";
                 }
 
-                if (!ctrlAIFiremanOn && !ctrlAIFiremanOff && !ctrlAIFiremanReset)
-                {
-                    InfoToLabel(keyPressed, Viewer.Catalog.GetString("AI Fireman") + "?!?", Viewer.Catalog.GetString(""), "", false, keyPressed);
-                }
-                else
+                // waiting time to hide the reset label
+                if (ctrlAIFiremanReset && clockAIFireTime + 3 < Owner.Viewer.Simulator.ClockTime)
+                    ctrlAIFiremanReset = false;
+
+                if (ctrlAIFiremanOn || ctrlAIFiremanOff || ctrlAIFiremanReset)
                 {
                     InfoToLabel(keyPressed, Viewer.Catalog.GetString("AI Fireman") + "!??", ctrlAIFiremanOn ? Viewer.Catalog.GetString("On") + "!??" : ctrlAIFiremanOff ? Viewer.Catalog.GetString("Off") + "!??" : ctrlAIFiremanReset ? Viewer.Catalog.GetString("Reset") + "%%%" : "-", "", false, keyPressed);
                 }
-
-                // Delay to hide the Reset label
-                if (ctrlAIFiremanReset && clockAIFireTime + 3 < Owner.Viewer.Simulator.ClockTime)
-                    ctrlAIFiremanReset = false;
             }
 
             // Grate limit
             keyPressed = "";
-            if (Owner.Viewer.PlayerLocomotive.GetType() == typeof(MSTSSteamLocomotive))
+            if (locomotive.GetType() == typeof(MSTSSteamLocomotive))
             {
                 MSTSSteamLocomotive steamloco = (MSTSSteamLocomotive)Owner.Viewer.PlayerLocomotive;
-                if (steamloco.GrateCombustionRateLBpFt2 > steamloco.GrateLimitLBpFt2)
+                if (steamloco.IsGrateLimit && steamloco.GrateCombustionRateLBpFt2 > steamloco.GrateLimitLBpFt2)
                 {
-                    if (steamloco.IsGrateLimit)
-                        InfoToLabel("", Viewer.Catalog.GetString("Grate limit"), Viewer.Catalog.GetString("Exceeded") + "!!!", "", false, keyPressed);
+                    grateLabelVisible = true;
+                    clockGrateTime = Owner.Viewer.Simulator.ClockTime;
+                    InfoToLabel("", Viewer.Catalog.GetString("Grate limit"), Viewer.Catalog.GetString("Exceeded") + "!!!", "", false, keyPressed);
                 }
                 else
-                    InfoToLabel("", Viewer.Catalog.GetString("Grate limit") + "?!?", Viewer.Catalog.GetString("Normal") + "?!?", "", false, keyPressed);
+                {
+                    // delay to hide the grate label
+                    if (grateLabelVisible && clockGrateTime + 3 < Owner.Viewer.Simulator.ClockTime)
+                        grateLabelVisible = false;
+
+                    if (grateLabelVisible)
+                    {
+                        InfoToLabel("", Viewer.Catalog.GetString("Grate limit") + "!??", Viewer.Catalog.GetString("Normal") + "!??", "", false, keyPressed);
+                    }
+                }
             }
-            else
-                InfoToLabel("", Viewer.Catalog.GetString("Grate limit") + "?!?", Viewer.Catalog.GetString("-") + "?!?", "", false, keyPressed);
 
             // Wheel
+            if (playerTrain.IsWheelSlip || playerTrain.IsWheelSlipWarninq || playerTrain.IsBrakeSkid)
+            {
+                wheelLabelVisible = true;
+                clockWheelTime = Owner.Viewer.Simulator.ClockTime;
+            }
             keyPressed = "";
-            if (Owner.Viewer.PlayerTrain.IsWheelSlip)
+            if (playerTrain.IsWheelSlip)
                 InfoToLabel("", Viewer.Catalog.GetString("Wheel"), Viewer.Catalog.GetString("slip") + "!!!", "", false, keyPressed);
-            else if (Owner.Viewer.PlayerTrain.IsWheelSlipWarninq)
+            else if (playerTrain.IsWheelSlipWarninq)
                 InfoToLabel("", Viewer.Catalog.GetString("Wheel"), Viewer.Catalog.GetString("slip warning") + "???", "", false, keyPressed);
-            else if (Owner.Viewer.PlayerTrain.IsBrakeSkid)
+            else if (playerTrain.IsBrakeSkid)
                 InfoToLabel("", Viewer.Catalog.GetString("Wheel"), Viewer.Catalog.GetString("skid") + "!!!", "", false, keyPressed);
             else
-                InfoToLabel("", Viewer.Catalog.GetString("Wheel") + "?!?", Viewer.Catalog.GetString("Normal") + "?!?", "", false, keyPressed);
+            {
+                // delay to hide the wheel label
+                if (wheelLabelVisible && clockWheelTime + 3 < Owner.Viewer.Simulator.ClockTime)
+                    wheelLabelVisible = false;
+
+                if (wheelLabelVisible)
+                {
+                    InfoToLabel("", Viewer.Catalog.GetString("Wheel") + "!??", Viewer.Catalog.GetString("Normal") + "!??", "", false, keyPressed);
+                }
+            }
 
             // Doors
             keyPressed = "";
-            if ((Owner.Viewer.PlayerLocomotive as MSTSWagon).DoorLeftOpen || (Owner.Viewer.PlayerLocomotive as MSTSWagon).DoorRightOpen)
+            var wagon = (MSTSWagon) locomotive;
+            if (wagon.DoorLeftOpen || wagon.DoorRightOpen)
             {
-                var color = Math.Abs(Owner.Viewer.PlayerLocomotive.SpeedMpS) > 0.1f ? "!!!" : "???";
-                var status = "";
-                if ((Owner.Viewer.PlayerLocomotive as MSTSWagon).DoorLeftOpen)
-                    status += Viewer.Catalog.GetString((Owner.Viewer.PlayerLocomotive as MSTSLocomotive).GetCabFlipped() ? Viewer.Catalog.GetString("Right") : Viewer.Catalog.GetString("Left"));
-                if ((Owner.Viewer.PlayerLocomotive as MSTSWagon).DoorRightOpen)
-                    status += string.Format(status == "" ? "{0}" : " {0}", Viewer.Catalog.GetString((Owner.Viewer.PlayerLocomotive as MSTSLocomotive).GetCabFlipped() ? Viewer.Catalog.GetString("Left") : Viewer.Catalog.GetString("Right")));
-                status += color;
+                var status = new List<string>();
+                bool flipped = locomotive.GetCabFlipped();
+                doorsLabelVisible = true;
+                clockDoorsTime = Owner.Viewer.Simulator.ClockTime;
+                if (wagon.DoorLeftOpen)
+                    status.Add(flipped ? Viewer.Catalog.GetString("Right"): Viewer.Catalog.GetString("Left"));
+                if (wagon.DoorRightOpen)
+                    status.Add(flipped ? Viewer.Catalog.GetString("Left") : Viewer.Catalog.GetString("Right"));
 
-                InfoToLabel(" ", Viewer.Catalog.GetString("Doors open"), status, "", false, keyPressed);
+                InfoToLabel(" ", Viewer.Catalog.GetString("Doors open"), string.Join(" ", status) + (locomotive.AbsSpeedMpS > 0.1f ? "!!!" : "???"), "", false, keyPressed);
             }
             else
-                InfoToLabel(" ", Viewer.Catalog.GetString("Doors open") + "?!?", Viewer.Catalog.GetString("Closed") + "?!?", "", false, keyPressed);
+            {
+                // delay to hide the doors label
+                if (doorsLabelVisible && clockDoorsTime + 3 < Owner.Viewer.Simulator.ClockTime)
+                    doorsLabelVisible = false;
+
+                if (doorsLabelVisible)
+                {
+                    InfoToLabel(" ", Viewer.Catalog.GetString("Doors open") + "!??", Viewer.Catalog.GetString("Closed") + "!??", "", false, keyPressed);
+                }
+            }
 
             // Ctrl + F Firing to manual
             if (UserInput.IsDown(UserCommand.ControlFiring))
@@ -998,5 +1066,10 @@ namespace Orts.Viewer3D.Popups
             }
         }
 
+        private static string Round(float x) => $"{Math.Round(x):F0}";
+
+        private static UserCommand? GetPressedKey(params UserCommand[] keysToTest) => keysToTest
+            .Where((UserCommand key) => UserInput.IsDown(key))
+            .FirstOrDefault();
     }
 }
