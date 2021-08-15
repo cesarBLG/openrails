@@ -1682,9 +1682,11 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                             if (Locomotive.TractiveForceCurves == null)
                             {
                                 maxForceN = Locomotive.MaxForceN * (controllerVolts / 100);
-                                float maxPowerW = Locomotive.MaxPowerW * t * t * (1 - Locomotive.PowerReduction);
-                                if (maxForceN * AbsWheelSpeedMpS > maxPowerW)
-                                    maxForceN = maxPowerW / AbsWheelSpeedMpS;
+                                //                               if (maxForceN * AbsWheelSpeedMpS > Locomotive.MaxPowerW * (controllerVolts / 100))
+                                //                                   maxForceN = Locomotive.MaxPowerW / AbsWheelSpeedMpS * (controllerVolts / 100);
+                              if (Locomotive.MaxForceN * AbsWheelSpeedMpS > Locomotive.MaxPowerW * (controllerVolts / 100))
+                                   maxForceN = Locomotive.MaxPowerW / AbsWheelSpeedMpS * (controllerVolts / 100) * (controllerVolts / 100);
+                                maxForceN *= 1 - Locomotive.PowerReduction;
                             }
                             else
                                 maxForceN = Locomotive.TractiveForceCurves.Get(controllerVolts / 100, AbsWheelSpeedMpS) * (1 - Locomotive.PowerReduction);
