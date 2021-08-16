@@ -1457,13 +1457,10 @@ namespace Orts.Viewer3D.Popups
                 Viewer.Catalog.GetString("Curve"),
                 Viewer.Catalog.GetString("Brk Frict."),
                 Viewer.Catalog.GetString("Brk Slide"),
-                Viewer.Catalog.GetString("Bear Temp")
-                //Add new header data here, if adding additional column.
-                // Possibly needed for buffing forces
-                //                Viewer.Catalog.GetString("VertD"),
-                //                Viewer.Catalog.GetString("VertL"),
-                //                Viewer.Catalog.GetString("BuffExc"),
-                //                Viewer.Catalog.GetString("CplAng")
+                Viewer.Catalog.GetString("Bear Temp"),
+                Viewer.Catalog.GetString(" "),
+                Viewer.Catalog.GetString("DerailCoeff")
+
                 );
             }
             else
@@ -1487,14 +1484,10 @@ namespace Orts.Viewer3D.Popups
                 Viewer.Catalog.GetString("Curve"),
                 Viewer.Catalog.GetString("Brk Frict."),
                 Viewer.Catalog.GetString("Brk Slide"),
-                Viewer.Catalog.GetString("Bear Temp")
-
-                // Possibly needed for buffing forces
-                //                Viewer.Catalog.GetString("VertD"),
-                //                Viewer.Catalog.GetString("VertL"),
-                //                Viewer.Catalog.GetString("BuffExc"),
-                //                Viewer.Catalog.GetString("CplAng")
-
+                Viewer.Catalog.GetString("Bear Temp"),
+                Viewer.Catalog.GetString(" "),
+                Viewer.Catalog.GetString("DerailCoeff")
+                
                 );
             }
             //Columns. HudScroll
@@ -1520,18 +1513,9 @@ namespace Orts.Viewer3D.Popups
                     TableSetCell(table, 6, "{0:F0}%", car.BrakeShoeCoefficientFriction * 100.0f);
                     TableSetCell(table, 7, car.HUDBrakeSkid ? Viewer.Catalog.GetString("Yes") : "No");
                     TableSetCell(table, 8, "{0} {1}", FormatStrings.FormatTemperature(car.WheelBearingTemperatureDegC, car.IsMetric, false), car.DisplayWheelBearingTemperatureStatus);
-
-                    // Possibly needed for buffing forces
-                    //                TableSetCell(table, 17, "{0}", FormatStrings.FormatForce(car.WagonVerticalDerailForceN, car.IsMetric));
-                    //                TableSetCell(table, 18, "{0}", FormatStrings.FormatForce(car.TotalWagonLateralDerailForceN, car.IsMetric));
-                    //                TableSetCell(table, 19, car.BuffForceExceeded ? Viewer.Catalog.GetString("Yes") : "No");
-                    //                TableSetCell(table, 20, "{0:F2}", MathHelper.ToDegrees(car.WagonFrontCouplerAngleRad));
-
-
                     TableSetCell(table, 9, car.Flipped ? Viewer.Catalog.GetString("Flipped") : "");
+                    TableSetCell(table, 19, "{0:F2}{1}", car.DerailmentCoefficient, car.DerailmentCoefficient > 1 ? "!!!" : car.DerailmentCoefficient < 1 && car.DerailmentCoefficient > 0.66 ? "???" : "");
                     TableAddLine(table);
-                    TableSetCell(table, 1, "Tot.Slack:");
-                    TableSetCell(table, 2, "{0}", FormatStrings.FormatShortDistanceDisplay(train.TotalCouplerSlackM, mstsLocomotive.IsMetric));
                 }
                 else
                 {
@@ -1552,13 +1536,13 @@ namespace Orts.Viewer3D.Popups
                     TableSetCell(table, 15, "{0:F0}%", car.BrakeShoeCoefficientFriction * 100.0f);
                     TableSetCell(table, 16, car.HUDBrakeSkid ? Viewer.Catalog.GetString("Yes") : Viewer.Catalog.GetString("No"));
                     TableSetCell(table, 17, "{0} {1}", FormatStrings.FormatTemperature(car.WheelBearingTemperatureDegC, car.IsMetric, false), car.DisplayWheelBearingTemperatureStatus);
-
                     TableSetCell(table, 18, car.Flipped ? Viewer.Catalog.GetString("Flipped") : "");
-
+                    TableSetCell(table, 19, "{0:F2}{1}", car.DerailmentCoefficient, car.DerailmentCoefficient > 1 ? "!!!" : car.DerailmentCoefficient < 1 && car.DerailmentCoefficient > 0.66 ? "???" : "");
                     TableAddLine(table);
-                    TableSetCell(table, 10, "Tot.Slack:");
-                    TableSetCell(table, 11, "{0}", FormatStrings.FormatShortDistanceDisplay(train.TotalCouplerSlackM, mstsLocomotive.IsMetric));
                 }
+            TableAddLine(table);
+            TableSetCell(table, 10, "Tot.Slack:");
+            TableSetCell(table, 11, "{0}", FormatStrings.FormatShortDistanceDisplay(train.TotalCouplerSlackM, mstsLocomotive.IsMetric));
             }
         }
         
@@ -1814,6 +1798,7 @@ namespace Orts.Viewer3D.Popups
 
         void TextPageWeather(TableData table)
         {
+            TableSetLabelValueColumns(table, 0, 2);
             TextPageHeading(table, Viewer.Catalog.GetString("WEATHER INFORMATION"));
 
             //Disable Hudscroll.
@@ -1832,6 +1817,7 @@ namespace Orts.Viewer3D.Popups
 
         void TextPageDebugInfo(TableData table)
         {
+            TableSetLabelValueColumns(table, 0, 2);
             TextPageHeading(table, Viewer.Catalog.GetString("DEBUG INFORMATION"));
 
             //Disable Hudscroll.
