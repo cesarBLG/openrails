@@ -4893,9 +4893,9 @@ namespace Orts.Simulation.RollingStocks
                         data = 0.0f;
                         if (Math.Abs(SpeedMpS) == 0.0f)
                             data = 0.0f;
-                        else if (Math.Abs(FilteredMotiveForceN) - Math.Abs(BrakeForceN + DynamicBrakeForceN) > 0)
+                        else if (Math.Abs(TractiveForceN) - Math.Abs(BrakeForceN + DynamicBrakeForceN) > 0)
                             data = Math.Abs(this.FilteredMotiveForceN);
-                        else if (Math.Abs(FilteredMotiveForceN) - Math.Abs(BrakeForceN + DynamicBrakeForceN) < 0)
+                        else if (Math.Abs(TractiveForceN) - Math.Abs(BrakeForceN + DynamicBrakeForceN) < 0)
                             data = -Math.Abs(BrakeForceN + DynamicBrakeForceN);
                         switch (cvc.Units)
                         {
