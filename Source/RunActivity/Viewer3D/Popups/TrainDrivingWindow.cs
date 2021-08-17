@@ -369,8 +369,10 @@ namespace Orts.Viewer3D.Popups
                 FirstColLenght = ListToLabel.Max(x => x.FirstColWidth);
                 LastColLenght = ListToLabel.Max(x => x.LastColWidth);
 
-                // Valid rows
-                var rowCount = ListToLabel.Where(x => !string.IsNullOrWhiteSpace(x.FirstCol.ToString()) || !string.IsNullOrWhiteSpace(x.LastCol.ToString())).Count() - 1;
+                // Validates rows with windows DPI settings
+                var dpi = (System.Drawing.Graphics.FromHwnd(IntPtr.Zero).DpiY / 96) > 1.00f ? 2 : 1;// values from testing
+                var adjustBottomLimit = (Owner.Viewer.PlayerLocomotive as MSTSLocomotive).CruiseControl != null ? dpi : dpi - 1;
+                var rowCount = ListToLabel.Where(x => !string.IsNullOrWhiteSpace(x.FirstCol.ToString()) || !string.IsNullOrWhiteSpace(x.LastCol.ToString())).Count() - adjustBottomLimit;
                 var desiredHeight = FontToBold ? Owner.TextFontDefaultBold.Height * rowCount
                     : Owner.TextFontDefault.Height * rowCount;
 
