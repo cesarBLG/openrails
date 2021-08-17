@@ -1,5 +1,5 @@
-﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.102
-July 29th, 2021
+﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.103
+August 17th, 2021
 
 Please note that the installation and use of Open Rails software, even of its unofficial versions, is governed by the Open Rails End User License Agreement. 
 
@@ -11,7 +11,8 @@ INSTALLATION
 
 
 RELEASE NOTES
-This unofficial version has been derived from the latest official OpenRails testing revision T1.3.1-1883, which already includes Monogame. 
+This unofficial version has been derived from the latest official OpenRails testing revision T1.3.1-1847, which already includes Monogame. 
+It includes also the other commits present in the official OR master release as of today, plus the fix of http://www.elvastower.com/forums/index.php?/topic/35377-restoring-the-master-key-variables-does-not-work-correctly/page__view__findpost__p__274829 , by Serana
 
 This unofficial version includes the cruise control software written by Jindrich with final adaptations by myself.
 
@@ -53,16 +54,12 @@ This version includes some features not (yet) available in the Open Rails testin
 - camera following detached wagons in hump yard operation by pressing Ctrl key while clicking with mouse on coupler in Train Operations Window to uncouple wagon
 - bug fix that didn't check for null label text, see http://www.elvastower.com/forums/index.php?/topic/32640-or-newyear-mg/page__view__findpost__p__273496
 - re-introduced bug fix for missing shapes http://www.elvastower.com/forums/index.php?/topic/32640-or-newyear-mg/page__view__findpost__p__272585
-- NEW: Cruise control: support for proportional set speed controller, independent from throttle controller
-
-
-
-
-
-
-
-
-
+- Cruise control: support for proportional set speed controller, independent from throttle controller
+- NEW: Cruise control: support for Combined control where the throttle section can be used also as max force selector
+- NEW: Cruise control: corrected some bugs
+- NEW: improve train driving window and web display, by mbm-OR
+- NEW: insert updated acronyms for compact train driving window for EN-DE-FR-IT, by mbm-OR
+- NEW: fix bug in stating whether tractive or braking force of ORTS_SIGNED_TRACTION_TOTAL_BRAKING
 
 The Monogame related code intentionally coincides only partly with the code of the OR official testing version.
 
