@@ -1515,7 +1515,6 @@ namespace Orts.Viewer3D.Popups
                     TableSetCell(table, 8, "{0} {1}", FormatStrings.FormatTemperature(car.WheelBearingTemperatureDegC, car.IsMetric, false), car.DisplayWheelBearingTemperatureStatus);
                     TableSetCell(table, 9, car.Flipped ? Viewer.Catalog.GetString("Flipped") : "");
                     TableSetCell(table, 19, "{0:F2}{1}", car.DerailmentCoefficient, car.DerailmentCoefficient > 1 ? "!!!" : car.DerailmentCoefficient < 1 && car.DerailmentCoefficient > 0.66 ? "???" : "");
-                    TableAddLine(table);
                 }
                 else
                 {
@@ -1538,7 +1537,6 @@ namespace Orts.Viewer3D.Popups
                     TableSetCell(table, 17, "{0} {1}", FormatStrings.FormatTemperature(car.WheelBearingTemperatureDegC, car.IsMetric, false), car.DisplayWheelBearingTemperatureStatus);
                     TableSetCell(table, 18, car.Flipped ? Viewer.Catalog.GetString("Flipped") : "");
                     TableSetCell(table, 19, "{0:F2}{1}", car.DerailmentCoefficient, car.DerailmentCoefficient > 1 ? "!!!" : car.DerailmentCoefficient < 1 && car.DerailmentCoefficient > 0.66 ? "???" : "");
-                    TableAddLine(table);
                 }
             TableAddLine(table);
             TableSetCell(table, 10, "Tot.Slack:");
