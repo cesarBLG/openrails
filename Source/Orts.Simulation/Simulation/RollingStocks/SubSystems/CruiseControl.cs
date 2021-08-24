@@ -70,6 +70,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
         protected double clockTime = 0;
         protected bool dynamicBrakeSetToZero = false;
         public float StartReducingSpeedDelta = 0.5f;
+        public float StartReducingSpeedDeltaDownwards = 0f;
         public bool Battery = false;
         public bool DynamicBrakePriority = false;
         public List<int> ForceStepsThrottleTable = new List<int>();
@@ -120,6 +121,8 @@ namespace Orts.Simulation.RollingStocks.SubSystems
         public bool HasIndependentThrottleDynamicBrakeLever = false;
         public bool HasProportionalSpeedSelector = false;
         public bool DoComputeNumberOfAxles = false;
+        protected float speedRegulatorIntermediateValue = 0;
+        protected float StepSize = 20;
 
         public CruiseControl(MSTSLocomotive locomotive)
         {
@@ -180,6 +183,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                 case "engine(ortscruisecontrol(defaultforcestep": SelectedMaxAccelerationStep = stf.ReadFloatBlock(STFReader.UNITS.Any, 1.0f); break;
                 case "engine(ortscruisecontrol(dynamicbrakemaxforceatselectorstep": DynamicBrakeMaxForceAtSelectorStep = stf.ReadFloatBlock(STFReader.UNITS.Any, 1.0f); break;
                 case "engine(ortscruisecontrol(startreducingspeeddelta": StartReducingSpeedDelta = (stf.ReadFloatBlock(STFReader.UNITS.Any, 1.0f) / 10); break;
+                case "engine(ortscruisecontrol(startreducingspeeddeltadownwards": StartReducingSpeedDeltaDownwards = (stf.ReadFloatBlock(STFReader.UNITS.Any, 1.0f) / 10); break;
                 case "engine(ortscruisecontrol(maxacceleration": MaxAccelerationMpSS = stf.ReadFloatBlock(STFReader.UNITS.Any, 1); break;
                 case "engine(ortscruisecontrol(maxdeceleration": MaxDecelerationMpSS = stf.ReadFloatBlock(STFReader.UNITS.Any, 0.5f); break;
                 case "engine(ortscruisecontrol(antiwheelspinequipped": AntiWheelSpinEquipped = stf.ReadBoolBlock(false); break;
@@ -254,6 +258,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
             AntiWheelSpinSpeedDiffThreshold = other.AntiWheelSpinSpeedDiffThreshold;
             DynamicBrakeMaxForceAtSelectorStep = other.DynamicBrakeMaxForceAtSelectorStep;
             StartReducingSpeedDelta = other.StartReducingSpeedDelta;
+            StartReducingSpeedDeltaDownwards = other.StartReducingSpeedDeltaDownwards;
             ForceStepsThrottleTable = other.ForceStepsThrottleTable;
             AccelerationTable = other.AccelerationTable;
             DynamicBrakeIncreaseSpeed = other.DynamicBrakeIncreaseSpeed;
@@ -301,6 +306,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
             clockTime = Simulator.ClockTime * 100;
             if (DoComputeNumberOfAxles)
                 ComputeNumberOfAxles();
+            if (StartReducingSpeedDeltaDownwards == 0) StartReducingSpeedDeltaDownwards = StartReducingSpeedDelta;
         }
 
         private void ComputeNumberOfAxles()
@@ -318,7 +324,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
         public void Update(float elapsedClockSeconds, float AbsWheelSpeedMpS)
         {
             elapsedTime += elapsedClockSeconds;
-            if (maxForceIncreasing) SpeedRegulatorMaxForceIncrease();
+            if (maxForceIncreasing) SpeedRegulatorMaxForceIncrease(elapsedClockSeconds);
             if (maxForceDecreasing)
             {
                 if (SelectedMaxAccelerationStep <= 0)
@@ -326,7 +332,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                     maxForceDecreasing = false;
                 }
                 else
-                    SpeedRegulatorMaxForceDecrease();
+                    SpeedRegulatorMaxForceDecrease(elapsedClockSeconds);
             }
             if (SpeedRegMode == SpeedRegulatorMode.Manual)
             {
@@ -372,6 +378,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
             outf.Write(this.throttleIsZero);
             outf.Write(this.trainBrakePercent);
             outf.Write(this.TrainLengthMeters);
+            outf.Write(speedRegulatorIntermediateValue);
         }
 
         public void Restore(BinaryReader inf)
@@ -402,6 +409,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
             throttleIsZero = inf.ReadBoolean();
             trainBrakePercent = inf.ReadSingle();
             TrainLengthMeters = inf.ReadInt32();
+            speedRegulatorIntermediateValue = inf.ReadSingle();
         }
 
         public void SpeedRegulatorModeIncrease()
@@ -556,12 +564,13 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                 WasForceReset = true;
             }
             maxForceIncreasing = true;
+            speedRegulatorIntermediateValue = SpeedRegulatorMaxForcePercentUnits ? SelectedMaxAccelerationPercent : SelectedMaxAccelerationStep;
         }
         public void SpeedRegulatorMaxForceStopIncrease()
         {
             maxForceIncreasing = false;
         }
-        protected void SpeedRegulatorMaxForceIncrease()
+        protected void SpeedRegulatorMaxForceIncrease(float elapsedClockSeconds)
         {
             Locomotive.SignalEvent(Common.Event.CruiseControlMaxForce);
             if (MaxForceSetSingleStep) maxForceIncreasing = false;
@@ -571,7 +580,8 @@ namespace Orts.Simulation.RollingStocks.SubSystems
             {
                 if (SelectedMaxAccelerationPercent == 100)
                     return;
-                SelectedMaxAccelerationPercent += 1f;
+                speedRegulatorIntermediateValue += StepSize * elapsedClockSeconds;
+                SelectedMaxAccelerationPercent = (float)Math.Truncate(speedRegulatorIntermediateValue + 1);
 //                SelectedMaxAccelerationPercent = (float)Math.Round(SelectedMaxAccelerationStep * 100 / SpeedRegulatorMaxForceSteps, 0);
                 Simulator.Confirmer.Message(ConfirmLevel.Information, Simulator.Catalog.GetString("Speed regulator max acceleration percent changed to") + " " + Simulator.Catalog.GetString(SelectedMaxAccelerationPercent.ToString()) + "%");
             }
@@ -579,8 +589,8 @@ namespace Orts.Simulation.RollingStocks.SubSystems
             {
                 if (SelectedMaxAccelerationStep == SpeedRegulatorMaxForceSteps)
                     return;
-                SelectedMaxAccelerationStep++;
-                SelectedMaxAccelerationStep = (float)Math.Round(SelectedMaxAccelerationStep, 0);
+                speedRegulatorIntermediateValue += MaxForceSelectorIsDiscrete ? elapsedClockSeconds : StepSize * elapsedClockSeconds * SpeedRegulatorMaxForceSteps / 100.0f;
+                SelectedMaxAccelerationStep = (float)Math.Truncate(speedRegulatorIntermediateValue + 1);
                 Simulator.Confirmer.Message(ConfirmLevel.Information, Simulator.Catalog.GetString("Speed regulator max acceleration changed to") + " " + Simulator.Catalog.GetString(Math.Round(SelectedMaxAccelerationStep * 100 / SpeedRegulatorMaxForceSteps, 0).ToString()));
             }
         }
@@ -590,12 +600,13 @@ namespace Orts.Simulation.RollingStocks.SubSystems
         {
             Locomotive.SignalEvent(Common.Event.CruiseControlMaxForce);
             maxForceDecreasing = true;
+            speedRegulatorIntermediateValue = SpeedRegulatorMaxForcePercentUnits ? SelectedMaxAccelerationPercent : SelectedMaxAccelerationStep;
         }
         public void SpeedRegulatorMaxForceStopDecrease()
         {
             maxForceDecreasing = false;
         }
-        protected void SpeedRegulatorMaxForceDecrease()
+        protected void SpeedRegulatorMaxForceDecrease(float elapsedClockSeconds)
         {
             Locomotive.SignalEvent(Common.Event.CruiseControlMaxForce);
             if (MaxForceSetSingleStep) maxForceDecreasing = false;
@@ -610,8 +621,8 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                 if (SelectedMaxAccelerationStep <= 0)
                     return;
             }
-            SelectedMaxAccelerationStep--;
-            SelectedMaxAccelerationStep = (float)Math.Round(SelectedMaxAccelerationStep, 0);
+            speedRegulatorIntermediateValue -= MaxForceSelectorIsDiscrete ? elapsedClockSeconds : StepSize * elapsedClockSeconds * SpeedRegulatorMaxForceSteps / 100.0f;
+            SelectedMaxAccelerationStep = (float)Math.Truncate(speedRegulatorIntermediateValue);
             if (DisableZeroForceStep)
             {
                 if (SelectedMaxAccelerationStep <= 1)
@@ -1216,8 +1227,8 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                                 else
                                     delta = (CurrentSelectedSpeedMpS + (TrainElevation < -0.01 ? TrainElevation * (SelectedNumberOfAxles / 12) : 0)) - AbsWheelSpeedMpS;
 
-                                relativeAcceleration = (float)-Math.Sqrt(-StartReducingSpeedDelta * delta);
-                                AccelerationDemandMpSS = (float)-Math.Sqrt(-StartReducingSpeedDelta * delta);
+                                relativeAcceleration = (float)-Math.Sqrt(-StartReducingSpeedDeltaDownwards * delta);
+                                AccelerationDemandMpSS = (float)-Math.Sqrt(-StartReducingSpeedDeltaDownwards * delta);
                                 if (maxForceN > 0)
                                 {
                                     if (controllerVolts > 0)
@@ -1379,9 +1390,9 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                             {
                                 if (Locomotive.DynamicBrakeAvailable)
                                 {
-                                    relativeAcceleration = (float)-Math.Sqrt(-StartReducingSpeedDelta * delta);
+                                    relativeAcceleration = (float)-Math.Sqrt(-StartReducingSpeedDeltaDownwards * delta);
 
-                                    float val = (StartReducingSpeedDelta) * coeff * ((delta + 0.5f) / 3);
+                                    float val = (StartReducingSpeedDeltaDownwards) * coeff * ((delta + 0.5f) / 3);
                                     if (val < 0)
                                         val = -val;
                                     AccelerationDemandMpSS = -(float)Math.Sqrt(val);

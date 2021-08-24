@@ -1,5 +1,5 @@
-﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.103
-August 17th, 2021
+﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.103.1
+August 24th, 2021
 
 Please note that the installation and use of Open Rails software, even of its unofficial versions, is governed by the Open Rails End User License Agreement. 
 
@@ -11,8 +11,8 @@ INSTALLATION
 
 
 RELEASE NOTES
-This unofficial version has been derived from the latest official OpenRails testing revision T1.3.1-1847, which already includes Monogame. 
-It includes also the other commits present in the official OR master release as of today, plus the fix of http://www.elvastower.com/forums/index.php?/topic/35377-restoring-the-master-key-variables-does-not-work-correctly/page__view__findpost__p__274829 , by Serana
+This unofficial version has been derived from the latest official OpenRails testing revision T1.3.1-1890, which already includes Monogame. 
+It includes also the other commits present in the official OR master release as of August 21st.
 
 This unofficial version includes the cruise control software written by Jindrich with final adaptations by myself.
 
@@ -59,7 +59,9 @@ This version includes some features not (yet) available in the Open Rails testin
 - NEW: Cruise control: corrected some bugs
 - NEW: improve train driving window and web display, by mbm-OR
 - NEW: insert updated acronyms for compact train driving window for EN-DE-FR-IT, by mbm-OR
-- NEW: fix bug in stating whether tractive or braking force of ORTS_SIGNED_TRACTION_TOTAL_BRAKING
+- NEW: fix bug in stating whether tractive or braking force of ORTS_SIGNED_TRACTION_TOTAL_BRAKINGWE
+- NEW: Cruise control: add variable to adjust dynamic braking force change speed
+- NEW: fix various cruise control bugs
 
 The Monogame related code intentionally coincides only partly with the code of the OR official testing version.
 
