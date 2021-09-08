@@ -56,47 +56,78 @@ namespace Orts.Viewer3D.Popups
         bool wheelLabelVisible = false;// Wheel label visible
         double clockWheelTime; // Wheel hide timing
 
+        bool derailLabelVisible = false;// DerailCoeff label visible
+        double clockDerailTime; //  DerailCoeff label visible
+
         bool doorsLabelVisible = false; // Doors label visible
         double clockDoorsTime; // Doors hide timing
 
-        public bool StandardHUD = true;// Standard text
+        public bool normalTextMode = true;// Standard text
         public bool TrainDrivingUpdating = false;
 
+        int maxFirstColWidth = 0;
+        int maxLastColWidth = 0;
         int WindowHeightMin = 0;
         int WindowHeightMax = 0;
         int WindowWidthMin = 0;
         int WindowWidthMax = 0;
-        int maxFirstColWidth = 0;
-        int maxLastColWidth = 0;
 
         char expandWindow;
-        string keyPressed;// display a symbol when a control key is pressed.
-        string gradientIndicator;
-        public int OffSetX = 0;
         const int TextSize = 15;
+        string gradientIndicator;
+        string keyPressed;// display a symbol when a control key is pressed.
         public int keyPresLenght;
+        public int OffSetX = 0;
 
+        Label ExpandWindow;
         Label indicator;
         LabelMono indicatorMono;
-        Label ExpandWindow;
         Label LabelFontToBold;
-        public static bool MonoFont;
+        public static bool FontChanged;
         public static bool FontToBold;
+        public static bool MonoFont;
 
+        /// <summary>
+        /// A Train Driving row with data fields.
+        /// </summary>
         public struct ListLabel
         {
-            public string FirstCol { get; set; }
-            public int FirstColWidth { get; set; }
-            public string LastCol { get; set; }
-            public int LastColWidth { get; set; }
-            public string SymbolCol { get; set; }
-            public bool ChangeColWidth { get; set; }
-            public string keyPressed { get; set; }
+            public string FirstCol;
+            public int FirstColWidth;
+            public string LastCol;
+            public int LastColWidth;
+            public string SymbolCol;
+            public bool ChangeColWidth;
+            public string KeyPressed;
         }
-        public List<ListLabel> ListToLabel = new List<ListLabel>();
+        public List<ListLabel> labels = new List<ListLabel>();
+
         public List<ListLabel> TempListToLabel = new List<ListLabel>();// used when listtolabel is changing
+
+        /// <summary>
+        /// Table of Colors to client-side color codes.
+        /// </summary>
+        /// <remarks>
+        /// Compare codes with index.css.
+        /// </remarks>
+        private static readonly Dictionary<Color, string> ColorCode = new Dictionary<Color, string>
+        {
+            { Color.Yellow, "???" },
+            { Color.Green, "??!" },
+            { Color.Black, "?!?" },
+            { Color.PaleGreen, "?!!" },
+            { Color.White, "!??" },
+            { Color.Orange, "!!?" },
+            { Color.OrangeRed, "!!!" },
+            { Color.Cyan, "%%%" },
+            { Color.Brown, "%$$" },
+            { Color.LightGreen, "%%$" },
+            { Color.Blue, "$%$" },
+            { Color.LightSkyBlue, "$$$" },
+        };
+
         // Change text color
-        readonly Dictionary<string, Color> ColorCode = new Dictionary<string, Color>
+        readonly Dictionary<string, Color> ColorCodeCtrl = new Dictionary<string, Color>
         {
             { "!!!", Color.OrangeRed },
             { "!!?", Color.Orange },
@@ -108,6 +139,20 @@ namespace Orts.Viewer3D.Popups
             { "$$$", Color.LightSkyBlue},
             { "%%%", Color.Cyan}
         };
+
+        private static class Symbols
+        {
+            public const string ArrowUp = "▲";
+            public const string SmallArrowUp = "△";
+            public const string ArrowDown = "▼";
+            public const string SmallArrowDown = "▽";
+            public const string End = "▬";
+            public const string EndLower = "▖";
+            public const string ArrowToRight = "►";
+            public const string SmallDiamond = "●";
+            public const string GradientDown = "\u2198";
+            public const string GradientUp = "\u2197";
+        }
 
         readonly Dictionary<string, string> FirstColToAbbreviated = new Dictionary<string, string>()
         {
@@ -121,6 +166,7 @@ namespace Orts.Viewer3D.Popups
             [Viewer.Catalog.GetString("Circuit breaker")] = Viewer.Catalog.GetString("CIRC"),
             [Viewer.Catalog.GetString("Cylinder cocks")] = Viewer.Catalog.GetString("CCOK"),
             [Viewer.Catalog.GetString("Direction")] = Viewer.Catalog.GetString("DIRC"),
+            [Viewer.Catalog.GetString("DerailCoeff")] = Viewer.Catalog.GetString("DRLC"),
             [Viewer.Catalog.GetString("Doors open")] = Viewer.Catalog.GetString("DOOR"),
             [Viewer.Catalog.GetString("Dynamic brake")] = Viewer.Catalog.GetString("BDYN"),
             [Viewer.Catalog.GetString("Electric train supply")] = Viewer.Catalog.GetString("TSUP"),
@@ -180,7 +226,7 @@ namespace Orts.Viewer3D.Popups
         protected internal override void Save(BinaryWriter outf)
         {
             base.Save(outf);
-            outf.Write(StandardHUD);
+            outf.Write(normalTextMode);
             outf.Write(Location.X);
             outf.Write(Location.Y);
             outf.Write(Location.Width);
@@ -189,13 +235,19 @@ namespace Orts.Viewer3D.Popups
             outf.Write(ctrlAIFiremanOn);
             outf.Write(ctrlAIFiremanOff);
             outf.Write(ctrlAIFiremanReset);
+            outf.Write(clockWheelTime);
+            outf.Write(wheelLabelVisible);
+            outf.Write(clockDerailTime);
+            outf.Write(derailLabelVisible);
+            outf.Write(clockDoorsTime);
+            outf.Write(doorsLabelVisible);
         }
 
         protected internal override void Restore(BinaryReader inf)
         {
             base.Restore(inf);
             Rectangle LocationRestore;
-            StandardHUD = inf.ReadBoolean();
+            normalTextMode = inf.ReadBoolean();
             LocationRestore.X = inf.ReadInt32();
             LocationRestore.Y = inf.ReadInt32();
             LocationRestore.Width = inf.ReadInt32();
@@ -204,6 +256,12 @@ namespace Orts.Viewer3D.Popups
             ctrlAIFiremanOn = inf.ReadBoolean();
             ctrlAIFiremanOff = inf.ReadBoolean();
             ctrlAIFiremanReset = inf.ReadBoolean();
+            clockWheelTime = inf.ReadDouble();
+            wheelLabelVisible = inf.ReadBoolean();
+            clockDerailTime = inf.ReadDouble();
+            derailLabelVisible = inf.ReadBoolean();
+            clockDoorsTime = inf.ReadDouble();
+            doorsLabelVisible = inf.ReadBoolean();
 
             // Display window
             SizeTo(LocationRestore.Width, LocationRestore.Height);
@@ -221,11 +279,11 @@ namespace Orts.Viewer3D.Popups
         {
             // Display main HUD data
             var vbox = base.Layout(layout).AddLayoutVertical();
-            if (ListToLabel.Count > 0)
+            if (labels.Count > 0)
             {
-                var colWidth = ListToLabel.Max(x => x.FirstColWidth) + (StandardHUD ? 15 : 20);
+                var colWidth = labels.Max(x => x.FirstColWidth) + (normalTextMode ? 15 : 20);
                 var TimeHboxPositionY = 0;
-                foreach (var data in ListToLabel.ToList())
+                foreach (var data in labels.ToList())
                 {
                     if (data.FirstCol.Contains(Viewer.Catalog.GetString("NwLn")))
                     {
@@ -243,21 +301,21 @@ namespace Orts.Viewer3D.Popups
                         var LastCol = data.LastCol;
                         var SymbolCol = data.SymbolCol;
 
-                        if (ColorCode.Keys.Any(FirstCol.EndsWith) || ColorCode.Keys.Any(LastCol.EndsWith) || ColorCode.Keys.Any(data.keyPressed.EndsWith) || ColorCode.Keys.Any(data.SymbolCol.EndsWith))
+                        if (ColorCodeCtrl.Keys.Any(FirstCol.EndsWith) || ColorCodeCtrl.Keys.Any(LastCol.EndsWith) || ColorCodeCtrl.Keys.Any(data.KeyPressed.EndsWith) || ColorCodeCtrl.Keys.Any(data.SymbolCol.EndsWith))
                         {
-                            var colorFirstColEndsWith = ColorCode.Keys.Any(FirstCol.EndsWith) ? ColorCode[FirstCol.Substring(FirstCol.Length - 3)] : Color.White;
-                            var colorLastColEndsWith = ColorCode.Keys.Any(LastCol.EndsWith) ? ColorCode[LastCol.Substring(LastCol.Length - 3)] : Color.White;
-                            var colorKeyPressed = ColorCode.Keys.Any(data.keyPressed.EndsWith) ? ColorCode[data.keyPressed.Substring(data.keyPressed.Length - 3)] : Color.White;
-                            var colorSymbolCol = ColorCode.Keys.Any(data.SymbolCol.EndsWith) ? ColorCode[data.SymbolCol.Substring(data.SymbolCol.Length - 3)] : Color.White;
+                            var colorFirstColEndsWith = ColorCodeCtrl.Keys.Any(FirstCol.EndsWith) ? ColorCodeCtrl[FirstCol.Substring(FirstCol.Length - 3)] : Color.White;
+                            var colorLastColEndsWith = ColorCodeCtrl.Keys.Any(LastCol.EndsWith) ? ColorCodeCtrl[LastCol.Substring(LastCol.Length - 3)] : Color.White;
+                            var colorKeyPressed = ColorCodeCtrl.Keys.Any(data.KeyPressed.EndsWith) ? ColorCodeCtrl[data.KeyPressed.Substring(data.KeyPressed.Length - 3)] : Color.White;
+                            var colorSymbolCol = ColorCodeCtrl.Keys.Any(data.SymbolCol.EndsWith) ? ColorCodeCtrl[data.SymbolCol.Substring(data.SymbolCol.Length - 3)] : Color.White;
 
                             // Erase the color code at the string end
-                            FirstCol = ColorCode.Keys.Any(FirstCol.EndsWith) ? FirstCol.Substring(0, FirstCol.Length - 3) : FirstCol;
-                            LastCol = ColorCode.Keys.Any(LastCol.EndsWith) ? LastCol.Substring(0, LastCol.Length - 3) : LastCol;
-                            keyPressed = ColorCode.Keys.Any(data.keyPressed.EndsWith) ? data.keyPressed.Substring(0, data.keyPressed.Length - 3) : data.keyPressed;
-                            SymbolCol = ColorCode.Keys.Any(data.SymbolCol.EndsWith) ? data.SymbolCol.Substring(0, data.SymbolCol.Length - 3) : data.SymbolCol;
+                            FirstCol = ColorCodeCtrl.Keys.Any(FirstCol.EndsWith) ? FirstCol.Substring(0, FirstCol.Length - 3) : FirstCol;
+                            LastCol = ColorCodeCtrl.Keys.Any(LastCol.EndsWith) ? LastCol.Substring(0, LastCol.Length - 3) : LastCol;
+                            keyPressed = ColorCodeCtrl.Keys.Any(data.KeyPressed.EndsWith) ? data.KeyPressed.Substring(0, data.KeyPressed.Length - 3) : data.KeyPressed;
+                            SymbolCol = ColorCodeCtrl.Keys.Any(data.SymbolCol.EndsWith) ? data.SymbolCol.Substring(0, data.SymbolCol.Length - 3) : data.SymbolCol;
 
                             // Apply color to FirstCol
-                            if (StandardHUD)
+                            if (normalTextMode)
                             {   // Apply color to FirstCol
                                 hbox.Add(indicator = new Label(TextSize, hbox.RemainingHeight, keyPressed, LabelAlignment.Center));
                                 indicator.Color = colorKeyPressed;
@@ -272,7 +330,7 @@ namespace Orts.Viewer3D.Popups
                                 indicatorMono.Color = colorFirstColEndsWith;
                             }
 
-                            if (data.keyPressed != null && data.keyPressed != "")
+                            if (data.KeyPressed != null && data.KeyPressed != "")
                             {
                                 hbox.Add(indicator = new Label(-TextSize, 0, TextSize, hbox.RemainingHeight, keyPressed, LabelAlignment.Right));
                                 indicator.Color = colorKeyPressed;
@@ -297,7 +355,7 @@ namespace Orts.Viewer3D.Popups
                             //Avoids troubles when the Main Scale (Windows DPI settings) is not set to 100%
                             if (LastCol.Contains(':')) TimeHboxPositionY = hbox.Position.Y;
 
-                            if (StandardHUD)
+                            if (normalTextMode)
                             {
                                 hbox.Add(indicator = new Label(colWidth, hbox.RemainingHeight, FirstCol));
                                 indicator.Color = Color.White; // Default color
@@ -311,7 +369,7 @@ namespace Orts.Viewer3D.Popups
                             // Font to bold, clickable label
                             if (hbox.Position.Y == TimeHboxPositionY && LastCol.Contains(':')) // Time line.
                             {
-                                hbox.Add(LabelFontToBold = new Label(Owner.TextFontDefault.MeasureString(LastCol) - (StandardHUD ? 5 : 3), hbox.RemainingHeight, LastCol));
+                                hbox.Add(LabelFontToBold = new Label(Owner.TextFontDefault.MeasureString(LastCol) - (normalTextMode ? 5 : 3), hbox.RemainingHeight, LastCol));
                                 LabelFontToBold.Color = Color.White;
                                 LabelFontToBold.Click += new Action<Control, Point>(FontToBold_Click);
                             }
@@ -325,6 +383,7 @@ namespace Orts.Viewer3D.Popups
                         // Clickable symbol
                         if (hbox.Position.Y == TimeHboxPositionY)
                         {
+                            var expandWindow = normalTextMode ? '\u25C4' : '\u25BA';// ◀ : ▶
                             hbox.Add(ExpandWindow = new Label(hbox.RemainingWidth - TextSize, 0, TextSize, hbox.RemainingHeight, expandWindow.ToString(), LabelAlignment.Right));
                             ExpandWindow.Color = Color.Yellow;
                             ExpandWindow.Click += new Action<Control, Point>(ExpandWindow_Click);
@@ -342,19 +401,31 @@ namespace Orts.Viewer3D.Popups
 
         void FontToBold_Click(Control arg1, Point arg2)
         {
-            FontToBold = FontToBold ? false : true;
+            FontChanged = true;
+            FontToBold = !FontToBold;
+            UpdateWindowSize();
         }
 
         void ExpandWindow_Click(Control arg1, Point arg2)
         {
-            StandardHUD = StandardHUD ? false : true;
-            //UpdateData();
+            normalTextMode = !normalTextMode;
+            UpdateWindowSize();
+        }
+
+        public override void TabAction() => CycleMode();
+
+        /// <summary>
+        /// Change between full and abbreviated text mode.
+        /// </summary>
+        public void CycleMode()
+        {
+            normalTextMode = !normalTextMode;
             UpdateWindowSize();
         }
 
         private void UpdateWindowSize()
         {
-            UpdateData();
+            labels = TrainDrivingWindowList(Owner.Viewer, normalTextMode).ToList();
             ModifyWindowSize();
         }
 
@@ -363,23 +434,22 @@ namespace Orts.Viewer3D.Popups
         /// </summary>
         private void ModifyWindowSize()
         {
-            if (ListToLabel.Count > 0)
+            if (labels.Count > 0)
             {
                 var textwidth = Owner.TextFontDefault.Height;
-                FirstColLenght = ListToLabel.Max(x => x.FirstColWidth);
-                LastColLenght = ListToLabel.Max(x => x.LastColWidth);
+                FirstColLenght = labels.Max(x => x.FirstColWidth);
+                LastColLenght = labels.Max(x => x.LastColWidth);
 
                 // Validates rows with windows DPI settings
-                var dpi = (System.Drawing.Graphics.FromHwnd(IntPtr.Zero).DpiY / 96) > 1.00f ? 2 : 1;// values from testing
-                var adjustBottomLimit = (Owner.Viewer.PlayerLocomotive as MSTSLocomotive).CruiseControl != null ? dpi : dpi - 1;
-                var rowCount = ListToLabel.Where(x => !string.IsNullOrWhiteSpace(x.FirstCol.ToString()) || !string.IsNullOrWhiteSpace(x.LastCol.ToString())).Count() - adjustBottomLimit;
+                var dpiOffset = (System.Drawing.Graphics.FromHwnd(IntPtr.Zero).DpiY / 96) > 1.00f ? 1 : 0;// values from testing
+                var rowCount = labels.Where(x => !string.IsNullOrWhiteSpace(x.FirstCol.ToString()) || !string.IsNullOrWhiteSpace(x.LastCol.ToString())).Count() - dpiOffset;
                 var desiredHeight = FontToBold ? Owner.TextFontDefaultBold.Height * rowCount
                     : Owner.TextFontDefault.Height * rowCount;
 
                 var desiredWidth = FirstColLenght + LastColLenght + 45;// interval between firstcol and lastcol
 
-                var newHeight = (int)MathHelper.Clamp(desiredHeight, (StandardHUD ? WindowHeightMin : 100), WindowHeightMax);
-                var newWidth = (int)MathHelper.Clamp(desiredWidth, (StandardHUD ? WindowWidthMin : 100), WindowWidthMax);
+                var newHeight = (int)MathHelper.Clamp(desiredHeight, (normalTextMode ? WindowHeightMin : 100), WindowHeightMax);
+                var newWidth = (int)MathHelper.Clamp(desiredWidth, (normalTextMode ? WindowWidthMin : 100), WindowWidthMax);
 
                 // Move the dialog up if we're expanding it, or down if not; this keeps the center in the same place.
                 var newTop = Location.Y + (Location.Height - newHeight) / 2;
@@ -391,6 +461,21 @@ namespace Orts.Viewer3D.Popups
         }
 
         /// <summary>
+        /// Sanitize the fields of a <see cref="ListLabel"/> in-place.
+        /// </summary>
+        /// <param name="label">A reference to the <see cref="ListLabel"/> to check.</param>
+        private void CheckLabel(ref ListLabel label, bool normalMode)
+        {
+            void CheckString(ref string s) => s = s ?? "";
+            CheckString(ref label.FirstCol);
+            CheckString(ref label.LastCol);
+            CheckString(ref label.SymbolCol);
+            CheckString(ref label.KeyPressed);
+
+            UpdateColsWidth(label, normalMode);
+        }
+
+        /// <summary>
         /// Display info according to the full text window or the slim text window
         /// </summary>
         /// <param name="firstkeyactivated"></param>
@@ -399,78 +484,70 @@ namespace Orts.Viewer3D.Popups
         /// <param name="symbolcol"></param>
         /// <param name="changecolwidth"></param>
         /// <param name="lastkeyactivated"></param>
-        private void InfoToLabel(string firstkeyactivated, string firstcol, string lastcol, string symbolcol, bool changecolwidth, string lastkeyactivated)
+
+        private void UpdateColsWidth(ListLabel label, bool normalmode)
         {
             if (!UpdateDataEnded)
             {
-                if (!StandardHUD)
+                if (!normalTextMode)
                 {
-                    foreach (var code in FirstColToAbbreviated)
-                    {
-                        if (firstcol.Contains(code.Key))
-                        {
-                            firstcol = firstcol.Replace(code.Key, code.Value).TrimEnd();
-                        }
-                    }
-                    foreach (var code in LastColToAbbreviated)
-                    {
-                        if (lastcol.Contains(code.Key))
-                        {
-                            lastcol = lastcol.Replace(code.Key, code.Value).TrimEnd();
-                        }
-                    }
+                    foreach (KeyValuePair<string, string> mapping in FirstColToAbbreviated)
+                        label.FirstCol = label.FirstCol.Replace(mapping.Key, mapping.Value);
+                    foreach (KeyValuePair<string, string> mapping in LastColToAbbreviated)
+                        label.LastCol = label.LastCol.Replace(mapping.Key, mapping.Value);
                 }
-
                 var firstColWidth = 0;
                 var lastColWidth = 0;
+                var firstCol = label.FirstCol;
+                var lastCol = label.LastCol;
+                var symbolCol = label.SymbolCol;
+                var keyPressed = label.KeyPressed;
+                var changeColwidth = label.ChangeColWidth;
 
-                if (!firstcol.Contains("Sprtr"))
+                if (!firstCol.Contains("Sprtr"))
                 {
-
-                    if (ColorCode.Keys.Any(firstcol.EndsWith))
+                    if (ColorCodeCtrl.Keys.Any(firstCol.EndsWith))
                     {
-                        var tempFirstCol = firstcol.Substring(0, firstcol.Length - 3);
-                        firstColWidth = !StandardHUD ? Owner.TextFontMonoSpacedBold.MeasureString(tempFirstCol.TrimEnd())
-                            : FontToBold ? Owner.TextFontDefaultBold.MeasureString(tempFirstCol.TrimEnd())
+                        var tempFirstCol = firstCol.Substring(0, firstCol.Length - 3);
+                        firstColWidth = FontToBold ? Owner.TextFontDefaultBold.MeasureString(tempFirstCol.TrimEnd())
+                            : !normalTextMode ? Owner.TextFontMonoSpacedBold.MeasureString(tempFirstCol.TrimEnd())
                             : Owner.TextFontDefault.MeasureString(tempFirstCol.TrimEnd());
                     }
                     else
                     {
-                        firstColWidth = !StandardHUD ? Owner.TextFontMonoSpacedBold.MeasureString(firstcol.TrimEnd())
-                            : FontToBold ? Owner.TextFontDefaultBold.MeasureString(firstcol.TrimEnd())
-                            : Owner.TextFontDefault.MeasureString(firstcol.TrimEnd());
+                        firstColWidth = FontToBold ? Owner.TextFontDefaultBold.MeasureString(firstCol.TrimEnd())
+                            : !normalTextMode ? Owner.TextFontMonoSpacedBold.MeasureString(firstCol.TrimEnd())
+                            : Owner.TextFontDefault.MeasureString(firstCol.TrimEnd());
                     }
 
-                    if (ColorCode.Keys.Any(lastcol.EndsWith))
+                    if (ColorCodeCtrl.Keys.Any(lastCol.EndsWith))
                     {
-                        var tempLastCol = lastcol.Substring(0, lastcol.Length - 3);
+                        var tempLastCol = lastCol.Substring(0, lastCol.Length - 3);
                         lastColWidth = FontToBold ? Owner.TextFontDefaultBold.MeasureString(tempLastCol.TrimEnd())
                             : Owner.TextFontDefault.MeasureString(tempLastCol.TrimEnd());
                     }
                     else
                     {
-                        lastColWidth = FontToBold ? Owner.TextFontDefaultBold.MeasureString(lastcol.TrimEnd())
-                            : Owner.TextFontDefault.MeasureString(lastcol.TrimEnd());
+                        lastColWidth = FontToBold ? Owner.TextFontDefaultBold.MeasureString(lastCol.TrimEnd())
+                            : Owner.TextFontDefault.MeasureString(lastCol.TrimEnd());
                     }
 
                     //Set a minimum value for LastColWidth to avoid overlap between time value and clickable symbol
-                    if (ListToLabel.Count == 1)
+                    if (labels.Count == 1)
                     {
-                        lastColWidth = ListToLabel.First().LastColWidth + 15;// time value + clickable symbol
+                        lastColWidth = labels.First().LastColWidth + 15;// time value + clickable symbol
                     }
-
-                    // Avoids text overlapping
-                    firstColWidth = firstColWidth + 5;// avoids the symbol/keypressed from overlapping with the text
                 }
-                ListToLabel.Add(new ListLabel
+
+                labels.Add(new ListLabel
                 {
-                    FirstCol = firstcol,
+                    FirstCol = firstCol,
                     FirstColWidth = firstColWidth,
-                    LastCol = lastcol,
+                    LastCol = lastCol,
                     LastColWidth = lastColWidth,
-                    SymbolCol = symbolcol,
-                    ChangeColWidth = changecolwidth,
-                    keyPressed = keyPressed
+                    SymbolCol = symbolCol,
+                    ChangeColWidth = changeColwidth,
+                    KeyPressed = keyPressed
                 });
 
                 //ResizeWindow, when the string spans over the right boundary of the window
@@ -483,14 +560,14 @@ namespace Orts.Viewer3D.Popups
             }
             else
             {
-                if (this.Visible)// Avoids conflict with WebApi data updating
+                if (this.Visible)
                 {
                     // Detect Autopilot is on to avoid flickering when slim window is displayed
                     var AutopilotOn = Owner.Viewer.PlayerLocomotive.Train.TrainType == Train.TRAINTYPE.AI_PLAYERHOSTING ? true : false;
 
                     //ResizeWindow, when the string spans over the right boundary of the window
-                    maxFirstColWidth = ListToLabel.Max(x => x.FirstColWidth);
-                    maxLastColWidth = ListToLabel.Max(x => x.LastColWidth);
+                    maxFirstColWidth = labels.Max(x => x.FirstColWidth);
+                    maxLastColWidth = labels.Max(x => x.LastColWidth);
 
                     if (!ResizeWindow & (FirstColOverFlow != maxFirstColWidth || (!AutopilotOn && LastColOverFlow != maxLastColWidth)))
                     {
@@ -502,40 +579,46 @@ namespace Orts.Viewer3D.Popups
             }
         }
 
-        private void UpdateData()
-        {   //Update data
-            var arrowUp = '\u25B2';  // ▲
-            var smallArrowUp = '\u25B3';  // △
-            var arrowDown = '\u25BC';// ▼
-            var smallArrowDown = '\u25BD';// ▽
-            var end = '\u25AC';// Black rectangle ▬
-            var endLower = '\u2596';// block ▖
-            var arrowToRight = '\u25BA'; // ►
-            var smallDiamond = '\u25C6'; // ●
 
-            var playerTrain = Owner.Viewer.PlayerLocomotive.Train;
-            var trainBrakeStatus = Owner.Viewer.PlayerLocomotive.GetTrainBrakeStatus();
-            var dynamicBrakePercent = Owner.Viewer.PlayerLocomotive.DynamicBrakePercent;
-            var dynamicBrakeStatus = Owner.Viewer.PlayerLocomotive.GetDynamicBrakeStatus();
-            var engineBrakeStatus = Owner.Viewer.PlayerLocomotive.GetEngineBrakeStatus();
-            var locomotive = Owner.Viewer.PlayerLocomotive as MSTSLocomotive;
-            var locomotiveStatus = Owner.Viewer.PlayerLocomotive.GetStatus();
-            var locomotiveSteam = Owner.Viewer.PlayerLocomotive as MSTSSteamLocomotive;
-            var combinedControlType = locomotive.CombinedControlType == MSTSLocomotive.CombinedControl.ThrottleDynamic ? true : false;
-            var showMUReverser = Math.Abs(playerTrain.MUReverserPercent) != 100f;
-            var showRetainers = playerTrain.RetainerSetting != RetainerSetting.Exhaust;
-            var stretched = playerTrain.Cars.Count > 1 && playerTrain.NPull == playerTrain.Cars.Count - 1;
-            var bunched = !stretched && playerTrain.Cars.Count > 1 && playerTrain.NPush == playerTrain.Cars.Count - 1;
-            var playerTrainInfo = Owner.Viewer.PlayerTrain.GetTrainInfo();
-            expandWindow = '\u23FA';// ⏺ toggle window
 
-            keyPressed = "";
-            ListToLabel.Clear();
+        /// <summary>
+        /// Retrieve a formatted list <see cref="ListLabel"/>s to be displayed as an in-browser Track Monitor.
+        /// </summary>
+        /// <param name="viewer">The Viewer to read train data from.</param>
+        /// <returns>A list of <see cref="ListLabel"/>s, one per row of the popup.</returns>
+        public IEnumerable<ListLabel> TrainDrivingWindowList(Viewer viewer, bool normalTextMode)
+        {
+            bool useMetric = viewer.MilepostUnitsMetric;
+            labels = new List<ListLabel>();
+            void AddLabel(ListLabel label)
+            {
+                CheckLabel(ref label, normalTextMode);
+            }
+            void AddSeparator() => AddLabel(new ListLabel
+            {
+                FirstCol = Viewer.Catalog.GetString("Sprtr"),
+            });
+
+            TrainCar trainCar = viewer.PlayerLocomotive;
+            Train train = trainCar.Train;
+            string trainBrakeStatus = trainCar.GetTrainBrakeStatus();
+            string dynamicBrakeStatus = trainCar.GetDynamicBrakeStatus();
+            string engineBrakeStatus = trainCar.GetEngineBrakeStatus();
+            MSTSLocomotive locomotive = (MSTSLocomotive)trainCar;
+            string locomotiveStatus = locomotive.GetStatus();
+            bool combinedControlType = locomotive.CombinedControlType == MSTSLocomotive.CombinedControl.ThrottleDynamic;
+            bool showMUReverser = Math.Abs(train.MUReverserPercent) != 100f;
+            bool showRetainers = train.RetainerSetting != RetainerSetting.Exhaust;
+            bool stretched = train.Cars.Count > 1 && train.NPull == train.Cars.Count - 1;
+            bool bunched = !stretched && train.Cars.Count > 1 && train.NPush == train.Cars.Count - 1;
+            Train.TrainInfo trainInfo = train.GetTrainInfo();
+
+            labels.Clear();
             UpdateDataEnded = false;
 
-            if (!StandardHUD)
+            if (!normalTextMode)
             {
-                var newBrakeStatus = new StringBuilder(trainBrakeStatus);
+                var newBrakeStatus = new System.Text.StringBuilder(trainBrakeStatus);
                 trainBrakeStatus = newBrakeStatus
                       .Replace(Viewer.Catalog.GetString("bar"), string.Empty)
                       .Replace(Viewer.Catalog.GetString("inHg"), string.Empty)
@@ -549,417 +632,536 @@ namespace Orts.Viewer3D.Popups
 
             // First Block
             // Client and server may have a time difference.
-            keyPressed = "";
-            InfoToLabel(keyPressed, Viewer.Catalog.GetString("Time"), FormatStrings.FormatTime(Owner.Viewer.Simulator.ClockTime + (MultiPlayer.MPManager.IsClient() ? Orts.MultiPlayer.MPManager.Instance().serverTimeDifference : 0)), "", false, keyPressed);
-            if (Owner.Viewer.Simulator.IsReplaying)
+            AddLabel(new ListLabel
             {
-                InfoToLabel(keyPressed, Viewer.Catalog.GetString("Replay"), FormatStrings.FormatTime(Owner.Viewer.Log.ReplayEndsAt - Owner.Viewer.Simulator.ClockTime), "", false, keyPressed);
-                keyPressed = "";
+                FirstCol = Viewer.Catalog.GetString("Time"),
+                LastCol = FormatStrings.FormatTime(viewer.Simulator.ClockTime + (MultiPlayer.MPManager.IsClient() ? MultiPlayer.MPManager.Instance().serverTimeDifference : 0)),
+            });
+            if (viewer.Simulator.IsReplaying)
+            {
+                AddLabel(new ListLabel
+                {
+                    FirstCol = Viewer.Catalog.GetString("Replay"),
+                    LastCol = FormatStrings.FormatTime(viewer.Log.ReplayEndsAt - viewer.Simulator.ClockTime),
+                });
             }
 
-            // Speed
-            keyPressed = "";
-            var speedColor = "";
-            if (locomotive.SpeedMpS < playerTrainInfo.allowedSpeedMpS - 1f)
-                speedColor = "!??";// White
-            else if (locomotive.SpeedMpS < playerTrainInfo.allowedSpeedMpS)
-                speedColor = "?!!";// PaleGreen
-            else if (locomotive.SpeedMpS < playerTrainInfo.allowedSpeedMpS + 5f)
-                speedColor = "!!?";// Orange
+            Color speedColor;
+            if (locomotive.SpeedMpS < trainInfo.allowedSpeedMpS - 1f)
+                speedColor = Color.White;
+            else if (locomotive.SpeedMpS < trainInfo.allowedSpeedMpS)
+                speedColor = Color.PaleGreen;
+            else if (locomotive.SpeedMpS < trainInfo.allowedSpeedMpS + 5f)
+                speedColor = Color.Orange;
             else
-                speedColor = "!!!";// Red
-            InfoToLabel(keyPressed, Viewer.Catalog.GetString("Speed"), FormatStrings.FormatSpeedDisplay(Owner.Viewer.PlayerLocomotive.SpeedMpS, Owner.Viewer.PlayerLocomotive.IsMetric) + speedColor, "", false, keyPressed);
+                speedColor = Color.OrangeRed;
+            AddLabel(new ListLabel
+            {
+                FirstCol = Viewer.Catalog.GetString("Speed"),
+                LastCol = $"{FormatStrings.FormatSpeedDisplay(locomotive.SpeedMpS, useMetric)}{ColorCode[speedColor]}",
+            });
 
             // Gradient info
-            if (StandardHUD)
+            if (normalTextMode)
             {
-                float gradient = -playerTrainInfo.currentElevationPercent;
-                if (gradient < -0.00015f)
-                {
-                    var c = '\u2198';
-                    gradientIndicator = $"{gradient:F1}%{c + "$$$"}";// LightSkyBlue
-                }
-                else if (gradient > 0.00015f)
-                {
-                    var c = '\u2197';
-                    gradientIndicator = $"{gradient:F1}%{c + "???"}";// Yellow
-                }
+                float gradient = -trainInfo.currentElevationPercent;
+                const float minSlope = 0.00015f;
+                string gradientIndicator;
+                if (gradient < -minSlope)
+                    gradientIndicator = $"{gradient:F1}%{Symbols.GradientDown}{ColorCode[Color.LightSkyBlue]}";
+                else if (gradient > minSlope)
+                    gradientIndicator = $"{gradient:F1}%{Symbols.GradientUp}{ColorCode[Color.Yellow]}";
                 else
                     gradientIndicator = $"{gradient:F1}%";
-
-                InfoToLabel(keyPressed, Viewer.Catalog.GetString("Gradient"), gradientIndicator, "", false, keyPressed);
-                keyPressed = "";
+                AddLabel(new ListLabel
+                {
+                    FirstCol = Viewer.Catalog.GetString("Gradient"),
+                    LastCol = gradientIndicator,
+                });
             }
-
             // Separator
-            InfoToLabel(keyPressed, "Sprtr", "", "", false, keyPressed);
-            keyPressed = "";
+            AddSeparator();
 
             // Second block
             // Direction
             {
                 UserCommand? reverserCommand = GetPressedKey(UserCommand.ControlBackwards, UserCommand.ControlForwards);
+                string reverserKey = "";
                 if (reverserCommand == UserCommand.ControlBackwards || reverserCommand == UserCommand.ControlForwards)
                 {
-                    bool moving = Math.Abs(playerTrain.SpeedMpS) > 1;
-                    bool nonSteamEnd = locomotive.EngineType != TrainCar.EngineTypes.Steam && locomotive.Direction == Direction.N && (locomotive.ThrottlePercent >= 1 || moving);
-                    bool steamEnd = locomotive is MSTSSteamLocomotive steamLocomotive2 && steamLocomotive2.CutoffController.MaximumValue == Math.Abs(playerTrain.MUReverserPercent / 100);
-
+                    bool moving = Math.Abs(trainCar.SpeedMpS) > 1;
+                    bool nonSteamEnd = trainCar.EngineType != TrainCar.EngineTypes.Steam && trainCar.Direction == Direction.N && (trainCar.ThrottlePercent >= 1 || moving);
+                    bool steamEnd = locomotive is MSTSSteamLocomotive steamLocomotive2 && steamLocomotive2.CutoffController.MaximumValue == Math.Abs(train.MUReverserPercent / 100);
                     if (reverserCommand != null && (nonSteamEnd || steamEnd))
-                        keyPressed = end.ToString() + "???";
+                        reverserKey = Symbols.End + ColorCode[Color.Yellow];
                     else if (reverserCommand == UserCommand.ControlBackwards)
-                        keyPressed = arrowDown.ToString() + "???";
+                        reverserKey = Symbols.ArrowDown + ColorCode[Color.Yellow];
                     else if (reverserCommand == UserCommand.ControlForwards)
-                        keyPressed = arrowUp.ToString() + "???";
+                        reverserKey = Symbols.ArrowUp + ColorCode[Color.Yellow];
                     else
-                        keyPressed = "";
+                        reverserKey = "";
                 }
-                var reverserIndicator = showMUReverser ? $"{Round(Math.Abs(playerTrain.MUReverserPercent))}% " : "";
-                InfoToLabel(keyPressed, Viewer.Catalog.GetString(locomotive.EngineType == TrainCar.EngineTypes.Steam ? "Reverser" : "Direction"),
-                    $"{reverserIndicator}{FormatStrings.Catalog.GetParticularString("Reverser", GetStringAttribute.GetPrettyName(locomotive.Direction))}", "", false, keyPressed);
-                keyPressed = "";
+                string reverserIndicator = showMUReverser ? $"{Round(Math.Abs(train.MUReverserPercent))}% " : "";
+                AddLabel(new ListLabel
+                {
+                    FirstCol = Viewer.Catalog.GetString(locomotive.EngineType == TrainCar.EngineTypes.Steam ? "Reverser" : "Direction"),
+                    LastCol = $"{reverserIndicator}{FormatStrings.Catalog.GetParticularString("Reverser", GetStringAttribute.GetPrettyName(locomotive.Direction))}",
+                    KeyPressed = reverserKey,
+                    SymbolCol = ""//reverserKey,
+                });
             }
 
             // Throttle
             {
                 UserCommand? throttleCommand = GetPressedKey(UserCommand.ControlThrottleDecrease, UserCommand.ControlThrottleIncrease);
-                bool upperLimit = throttleCommand == UserCommand.ControlThrottleIncrease && locomotive.ThrottleController.MaximumValue == locomotive.ThrottlePercent / 100;
-                bool lowerLimit = throttleCommand == UserCommand.ControlThrottleDecrease && locomotive.ThrottlePercent == 0;
-
+                string throttleKey;
+                bool upperLimit = throttleCommand == UserCommand.ControlThrottleIncrease && locomotive.ThrottleController.MaximumValue == trainCar.ThrottlePercent / 100;
+                bool lowerLimit = throttleCommand == UserCommand.ControlThrottleDecrease && trainCar.ThrottlePercent == 0;
                 if (locomotive.DynamicBrakePercent < 1 && (upperLimit || lowerLimit))
-                {
-                    keyPressed = end.ToString() + "???";
-                }
+                    throttleKey = Symbols.End + ColorCode[Color.Yellow];
                 else if (locomotive.DynamicBrakePercent > -1)
-                {
-                    keyPressed = endLower.ToString() + "???";
-                }
+                    throttleKey = Symbols.EndLower + ColorCode[Color.Yellow];
                 else if (throttleCommand == UserCommand.ControlThrottleIncrease)
-                {
-                    keyPressed = arrowUp.ToString() + "???";
-                }
+                    throttleKey = Symbols.ArrowUp + ColorCode[Color.Yellow];
                 else if (throttleCommand == UserCommand.ControlThrottleDecrease)
-                {
-                    keyPressed = arrowDown.ToString() + "???";
-                }
+                    throttleKey = Symbols.ArrowDown + ColorCode[Color.Yellow];
                 else
-                    keyPressed = "";
+                    throttleKey = "";
 
-                InfoToLabel(keyPressed, Viewer.Catalog.GetString(locomotive is MSTSSteamLocomotive ? "Regulator" : "Throttle"), locomotive.ThrottlePercent.ToString("0") + "%", "", false, keyPressed);
-                keyPressed = "";
+                AddLabel(new ListLabel
+                {
+                    FirstCol = Viewer.Catalog.GetString(locomotive is MSTSSteamLocomotive ? "Regulator" : "Throttle"),
+                    LastCol = $"{Round(locomotive.ThrottlePercent)}%",
+                    KeyPressed = throttleKey,
+                    SymbolCol = ""//throttleKey,
+                });
             }
 
             // Cylinder Cocks
             if (locomotive is MSTSSteamLocomotive steamLocomotive)
             {
+                string cocksIndicator, cocksKey;
                 if (steamLocomotive.CylinderCocksAreOpen)
                 {
-                    keyPressed = arrowToRight.ToString() + "???";
-                    InfoToLabel(keyPressed, Viewer.Catalog.GetString("Cylinder cocks"), Viewer.Catalog.GetString("Open") + "!!?", "", false, keyPressed);
+                    cocksIndicator = Viewer.Catalog.GetString("Open") + ColorCode[Color.Orange];
+                    cocksKey = Symbols.ArrowToRight + ColorCode[Color.Yellow];
                 }
-                else{
-                    keyPressed = "";
-                    InfoToLabel(keyPressed, Viewer.Catalog.GetString("Cylinder cocks"), Viewer.Catalog.GetString("Closed") + "!??", "", false, keyPressed);
+                else
+                {
+                    cocksIndicator = Viewer.Catalog.GetString("Closed") + ColorCode[Color.White];
+                    cocksKey = "";
                 }
+                AddLabel(new ListLabel
+                {
+                    FirstCol = Viewer.Catalog.GetString("Cylinder cocks"),
+                    LastCol = cocksIndicator,
+                    KeyPressed = cocksKey,
+                    SymbolCol = ""//cocksKey,
+                });
             }
 
             // Sander
-            keyPressed = UserInput.IsDown(UserCommand.ControlSander) || UserInput.IsDown(UserCommand.ControlSanderToggle) ? arrowDown.ToString() + "???" : " ";
             if (locomotive.GetSanderOn())
             {
-                var sanderBlocked = locomotive is MSTSLocomotive && Math.Abs(playerTrain.SpeedMpS) > locomotive.SanderSpeedOfMpS;
-                keyPressed = sanderBlocked ? "" : arrowToRight.ToString() + "???";
-                InfoToLabel(keyPressed, Viewer.Catalog.GetString("Sander"), sanderBlocked ? Viewer.Catalog.GetString("Blocked") + "!!!": Viewer.Catalog.GetString("On") + "!!?", "", StandardHUD ? true : false, keyPressed);
+                bool sanderBlocked = locomotive.AbsSpeedMpS > locomotive.SanderSpeedOfMpS;
+                string sanderKey = Symbols.ArrowToRight + ColorCode[Color.Yellow];
+                AddLabel(new ListLabel
+                {
+                    FirstCol = Viewer.Catalog.GetString("Sander"),
+                    LastCol = sanderBlocked ? Viewer.Catalog.GetString("Blocked") + ColorCode[Color.OrangeRed] : Viewer.Catalog.GetString("On") + ColorCode[Color.Orange],
+                    KeyPressed = sanderKey,
+                    SymbolCol = ""//sanderKey,
+                });
             }
             else
             {
-                keyPressed = "";
-                InfoToLabel(keyPressed, Viewer.Catalog.GetString("Sander"), Viewer.Catalog.GetString("Off"), "", false, keyPressed);
+                AddLabel(new ListLabel
+                {
+                    FirstCol = Viewer.Catalog.GetString("Sander"),
+                    LastCol = Viewer.Catalog.GetString("Off"),
+                    KeyPressed = "",
+                    SymbolCol = "",
+                });
             }
 
-            InfoToLabel("", "Sprtr", "", "", false, keyPressed);
+            AddSeparator();
 
             // Train Brake multi-lines
-            // TO DO: A better algorithm
+            // TODO: A better algorithm
+            //var brakeStatus = Owner.Viewer.PlayerLocomotive.GetTrainBrakeStatus();
             //steam loco
-            keyPressed = UserInput.IsDown(UserCommand.ControlTrainBrakeDecrease) ? arrowDown.ToString() + "???" : UserInput.IsDown(UserCommand.ControlTrainBrakeIncrease) ? arrowUp.ToString() + "???" : "";
-
-            var brakeInfoValue = "";
-            var index = 0;
+            string brakeInfoValue = "";
+            int index = 0;
 
             if (trainBrakeStatus.Contains(Viewer.Catalog.GetString("EQ")))
             {
+                string brakeKey;
+                switch (GetPressedKey(UserCommand.ControlTrainBrakeDecrease, UserCommand.ControlTrainBrakeIncrease))
+                {
+                    case UserCommand.ControlTrainBrakeDecrease:
+                        brakeKey = Symbols.ArrowDown + ColorCode[Color.Yellow];
+                        break;
+                    case UserCommand.ControlTrainBrakeIncrease:
+                        brakeKey = Symbols.ArrowUp + ColorCode[Color.Yellow];
+                        break;
+                    default:
+                        brakeKey = "";
+                        break;
+                }
                 brakeInfoValue = trainBrakeStatus.Substring(0, trainBrakeStatus.IndexOf(Viewer.Catalog.GetString("EQ"))).TrimEnd();
-                InfoToLabel(keyPressed, Viewer.Catalog.GetString("Train brake"), brakeInfoValue + "%%%", "", false, keyPressed);
-                keyPressed = "";
+                AddLabel(new ListLabel
+                {
+                    FirstCol = Viewer.Catalog.GetString("Train brake"),
+                    LastCol = $"{brakeInfoValue}{ColorCode[Color.Cyan]}",
+                    KeyPressed = brakeKey,
+                    SymbolCol = ""//brakeKey,
+                });
+
                 index = trainBrakeStatus.IndexOf(Viewer.Catalog.GetString("EQ"));
                 brakeInfoValue = trainBrakeStatus.Substring(index, trainBrakeStatus.IndexOf(Viewer.Catalog.GetString("BC")) - index).TrimEnd();
 
-                InfoToLabel(keyPressed, "", brakeInfoValue, "", false, keyPressed);
-                keyPressed = "";
+                AddLabel(new ListLabel
+                {
+                    LastCol = brakeInfoValue,
+                });
                 if (trainBrakeStatus.Contains(Viewer.Catalog.GetString("EOT")))
                 {
-                    var IndexOffset = Viewer.Catalog.GetString("EOT").Length + 1;
+                    int indexOffset = Viewer.Catalog.GetString("EOT").Length + 1;
                     index = trainBrakeStatus.IndexOf(Viewer.Catalog.GetString("BC"));
                     brakeInfoValue = trainBrakeStatus.Substring(index, trainBrakeStatus.IndexOf(Viewer.Catalog.GetString("EOT")) - index).TrimEnd();
-                    keyPressed = "";
-                    InfoToLabel(keyPressed, "", brakeInfoValue, "", false, keyPressed);
-                    keyPressed = "";
-                    index = trainBrakeStatus.IndexOf(Viewer.Catalog.GetString("EOT")) + IndexOffset;
+                    AddLabel(new ListLabel
+                    {
+                        LastCol = brakeInfoValue,
+                    });
+                    index = trainBrakeStatus.IndexOf(Viewer.Catalog.GetString("EOT")) + indexOffset;
                     brakeInfoValue = trainBrakeStatus.Substring(index, trainBrakeStatus.Length - index).TrimStart();
-                    keyPressed = "";
-                    InfoToLabel(keyPressed, "", brakeInfoValue, "", false, keyPressed);
-                    keyPressed = "";
+                    AddLabel(new ListLabel
+                    {
+                        LastCol = brakeInfoValue,
+                    });
                 }
                 else
                 {
                     index = trainBrakeStatus.IndexOf(Viewer.Catalog.GetString("BC"));
                     brakeInfoValue = trainBrakeStatus.Substring(index, trainBrakeStatus.Length - index).TrimEnd();
-                    keyPressed = "";
-                    InfoToLabel(keyPressed, "", brakeInfoValue, "", false, keyPressed);
-                    keyPressed = "";
+                    AddLabel(new ListLabel
+                    {
+                        LastCol = brakeInfoValue,
+                    });
                 }
             }
             else if (trainBrakeStatus.Contains(Viewer.Catalog.GetString("Lead")))
             {
-                var IndexOffset = Viewer.Catalog.GetString("Lead").Length + 1;
+                int indexOffset = Viewer.Catalog.GetString("Lead").Length + 1;
                 brakeInfoValue = trainBrakeStatus.Substring(0, trainBrakeStatus.IndexOf(Viewer.Catalog.GetString("Lead"))).TrimEnd();
-                InfoToLabel(keyPressed, Viewer.Catalog.GetString("Train brake"), brakeInfoValue + "%%%", "", false, keyPressed);
+                AddLabel(new ListLabel
+                {
+                    FirstCol = Viewer.Catalog.GetString("Train brake"),
+                    LastCol = $"{brakeInfoValue}{ColorCode[Color.Cyan]}",
+                });
 
-                keyPressed = "";
-                index = trainBrakeStatus.IndexOf(Viewer.Catalog.GetString("Lead")) + IndexOffset;
+                index = trainBrakeStatus.IndexOf(Viewer.Catalog.GetString("Lead")) + indexOffset;
                 if (trainBrakeStatus.Contains(Viewer.Catalog.GetString("EOT")))
                 {
                     brakeInfoValue = trainBrakeStatus.Substring(index, trainBrakeStatus.IndexOf(Viewer.Catalog.GetString("EOT")) - index).TrimEnd();
-                    InfoToLabel(keyPressed, "", brakeInfoValue, "", false, keyPressed);
+                    AddLabel(new ListLabel
+                    {
+                        LastCol = brakeInfoValue,
+                    });
 
-                    keyPressed = "";
-                    index = trainBrakeStatus.IndexOf(Viewer.Catalog.GetString("EOT")) + IndexOffset;
+                    index = trainBrakeStatus.IndexOf(Viewer.Catalog.GetString("EOT")) + indexOffset;
                     brakeInfoValue = trainBrakeStatus.Substring(index, trainBrakeStatus.Length - index).TrimEnd();
-                    InfoToLabel(keyPressed, "", brakeInfoValue, "", false, keyPressed);
+                    AddLabel(new ListLabel
+                    {
+                        LastCol = brakeInfoValue,
+                    });
                 }
                 else
                 {
                     brakeInfoValue = trainBrakeStatus.Substring(index, trainBrakeStatus.Length - index).TrimEnd();
-                    InfoToLabel(keyPressed, "", brakeInfoValue, "", false, keyPressed);
+                    AddLabel(new ListLabel
+                    {
+                        LastCol = brakeInfoValue,
+                    });
                 }
             }
             else if (trainBrakeStatus.Contains(Viewer.Catalog.GetString("BC")))
             {
                 brakeInfoValue = trainBrakeStatus.Substring(0, trainBrakeStatus.IndexOf(Viewer.Catalog.GetString("BC"))).TrimEnd();
-                InfoToLabel(keyPressed, Viewer.Catalog.GetString("Train brake"), brakeInfoValue + "%%%", "", false, keyPressed);
+                AddLabel(new ListLabel
+                {
+                    FirstCol = Viewer.Catalog.GetString("Train brake"),
+                    LastCol = $"{brakeInfoValue}{ColorCode[Color.Cyan]}",
+                });
 
-                keyPressed = "";
                 index = trainBrakeStatus.IndexOf(Viewer.Catalog.GetString("BC"));
                 brakeInfoValue = trainBrakeStatus.Substring(index, trainBrakeStatus.Length - index).TrimEnd();
 
-                keyPressed = "";
-                InfoToLabel(keyPressed, "", brakeInfoValue, "", false, keyPressed);
-                keyPressed = "";
+                AddLabel(new ListLabel
+                {
+                    LastCol = brakeInfoValue,
+                });
             }
 
-            keyPressed = "";
             if (showRetainers)
-                InfoToLabel(keyPressed, Viewer.Catalog.GetString("Retainers"), (playerTrain.RetainerPercent + " " + Viewer.Catalog.GetString(GetStringAttribute.GetPrettyName(playerTrain.RetainerSetting))), "", false, keyPressed);
-
-            keyPressed = "";
-            if ((Owner.Viewer.PlayerLocomotive as MSTSLocomotive).EngineBrakeFitted) // ideally this test should be using "engineBrakeStatus != null", but this currently does not work, as a controller is defined by default
             {
+                AddLabel(new ListLabel
+                {
+                    FirstCol = Viewer.Catalog.GetString("Retainers"),
+                    LastCol = $"{train.RetainerPercent} {Viewer.Catalog.GetString(GetStringAttribute.GetPrettyName(train.RetainerSetting))}",
+                });
             }
-            keyPressed = UserInput.IsDown(UserCommand.ControlEngineBrakeDecrease) ? arrowDown.ToString() + "???" : UserInput.IsDown(UserCommand.ControlEngineBrakeIncrease) ? arrowUp.ToString() + "???" : "";
+
             if (engineBrakeStatus.Contains(Viewer.Catalog.GetString("BC")))
             {
-                InfoToLabel(keyPressed, Viewer.Catalog.GetString("Engine brake"), engineBrakeStatus.Substring(0, engineBrakeStatus.IndexOf("BC")) + "%%%", "", false, keyPressed);
-                keyPressed = "";
+                AddLabel(new ListLabel
+                {
+                    FirstCol = Viewer.Catalog.GetString("Engine brake"),
+                    LastCol = engineBrakeStatus.Substring(0, engineBrakeStatus.IndexOf("BC")) + ColorCode[Color.Cyan],
+                });
                 index = engineBrakeStatus.IndexOf(Viewer.Catalog.GetString("BC"));
                 brakeInfoValue = engineBrakeStatus.Substring(index, engineBrakeStatus.Length - index).TrimEnd();
-                InfoToLabel(keyPressed, Viewer.Catalog.GetString(""), brakeInfoValue + "!??", "", false, keyPressed);
+                AddLabel(new ListLabel
+                {
+                    FirstCol = Viewer.Catalog.GetString(""),
+                    LastCol = $"{brakeInfoValue}{ColorCode[Color.White]}",
+                });
             }
             else
-                InfoToLabel(keyPressed, Viewer.Catalog.GetString("Engine brake"), engineBrakeStatus + "%%%", "", false, keyPressed);
-
-            keyPressed = "";
-            if ( dynamicBrakeStatus != null && locomotive.IsLeadLocomotive())
             {
-                if (!DynBrakeSetup && (UserInput.IsDown(UserCommand.ControlDynamicBrakeIncrease) && dynamicBrakePercent == 0)
-                    || (combinedControlType && UserInput.IsDown(UserCommand.ControlThrottleDecrease) && Owner.Viewer.PlayerLocomotive.ThrottlePercent == 0 && dynamicBrakeStatus == "0%"))
+                AddLabel(new ListLabel
                 {
-                    StartTime = locomotive.DynamicBrakeCommandStartTime + locomotive.DynamicBrakeDelayS;
-                    DynBrakeSetup = true;
-                    keyPressed = arrowToRight.ToString() + "???";
-                    InfoToLabel(keyPressed, Viewer.Catalog.GetString("Dynamic brake"), Viewer.Catalog.GetString("Setup") + "%%%", "", false, keyPressed);
-                }
-                else if (DynBrakeSetup && StartTime < Owner.Viewer.Simulator.ClockTime)
+                    FirstCol = Viewer.Catalog.GetString("Engine brake"),
+                    LastCol = $"{engineBrakeStatus}{ColorCode[Color.Cyan]}",
+                });
+            }
+
+            if (dynamicBrakeStatus != null && locomotive.IsLeadLocomotive())
+            {
+                if (locomotive.DynamicBrakePercent >= 0)
                 {
-                    DynBrakeSetup = false;
-                    InfoToLabel(keyPressed, Viewer.Catalog.GetString("Dynamic brake"), dynamicBrakePercent + "% " + "%%%", "", false, keyPressed);
-                }
-                else if (DynBrakeSetup && StartTime > Owner.Viewer.Simulator.ClockTime)
-                {
-                    keyPressed = arrowToRight.ToString() + "???";
-                    InfoToLabel(keyPressed, Viewer.Catalog.GetString("Dynamic brake"), Viewer.Catalog.GetString("Setup") + "%%%", "", false, keyPressed);
-                }
-                else if (!DynBrakeSetup && dynamicBrakePercent > -1)
-                {
-                    if (combinedControlType)
+                    AddLabel(new ListLabel
                     {
-                        keyPressed = UserInput.IsDown(UserCommand.ControlThrottleIncrease) || UserInput.IsDown(UserCommand.ControlDynamicBrakeDecrease) ? arrowDown.ToString() + "???"
-                           : UserInput.IsDown(UserCommand.ControlThrottleDecrease) || UserInput.IsDown(UserCommand.ControlDynamicBrakeIncrease) ? arrowUp.ToString() + "???"
-                           : "";
-                    }
-                    else
-                    {
-                        keyPressed = UserInput.IsDown(UserCommand.ControlDynamicBrakeDecrease) ? arrowDown.ToString() + "???"
-                            : UserInput.IsDown(UserCommand.ControlDynamicBrakeIncrease) ? arrowUp.ToString() + "???"
-                            : "";
-                    }
-                    InfoToLabel(keyPressed, Viewer.Catalog.GetString("Dynamic brake"), dynamicBrakeStatus + "%%%", "", false, keyPressed);
+                        FirstCol = Viewer.Catalog.GetString("Dynamic brake"),
+                        LastCol = locomotive.DynamicBrake ? dynamicBrakeStatus : Viewer.Catalog.GetString("Setup") + ColorCode[Color.Cyan],
+                    });
                 }
-                else if (dynamicBrakeStatus == "" && dynamicBrakePercent < 0)
+                else
                 {
-                    InfoToLabel(keyPressed, Viewer.Catalog.GetString("Dynamic brake"), Viewer.Catalog.GetString("Off"), "", false, keyPressed);
+                    AddLabel(new ListLabel
+                    {
+                        FirstCol = Viewer.Catalog.GetString("Dynamic brake"),
+                        LastCol = Viewer.Catalog.GetString("Off"),
+                    });
                 }
             }
-            keyPressed = "";
-            InfoToLabel(keyPressed, "Sprtr", "", "", false, keyPressed);
+
+            AddSeparator();
 
             if (locomotiveStatus != null)
             {
-                foreach (var data in locomotiveStatus.Split('\n').Where((string d) => !string.IsNullOrWhiteSpace(d)))
+                foreach (string data in locomotiveStatus.Split('\n').Where((string d) => !string.IsNullOrWhiteSpace(d)))
                 {
-                    var parts = data.Split(new[] { " = " }, 2, StringSplitOptions.None);
-                    var HeatColor = "!??"; // Color.White
-                    keyPressed = "";
-                    if (!StandardHUD && Viewer.Catalog.GetString(parts[0]).StartsWith(Viewer.Catalog.GetString("Steam usage")))
+                    string[] parts = data.Split(new string[] { " = " }, 2, StringSplitOptions.None);
+                    string keyPart = parts[0];
+                    string valuePart = parts?[1];
+                    if (Viewer.Catalog.GetString(keyPart).StartsWith(Viewer.Catalog.GetString("Boiler pressure")))
                     {
-                    }
-                    else if (Viewer.Catalog.GetString(parts[0]).StartsWith(Viewer.Catalog.GetString("Boiler pressure")))
-                    {
-                        MSTSSteamLocomotive steamloco = (MSTSSteamLocomotive)Owner.Viewer.PlayerLocomotive;
-                        var bandUpper = steamloco.PreviousBoilerHeatOutBTUpS * 1.025f; // find upper bandwidth point
-                        var bandLower = steamloco.PreviousBoilerHeatOutBTUpS * 0.975f; // find lower bandwidth point - gives a total 5% bandwidth
+                        MSTSSteamLocomotive steamLocomotive2 = (MSTSSteamLocomotive)locomotive;
+                        float bandUpper = steamLocomotive2.PreviousBoilerHeatOutBTUpS * 1.025f; // find upper bandwidth point
+                        float bandLower = steamLocomotive2.PreviousBoilerHeatOutBTUpS * 0.975f; // find lower bandwidth point - gives a total 5% bandwidth
 
-                        if (steamloco.BoilerHeatInBTUpS > bandLower && steamloco.BoilerHeatInBTUpS < bandUpper) HeatColor = smallDiamond.ToString() + "!??";
-                        else if (steamloco.BoilerHeatInBTUpS < bandLower) HeatColor = smallArrowDown.ToString() + "%%%"; // Color.Cyan
-                        else if (steamloco.BoilerHeatInBTUpS > bandUpper) HeatColor = smallArrowUp.ToString() + "!!?"; // Color.Orange
+                        string heatIndicator;
+                        if (steamLocomotive2.BoilerHeatInBTUpS > bandLower && steamLocomotive2.BoilerHeatInBTUpS < bandUpper)
+                            heatIndicator = $"{Symbols.SmallDiamond}{ColorCode[Color.White]}";
+                        else if (steamLocomotive2.BoilerHeatInBTUpS < bandLower)
+                            heatIndicator = $"{Symbols.SmallArrowDown}{ColorCode[Color.Cyan]}";
+                        else if (steamLocomotive2.BoilerHeatInBTUpS > bandUpper)
+                            heatIndicator = $"{Symbols.SmallArrowUp}{ColorCode[Color.Orange]}";
+                        else
+                            heatIndicator = ColorCode[Color.White];
 
-                        keyPressed = "";
-                        InfoToLabel(keyPressed, Viewer.Catalog.GetString("Boiler pressure"), Viewer.Catalog.GetString(parts[1]), HeatColor, false, keyPressed);
+                        AddLabel(new ListLabel
+                        {
+                            FirstCol = Viewer.Catalog.GetString("Boiler pressure"),
+                            LastCol = Viewer.Catalog.GetString(valuePart),
+                            SymbolCol = heatIndicator,
+                        });
                     }
-                    else if (!StandardHUD && Viewer.Catalog.GetString(parts[0]).StartsWith(Viewer.Catalog.GetString("Fuel levels")))
+                    else if (!normalTextMode && Viewer.Catalog.GetString(parts[0]).StartsWith(Viewer.Catalog.GetString("Fuel levels")))
                     {
-                        keyPressed = "";
-                        InfoToLabel(keyPressed, parts[0].EndsWith("?") || parts[0].EndsWith("!") ? Viewer.Catalog.GetString(parts[0].Substring(0, parts[0].Length - 3)) : Viewer.Catalog.GetString(parts[0]), (parts.Length > 1 ? Viewer.Catalog.GetString(parts[1].Replace(" ", string.Empty)) : ""), "", false, keyPressed);
+                        AddLabel(new ListLabel
+                        {
+                            FirstCol = keyPart.EndsWith("?") || keyPart.EndsWith("!") ? Viewer.Catalog.GetString(keyPart.Substring(0, keyPart.Length - 3)) : Viewer.Catalog.GetString(keyPart),
+                            LastCol = valuePart.Length > 1 ? Viewer.Catalog.GetString(valuePart.Replace(" ", string.Empty)) : "",
+                        });
                     }
-                    else if (parts[0].StartsWith(Viewer.Catalog.GetString("Gear")))
+                    else if (keyPart.StartsWith(Viewer.Catalog.GetString("Gear")))
                     {
-                        keyPressed = UserInput.IsDown(UserCommand.ControlGearDown) ? arrowDown.ToString() + "???" : UserInput.IsDown(UserCommand.ControlGearUp) ? arrowUp.ToString() + "???" : "";
-                        InfoToLabel(keyPressed, Viewer.Catalog.GetString(parts[0]), (parts.Length > 1 ? Viewer.Catalog.GetString(parts[1]) : ""), "", false, keyPressed);
-                        keyPressed = "";
+                        string gearKey;
+                        switch (GetPressedKey(UserCommand.ControlGearDown, UserCommand.ControlGearUp))
+                        {
+                            case UserCommand.ControlGearDown:
+                                gearKey = Symbols.ArrowDown + ColorCode[Color.Yellow];
+                                break;
+                            case UserCommand.ControlGearUp:
+                                gearKey = Symbols.ArrowUp + ColorCode[Color.Yellow];
+                                break;
+                            default:
+                                gearKey = "";
+                                break;
+                        }
+
+                        AddLabel(new ListLabel
+                        {
+                            FirstCol = Viewer.Catalog.GetString(keyPart),
+                            LastCol = valuePart != null ? Viewer.Catalog.GetString(valuePart) : "",
+                            KeyPressed = gearKey,
+                            SymbolCol = gearKey,
+                        });
                     }
                     else if (parts.Contains(Viewer.Catalog.GetString("Pantographs")))
                     {
-                        keyPressed = UserInput.IsDown(UserCommand.ControlPantograph1) ? parts[1].StartsWith(Viewer.Catalog.GetString("Up")) ? arrowUp.ToString() + "???" : arrowDown.ToString() + "???" : "";
-                        InfoToLabel(keyPressed, Viewer.Catalog.GetString(parts[0]), (parts.Length > 1 ? Viewer.Catalog.GetString(parts[1]) : ""), "", false, keyPressed);
-                        keyPressed = "";
+                        string pantoKey;
+                        switch (GetPressedKey(UserCommand.ControlPantograph1))
+                        {
+                            case UserCommand.ControlPantograph1:
+                                string arrow = parts[1].StartsWith(Viewer.Catalog.GetString("Up")) ? Symbols.ArrowUp : Symbols.ArrowDown;
+                                pantoKey = arrow + ColorCode[Color.Yellow];
+                                break;
+                            default:
+                                pantoKey = "";
+                                break;
+                        }
+
+                        AddLabel(new ListLabel
+                        {
+                            FirstCol = Viewer.Catalog.GetString(keyPart),
+                            LastCol = valuePart != null ? Viewer.Catalog.GetString(valuePart) : "",
+                            KeyPressed = pantoKey,
+                        });
                     }
                     else if (parts.Contains(Viewer.Catalog.GetString("Engine")))
                     {
-                        keyPressed = "";
-                        InfoToLabel(keyPressed, Viewer.Catalog.GetString(parts[0]), (parts.Length > 1 ? Viewer.Catalog.GetString(parts[1]) + "!??" : ""), "", false, keyPressed);
-                        keyPressed = "";
+                        AddLabel(new ListLabel
+                        {
+                            FirstCol = Viewer.Catalog.GetString(keyPart),
+                            LastCol = valuePart != null ? $"{Viewer.Catalog.GetString(valuePart)}{ColorCode[Color.White]}" : "",
+                        });
                     }
                     else
                     {
-                        InfoToLabel("", parts[0].EndsWith("?") || parts[0].EndsWith("!") ? Viewer.Catalog.GetString(parts[0].Substring(0, parts[0].Length - 3)) : Viewer.Catalog.GetString(parts[0]), (parts.Length > 1 ? Viewer.Catalog.GetString(parts[1]) : ""), "", false, keyPressed);
+                        AddLabel(new ListLabel
+                        {
+                            FirstCol = keyPart.EndsWith("?") || keyPart.EndsWith("!") ? Viewer.Catalog.GetString(keyPart.Substring(0, keyPart.Length - 3)) : Viewer.Catalog.GetString(keyPart),
+                            LastCol = valuePart != null ? Viewer.Catalog.GetString(valuePart) : "",
+                        });
                     }
                 }
             }
 
-            keyPressed = "";
-            InfoToLabel(keyPressed, "Sprtr", "", "", true, keyPressed);
+            AddSeparator();
 
             // Control Cruise
             if ((Owner.Viewer.PlayerLocomotive as MSTSLocomotive).CruiseControl != null)
             {
                 var cc = (Owner.Viewer.PlayerLocomotive as MSTSLocomotive).CruiseControl;
-                InfoToLabel(keyPressed, Viewer.Catalog.GetString("CCStatus"), cc.SpeedRegMode.ToString() + "%%%", "", false, keyPressed);
+                AddLabel(new ListLabel
+                {
+                    FirstCol = Viewer.Catalog.GetString("CCStatus"),
+                    LastCol = cc.SpeedRegMode.ToString() + ColorCode[Color.Cyan]//"%%%"
+                });
+
                 if (cc.SpeedRegMode == Simulation.RollingStocks.SubSystems.CruiseControl.SpeedRegulatorMode.Auto)
                 {
-                    InfoToLabel(keyPressed, Viewer.Catalog.GetString("Target"), 
-                        FormatStrings.FormatSpeedDisplay(cc.SelectedSpeedMpS, Owner.Viewer.PlayerLocomotive.IsMetric) + "%%%", "", false, keyPressed);
-                    InfoToLabel(keyPressed, Viewer.Catalog.GetString("MaxAccel"), (cc.SpeedRegulatorMaxForcePercentUnits ? cc.SelectedMaxAccelerationPercent.ToString("0") + "% " :
-                        Math.Round((cc.MaxForceSelectorIsDiscrete ? (int)cc.SelectedMaxAccelerationStep : cc.SelectedMaxAccelerationStep) * 100 / cc.SpeedRegulatorMaxForceSteps).ToString("0") + "% ") + "%%%", "", false, keyPressed);
+                    AddLabel(new ListLabel
+                    {
+                        FirstCol = Viewer.Catalog.GetString("Target"),
+                        LastCol = $"{FormatStrings.FormatSpeedDisplay(cc.SelectedSpeedMpS, Owner.Viewer.PlayerLocomotive.IsMetric) + ColorCode[Color.Cyan]}"//"%%%"
+                    });
+
+                    var maxAcceleration = Math.Round((cc.MaxForceSelectorIsDiscrete ? (int)cc.SelectedMaxAccelerationStep : cc.SelectedMaxAccelerationStep) * 100 / cc.SpeedRegulatorMaxForceSteps).ToString("0") + "% ";//, "", false, keyPressed);
+                    AddLabel(new ListLabel
+                    {
+                        FirstCol = Viewer.Catalog.GetString("MaxAccel"),
+                        LastCol = $"{maxAcceleration + ColorCode[Color.Cyan]}"//"%%%"
+                    });
                 }
-                keyPressed = "";
-                InfoToLabel(keyPressed, "Sprtr", "", "", true, keyPressed);
+                AddSeparator();
             }
 
-            keyPressed = "";
-            if (StandardHUD)
-                InfoToLabel(keyPressed, Viewer.Catalog.GetString("FPS"), Owner.Viewer.RenderProcess.FrameRate.SmoothedValue.ToString("F0"), "", false, keyPressed);
+            // FPS
+            if (normalTextMode)
+            {
+                AddLabel(new ListLabel
+                {
+                    FirstCol = Viewer.Catalog.GetString("FPS"),
+                    LastCol = $"{Math.Floor(viewer.RenderProcess.FrameRate.SmoothedValue)}",
+                });
+            }
 
             // Messages
             // Autopilot
-            keyPressed = "";
-
-            if (Owner.Viewer.PlayerLocomotive.Train.TrainType == Train.TRAINTYPE.AI_PLAYERHOSTING)
+            bool autopilot = locomotive.Train.TrainType == Train.TRAINTYPE.AI_PLAYERHOSTING;
+            AddLabel(new ListLabel
             {
-                keyPressed = UserInput.IsDown(UserCommand.GameAutopilotMode) ? arrowUp.ToString() + "???" : "";
-                InfoToLabel(keyPressed, Viewer.Catalog.GetString("Autopilot"), Viewer.Catalog.GetString("On") + "???", "", false, keyPressed);
-            }
-            else if (Owner.Viewer.PlayerLocomotive.Train.TrainType != Train.TRAINTYPE.AI_PLAYERHOSTING)
-            {
-                keyPressed = UserInput.IsDown(UserCommand.GameAutopilotMode) ? arrowDown.ToString() + "???" : "";
-                InfoToLabel(keyPressed, Viewer.Catalog.GetString("Autopilot"), Viewer.Catalog.GetString("Off"), "", false, keyPressed);
-            }
-            else
-                InfoToLabel("", Viewer.Catalog.GetString("Autopilot"), Viewer.Catalog.GetString("Off"), "", false, keyPressed);
+                FirstCol = Viewer.Catalog.GetString("Autopilot"),
+                LastCol = autopilot ? Viewer.Catalog.GetString("On") + ColorCode[Color.Yellow] : Viewer.Catalog.GetString("Off"),
+            });
 
             //AI Fireman
-            if (locomotive is MSTSSteamLocomotive)
+            if (locomotive is MSTSSteamLocomotive steamLocomotive3)
             {
-                keyPressed = "";
-                if (UserInput.IsDown(UserCommand.ControlAIFireOn))
+                string aifireKey;
+                aifireKey = Symbols.ArrowToRight + ColorCode[Color.Yellow];
+                switch (GetPressedKey(UserCommand.ControlAIFireOn, UserCommand.ControlAIFireOff, UserCommand.ControlAIFireReset))
                 {
-                    ctrlAIFiremanReset = ctrlAIFiremanOff = false;
-                    ctrlAIFiremanOn = true;
-                    keyPressed = arrowToRight.ToString() + "???";
-                }
-                else if (UserInput.IsDown(UserCommand.ControlAIFireOff))
-                {
-                    ctrlAIFiremanReset = ctrlAIFiremanOn = false;
-                    ctrlAIFiremanOff = true;
-                    keyPressed = arrowToRight.ToString() + "???";
-                }
-                else if (UserInput.IsDown(UserCommand.ControlAIFireReset))
-                {
-                    ctrlAIFiremanOn = ctrlAIFiremanOff = false;
-                    ctrlAIFiremanReset = true;
-                    clockAIFireTime = Owner.Viewer.Simulator.ClockTime;
-                    keyPressed = arrowToRight.ToString() + "???";
+                    case UserCommand.ControlAIFireOn:
+                        ctrlAIFiremanReset = ctrlAIFiremanOff = false;
+                        ctrlAIFiremanOn = true;
+                        break;
+                    case UserCommand.ControlAIFireOff:
+                        ctrlAIFiremanReset = ctrlAIFiremanOn = false;
+                        ctrlAIFiremanOff = true;
+                        break;
+                    case UserCommand.ControlAIFireReset:
+                        ctrlAIFiremanOn = ctrlAIFiremanOff = false;
+                        ctrlAIFiremanReset = true;
+                        clockAIFireTime = Owner.Viewer.Simulator.ClockTime;
+                        break;
+                    default:
+                        aifireKey = "";
+                        break;
                 }
 
                 // waiting time to hide the reset label
-                if (ctrlAIFiremanReset && clockAIFireTime + 3 < Owner.Viewer.Simulator.ClockTime)
+                if (ctrlAIFiremanReset && clockAIFireTime + 5 < Owner.Viewer.Simulator.ClockTime)
                     ctrlAIFiremanReset = false;
 
-                if (ctrlAIFiremanOn || ctrlAIFiremanOff || ctrlAIFiremanReset)
+                if (ctrlAIFiremanReset || ctrlAIFiremanOn || ctrlAIFiremanOff)
                 {
-                    InfoToLabel(keyPressed, Viewer.Catalog.GetString("AI Fireman") + "!??", ctrlAIFiremanOn ? Viewer.Catalog.GetString("On") + "!??" : ctrlAIFiremanOff ? Viewer.Catalog.GetString("Off") + "!??" : ctrlAIFiremanReset ? Viewer.Catalog.GetString("Reset") + "%%%" : "-", "", false, keyPressed);
+                    AddLabel(new ListLabel
+                    {
+                        FirstCol = Viewer.Catalog.GetString("AI Fireman") + ColorCode[Color.White],
+                        LastCol = ctrlAIFiremanOn ? Viewer.Catalog.GetString("On") : ctrlAIFiremanOff ? Viewer.Catalog.GetString("Off") : ctrlAIFiremanReset ? Viewer.Catalog.GetString("Reset") + ColorCode[Color.Cyan] : "",
+                        KeyPressed = aifireKey
+                    });
                 }
             }
 
             // Grate limit
-            keyPressed = "";
-            if (locomotive.GetType() == typeof(MSTSSteamLocomotive))
+            if (locomotive is MSTSSteamLocomotive steamLocomotive1)
             {
-                MSTSSteamLocomotive steamloco = (MSTSSteamLocomotive)Owner.Viewer.PlayerLocomotive;
-                if (steamloco.IsGrateLimit && steamloco.GrateCombustionRateLBpFt2 > steamloco.GrateLimitLBpFt2)
+                if (steamLocomotive1.IsGrateLimit && steamLocomotive1.GrateCombustionRateLBpFt2 > steamLocomotive1.GrateLimitLBpFt2)
                 {
                     grateLabelVisible = true;
                     clockGrateTime = Owner.Viewer.Simulator.ClockTime;
-                    InfoToLabel("", Viewer.Catalog.GetString("Grate limit"), Viewer.Catalog.GetString("Exceeded") + "!!!", "", false, keyPressed);
+
+                    AddLabel(new ListLabel
+                    {
+                        FirstCol = Viewer.Catalog.GetString("Grate limit"),
+                        LastCol = Viewer.Catalog.GetString("Exceeded") + ColorCode[Color.OrangeRed],
+                    });
                 }
                 else
                 {
@@ -969,24 +1171,46 @@ namespace Orts.Viewer3D.Popups
 
                     if (grateLabelVisible)
                     {
-                        InfoToLabel("", Viewer.Catalog.GetString("Grate limit") + "!??", Viewer.Catalog.GetString("Normal") + "!??", "", false, keyPressed);
+                        AddLabel(new ListLabel
+                        {
+                            FirstCol = Viewer.Catalog.GetString("Grate limit") + ColorCode[Color.White],
+                            LastCol = Viewer.Catalog.GetString("Normal") + ColorCode[Color.White]
+                        });
                     }
                 }
             }
 
             // Wheel
-            if (playerTrain.IsWheelSlip || playerTrain.IsWheelSlipWarninq || playerTrain.IsBrakeSkid)
+            if (train.IsWheelSlip || train.IsWheelSlipWarninq || train.IsBrakeSkid)
             {
                 wheelLabelVisible = true;
                 clockWheelTime = Owner.Viewer.Simulator.ClockTime;
             }
-            keyPressed = "";
-            if (playerTrain.IsWheelSlip)
-                InfoToLabel("", Viewer.Catalog.GetString("Wheel"), Viewer.Catalog.GetString("slip") + "!!!", "", false, keyPressed);
-            else if (playerTrain.IsWheelSlipWarninq)
-                InfoToLabel("", Viewer.Catalog.GetString("Wheel"), Viewer.Catalog.GetString("slip warning") + "???", "", false, keyPressed);
-            else if (playerTrain.IsBrakeSkid)
-                InfoToLabel("", Viewer.Catalog.GetString("Wheel"), Viewer.Catalog.GetString("skid") + "!!!", "", false, keyPressed);
+
+            if (train.IsWheelSlip)
+            {
+                AddLabel(new ListLabel
+                {
+                    FirstCol = Viewer.Catalog.GetString("Wheel"),
+                    LastCol = Viewer.Catalog.GetString("slip") + ColorCode[Color.OrangeRed],
+                });
+            }
+            else if (train.IsWheelSlipWarninq)
+            {
+                AddLabel(new ListLabel
+                {
+                    FirstCol = Viewer.Catalog.GetString("Wheel"),
+                    LastCol = Viewer.Catalog.GetString("slip warning") + ColorCode[Color.Yellow],
+                });
+            }
+            else if (train.IsBrakeSkid)
+            {
+                AddLabel(new ListLabel
+                {
+                    FirstCol = Viewer.Catalog.GetString("Wheel"),
+                    LastCol = Viewer.Catalog.GetString("skid") + ColorCode[Color.OrangeRed],
+                });
+            }
             else
             {
                 // delay to hide the wheel label
@@ -995,13 +1219,71 @@ namespace Orts.Viewer3D.Popups
 
                 if (wheelLabelVisible)
                 {
-                    InfoToLabel("", Viewer.Catalog.GetString("Wheel") + "!??", Viewer.Catalog.GetString("Normal") + "!??", "", false, keyPressed);
+                    AddLabel(new ListLabel
+                    {
+                        FirstCol = Viewer.Catalog.GetString("Wheel") + ColorCode[Color.White],
+                        LastCol = Viewer.Catalog.GetString("Normal") + ColorCode[Color.White]
+                    });
+                }
+            }
+
+            //Derailment Coefficient. Changed the float value output by a text label.
+            var maxDerailCoeff = 0.0f;
+            var carIDerailCoeff = "";
+            for (var i = 0; i < train.Cars.Count; i++)
+            {
+                var carDerailCoeff = train.Cars[i].DerailmentCoefficient;
+                carDerailCoeff = float.IsInfinity(carDerailCoeff) || float.IsNaN(carDerailCoeff) ? 0 : carDerailCoeff;
+                if (carDerailCoeff > maxDerailCoeff)
+                {
+                    maxDerailCoeff = carDerailCoeff;
+                    carIDerailCoeff = train.Cars[i].CarID;
+                }
+            }
+
+            if (maxDerailCoeff > 0.66)
+            {
+                derailLabelVisible = true;
+                clockDerailTime = Owner.Viewer.Simulator.ClockTime;
+            }
+
+            if (maxDerailCoeff > 0.66)
+            {
+                if (maxDerailCoeff > 1)
+                {
+                    AddLabel(new ListLabel
+                    {
+                        FirstCol = Viewer.Catalog.GetString("DerailCoeff"),
+                        LastCol = $"{Viewer.Catalog.GetString("Derailed")} {carIDerailCoeff}" + ColorCode[Color.OrangeRed],
+                    });
+                }
+                else if (maxDerailCoeff < 1 && maxDerailCoeff > 0.66)
+                {
+                    AddLabel(new ListLabel
+                    {
+                        FirstCol = Viewer.Catalog.GetString("DerailCoeff"),
+                        LastCol = $"{Viewer.Catalog.GetString("Warning")} {carIDerailCoeff}" + ColorCode[Color.Yellow],
+                    });
+                }
+            }
+            else
+            {
+                // delay to hide the derailcoeff label
+                if (derailLabelVisible && clockDerailTime + 3 < Owner.Viewer.Simulator.ClockTime)
+                    derailLabelVisible = false;
+
+                if (derailLabelVisible)
+                {
+                    AddLabel(new ListLabel
+                    {
+                        FirstCol = Viewer.Catalog.GetString("DerailCoeff") + ColorCode[Color.White],
+                        LastCol = Viewer.Catalog.GetString("Normal") + ColorCode[Color.White]
+                    });
                 }
             }
 
             // Doors
-            keyPressed = "";
-            var wagon = (MSTSWagon) locomotive;
+            var wagon = (MSTSWagon)locomotive;
             if (wagon.DoorLeftOpen || wagon.DoorRightOpen)
             {
                 var status = new List<string>();
@@ -1009,11 +1291,15 @@ namespace Orts.Viewer3D.Popups
                 doorsLabelVisible = true;
                 clockDoorsTime = Owner.Viewer.Simulator.ClockTime;
                 if (wagon.DoorLeftOpen)
-                    status.Add(flipped ? Viewer.Catalog.GetString("Right"): Viewer.Catalog.GetString("Left"));
+                    status.Add(Viewer.Catalog.GetString(Viewer.Catalog.GetString(flipped ? "Right" : "Left")));
                 if (wagon.DoorRightOpen)
-                    status.Add(flipped ? Viewer.Catalog.GetString("Left") : Viewer.Catalog.GetString("Right"));
+                    status.Add(Viewer.Catalog.GetString(Viewer.Catalog.GetString(flipped ? "Left" : "Right")));
 
-                InfoToLabel(" ", Viewer.Catalog.GetString("Doors open"), string.Join(" ", status) + (locomotive.AbsSpeedMpS > 0.1f ? "!!!" : "???"), "", false, keyPressed);
+                AddLabel(new ListLabel
+                {
+                    FirstCol = Viewer.Catalog.GetString("Doors open"),
+                    LastCol = string.Join(" ", status) + ColorCode[locomotive.AbsSpeedMpS > 0.1f ? Color.OrangeRed : Color.Yellow],
+                });
             }
             else
             {
@@ -1023,19 +1309,17 @@ namespace Orts.Viewer3D.Popups
 
                 if (doorsLabelVisible)
                 {
-                    InfoToLabel(" ", Viewer.Catalog.GetString("Doors open") + "!??", Viewer.Catalog.GetString("Closed") + "!??", "", false, keyPressed);
+                    AddLabel(new ListLabel
+                    {
+                        FirstCol = Viewer.Catalog.GetString("Doors open") + ColorCode[Color.White],
+                        LastCol = Viewer.Catalog.GetString("Closed") + ColorCode[Color.White]
+                    });
                 }
             }
 
-            // Ctrl + F Firing to manual
-            if (UserInput.IsDown(UserCommand.ControlFiring))
-            {
-                ResizeWindow = true;
-            }
-
+            AddLabel(new ListLabel());
             UpdateDataEnded = true;
-            keyPressed = "";
-            InfoToLabel(keyPressed, "", "", "", true, keyPressed);
+            return labels;
         }
 
         public override void PrepareFrame(ElapsedTime elapsedTime, bool updateFull)
@@ -1051,17 +1335,23 @@ namespace Orts.Viewer3D.Popups
             if (!MovingCurrentWindow && !TrainDrivingUpdating && updateFull)
             {
                 TrainDrivingUpdating = true;
-                UpdateData();
+                labels = TrainDrivingWindowList(Owner.Viewer, normalTextMode).ToList();
                 TrainDrivingUpdating = false;
 
                 // Ctrl + F (FiringIsManual)
-                if (ResizeWindow || LinesCount != ListToLabel.Count())
+                if (ResizeWindow || LinesCount != labels.Count())
                 {
                     ResizeWindow = false;
                     UpdateWindowSize();
-                    LinesCount = ListToLabel.Count();
+                    LinesCount = labels.Count();
                 }
-
+                //Resize this window after the font has been changed externally
+                if (MultiPlayerWindow.FontChanged)
+                {
+                    MultiPlayerWindow.FontChanged = false;
+                    FontToBold = !FontToBold;
+                    UpdateWindowSize();
+                }
                 //Update Layout
                 Layout();
             }

@@ -920,26 +920,33 @@ namespace Orts.Viewer3D.Popups
         void TextPagePowerSupplyInfo(TableData table)
         {
             TextPageHeading(table, Viewer.Catalog.GetString("POWER SUPPLY INFORMATION"));
+            ResetHudScroll();//Reset Hudscroll.
 
             Train train = Viewer.PlayerLocomotive.Train;
+            List<string> statusPowerSupply = new List<string>();
+            List<string> statusHeader = new List<string>();
+            var carsWithPowerSupply = train.Cars.Where(car => car.PowerSupply != null).Count();
 
             TableAddLine(table);
-            TableSetCells(table, 0,
-                    Viewer.Catalog.GetString("Wagon"),
-                    Viewer.Catalog.GetString("Type"),
-                    Viewer.Catalog.GetParticularString("Pantograph", "Panto"),
-                    Viewer.Catalog.GetParticularString("Engine", "Eng"),
-                    Viewer.Catalog.GetParticularString("CircuitBreaker", "CB"),
-                    Viewer.Catalog.GetParticularString("TractionCutOffRelay", "TCOR"),
-                    Viewer.Catalog.GetString("MainPS"),
-                    Viewer.Catalog.GetString("AuxPS"),
-                    Viewer.Catalog.GetString("Battery"),
-                    Viewer.Catalog.GetString("LowVoltPS"),
-                    Viewer.Catalog.GetString("CabPS"),
-                    Viewer.Catalog.GetString("ETS"),
-                    Viewer.Catalog.GetString("ETSCable"),
-                    Viewer.Catalog.GetString("Power")
-                );
+            //POWER SUPPLY header
+            statusPowerSupply.Add(string.Format("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}\t{10}\t{11}\t{12}\t\t{13}\t",
+                Viewer.Catalog.GetString("Wagon"),
+                Viewer.Catalog.GetString("Type"),
+                Viewer.Catalog.GetParticularString("Pantograph", "Panto"),
+                Viewer.Catalog.GetParticularString("Engine", "Eng"),
+                Viewer.Catalog.GetParticularString("CircuitBreaker", "CB"),
+                Viewer.Catalog.GetParticularString("TractionCutOffRelay", "TCOR"),
+                Viewer.Catalog.GetString("MainPS"),
+                Viewer.Catalog.GetString("AuxPS"),
+                Viewer.Catalog.GetString("Battery"),
+                Viewer.Catalog.GetString("LowVoltPS"),
+                Viewer.Catalog.GetString("CabPS"),
+                Viewer.Catalog.GetString("ETS"),
+                Viewer.Catalog.GetString("ETSCable"),
+                Viewer.Catalog.GetString("Power")
+            //Add new header data here, if adding additional column.
+            ));
+
             foreach (TrainCar car in train.Cars.Where(car => car.PowerSupply != null))
             {
                 IPowerSupply powerSupply = car.PowerSupply;
@@ -1007,8 +1014,7 @@ namespace Orts.Viewer3D.Popups
                 }
                 // If power supply is steam power supply, do nothing.
 
-                TableAddLine(table);
-                TableSetCells(table, 0,
+                statusPowerSupply.Add(string.Format("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}\t{10}\t{11}\t{12}\t\t{13}\t",
                     car.CarID,
                     car.WagonType.ToString(),
                     pantographState,
@@ -1023,8 +1029,16 @@ namespace Orts.Viewer3D.Popups
                     electricTrainSupplyState,
                     electricTrainSupplyCableState,
                     electricTrainSupplyPower
-                    );
+                    ));
+
             }
+
+            //Pages count from number of nLinesShow.
+            columnsCount = statusPowerSupply[statusPowerSupply.Count - 1].Count(x => x == '\t') + (statusPowerSupply[statusPowerSupply.Count - 1].EndsWith("\t") ? 0 : 1);
+            //table.CurrentRow + 1 (Consist information. Header) + 1 (Consist information. Data.) + 1 (TableAddLine(table)) + 1 (Car information)
+            TextLineNumber(carsWithPowerSupply, table.CurrentRow + 4, columnsCount);//HudScroll
+            //Display data
+            DrawScrollArrows(statusPowerSupply, table, false);
         }
 
         void TextPageBrakeInfo(TableData table)
@@ -1228,7 +1242,7 @@ namespace Orts.Viewer3D.Popups
                     Viewer.Catalog.GetString("AnglCock"),
                     //13
                     Viewer.Catalog.GetString("BleedOff")
-                    //Add new header data here, if addining additional column.
+                    //Add new header data here, if adding additional column.
                     ));
                 }
             }
@@ -1365,6 +1379,7 @@ namespace Orts.Viewer3D.Popups
 
             var train = Viewer.PlayerLocomotive.Train;
             var mstsLocomotive = Viewer.PlayerLocomotive as MSTSLocomotive;
+            List<string> statusForce = new List<string>();
 
             ResetHudScroll(); //Reset Hudscroll.
             if (hudWindowFullScreen || WebServerEnabled)
@@ -1426,72 +1441,48 @@ namespace Orts.Viewer3D.Popups
                     var status = new StringBuilder();
                     if (hudWindowColumnsActualPage > 0)
                     {
-                        status.AppendFormat("\n{0}\t{1:N2} mph\t{2}\t{3:N2} mph\n",
+                        status.AppendFormat("{0}\t{1:N2} mph\t{2}\t{3:N2} mph",
                         Viewer.Catalog.GetString("ResWind:"), train.ResultantWindComponentDeg,
                         Viewer.Catalog.GetString("ResSpeed:"), Me.ToMi(pS.TopH(train.WindResultantSpeedMpS)));
                     }
                     else
                     {
-                        status.AppendFormat("\n{0}\t{1:N2} mph\t{2}\t\t{3:N2} Deg\t{4}\t\t{5:N2} Deg\t{6}\t{7:N2} mph\t{8}\t{9:N2} mph\n",
-                        Viewer.Catalog.GetString("Wind Speed:"), Me.ToMi(pS.TopH(train.PhysicsWindSpeedMpS)),
-                        Viewer.Catalog.GetString("Wind Direction:"), train.PhysicsWindDirectionDeg,
-                        Viewer.Catalog.GetString("Train Direction:"), train.PhysicsTrainLocoDirectionDeg,
-                        Viewer.Catalog.GetString("ResWind:"), train.ResultantWindComponentDeg,
-                        Viewer.Catalog.GetString("ResSpeed:"), Me.ToMi(pS.TopH(train.WindResultantSpeedMpS))
+                        status.AppendFormat("{0} {1:N2} mph\t\t\t{2} {3:N2} Deg\t\t\t{4} {5:N2} Deg\t\t\t{6} {7:N2} mph\t\t\t{8} {9:N2} mph",
+                        Viewer.Catalog.GetString("Wind Speed:"), Me.ToMi(pS.TopH(train.PhysicsWindSpeedMpS)).ToString("000.00"),
+                        Viewer.Catalog.GetString("Wind Direction:"), train.PhysicsWindDirectionDeg.ToString("000.00"),
+                        Viewer.Catalog.GetString("Train Direction:"), train.PhysicsTrainLocoDirectionDeg.ToString("000.00"),
+                        Viewer.Catalog.GetString("ResWind:"), train.ResultantWindComponentDeg.ToString("000.00"),
+                        Viewer.Catalog.GetString("ResSpeed:"), Me.ToMi(pS.TopH(train.WindResultantSpeedMpS)).ToString("000.00")
                         //Add new header + data here, if required.
                         );
                     }
                     TableAddLines(table, status.ToString());
                 }
             }
-            //HudScroll
-            if (hudWindowColumnsActualPage > 0)
-            {
-                //HudScroll
-                TableSetCells(table, 0,
-                Viewer.Catalog.GetString("Car"),
-                Viewer.Catalog.GetString("Coupler"),
-                Viewer.Catalog.GetString("Slack"),
-                Viewer.Catalog.GetString("Mass"),
-                Viewer.Catalog.GetString("Gradient"),
-                Viewer.Catalog.GetString("Curve"),
-                Viewer.Catalog.GetString("Brk Frict."),
-                Viewer.Catalog.GetString("Brk Slide"),
-                Viewer.Catalog.GetString("Bear Temp"),
-                Viewer.Catalog.GetString(" "),
-                Viewer.Catalog.GetString("DerailCoeff")
 
-                );
-            }
-            else
-            {
-                //Normal view
-                TableSetCells(table, 0,
-                Viewer.Catalog.GetString("Car"),
-                Viewer.Catalog.GetString("Total"),
-                Viewer.Catalog.GetString("Motive"),
-                Viewer.Catalog.GetString("Brake"),
-                Viewer.Catalog.GetString("Friction"),
-                Viewer.Catalog.GetString("Gravity"),
-                Viewer.Catalog.GetString("Curve"),
-                Viewer.Catalog.GetString("Tunnel"),
-                Viewer.Catalog.GetString("Wind"),
-                Viewer.Catalog.GetString("Coupler"),
-                Viewer.Catalog.GetString("Coupler"),
-                Viewer.Catalog.GetString("Slack"),
-                Viewer.Catalog.GetString("Mass"),
-                Viewer.Catalog.GetString("Gradient"),
-                Viewer.Catalog.GetString("Curve"),
-                Viewer.Catalog.GetString("Brk Frict."),
-                Viewer.Catalog.GetString("Brk Slide"),
-                Viewer.Catalog.GetString("Bear Temp"),
-                Viewer.Catalog.GetString(" "),
-                Viewer.Catalog.GetString("DerailCoeff")
-                
-                );
-            }
-            //Columns. HudScroll
-            var columnsCount = ColumnsCount(table, false);
+            //Normal view
+            statusForce.Add(string.Format("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}\t{10}\t{11}\t{12}\t{13}\t{14}\t{15}\t{16}\t{17}\t{18}\t{19}\t",
+            Viewer.Catalog.GetString("Car"),
+            Viewer.Catalog.GetString("Total"),
+            Viewer.Catalog.GetString("Motive"),
+            Viewer.Catalog.GetString("Brake"),
+            Viewer.Catalog.GetString("Friction"),
+            Viewer.Catalog.GetString("Gravity"),
+            Viewer.Catalog.GetString("Curve"),
+            Viewer.Catalog.GetString("Tunnel"),
+            Viewer.Catalog.GetString("Wind"),
+            Viewer.Catalog.GetString("Coupler"),
+            Viewer.Catalog.GetString("Coupler"),
+            Viewer.Catalog.GetString("Slack"),
+            Viewer.Catalog.GetString("Mass"),
+            Viewer.Catalog.GetString("Gradient"),
+            Viewer.Catalog.GetString("Curve"),
+            Viewer.Catalog.GetString("Brk Frict."),
+            Viewer.Catalog.GetString("Brk Slide"),
+            Viewer.Catalog.GetString("Bear Temp"),
+            Viewer.Catalog.GetString(" "),
+            Viewer.Catalog.GetString("DerailCoeff")
+            ));
 
             TableAddLine(table);
 
@@ -1502,48 +1493,46 @@ namespace Orts.Viewer3D.Popups
             {
                 var j = (i == 0) ? 0 : i;
                 var car = train.Cars[j];
-                TableSetCell(table, 0, "{0}", car.CarID);
-                if (hudWindowColumnsActualPage > 0)
-                {
-                    TableSetCell(table, 1, "{0} : {1}", car.GetCouplerRigidIndication() ? "R" : "F", car.CouplerExceedBreakLimit ? "xxx" + "!!!" : car.CouplerOverloaded ? "O/L" + "???" : car.HUDCouplerForceIndication == 1 ? "Pull" : car.HUDCouplerForceIndication == 2 ? "Push" : "-");
-                    TableSetCell(table, 2, "{0}", FormatStrings.FormatVeryShortDistanceDisplay(car.CouplerSlackM, car.IsMetric));
-                    TableSetCell(table, 3, "{0}", FormatStrings.FormatLargeMass(car.MassKG, car.IsMetric, car.IsUK));
-                    TableSetCell(table, 4, "{0:F2}%", -car.CurrentElevationPercent);
-                    TableSetCell(table, 5, "{0}", FormatStrings.FormatDistance(car.CurrentCurveRadius, car.IsMetric));
-                    TableSetCell(table, 6, "{0:F0}%", car.BrakeShoeCoefficientFriction * 100.0f);
-                    TableSetCell(table, 7, car.HUDBrakeSkid ? Viewer.Catalog.GetString("Yes") : "No");
-                    TableSetCell(table, 8, "{0} {1}", FormatStrings.FormatTemperature(car.WheelBearingTemperatureDegC, car.IsMetric, false), car.DisplayWheelBearingTemperatureStatus);
-                    TableSetCell(table, 9, car.Flipped ? Viewer.Catalog.GetString("Flipped") : "");
-                    TableSetCell(table, 19, "{0:F2}{1}", car.DerailmentCoefficient, car.DerailmentCoefficient > 1 ? "!!!" : car.DerailmentCoefficient < 1 && car.DerailmentCoefficient > 0.66 ? "???" : "");
-                }
-                else
-                {
-                    TableSetCell(table, 1, "{0}", FormatStrings.FormatForce(car.TotalForceN, car.IsMetric));
-                    TableSetCell(table, 2, "{0}{1}", FormatStrings.FormatForce(car.MotiveForceN, car.IsMetric), car.WheelSlip ? "!!!" : car.WheelSlipWarning ? "???" : "");
-                    TableSetCell(table, 3, "{0}", FormatStrings.FormatForce(car.BrakeForceN, car.IsMetric));
-                    TableSetCell(table, 4, "{0}", FormatStrings.FormatForce(car.FrictionForceN, car.IsMetric));
-                    TableSetCell(table, 5, "{0}", FormatStrings.FormatForce(car.GravityForceN, car.IsMetric));
-                    TableSetCell(table, 6, "{0}", FormatStrings.FormatForce(car.CurveForceN, car.IsMetric));
-                    TableSetCell(table, 7, "{0}", FormatStrings.FormatForce(car.TunnelForceN, car.IsMetric));
-                    TableSetCell(table, 8, "{0}", FormatStrings.FormatForce(car.WindForceN, car.IsMetric));
-                    TableSetCell(table, 9, "{0}", FormatStrings.FormatForce(car.CouplerForceU, car.IsMetric));
-                    TableSetCell(table, 10, "{0} : {1}", car.GetCouplerRigidIndication() ? "R" : "F", car.CouplerExceedBreakLimit ? "xxx" + "!!!" : car.CouplerOverloaded ? "O/L" + "???" : car.HUDCouplerForceIndication == 1 ? "Pull" : car.HUDCouplerForceIndication == 2 ? "Push" : "-");
-                    TableSetCell(table, 11, "{0}", FormatStrings.FormatVeryShortDistanceDisplay(car.CouplerSlackM, car.IsMetric));
-                    TableSetCell(table, 12, "{0}", FormatStrings.FormatLargeMass(car.MassKG, car.IsMetric, car.IsUK));
-                    TableSetCell(table, 13, "{0:F2}%", -car.CurrentElevationPercent);
-                    TableSetCell(table, 14, "{0}", FormatStrings.FormatDistance(car.CurrentCurveRadius, car.IsMetric));
-                    TableSetCell(table, 15, "{0:F0}%", car.BrakeShoeCoefficientFriction * 100.0f);
-                    TableSetCell(table, 16, car.HUDBrakeSkid ? Viewer.Catalog.GetString("Yes") : Viewer.Catalog.GetString("No"));
-                    TableSetCell(table, 17, "{0} {1}", FormatStrings.FormatTemperature(car.WheelBearingTemperatureDegC, car.IsMetric, false), car.DisplayWheelBearingTemperatureStatus);
-                    TableSetCell(table, 18, car.Flipped ? Viewer.Catalog.GetString("Flipped") : "");
-                    TableSetCell(table, 19, "{0:F2}{1}", car.DerailmentCoefficient, car.DerailmentCoefficient > 1 ? "!!!" : car.DerailmentCoefficient < 1 && car.DerailmentCoefficient > 0.66 ? "???" : "");
-                }
-            TableAddLine(table);
-            TableSetCell(table, 10, "Tot.Slack:");
-            TableSetCell(table, 11, "{0}", FormatStrings.FormatShortDistanceDisplay(train.TotalCouplerSlackM, mstsLocomotive.IsMetric));
+                statusForce.Add(string.Format("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}\t{10}\t{11}\t{12}\t{13:F2} %\t{14}\t{15:F0} %\t{16}\t{17}\t{18}\t{19:F2}\t",
+                    car.CarID,
+                    FormatStrings.FormatForce(car.TotalForceN, car.IsMetric),
+                    FormatStrings.FormatForce(car.MotiveForceN, car.IsMetric) + (car.WheelSlip ? "!!!" : car.WheelSlipWarning ? "???" : ""),
+                    FormatStrings.FormatForce(car.BrakeForceN, car.IsMetric),
+                    FormatStrings.FormatForce(car.FrictionForceN, car.IsMetric),
+                    FormatStrings.FormatForce(car.GravityForceN, car.IsMetric),
+                    FormatStrings.FormatForce(car.CurveForceN, car.IsMetric),
+                    FormatStrings.FormatForce(car.TunnelForceN, car.IsMetric),
+                    FormatStrings.FormatForce(car.WindForceN, car.IsMetric),
+                    FormatStrings.FormatForce(car.CouplerForceU, car.IsMetric),
+                    (car.GetCouplerRigidIndication() ? "R" : "F") + " : " + (car.CouplerExceedBreakLimit ? "xxx" + "!!!" : car.CouplerOverloaded ? "O/L" + "???" : car.HUDCouplerForceIndication == 1 ? "Pull" : car.HUDCouplerForceIndication == 2 ? "Push" : "-"),
+                    FormatStrings.FormatVeryShortDistanceDisplay(car.CouplerSlackM, car.IsMetric),
+                    FormatStrings.FormatLargeMass(car.MassKG, car.IsMetric, car.IsUK),
+                    -car.CurrentElevationPercent,
+                    FormatStrings.FormatDistance(car.CurrentCurveRadius, car.IsMetric),
+                    car.BrakeShoeCoefficientFriction * 100.0f,//15
+                    (car.HUDBrakeSkid ? Viewer.Catalog.GetString("Yes") : Viewer.Catalog.GetString("No")),
+                    FormatStrings.FormatTemperature(car.WheelBearingTemperatureDegC, car.IsMetric, false) + " " + car.DisplayWheelBearingTemperatureStatus,
+                    car.Flipped ? Viewer.Catalog.GetString("Flipped") : "",
+                    car.DerailmentCoefficient.ToString("0.00") + (car.DerailmentCoefficient > 1 ? "!!!" : car.DerailmentCoefficient < 1 && car.DerailmentCoefficient > 0.66 ? "???" : "")
+                    ));
             }
+            TableAddLine(table);
+
+            //Total slack
+            statusForce.Add(string.Format(hudWindowColumnsActualPage == 2 ? "\t\t\t\t\t\t\t\t\t\t\t{0}\t{1}\t"
+                    : hudWindowColumnsActualPage == 0 ? "\t\t\t\t\t\t\t\t\t\t{0}\t{1}\t"
+                    : "",
+                    "Tot.Slack:",
+                    FormatStrings.FormatShortDistanceDisplay(train.TotalCouplerSlackM, mstsLocomotive.IsMetric)
+                    ));
+
+            //Pages count from number of nLinesShow.
+            columnsCount = statusForce[statusForce.Count - 1].Count(x => x == '\t');
+            TextLineNumber(train.Cars.Count, table.CurrentRow + 4, columnsCount);//HudScroll
+            //Display data
+            DrawScrollArrows(statusForce, table, false);
         }
-        
+
         void TextPageDispatcherInfo(TableData table)
         {
             // count active trains

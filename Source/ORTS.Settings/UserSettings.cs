@@ -416,7 +416,7 @@ namespace ORTS.Settings
         [Default(new[] { 75, 0 })]
         public int[] WindowPosition_HUDScroll { get; set; }
         [Default(new[] { 50, 50 })]
-        public int[] WindowPosition_TrainDriving { get; set; }
+        public int[] WindowPosition_MultiPlayer { get; set; }
         [Default(new[] { 0, 100 })]
         public int[] WindowPosition_NextStation { get; set; }
         [Default(new[] { 50, 50 })]
@@ -425,6 +425,8 @@ namespace ORTS.Settings
         public int[] WindowPosition_Switch { get; set; }
         [Default(new[] { 100, 0 })]
         public int[] WindowPosition_TrackMonitor { get; set; }
+        [Default(new[] { 50, 50 })]
+        public int[] WindowPosition_TrainDriving { get; set; }
         [Default(new[] { 50, 50 })]
         public int[] WindowPosition_TrainOperations { get; set; }
         [Default(new[] { 50, 50 })]
