@@ -244,6 +244,10 @@ namespace Orts.Common
         HeatingOn,
         AirConditioningOff,
         AirConditioningOn,
+
+        OverchargeBrakingOn,
+        OverchargeBrakingOff,
+
         // Cruise Control
         LeverFromZero,
         LeverToZero,
@@ -516,6 +520,9 @@ namespace Orts.Common
                         case 233: return Event.HeatingOff;
                         case 234: return Event.AirConditioningOn;
                         case 235: return Event.AirConditioningOff;
+
+                        case 250: return Event.OverchargeBrakingOn;
+                        case 251: return Event.OverchargeBrakingOff;
 
                         // Cruise Control
                         case 298: return Event.LeverFromZero;
