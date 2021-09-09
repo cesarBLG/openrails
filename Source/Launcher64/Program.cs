@@ -15,14 +15,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Open Rails.  If not, see <http://www.gnu.org/licenses/>.
 
-/* ORTS Launcher
- * 
- * This is the program that users execute start ORTS.  
- * Its purpose is to check for required dependencies 
- * before launching the rest of the ORTS executables.
- * 
- * This program must be compiled with a minimum of dependencies
- * so that it is guaranteed to run.
+/* Open Rails Launcher
+ *
+ * This is the program which users launch. Its purpose is to check for the
+ * required dependencies before launching the menu, so it is designed to
+ * run on clean versions of Windows 7 and up
+ *
+ * Dependencies checked for:
+ *   - Microsoft .NET Framework 4.7.2
  */
 
 using Microsoft.Win32;
@@ -57,7 +57,6 @@ namespace ORTS
             List<DependencyHint> missingDependencies = new List<DependencyHint>();
 
             CheckNetFx(missingDependencies);
-            CheckDXRuntime(missingDependencies);
 
             if (missingDependencies.Count > 0)
             {
@@ -108,20 +107,6 @@ namespace ORTS
                 Text = "Please go to\n https://support.microsoft.com/en-us/help/4054530/microsoft-net-framework-4-7-2-offline-installer-for-windows \nto download the installation package " +
                 "for Microsoft .NET Framework 4.7.2 and install the software.",
                 Url = "https://support.microsoft.com/en-us/help/4054530/microsoft-net-framework-4-7-2-offline-installer-for-windows"
-            });
-        }
-
-        static void CheckDXRuntime(List<DependencyHint> missingDependencies)
-        {
-            if (File.Exists(Path.Combine(Environment.SystemDirectory, "D3Dcompiler_43.dll")))       //there is a dependency in Monogame requiring the specific version of D3D compiler
-                return;
-
-            missingDependencies.Add(new DependencyHint()
-            {
-                Name = "DirectX 9 Runtime",
-                Text = "Please go to\n https://www.microsoft.com/en-us/download/details.aspx?id=35&nowin10 \nto download the web installer for " +
-                "DirectX Runtime and install the software. While downloading and installing, you may uncheck the installation of MSN and Bing software.",
-                Url = "https://www.microsoft.com/en-us/download/details.aspx?id=35&nowin10"
             });
         }
 

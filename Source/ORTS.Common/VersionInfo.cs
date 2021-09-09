@@ -155,6 +155,38 @@ namespace ORTS.Common
             return false; // default validity
         }
 
+
+        /// <summary>
+        /// Converts many possible Open Rails versions into a standard Version struct
+        /// </summary>
+        /// <param name="version">text version to parse</param>
+        public static Version ParseVersion(string version)
+        {
+            // Version numbers which we do parse:
+            //  - 0.9.0.1648            --> 0.9
+            //  - 1.3.1.4328            --> 1.3.1
+            //  - T1.3.1-241-g6ff150c21 --> 1.3.1.241
+            //  - X1.3.1-370-g7df5318c2 --> 1.3.1.370
+            //  - 1.4                   --> 1.4
+            //  - 1.4-rc1               --> 1.4
+            //  - T1.4-2-g7db094316     --> 1.4.0.2
+            // Version numbers which we do NOT parse:
+            //  - U2019.07.25-2200
+            //  - U2021.06.25-0406
+            //  - X.1648
+            //  - X1648
+
+            if (version.StartsWith("T") || version.StartsWith("X")) version = version.Substring(1);
+
+            var versionParts = version.Split('-');
+            if (!System.Version.TryParse(versionParts[0], out var parsedVersion)) return new Version();
+
+            var commits = 0;
+            if (versionParts.Length > 1) int.TryParse(versionParts[1], out commits);
+            // parsedVersion.Build will be -1 if the version only has major and minor, but we need the build number >= 0 here
+            return new Version(parsedVersion.Major, parsedVersion.Minor, Math.Max(0, parsedVersion.Build), commits);
+        }
+
         /// <summary>
         /// Find the revision number (e.g. 1648) from the full version (e.g. 0.9.0.1648 or X.1648 or X1648)
         /// </summary>
@@ -173,6 +205,16 @@ namespace ORTS.Common
             }
             catch { }
             return revision;
+        }
+
+        public static long GetVersionLong(Version version)
+        {
+            long number = 0;
+            if (version.Major > 0) number += (long)(version.Major & 0xFFFF) << 48;
+            if (version.Minor > 0) number += (long)(version.Minor & 0xFFFF) << 32;
+            if (version.Build > 0) number += (version.Build & 0xFFFF) << 16;
+            if (version.Revision > 0) number += (version.Revision & 0xFFFF);
+            return number;
         }
     }
 }
