@@ -1238,7 +1238,7 @@
             // 
             this.numericWorldObjectDensity.Location = new System.Drawing.Point(6, 299);
             this.numericWorldObjectDensity.Maximum = new decimal(new int[] {
-            10,
+            99,
             0,
             0,
             0});
