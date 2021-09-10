@@ -1258,7 +1258,7 @@ namespace Orts.Viewer3D
 
     public class SolidColorMaterial : Material
     {
-        static BasicEffect basicEffect;
+        BasicEffect basicEffect;
 
         public SolidColorMaterial(Viewer viewer, float a, float r, float g, float b)
             : base(viewer, null)

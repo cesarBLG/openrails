@@ -1493,7 +1493,7 @@ namespace Orts.Viewer3D.RollingStock
         /// Gets the requested Locomotive data and returns it as a fraction (from 0 to 1) of the range between Min and Max values.
         /// </summary>
         /// <returns>Data value as fraction (from 0 to 1) of the range between Min and Max values</returns>
-        public float GetRangeFraction()
+        public float GetRangeFraction(bool offsetFromZero = false)
         {
             var data = Locomotive.GetDataOf(Control);
             if (data < Control.MinValue)
@@ -1504,7 +1504,7 @@ namespace Orts.Viewer3D.RollingStock
             if (Control.MaxValue == Control.MinValue)
                 return 0;
 
-            return (float)((data - Control.MinValue) / (Control.MaxValue - Control.MinValue));
+            return (float)((data - (offsetFromZero && Control.MinValue < 0 ? 0 : Control.MinValue)) / (Control.MaxValue - Control.MinValue));
         }
 
         public CABViewControlStyles GetStyle()
@@ -1655,7 +1655,8 @@ namespace Orts.Viewer3D.RollingStock
 
         public color GetColor(out bool positive)
         {
-            if (Locomotive.GetDataOf(Control) < 0) { positive = false; return Gauge.NegativeColor; }
+            if (Locomotive.GetDataOf(Control) < 0)
+            { positive = false; return Gauge.NegativeColor; }
             else { positive = true; return Gauge.PositiveColor; }
         }
 
@@ -3474,7 +3475,7 @@ namespace Orts.Viewer3D.RollingStock
 
             //create the shape primitive
             shapePrimitive = new MutableShapePrimitive(Material, NumVertices, NumIndices, new[] { -1 }, 0);
-            UpdateShapePrimitive();
+            UpdateShapePrimitive(Material);
 
         }
 
@@ -3485,11 +3486,11 @@ namespace Orts.Viewer3D.RollingStock
             CABViewControlTypes controltype = CVFR.GetControlType();
             Material material = null;
 
-            if (AceFile != "")
+            if (Alert) { imageName = "alert.ace"; }
+            else if (AceFile != "")
             {
                 imageName = AceFile;
             }
-            else if (Alert) { imageName = "alert.ace"; }
             else
             {
                 switch (controltype)
@@ -3574,11 +3575,11 @@ namespace Orts.Viewer3D.RollingStock
             }
 
             //update the shape primitive
-            UpdateShapePrimitive();
+            UpdateShapePrimitive(UsedMaterial);
 
         }
 
-        private void UpdateShapePrimitive()
+        private void UpdateShapePrimitive(Material material)
         {
             var indexData = new short[NumIndices];
             Array.Copy(TriangleListIndices, indexData, NumIndices);
@@ -3587,6 +3588,8 @@ namespace Orts.Viewer3D.RollingStock
             var vertexData = new VertexPositionNormalTexture[NumVertices];
             Array.Copy(VertexList, vertexData, NumVertices);
             shapePrimitive.SetVertexData(vertexData, 0, NumVertices, NumIndices / 3);
+
+            shapePrimitive.SetMaterial(material);
         }
 
         //ACE MAP:
@@ -3705,8 +3708,9 @@ namespace Orts.Viewer3D.RollingStock
 
 
             //create the shape primitive
-            shapePrimitive = new MutableShapePrimitive(FindMaterial(), NumVertices, NumIndices, new[] { -1 }, 0);
-            UpdateShapePrimitive();
+            var material = FindMaterial();
+            shapePrimitive = new MutableShapePrimitive(material, NumVertices, NumIndices, new[] { -1 }, 0);
+            UpdateShapePrimitive(material);
 
         }
 
@@ -3718,13 +3722,14 @@ namespace Orts.Viewer3D.RollingStock
             {
                 if (PositiveMaterial == null)
                 {
-                    PositiveMaterial = new SolidColorMaterial(this.Viewer, 0f, c.R, c.G, c.B);
+                    PositiveMaterial = new SolidColorMaterial(this.Viewer, c.A, c.R, c.G, c.B);
                 }
                 return PositiveMaterial;
             }
             else
             {
-                if (NegativeMaterial == null) NegativeMaterial = new SolidColorMaterial(this.Viewer, c.A, c.R, c.G, c.B);
+                if (NegativeMaterial == null)
+                    NegativeMaterial = new SolidColorMaterial(this.Viewer, c.A, c.R, c.G, c.B);
                 return NegativeMaterial;
             }
         }
@@ -3736,11 +3741,12 @@ namespace Orts.Viewer3D.RollingStock
 
             Material UsedMaterial = FindMaterial();
 
-            float length = CVFR.GetRangeFraction();
+            float length = CVFR.GetRangeFraction(true);
 
             CVCGauge gauge = CVFR.GetGauge();
 
             var len = maxLen * length;
+            var absLen = Math.Abs(len);
             Vertex v1, v2, v3, v4;
 
             //the left-bottom vertex if ori=0;dir=0, right-bottom if ori=0,dir=1; left-top if ori=1,dir=0; left-bottom if ori=1,dir=1;
@@ -3748,33 +3754,33 @@ namespace Orts.Viewer3D.RollingStock
 
             if (Orientation == 0)
             {
-                if (Direction == 0)//moving right
+                if (Direction == 0 ^ len < 0)//moving right
                 {
                     //other vertices
                     v2 = new Vertex(0f, width, 0.002f, 0, 0, 1, 0f, 0f);
-                    v3 = new Vertex(len, width, 0.002f, 0, 0, 1, 0f, 0f);
-                    v4 = new Vertex(len, 0f, 0.002f, 0, 0, 1, 0f, 0f);
+                    v3 = new Vertex(absLen, width, 0.002f, 0, 0, 1, 0f, 0f);
+                    v4 = new Vertex(absLen, 0f, 0.002f, 0, 0, 1, 0f, 0f);
                 }
                 else //moving left
                 {
                     v4 = new Vertex(0f, width, 0.002f, 0, 0, 1, 0f, 0f);
-                    v3 = new Vertex(-len, width, 0.002f, 0, 0, 1, 0f, 0f);
-                    v2 = new Vertex(-len, 0f, 0.002f, 0, 0, 1, 0f, 0f);
+                    v3 = new Vertex(-absLen, width, 0.002f, 0, 0, 1, 0f, 0f);
+                    v2 = new Vertex(-absLen, 0f, 0.002f, 0, 0, 1, 0f, 0f);
                 }
             }
             else
             {
-                if (Direction == 1)//up
+                if (Direction == 1 ^ len < 0)//up
                 {
                     //other vertices
-                    v2 = new Vertex(0f, len, 0.002f, 0, 0, 1, 0f, 0f);
-                    v3 = new Vertex(width, len, 0.002f, 0, 0, 1, 0f, 0f);
+                    v2 = new Vertex(0f, absLen, 0.002f, 0, 0, 1, 0f, 0f);
+                    v3 = new Vertex(width, absLen, 0.002f, 0, 0, 1, 0f, 0f);
                     v4 = new Vertex(width, 0f, 0.002f, 0, 0, 1, 0f, 0f);
                 }
                 else //moving down
                 {
-                    v4 = new Vertex(0f, -len, 0.002f, 0, 0, 1, 0f, 0f);
-                    v3 = new Vertex(width, -len, 0.002f, 0, 0, 1, 0f, 0f);
+                    v4 = new Vertex(0f, -absLen, 0.002f, 0, 0, 1, 0f, 0f);
+                    v3 = new Vertex(width, -absLen, 0.002f, 0, 0, 1, 0f, 0f);
                     v2 = new Vertex(width, 0, 0.002f, 0, 0, 1, 0f, 0f);
                 }
             }
@@ -3787,7 +3793,7 @@ namespace Orts.Viewer3D.RollingStock
             NumVertices += 4;
 
             //update the shape primitive
-            UpdateShapePrimitive();
+            UpdateShapePrimitive(UsedMaterial);
 
         }
 
@@ -3819,7 +3825,7 @@ namespace Orts.Viewer3D.RollingStock
             return 1.0f;
         }
 
-        private void UpdateShapePrimitive()
+        private void UpdateShapePrimitive(Material material)
         {
             var indexData = new short[NumIndices];
             Array.Copy(TriangleListIndices, indexData, NumIndices);
@@ -3828,6 +3834,8 @@ namespace Orts.Viewer3D.RollingStock
             var vertexData = new VertexPositionNormalTexture[NumVertices];
             Array.Copy(VertexList, vertexData, NumVertices);
             shapePrimitive.SetVertexData(vertexData, 0, NumVertices, NumIndices / 3);
+
+            shapePrimitive.SetMaterial(material);
         }
 
         public void PrepareFrame(RenderFrame frame, ElapsedTime elapsedTime)
