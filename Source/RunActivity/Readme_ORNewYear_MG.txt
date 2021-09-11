@@ -1,5 +1,5 @@
-﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.103.1
-August 24th, 2021
+﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.104
+September 11th, 2021
 
 Please note that the installation and use of Open Rails software, even of its unofficial versions, is governed by the Open Rails End User License Agreement. 
 
@@ -11,8 +11,7 @@ INSTALLATION
 
 
 RELEASE NOTES
-This unofficial version has been derived from the latest official OpenRails testing revision T1.3.1-1890, which already includes Monogame. 
-It includes also the other commits present in the official OR master release as of August 21st.
+This unofficial version has been derived from the latest official OpenRails Release candidate 1.4-rc2, coinciding with the latest testing version T1.3.1-2020 
 
 This unofficial version includes the cruise control software written by Jindrich with final adaptations by myself.
 
@@ -46,7 +45,6 @@ This version includes some features not (yet) available in the Open Rails testin
 - commands to selectively throw facing or trailing switches, see http://www.elvastower.com/forums/index.php?/topic/34991-opposite-switch-throwing-with-g-key/page__view__findpost__p__270291
 - locomotive and train elevator, see http://www.elvastower.com/forums/index.php?/topic/35082-locomotive-and-train-elevator/#entry271012
 - preliminary bug fix for http://www.elvastower.com/forums/index.php?/topic/35112-problem-with-tcs-scripts-and-timetable-mode/
-- analog clocks list file no more needed, by jonas
 - max fog distance increased to 300 km
 - first cruise control implementation, by Jindrich and slightly adapted by me
 - added AIFireman info in web and main display TrainDrivingInfo, by mbm_OR
@@ -55,13 +53,14 @@ This version includes some features not (yet) available in the Open Rails testin
 - bug fix that didn't check for null label text, see http://www.elvastower.com/forums/index.php?/topic/32640-or-newyear-mg/page__view__findpost__p__273496
 - re-introduced bug fix for missing shapes http://www.elvastower.com/forums/index.php?/topic/32640-or-newyear-mg/page__view__findpost__p__272585
 - Cruise control: support for proportional set speed controller, independent from throttle controller
-- NEW: Cruise control: support for Combined control where the throttle section can be used also as max force selector
-- NEW: Cruise control: corrected some bugs
-- NEW: improve train driving window and web display, by mbm-OR
-- NEW: insert updated acronyms for compact train driving window for EN-DE-FR-IT, by mbm-OR
-- NEW: fix bug in stating whether tractive or braking force of ORTS_SIGNED_TRACTION_TOTAL_BRAKINGWE
-- NEW: Cruise control: add variable to adjust dynamic braking force change speed
-- NEW: fix various cruise control bugs
+- Cruise control: support for Combined control where the throttle section can be used also as max force selector
+- Fix bug in stating whether tractive or braking force of ORTS_SIGNED_TRACTION_TOTAL_BRAKINGWE
+- Cruise control: add variable to adjust dynamic braking force change speed
+- NEW: 3D cabs: bug fix for https://bugs.launchpad.net/or/+bug/1943302 3D cab bugs in bars and digitals
+- NEW: 3D cabs: bug fix for https://bugs.launchpad.net/or/+bug/1943303 In 3D cabs bars ranging from negative to positive values are incorrectly displayed
+- NEW: 3D cabs: bug fix for https://bugs.launchpad.net/or/+bug/1943307 In 3d cabs Alert colour not displayed when feature selected.
+
+For this revision a special thank you is for mbm-OR, that provided to me with the patch to align Train Driving Info/Display with the version present in the Testing release.
 
 The Monogame related code intentionally coincides only partly with the code of the OR official testing version.
 
