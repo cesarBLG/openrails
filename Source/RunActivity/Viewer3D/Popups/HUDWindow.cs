@@ -2187,7 +2187,7 @@ namespace Orts.Viewer3D.Popups
             var train = locomotive.Train;
             if (Viewer.HUDScrollWindow.Visible && WebServerPageNo == 0 && hudWindowColumnsPagesCount == 0 && hudWindowLinesPagesCount == 1 && TextPages[TextPage] != TextPageLocomotiveInfo && !hudWindowFullScreen)
                 Viewer.HUDScrollWindow.Visible = false;
-            if ((!Viewer.HUDScrollWindow.Visible && hudWindowColumnsPagesCount > 0 )|| WebServerPageNo > 0 ||(TextPages[TextPage] == TextPageLocomotiveInfo && (IsSteamLocomotive || hudWindowLocoPagesCount > 1)))
+            if ((!Viewer.HUDScrollWindow.Visible && (hudWindowColumnsPagesCount > 0 || hudWindowLinesPagesCount > 1)) || WebServerPageNo > 0 ||(TextPages[TextPage] == TextPageLocomotiveInfo && (IsSteamLocomotive || hudWindowLocoPagesCount > 1)))
                 Viewer.HUDScrollWindow.Visible = true;
         }
 
