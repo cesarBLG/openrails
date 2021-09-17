@@ -4613,6 +4613,13 @@ namespace Orts.Simulation.RollingStocks
             TrainControlSystem.AlerterPressed(pressed);
         }
 
+        public enum TrainType { Pax, Cargo };
+        public TrainType SelectedTrainType = TrainType.Pax;
+        public void ChangeTrainTypePaxCargo()
+        {
+            SelectedTrainType = SelectedTrainType == TrainType.Pax ? TrainType.Cargo : TrainType.Pax;
+        }
+
         public override void SignalEvent(Event evt)
         {
             switch (evt)
