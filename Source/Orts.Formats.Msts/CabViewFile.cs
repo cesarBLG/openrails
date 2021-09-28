@@ -361,7 +361,12 @@ namespace Orts.Formats.Msts
         RPM,
         LBS,
 
-        KILOMETRES
+        KILOMETRES,
+        METRES,
+        MILES,
+        FEET,
+        YARDS
+
     }
 
     public enum DiscreteStates

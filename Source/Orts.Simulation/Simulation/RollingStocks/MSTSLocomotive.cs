@@ -5547,6 +5547,28 @@ namespace Orts.Simulation.RollingStocks
                     data = LocomotivePowerSupply.ElectricTrainSupplyOn ? 1 : 0;
                     break;
 
+                case CABViewControlTypes.ORTS_ODOMETER:
+                    switch (cvc.Units)
+                    {
+                        case CABViewControlUnits.KILOMETRES:
+                            data = float.Parse(Math.Round(OdometerM / 1000, 0).ToString());
+                            break;
+                        case CABViewControlUnits.MILES:
+                            data = (float)Math.Round(Me.ToMi(OdometerM), 0);
+                            break;
+                        case CABViewControlUnits.FEET:
+                            data = (float)Math.Round(Me.ToFt(OdometerM), 0);
+                            break;
+                        case CABViewControlUnits.YARDS:
+                            data = (float)Math.Round(Me.ToYd(OdometerM), 0);
+                            break;
+                        case CABViewControlUnits.METRES:
+                        default:
+                            data = OdometerM;
+                        break;
+                    }
+                    break;
+
                 default:
                     if (CruiseControl != null)
                         data = CruiseControl.GetDataOf(cvc);
