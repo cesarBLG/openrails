@@ -1921,9 +1921,6 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                         data = Locomotive.AccelerationBits;
                         break;
                     }
-                case CABViewControlTypes.ORTS_ODOMETER:
-                    data = cvc.Units == CABViewControlUnits.KILOMETRES ? float.Parse(Math.Round(Locomotive.OdometerM / 1000, 0).ToString()) : Locomotive.OdometerM;
-                    break;
                 case CABViewControlTypes.ORTS_CC_SELECT_SPEED:
                     data = Locomotive.SelectingSpeedPressed ? 1 : 0;
                     break;
