@@ -315,6 +315,7 @@ namespace Orts.Simulation.RollingStocks
         protected float OdometerResetPositionM = 0;
         protected bool OdometerCountingUp = true;
         protected bool OdometerCountingForwards = true;
+        public bool OdometerResetButtonPressed = false;
 
         public bool OdometerVisible { get; private set; }
         public float OdometerM
@@ -4554,32 +4555,35 @@ namespace Orts.Simulation.RollingStocks
         /// Set odometer reference distance to actual travelled distance,
         /// and set measuring direction to the actual direction
         /// </summary>
-        public void OdometerReset()
+        public void OdometerReset(bool toState)
         {
             if (Train == null)
                 return;
-
-            if (OdometerCountingForwards != OdometerCountingUp ^ (Direction == Direction.Reverse))
+            if (toState)
             {
-                OdometerCountingForwards = !OdometerCountingForwards;
-            }
+                if (OdometerCountingForwards != OdometerCountingUp ^ (Direction == Direction.Reverse))
+                {
+                    OdometerCountingForwards = !OdometerCountingForwards;
+                }
 
-            if (Direction == Direction.Reverse)
-            {
-                if (OdometerCountingForwards)
-                    OdometerResetPositionM = Train.DistanceTravelledM - Train.Length;
+                if (Direction == Direction.Reverse)
+                {
+                    if (OdometerCountingForwards)
+                        OdometerResetPositionM = Train.DistanceTravelledM - Train.Length;
+                    else
+                        OdometerResetPositionM = Train.DistanceTravelledM;
+                }
                 else
-                    OdometerResetPositionM = Train.DistanceTravelledM;
-            }
-            else
-            {
-                if (OdometerCountingForwards)
-                    OdometerResetPositionM = Train.DistanceTravelledM;
-                else
-                    OdometerResetPositionM = Train.DistanceTravelledM + Train.Length;
-            }
+                {
+                    if (OdometerCountingForwards)
+                        OdometerResetPositionM = Train.DistanceTravelledM;
+                    else
+                        OdometerResetPositionM = Train.DistanceTravelledM + Train.Length;
+                }
 
-            Simulator.Confirmer.Confirm(CabControl.Odometer, CabSetting.On);
+                Simulator.Confirmer.Confirm(CabControl.Odometer, CabSetting.On);
+            }
+            OdometerResetButtonPressed = toState;
         }
 
         public void OdometerToggleDirection()
@@ -5567,6 +5571,12 @@ namespace Orts.Simulation.RollingStocks
                             data = OdometerM;
                         break;
                     }
+                    break;
+                case CABViewControlTypes.ORTS_ODOMETER_DIRECTION:
+                    data = OdometerCountingUp ? 1 : 0;
+                    break;
+                case CABViewControlTypes.ORTS_ODOMETER_RESET:
+                    data = OdometerResetButtonPressed ? 1 : 0;
                     break;
 
                 default:
