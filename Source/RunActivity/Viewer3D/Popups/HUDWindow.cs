@@ -1317,7 +1317,7 @@ namespace Orts.Viewer3D.Popups
                 {
                     statusString = statusString + cell + "\t";
                 }
-                if (statusString.StartsWith("1V"))
+                if (statusString.StartsWith("1V") || statusString.StartsWith("ST"))
                 {
                     var indexMatch = statusHeader.FindIndex(x => x.Contains(Viewer.Catalog.GetString("VacRes")));
                     if (!statusBrake.Contains(statusHeader[indexMatch]))//Avoid header duplicity
