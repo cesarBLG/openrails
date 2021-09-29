@@ -1,5 +1,5 @@
-﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.105
-September 18th, 2021
+﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.106
+September 29thy, 2021
 
 Please note that the installation and use of Open Rails software, even of its unofficial versions, is governed by the Open Rails End User License Agreement. 
 
@@ -11,7 +11,8 @@ INSTALLATION
 
 
 RELEASE NOTES
-This unofficial version has been derived from the latest official OpenRails Release candidate 1.4-rc4, coinciding with the latest testing version T1.3.1-2055 
+This unofficial version has been derived from the latest official OpenRails Release candidate 1.4-rc4, and from the latest official Testing release
+T1.3.1-2065 
 
 This unofficial version includes the cruise control software written by Jindrich with final adaptations by myself.
 
@@ -56,7 +57,8 @@ This version includes some features not (yet) available in the Open Rails testin
 - Cruise control: support for Combined control where the throttle section can be used also as max force selector
 - Fix bug in stating whether tractive or braking force of ORTS_SIGNED_TRACTION_TOTAL_BRAKING
 - Cruise control: add variable to adjust dynamic braking force change speed
-Moreover this includes also PR #488 by steamer-CTN: Correct error introduced that stopped some brake tokens from operating.
+- Cruise control: manage running in reverse
+- NEW: cabview controls ODOMETER, ODOMETER_RESET and ODOMETER_DIRECTION, see https://blueprints.launchpad.net/or/+spec/odometer-cabview-control .
 
 The Monogame related code intentionally coincides only partly with the code of the OR official testing version.
 
