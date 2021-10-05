@@ -49,6 +49,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
         public float SelectedSpeedMpS = 0;
         public int SelectedNumberOfAxles = 0;
         public float SpeedRegulatorNominalSpeedStepMpS = 0;
+        public float SpeedRegulatorNominalSpeedStepKpHOrMpH = 0;
         public float MaxAccelerationMpSS = 0;
         public float MaxDecelerationMpSS = 0;
         public bool UseThrottle = false;
@@ -120,7 +121,11 @@ namespace Orts.Simulation.RollingStocks.SubSystems
         public bool DynamicBrakeCommandHasPriorityOverCruiseControl = true;
         public bool HasIndependentThrottleDynamicBrakeLever = false;
         public bool HasProportionalSpeedSelector = false;
+        public bool SpeedSelectorIsDiscrete = false;
         public bool DoComputeNumberOfAxles = false;
+        public bool DisableManualSwitchToManualWhenSetForceNotAtZero = false;
+        public bool DisableManualSwitchToAutoWhenSetForceNotAtZero = false;
+        public bool DisableManualSwitchToAutoWhenSetSpeedNotAtTop = false;
         protected float speedRegulatorIntermediateValue = 0;
         protected float StepSize = 20;
         protected float RelativeAccelerationMpSS = 0; // Acceleration relative to state of reverser
@@ -160,6 +165,9 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                 case "engine(ortscruisecontrol(disablecruisecontrolonthrottleandzerospeed": DisableCruiseControlOnThrottleAndZeroSpeed = stf.ReadBoolBlock(false); break;
                 case "engine(ortscruisecontrol(disablecruisecontrolonthrottleandzeroforce": DisableCruiseControlOnThrottleAndZeroForce = stf.ReadBoolBlock(false); break;
                 case "engine(ortscruisecontrol(disablecruisecontrolonthrottleandzeroforceandzerospeed": DisableCruiseControlOnThrottleAndZeroForceAndZeroSpeed = stf.ReadBoolBlock(false); break;
+                case "engine(ortscruisecontrol(disablemanualswitchtomanualwhensetforcenotatzero": DisableManualSwitchToManualWhenSetForceNotAtZero = stf.ReadBoolBlock(false); break;
+                case "engine(ortscruisecontrol(disablemanualswitchtoautowhensetforcenotatzero": DisableManualSwitchToAutoWhenSetForceNotAtZero = stf.ReadBoolBlock(false); break;
+                case "engine(ortscruisecontrol(disablemanualswitchtoautowhensetspeednotattop": DisableManualSwitchToAutoWhenSetSpeedNotAtTop = stf.ReadBoolBlock(false); break;
 
                 case "engine(ortscruisecontrol(forcestepsthrottletable":
                     foreach (var forceStepThrottleValue in stf.ReadStringBlock("").Replace(" ", "").Split(','))
@@ -189,7 +197,12 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                 case "engine(ortscruisecontrol(maxdeceleration": MaxDecelerationMpSS = stf.ReadFloatBlock(STFReader.UNITS.Any, 0.5f); break;
                 case "engine(ortscruisecontrol(antiwheelspinequipped": AntiWheelSpinEquipped = stf.ReadBoolBlock(false); break;
                 case "engine(ortscruisecontrol(antiwheelspinspeeddiffthreshold": AntiWheelSpinSpeedDiffThreshold = stf.ReadFloatBlock(STFReader.UNITS.None, 0.5f); break;
-                case "engine(ortscruisecontrol(nominalspeedstep": SpeedRegulatorNominalSpeedStepMpS = SpeedIsMph ? MpS.FromMpH(stf.ReadFloatBlock(STFReader.UNITS.Speed, 0)) : MpS.FromKpH(stf.ReadFloatBlock(STFReader.UNITS.Speed, 0)); break;
+                case "engine(ortscruisecontrol(nominalspeedstep":
+                    {
+                        SpeedRegulatorNominalSpeedStepKpHOrMpH = stf.ReadFloatBlock(STFReader.UNITS.Speed, 0);
+                        SpeedRegulatorNominalSpeedStepMpS = SpeedIsMph ? MpS.FromMpH(SpeedRegulatorNominalSpeedStepKpHOrMpH) : MpS.FromKpH(SpeedRegulatorNominalSpeedStepKpHOrMpH);
+                        break;
+                    }
                 case "engine(ortscruisecontrol(usethrottleasspeedselector": UseThrottleAsSpeedSelector = stf.ReadBoolBlock(false); break;
                 case "engine(ortscruisecontrol(usethrottleasforceselector": UseThrottleAsForceSelector = stf.ReadBoolBlock(false); break;
                 case "engine(ortscruisecontrol(dynamicbrakeincreasespeed": DynamicBrakeIncreaseSpeed = stf.ReadFloatBlock(STFReader.UNITS.Any, 0.5f); break;
@@ -200,6 +213,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                 case "engine(ortscruisecontrol(dynamicbrakecommandhaspriorityovercruisecontrol": DynamicBrakeCommandHasPriorityOverCruiseControl = stf.ReadBoolBlock(true); break;
                 case "engine(ortscruisecontrol(hasindependentthrottledynamicbrakelever": HasIndependentThrottleDynamicBrakeLever = stf.ReadBoolBlock(false); break;
                 case "engine(ortscruisecontrol(hasproportionalspeedselector": HasProportionalSpeedSelector = stf.ReadBoolBlock(false); break;
+                case "engine(ortscruisecontrol(speedselectorisdiscrete": SpeedSelectorIsDiscrete = stf.ReadBoolBlock(false); break;
                 case "engine(ortscruisecontrol(docomputenumberofaxles": DoComputeNumberOfAxles = stf.ReadBoolBlock(false); break;
                 case "engine(ortscruisecontrol(options":
                     foreach (var speedRegulatorOption in stf.ReadStringBlock("").ToLower().Replace(" ", "").Split(','))
@@ -251,6 +265,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
             SpeedRegulatorOptions = other.SpeedRegulatorOptions;
             CruiseControlLogic = other.CruiseControlLogic;
             SpeedRegulatorNominalSpeedStepMpS = other.SpeedRegulatorNominalSpeedStepMpS;
+            SpeedRegulatorNominalSpeedStepKpHOrMpH = other.SpeedRegulatorNominalSpeedStepKpHOrMpH;
             MaxAccelerationMpSS = other.MaxAccelerationMpSS;
             MaxDecelerationMpSS = other.MaxDecelerationMpSS;
             UseThrottle = other.UseThrottle;
@@ -297,6 +312,10 @@ namespace Orts.Simulation.RollingStocks.SubSystems
             DynamicBrakeCommandHasPriorityOverCruiseControl = other.DynamicBrakeCommandHasPriorityOverCruiseControl;
             HasIndependentThrottleDynamicBrakeLever = other.HasIndependentThrottleDynamicBrakeLever;
             HasProportionalSpeedSelector = other.HasProportionalSpeedSelector;
+            DisableManualSwitchToManualWhenSetForceNotAtZero = other.DisableManualSwitchToManualWhenSetForceNotAtZero;
+            DisableManualSwitchToAutoWhenSetForceNotAtZero = other.DisableManualSwitchToAutoWhenSetForceNotAtZero;
+            DisableManualSwitchToAutoWhenSetSpeedNotAtTop = other.DisableManualSwitchToAutoWhenSetSpeedNotAtTop;
+            SpeedSelectorIsDiscrete = other.SpeedSelectorIsDiscrete;
             DoComputeNumberOfAxles = other.DoComputeNumberOfAxles;
             SpeedRegulatorOptions = other.SpeedRegulatorOptions;
         }
@@ -422,6 +441,10 @@ namespace Orts.Simulation.RollingStocks.SubSystems
             SpeedRegulatorMode previousMode = SpeedRegMode;
             if (!Equipped) return;
             if (SpeedRegMode == SpeedRegulatorMode.Testing) return;
+            if (SpeedRegMode == SpeedRegulatorMode.Manual &&
+               ((DisableManualSwitchToAutoWhenSetForceNotAtZero && SelectedMaxAccelerationStep != 0) ||
+               (DisableManualSwitchToAutoWhenSetSpeedNotAtTop && SelectedSpeedMpS != Locomotive.MaxSpeedMpS)))
+                return;
             bool test = false;
             while (!test)
             {
@@ -431,7 +454,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                     case SpeedRegulatorMode.Auto:
                         {
                             if (SpeedRegulatorOptions.Contains("regulatorauto")) test = true;
-                            SelectedSpeedMpS = Locomotive.AbsSpeedMpS;
+                            if (!DisableManualSwitchToAutoWhenSetSpeedNotAtTop) SelectedSpeedMpS = Locomotive.AbsSpeedMpS;
                             break;
                         }
                     case SpeedRegulatorMode.Testing: if (SpeedRegulatorOptions.Contains("regulatortest")) test = true; break;
@@ -449,6 +472,9 @@ namespace Orts.Simulation.RollingStocks.SubSystems
             Locomotive.SignalEvent(Common.Event.CruiseControlSpeedRegulator);
             if (!Equipped) return;
             if (SpeedRegMode == SpeedRegulatorMode.Manual) return;
+            if (SpeedRegMode == SpeedRegulatorMode.Auto &&
+                (DisableManualSwitchToManualWhenSetForceNotAtZero && SelectedMaxAccelerationStep != 0))
+                return;
             bool test = false;
             while (!test)
             {
@@ -461,7 +487,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                             Locomotive.ThrottleController.SetPercent(0);
                             currentThrottlePercent = 0;
                             if (SpeedRegulatorOptions.Contains("regulatormanual")) test = true;
-                             SelectedSpeedMpS = 0;
+                            if (ZeroSelectedSpeedWhenPassingToThrottleMode) SelectedSpeedMpS = 0;
                             foreach (MSTSLocomotive lc in playerNotDriveableTrainLocomotives)
                             {
                                 lc.ThrottleOverriden = 0;
@@ -762,7 +788,10 @@ namespace Orts.Simulation.RollingStocks.SubSystems
             SelectedSpeedMpS += SpeedRegulatorNominalSpeedStepMpS;
             if (SelectedSpeedMpS > Locomotive.MaxSpeedMpS)
                 SelectedSpeedMpS = Locomotive.MaxSpeedMpS;
-            Simulator.Confirmer.Message(ConfirmLevel.Information, Simulator.Catalog.GetString("Selected speed changed to ") + Math.Round(MpS.FromMpS(SelectedSpeedMpS, true), 0, MidpointRounding.AwayFromZero).ToString() + " km/h");
+            if (SpeedIsMph)
+                Simulator.Confirmer.Message(ConfirmLevel.Information, Simulator.Catalog.GetString("Selected speed changed to ") + Math.Round(MpS.FromMpS(SelectedSpeedMpS, false), 0, MidpointRounding.AwayFromZero).ToString() + " mph");
+            else
+                Simulator.Confirmer.Message(ConfirmLevel.Information, Simulator.Catalog.GetString("Selected speed changed to ") + Math.Round(MpS.FromMpS(SelectedSpeedMpS, true), 0, MidpointRounding.AwayFromZero).ToString() + " km/h");
         }
 
         public bool SelectedSpeedDecreasing = false;
@@ -831,7 +860,10 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                 }
                 SelectedSpeedDecreasing = false;
             }
-            Simulator.Confirmer.Message(ConfirmLevel.Information, Simulator.Catalog.GetString("Selected speed changed to ") + Math.Round(MpS.FromMpS(SelectedSpeedMpS, true), 0, MidpointRounding.AwayFromZero).ToString() + " km/h");
+            if (SpeedIsMph)
+                Simulator.Confirmer.Message(ConfirmLevel.Information, Simulator.Catalog.GetString("Selected speed changed to ") + Math.Round(MpS.FromMpS(SelectedSpeedMpS, false), 0, MidpointRounding.AwayFromZero).ToString() + " mph");
+            else
+                Simulator.Confirmer.Message(ConfirmLevel.Information, Simulator.Catalog.GetString("Selected speed changed to ") + Math.Round(MpS.FromMpS(SelectedSpeedMpS, true), 0, MidpointRounding.AwayFromZero).ToString() + " km/h");
         }
 
         public void SpeedRegulatorSelectedSpeedChangeByMouse(float movExtension, bool metric, float maxValue)
@@ -850,8 +882,10 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                     else if (movExtension < 0)
                         return;
                 }
-                SelectedSpeedMpS += metric ? MpS.FromKpH((float)Math.Round(movExtension * maxValue)) :
-                    MpS.FromMpH((float)Math.Round(movExtension * maxValue));
+                SelectedSpeedMpS += SpeedSelectorIsDiscrete ? (metric ? MpS.FromKpH((float)Math.Round(movExtension * maxValue / SpeedRegulatorNominalSpeedStepKpHOrMpH) * SpeedRegulatorNominalSpeedStepKpHOrMpH) :
+                    MpS.FromMpH((float)Math.Round(movExtension * maxValue / SpeedRegulatorNominalSpeedStepKpHOrMpH) * SpeedRegulatorNominalSpeedStepKpHOrMpH)) :
+                    (metric ? MpS.FromKpH((float)Math.Round(movExtension * maxValue)) :
+                    MpS.FromMpH((float)Math.Round(movExtension * maxValue)));
                 if (SelectedSpeedMpS > Locomotive.MaxSpeedMpS)
                     SelectedSpeedMpS = Locomotive.MaxSpeedMpS;
                 if (SelectedSpeedMpS < 0)
@@ -860,8 +894,10 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                 {
                     Locomotive.SignalEvent(Common.Event.LeverToZero);
                 }
-                Locomotive.Simulator.Confirmer.Information("Selected maximum speed was changed to " +
-                    ((int)SelectedSpeedMpS).ToString());
+                if (SpeedIsMph)
+                    Simulator.Confirmer.Message(ConfirmLevel.Information, Simulator.Catalog.GetString("Selected speed changed to ") + Math.Round(MpS.FromMpS(SelectedSpeedMpS, false), 0, MidpointRounding.AwayFromZero).ToString() + " mph");
+                else
+                    Simulator.Confirmer.Message(ConfirmLevel.Information, Simulator.Catalog.GetString("Selected speed changed to ") + Math.Round(MpS.FromMpS(SelectedSpeedMpS, true), 0, MidpointRounding.AwayFromZero).ToString() + " km/h");
             }
         }
 

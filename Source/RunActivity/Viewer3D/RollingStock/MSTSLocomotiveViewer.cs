@@ -2514,13 +2514,30 @@ namespace Orts.Viewer3D.RollingStock
                     break;
                 case CABViewControlTypes.ORTS_SELECTED_SPEED_REGULATOR_MODE:
                     p = ChangedValue(0);
-                    if (p == 1)
+                    if (Control.ControlStyle == CABViewControlStyles.ONOFF)
                     {
-                        Locomotive.CruiseControl.SpeedRegulatorModeIncrease();
+                        if (ChangedValue(0) == 1)
+                        {
+                            if (Locomotive.CruiseControl.SpeedRegMode == Simulation.RollingStocks.SubSystems.CruiseControl.SpeedRegulatorMode.Manual)
+                            {
+                                Locomotive.CruiseControl.SpeedRegulatorModeIncrease();
+                            }
+                            else if (Locomotive.CruiseControl.SpeedRegMode == Simulation.RollingStocks.SubSystems.CruiseControl.SpeedRegulatorMode.Auto)
+                            {
+                                Locomotive.CruiseControl.SpeedRegulatorModeDecrease();
+                            }
+                        }
                     }
-                    else if (p == -1)
+                    else
                     {
-                        Locomotive.CruiseControl.SpeedRegulatorModeDecrease();
+                        if (p == 1)
+                        {
+                            Locomotive.CruiseControl.SpeedRegulatorModeIncrease();
+                        }
+                        else if (p == -1)
+                        {
+                            Locomotive.CruiseControl.SpeedRegulatorModeDecrease();
+                        }
                     }
                     break;
                 case CABViewControlTypes.ORTS_SELECTED_SPEED_MODE:
