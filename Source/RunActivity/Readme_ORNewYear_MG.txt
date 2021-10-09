@@ -1,5 +1,5 @@
-﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.106
-September 29thy, 2021
+﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.107
+October 9th, 2021
 
 Please note that the installation and use of Open Rails software, even of its unofficial versions, is governed by the Open Rails End User License Agreement. 
 
@@ -11,8 +11,8 @@ INSTALLATION
 
 
 RELEASE NOTES
-This unofficial version has been derived from the latest official OpenRails Release candidate 1.4-rc4, and from the latest official Testing release
-T1.3.1-2065 
+This unofficial version has been derived from the latest official OpenRails Release candidate 1.4-rc6, and from the latest official Testing release
+T1.3.1-2088 
 
 This unofficial version includes the cruise control software written by Jindrich with final adaptations by myself.
 
@@ -58,7 +58,13 @@ This version includes some features not (yet) available in the Open Rails testin
 - Fix bug in stating whether tractive or braking force of ORTS_SIGNED_TRACTION_TOTAL_BRAKING
 - Cruise control: add variable to adjust dynamic braking force change speed
 - Cruise control: manage running in reverse
-- NEW: cabview controls ODOMETER, ODOMETER_RESET and ODOMETER_DIRECTION, see https://blueprints.launchpad.net/or/+spec/odometer-cabview-control .
+- cabview controls ODOMETER, ODOMETER_RESET and ODOMETER_DIRECTION, see https://blueprints.launchpad.net/or/+spec/odometer-cabview-control 
+- NEW: Odometer: support for display of decimals, see http://www.elvastower.com/forums/index.php?/topic/35541-odometer-cabview-controls/page__pid__276808__st__10#entry276808
+- NEW: Cruise control: improved support for auto/manual switch, including support for ON/OFF control and additional parameters for .eng file.
+
+Moreover following items have been added:
+- NEW: fix for https://bugs.launchpad.net/or/+bug/1945886 Impossible to start trains upnill with dynamic brake blending(PR #512 by Serana)
+- NEW: code of PR #515 (Correct issue with compressor not turning off), by steamer_ctn.
 
 The Monogame related code intentionally coincides only partly with the code of the OR official testing version.
 
