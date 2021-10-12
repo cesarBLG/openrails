@@ -1634,7 +1634,6 @@ namespace Orts.Common
         public override void Redo()
         {
             Receiver.OdometerToggle();
-            // Report();
         }
 
         public override string ToString()
@@ -1657,7 +1656,6 @@ namespace Orts.Common
         public override void Redo()
         {
             Receiver.OdometerReset(ToState);
-            // Report();
         }
 
         public override string ToString()
@@ -1680,7 +1678,6 @@ namespace Orts.Common
         public override void Redo()
         {
             Receiver.OdometerToggleDirection();
-            // Report();
         }
 
         public override string ToString()
@@ -1910,4 +1907,47 @@ namespace Orts.Common
         }
     }
 
+    [Serializable()]
+    public sealed class ToggleGenericItem1Command : Command
+    {
+        public static MSTSLocomotive Receiver { get; set; }
+
+        public ToggleGenericItem1Command(CommandLog log)
+            : base(log)
+        {
+            Redo();
+        }
+
+        public override void Redo()
+        {
+            Receiver.GenericItem1Toggle();
+        }
+
+        public override string ToString()
+        {
+            return base.ToString();
+        }
+    }
+
+    [Serializable()]
+    public sealed class ToggleGenericItem2Command : Command
+    {
+        public static MSTSLocomotive Receiver { get; set; }
+
+        public ToggleGenericItem2Command(CommandLog log)
+            : base(log)
+        {
+            Redo();
+        }
+
+        public override void Redo()
+        {
+            Receiver.GenericItem2Toggle();
+        }
+
+        public override string ToString()
+        {
+            return base.ToString();
+        }
+    }
 }

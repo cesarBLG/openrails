@@ -441,6 +441,9 @@ namespace Orts.Simulation.RollingStocks
 
         public float PowerReduction = 0;
 
+        public bool GenericItem1;
+        public bool GenericItem2;
+
         // Jindrich
         public CruiseControl CruiseControl;
  //       public MultiPositionController MultiPositionController;
@@ -1190,6 +1193,8 @@ namespace Orts.Simulation.RollingStocks
             outf.Write(IsWaterScoopDown);
             outf.Write(CurrentTrackSandBoxCapacityM3);
             outf.Write(SaveAdhesionFilter);
+            outf.Write(GenericItem1);
+            outf.Write(GenericItem2);
 
             base.Save(outf);
 
@@ -1242,6 +1247,9 @@ namespace Orts.Simulation.RollingStocks
             SaveAdhesionFilter = inf.ReadSingle();
             
             AdhesionFilter.Reset(SaveAdhesionFilter);
+
+            GenericItem1 = inf.ReadBoolean();
+            GenericItem2 = inf.ReadBoolean();
 
             base.Restore(inf);
 
@@ -4600,6 +4608,18 @@ namespace Orts.Simulation.RollingStocks
             Simulator.Confirmer.Confirm(CabControl.Odometer, OdometerCountingUp ? CabSetting.Increase : CabSetting.Decrease);
         }
 
+        public void GenericItem1Toggle()
+        {
+            GenericItem1 = !GenericItem1;
+            SignalEvent(GenericItem1? Event.GenericItem1On : Event.GenericItem1Off); // hook for sound trigger
+        }
+
+        public void GenericItem2Toggle()
+        {
+            GenericItem2 = !GenericItem2;
+            SignalEvent(GenericItem2 ? Event.GenericItem2On : Event.GenericItem2Off); // hook for sound trigger
+        }
+
         public override bool GetCabFlipped()
         {
             return UsingRearCab;
@@ -5512,6 +5532,16 @@ namespace Orts.Simulation.RollingStocks
                         seconds += 60;
                     data = seconds;
                     break;
+                case CABViewControlTypes.ORTS_GENERIC_ITEM1:
+                    {
+                        data = GenericItem1 ? 1 : 0;
+                        break;
+                    }
+                case CABViewControlTypes.ORTS_GENERIC_ITEM2:
+                    {
+                        data = GenericItem2 ? 1 : 0;
+                        break;
+                    }
 
                 // Train Control System controls
                 case CABViewControlTypes.ORTS_TCS1:
