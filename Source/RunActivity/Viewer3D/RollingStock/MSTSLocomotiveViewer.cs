@@ -308,7 +308,9 @@ namespace Orts.Viewer3D.RollingStock
 
             // Wipers and bell animation
             Wipers.UpdateLoop(Locomotive.Wiper, elapsedTime);
-            Bell.UpdateLoop(Locomotive.Bell, elapsedTime, TrainCarShape.SharedShape.BellAnimationFPS);
+            Bell.UpdateLoop(Locomotive.Bell, elapsedTime, TrainCarShape.SharedShape.CustomAnimationFPS);
+            Item1Continuous.UpdateLoop(Locomotive.GenericItem1, elapsedTime, TrainCarShape.SharedShape.CustomAnimationFPS);
+            Item2Continuous.UpdateLoop(Locomotive.GenericItem2, elapsedTime, TrainCarShape.SharedShape.CustomAnimationFPS);
 
             // Draw 2D CAB View - by GeorgeS
             if (Viewer.Camera.AttachedCar == this.MSTSWagon &&
@@ -2448,8 +2450,10 @@ namespace Orts.Viewer3D.RollingStock
                 case CABViewControlTypes.ORTS_ODOMETER_DIRECTION: if (ChangedValue(1) == 0) new ToggleOdometerDirectionCommand(Viewer.Log); break;
                 case CABViewControlTypes.ORTS_ODOMETER_RESET:
                     new ResetOdometerCommand(Viewer.Log, ChangedValue(Locomotive.OdometerResetButtonPressed ? 1 : 0) > 0); break;
-                case CABViewControlTypes.ORTS_GENERIC_ITEM1: new ToggleGenericItem1Command(Viewer.Log); break;
-                case CABViewControlTypes.ORTS_GENERIC_ITEM2: new ToggleGenericItem2Command(Viewer.Log); break;
+                case CABViewControlTypes.ORTS_GENERIC_ITEM1:
+                    if ((Locomotive.GenericItem1 ? 1 : 0) != ChangedValue(Locomotive.GenericItem1 ? 1 : 0)) new ToggleGenericItem1Command(Viewer.Log); break;
+                case CABViewControlTypes.ORTS_GENERIC_ITEM2:
+                    if ((Locomotive.GenericItem2 ? 1 : 0) != ChangedValue(Locomotive.GenericItem2 ? 1 : 0)) new ToggleGenericItem2Command(Viewer.Log); break;
 
                 // Train Control System controls
                 case CABViewControlTypes.ORTS_TCS1:

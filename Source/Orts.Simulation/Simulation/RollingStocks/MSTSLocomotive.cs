@@ -441,9 +441,6 @@ namespace Orts.Simulation.RollingStocks
 
         public float PowerReduction = 0;
 
-        public bool GenericItem1;
-        public bool GenericItem2;
-
         // Jindrich
         public CruiseControl CruiseControl;
  //       public MultiPositionController MultiPositionController;
