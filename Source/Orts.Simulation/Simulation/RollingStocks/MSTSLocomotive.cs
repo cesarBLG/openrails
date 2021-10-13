@@ -1808,7 +1808,11 @@ namespace Orts.Simulation.RollingStocks
             {
                 if (CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Manual)
                     CruiseControl.SkipThrottleDisplay = false;
-                if (!IsPlayerTrain || CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Manual || CruiseControl.UseThrottle ||
+
+                if (IsPlayerTrain)
+                    CruiseControl.UpdateSelectedSpeed(elapsedClockSeconds);
+
+                 if (!IsPlayerTrain || CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Manual || CruiseControl.UseThrottle ||
                     CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto && CruiseControl.DynamicBrakePriority)
                 {
                     CruiseControl.WasForceReset = false;
