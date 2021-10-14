@@ -5617,7 +5617,7 @@ namespace Orts.Simulation.RollingStocks
                     switch (cvc.Units)
                     {
                         case CABViewControlUnits.KILOMETRES:
-                            data = OdometerM / 1000;
+                            data = (float)Me.ToKiloM(OdometerM);
                             break;
                         case CABViewControlUnits.MILES:
                             data = (float)Me.ToMi(OdometerM);
@@ -5631,7 +5631,7 @@ namespace Orts.Simulation.RollingStocks
                         case CABViewControlUnits.METRES:
                         default:
                             data = OdometerM;
-                        break;
+                            break;
                     }
                     break;
                 case CABViewControlTypes.ORTS_ODOMETER_DIRECTION:

@@ -255,6 +255,9 @@ namespace Orts.Formats.Msts
         ORTS_TCS47,
         ORTS_TCS48,
         ORTS_ETCS,
+        ORTS_ODOMETER,
+        ORTS_ODOMETER_RESET,
+        ORTS_ODOMETER_DIRECTION,
         ORTS_SELECTED_SPEED,
         ORTS_SELECTED_SPEED_DISPLAY,
         ORTS_SELECTED_SPEED_MODE,
@@ -276,9 +279,6 @@ namespace Orts.Formats.Msts
         ORTS_CONTROLLER_VOLTAGE,
         ORTS_AMPERS_BY_CONTROLLER_VOLTAGE,
         ORTS_ACCELERATION_IN_TIME,
-        ORTS_ODOMETER,
-        ORTS_ODOMETER_RESET,
-        ORTS_ODOMETER_DIRECTION,
         ORTS_CC_SELECT_SPEED,
         ORTS_NUMBER_OF_AXES_INCREASE,
         ORTS_NUMBER_OF_AXES_DECREASE,
@@ -368,7 +368,6 @@ namespace Orts.Formats.Msts
         MILES,
         FEET,
         YARDS
-
     }
 
     public enum DiscreteStates
