@@ -250,5 +250,6 @@
         [GetString("Control Select Speed 180 kph/mph")] ControlSelectSpeed180,
         [GetString("Control Select Speed 190 kph/mph")] ControlSelectSpeed190,
         [GetString("Control Select Speed 200 kph/mph")] ControlSelectSpeed200,
+        [GetString("Control Selected Speed To Zero")] ControlSpeedRegulatorSelectedSpeedToZero,
     }
 }

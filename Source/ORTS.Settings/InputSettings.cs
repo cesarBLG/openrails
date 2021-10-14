@@ -478,6 +478,7 @@ namespace ORTS.Settings
             Commands[(int)UserCommand.ControlSelectSpeed180] = new UserCommandKeyInput(0x09, KeyModifiers.Control | KeyModifiers.Shift);
             Commands[(int)UserCommand.ControlSelectSpeed190] = new UserCommandKeyInput(0x0A, KeyModifiers.Control | KeyModifiers.Shift);
             Commands[(int)UserCommand.ControlSelectSpeed200] = new UserCommandKeyInput(0x0B, KeyModifiers.Control | KeyModifiers.Shift);
+            Commands[(int)UserCommand.ControlSpeedRegulatorSelectedSpeedToZero] = new UserCommandKeyInput(0x1E, KeyModifiers.Shift | KeyModifiers.Alt);
 
             Commands[(int)UserCommand.DebugClockBackwards] = new UserCommandKeyInput(0x0C);
             Commands[(int)UserCommand.DebugClockForwards] = new UserCommandKeyInput(0x0D);

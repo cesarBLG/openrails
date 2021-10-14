@@ -74,6 +74,7 @@ namespace Orts.Viewer3D.RollingStock.SubSystems
             UserInputCommands.Add(UserCommand.ControlSelectSpeed180, new Action[] { Noop, () => CruiseControl.SetSpeed(180) });
             UserInputCommands.Add(UserCommand.ControlSelectSpeed190, new Action[] { Noop, () => CruiseControl.SetSpeed(190) });
             UserInputCommands.Add(UserCommand.ControlSelectSpeed200, new Action[] { Noop, () => CruiseControl.SetSpeed(200) });
+            UserInputCommands.Add(UserCommand.ControlSpeedRegulatorSelectedSpeedToZero, new Action[] { Noop, () => CruiseControl.SetSpeed(0) });
         }
     }
 }
