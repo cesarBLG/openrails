@@ -1,5 +1,5 @@
-﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.107
-October 9th, 2021
+﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.108
+October 15th, 2021
 
 Please note that the installation and use of Open Rails software, even of its unofficial versions, is governed by the Open Rails End User License Agreement. 
 
@@ -59,12 +59,16 @@ This version includes some features not (yet) available in the Open Rails testin
 - Cruise control: add variable to adjust dynamic braking force change speed
 - Cruise control: manage running in reverse
 - cabview controls ODOMETER, ODOMETER_RESET and ODOMETER_DIRECTION, see https://blueprints.launchpad.net/or/+spec/odometer-cabview-control 
-- NEW: Odometer: support for display of decimals, see http://www.elvastower.com/forums/index.php?/topic/35541-odometer-cabview-controls/page__pid__276808__st__10#entry276808
-- NEW: Cruise control: improved support for auto/manual switch, including support for ON/OFF control and additional parameters for .eng file.
+- Cruise control: improved support for auto/manual switch, including support for ON/OFF control and additional parameters for .eng file
+- NEW: Cruise control: keyboard command to set selected speed at zero
+- NEW: 2 cabview controls for generic items, see http://www.elvastower.com/forums/index.php?/topic/35572-cabview-controls-for-generic-items/
+- NEW: fix bug in .csproj file, by perpetualKid
+- NEW: Cruise control: allow optional setting of speed also in manual mode.
 
 Moreover following items have been added:
-- NEW: fix for https://bugs.launchpad.net/or/+bug/1945886 Impossible to start trains upnill with dynamic brake blending(PR #512 by Serana)
-- NEW: code of PR #515 (Correct issue with compressor not turning off), by steamer_ctn.
+- fix for https://bugs.launchpad.net/or/+bug/1945886 Impossible to start trains upnill with dynamic brake blending(PR #512 by Serana)
+- code of PR #515 (Correct issue with compressor not turning off), by steamer_ctn
+- code pf PR #514 (Locales not to be translated), by mbm_OR.
 
 The Monogame related code intentionally coincides only partly with the code of the OR official testing version.
 
