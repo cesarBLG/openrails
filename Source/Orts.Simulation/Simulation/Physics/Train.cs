@@ -11223,8 +11223,13 @@ namespace Orts.Simulation.Physics
 
             if (TCRoute != null && (ControlMode == TRAIN_CONTROL.AUTO_SIGNAL || ControlMode == TRAIN_CONTROL.AUTO_NODE))
             {
-                PresentPosition[0].RouteListIndex = ValidRoute[0].GetRouteIndex(PresentPosition[0].TCSectionIndex, 0);
-                PresentPosition[1].RouteListIndex = ValidRoute[0].GetRouteIndex(PresentPosition[1].TCSectionIndex, 0);
+                var routeListIndex = ValidRoute[0].GetRouteIndex(PresentPosition[0].TCSectionIndex, 0);
+                PresentPosition[0].RouteListIndex = routeListIndex;
+                if (routeListIndex != -1) PresentPosition[0].TCDirection = ValidRoute[0][routeListIndex].Direction;
+                routeListIndex = ValidRoute[0].GetRouteIndex(PresentPosition[1].TCSectionIndex, 0);
+                PresentPosition[1].RouteListIndex = routeListIndex;
+                if (routeListIndex != -1) PresentPosition[1].TCDirection = ValidRoute[0][routeListIndex].Direction;
+                TCRoute.SetReversalOffset(Length, Simulator.TimetableMode);
 
                 SwitchToNodeControl(PresentPosition[0].TCSectionIndex);
                 CheckDeadlock(ValidRoute[0], Number);
@@ -11339,7 +11344,7 @@ namespace Orts.Simulation.Physics
                         }
                         else
                         {
-                            ValidRoute[0].Add(new TCRouteElement(OccupiedTrack[isection], thisDirection == 1 ? 0  : 1, signalRef, lastSectionIndex));
+                            ValidRoute[0].Add(new TCRouteElement(OccupiedTrack[isection], thisDirection, signalRef, lastSectionIndex));
                         }
                     }
                     else
@@ -11390,8 +11395,8 @@ namespace Orts.Simulation.Physics
                     else
                     {
                         lastIndex = nextIndex;
-                        lastSectionIndex = nextSectionIndex;
                     }
+                    lastSectionIndex = nextSectionIndex;
                 }
             }
         }

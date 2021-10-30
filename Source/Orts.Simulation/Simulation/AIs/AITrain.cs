@@ -4114,6 +4114,8 @@ namespace Orts.Simulation.AIs
 
             int directionNow = ValidRoute[0][PresentPosition[0].RouteListIndex].Direction;
             int positionNow = ValidRoute[0][PresentPosition[0].RouteListIndex].TCSectionIndex;
+            int directionNowBack = PresentPosition[1].TCDirection;
+            int positionNowBack = PresentPosition[1].TCSectionIndex;
 
             bool[] nextPart = UpdateRouteActions(0, checkLoop);
 
@@ -4132,7 +4134,7 @@ namespace Orts.Simulation.AIs
                          Number.ToString() + " continued, part : " + TCRoute.activeSubpath.ToString() + "\n");
                 }
 
-                if (positionNow == PresentPosition[0].TCSectionIndex && directionNow != PresentPosition[0].TCDirection)
+                if (positionNowBack == PresentPosition[0].TCSectionIndex && directionNowBack != PresentPosition[0].TCDirection)
                 {
                     ReverseFormation(false);
                     // active subpath must be incremented in parallel in incorporated train if present
@@ -4565,8 +4567,12 @@ namespace Orts.Simulation.AIs
             AddTrackSections();
             if (TCRoute != null && (ControlMode == TRAIN_CONTROL.AUTO_SIGNAL || ControlMode == TRAIN_CONTROL.AUTO_NODE))
             {
-                PresentPosition[0].RouteListIndex = ValidRoute[0].GetRouteIndex(PresentPosition[0].TCSectionIndex, 0);
-                PresentPosition[1].RouteListIndex = ValidRoute[0].GetRouteIndex(PresentPosition[1].TCSectionIndex, 0);
+                var routeListIndex = ValidRoute[0].GetRouteIndex(PresentPosition[0].TCSectionIndex, 0);
+                PresentPosition[0].RouteListIndex = routeListIndex;
+                if (routeListIndex != -1) PresentPosition[0].TCDirection = ValidRoute[0][routeListIndex].Direction;
+                routeListIndex = ValidRoute[0].GetRouteIndex(PresentPosition[1].TCSectionIndex, 0);
+                PresentPosition[1].RouteListIndex = routeListIndex;
+                if (routeListIndex != -1) PresentPosition[1].TCDirection = ValidRoute[0][routeListIndex].Direction;
                 TCRoute.SetReversalOffset(Length, Simulator.TimetableMode);
             }
             ResetActions(true);
