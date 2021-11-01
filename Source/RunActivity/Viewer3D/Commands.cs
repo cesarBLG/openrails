@@ -89,6 +89,30 @@ namespace Orts.Viewer3D
         }
     }
 
+
+    [Serializable()]
+    public sealed class SelectScreenCommand : BooleanCommand
+    {
+        public static CabRenderer Receiver { get; set; }
+
+        public SelectScreenCommand(CommandLog log, bool toState, int display, string screen)
+            : base(log, toState)
+        {
+            Redo(display, screen);
+        }
+
+        public void Redo(int display, string screen)
+        {
+            if (ToState)
+                Receiver.ActiveScreen[display] = screen;
+        }
+
+        public override string ToString()
+        {
+            return base.ToString();
+        }
+    }
+
     // Other
     [Serializable()]
     public sealed class ChangeCabCommand : Command

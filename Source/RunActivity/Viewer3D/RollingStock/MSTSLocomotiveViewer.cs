@@ -1069,6 +1069,7 @@ namespace Orts.Viewer3D.RollingStock
         private bool _isNightTexture;
         private bool HasCabLightDirectory = false;
         public Dictionary<int, CabViewControlRenderer> ControlMap;
+        public string[] ActiveScreen = new string[4];
 
         [CallOnThread("Loader")]
         public CabRenderer(Viewer viewer, MSTSLocomotive car)
@@ -1369,7 +1370,21 @@ namespace Orts.Viewer3D.RollingStock
 
             if (_Location == 0)
                 foreach (var cvcr in CabViewControlRenderersList[i])
+                {
+                    if (cvcr.Control.Screens != null && cvcr.Control.Screens[0] != "all")
+                    {
+                        foreach (var screen in cvcr.Control.Screens)
+                        {
+                            if (ActiveScreen[cvcr.Control.Display] == screen)
+                            {
+                                cvcr.PrepareFrame(frame, elapsedTime);
+                                break;
+                            }
+                        }
+                        continue;
+                    }
                     cvcr.PrepareFrame(frame, elapsedTime);
+                }
         }
 
         public override void Draw(GraphicsDevice graphicsDevice)
@@ -1843,6 +1858,7 @@ namespace Orts.Viewer3D.RollingStock
         float CumulativeTime;
         float Scale = 1;
         int OldFrameIndex = 0;
+        public bool ButtonState = false;
 
         /// <summary>
         /// Accumulated mouse movement. Used for controls with no assigned notch controllers, e.g. headlight and reverser.
@@ -2098,6 +2114,9 @@ namespace Orts.Viewer3D.RollingStock
                 case CABViewControlTypes.ORTS_GENERIC_ITEM1:
                 case CABViewControlTypes.ORTS_GENERIC_ITEM2:
                     index = (int)data;
+                    break;
+                case CABViewControlTypes.ORTS_SCREEN_SELECT:
+                    index = ButtonState ? 1 : 0;
                     break;
 
                 // Train Control System controls
@@ -2454,6 +2473,11 @@ namespace Orts.Viewer3D.RollingStock
                     if ((Locomotive.GenericItem1 ? 1 : 0) != ChangedValue(Locomotive.GenericItem1 ? 1 : 0)) new ToggleGenericItem1Command(Viewer.Log); break;
                 case CABViewControlTypes.ORTS_GENERIC_ITEM2:
                     if ((Locomotive.GenericItem2 ? 1 : 0) != ChangedValue(Locomotive.GenericItem2 ? 1 : 0)) new ToggleGenericItem2Command(Viewer.Log); break;
+                case CABViewControlTypes.ORTS_SCREEN_SELECT:
+                    bool buttonState = ChangedValue(ButtonState ? 1 : 0) > 0;
+                    new SelectScreenCommand(Viewer.Log, buttonState, ((CVCDiscrete)Control).Display, ((CVCDiscrete)Control).NewScreen);
+                    ButtonState = buttonState;
+                    break;
 
                 // Train Control System controls
                 case CABViewControlTypes.ORTS_TCS1:

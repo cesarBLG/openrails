@@ -206,6 +206,7 @@ namespace Orts.Formats.Msts
         ORTS_2DEXTERNALWIPERS,
         ORTS_GENERIC_ITEM1,
         ORTS_GENERIC_ITEM2,
+        ORTS_SCREEN_SELECT,
 
         // TCS Controls
         ORTS_TCS1,
@@ -444,6 +445,9 @@ namespace Orts.Formats.Msts
         public float PreviousData;
         public float Precision;
 
+        public int Display;
+        public List<string> Screens;
+
         public CABViewControlTypes ControlType = CABViewControlTypes.NONE;
         public CABViewControlStyles ControlStyle = CABViewControlStyles.NONE;
         public CABViewControlUnits Units = CABViewControlUnits.NONE;
@@ -563,6 +567,23 @@ namespace Orts.Formats.Msts
             stf.SkipRestOfBlock();
             return rotation;
         }
+
+        protected virtual void ParseDisplay(STFReader stf)
+        {
+            stf.MustMatch("(");
+            Display = stf.ReadInt(0);
+            stf.SkipRestOfBlock();
+        }
+
+        protected virtual void ParseScreen(STFReader stf)
+        {
+            stf.MustMatch("(");
+            var newScreen = stf.ReadString();
+            stf.SkipRestOfBlock();
+            if (Screens == null)
+                Screens = new List<string>();
+            Screens.Add(newScreen.ToLower());
+        }
     }
     #endregion
 
@@ -629,7 +650,9 @@ namespace Orts.Formats.Msts
                     stf.MustMatch("(");
                     Precision = stf.ReadFloat(STFReader.UNITS.None, null);
                     stf.SkipRestOfBlock();
-                })
+                }),
+                new STFReader.TokenProcessor("ortsdisplay", ()=>{ParseDisplay(stf); }),
+                new STFReader.TokenProcessor("ortsscreenpage", () => {ParseScreen(stf); }),
             });
         }
     }
@@ -849,6 +872,8 @@ namespace Orts.Formats.Msts
                     Label = stf.ReadString();
                     stf.SkipRestOfBlock();
                 }),
+                new STFReader.TokenProcessor("ortsdisplay", ()=>{ParseDisplay(stf); }),
+                new STFReader.TokenProcessor("ortsscreenpage", () => {ParseScreen(stf); })
             });
         }
 
@@ -909,7 +934,9 @@ namespace Orts.Formats.Msts
                 new STFReader.TokenProcessor("accuracy", ()=>{ ParseAccuracy(stf); }), 
                 new STFReader.TokenProcessor("controlcolour", ()=>{ PositiveColor = ParseControlColor(stf); }),
                 new STFReader.TokenProcessor("ortsfont", ()=>{ParseFont(stf); }),
-                new STFReader.TokenProcessor("ortsangle", () => { Rotation = ParseRotation(stf); })
+                new STFReader.TokenProcessor("ortsangle", () => { Rotation = ParseRotation(stf); }),
+                new STFReader.TokenProcessor("ortsdisplay", ()=>{ParseDisplay(stf); }),
+                new STFReader.TokenProcessor("ortsscreenpage", () => {ParseScreen(stf); })
             });
         }
 
@@ -945,6 +972,8 @@ namespace Orts.Formats.Msts
         private int _ValuesRead;
         private int numPositions;
         private bool canFill = true;
+
+        public string NewScreen;
 
         public CVCDiscrete(STFReader stf, string basepath, DiscreteStates discreteState)
         {
@@ -1085,6 +1114,9 @@ namespace Orts.Formats.Msts
                         stf.SkipRestOfBlock();
                     }),
                     new STFReader.TokenProcessor("controlid", ()=> { ControlId = stf.ReadIntBlock(0); }),
+                new STFReader.TokenProcessor("ortsdisplay", ()=>{ParseDisplay(stf); }),
+                new STFReader.TokenProcessor("ortsscreenpage", () => {ParseScreen(stf); }),
+                new STFReader.TokenProcessor("ortsnewscreenpage", () => {ParseNewScreen(stf); }),
                 });
 
                 // If no ACE, just don't need any fixup
@@ -1274,6 +1306,13 @@ namespace Orts.Formats.Msts
 //                    throw new STFException(stf, "Problem with NumPositions/NumValues/NumFrames/ScaleRange");
 //            } // End of Need check the Values collection for validity
         } // End of Constructor
+
+        protected void ParseNewScreen(STFReader stf)
+        {
+            stf.MustMatch("(");
+            NewScreen = stf.ReadString();
+            stf.SkipRestOfBlock();
+        }
     }
     #endregion
 
@@ -1314,6 +1353,8 @@ namespace Orts.Formats.Msts
                     for (int i = Values.Count; i < FramesCount; i++)
                         Values.Add(-10000);
                 }),
+                new STFReader.TokenProcessor("ortsdisplay", ()=>{ParseDisplay(stf); }),
+                new STFReader.TokenProcessor("ortsscreenpage", () => {ParseScreen(stf); })
             });
         }
         protected int ParseNumStyle(STFReader stf)
@@ -1393,6 +1434,8 @@ namespace Orts.Formats.Msts
                 new STFReader.TokenProcessor("parameters", ()=>{ ParseCustomParameters(stf); }),
                 new STFReader.TokenProcessor("disablediflowvoltagepowersupplyoff", ()=>{ ParseDisabledIfLowVoltagePowerSupplyOff(stf); }),
                 new STFReader.TokenProcessor("disabledifcabpowersupplyoff", ()=>{ ParseDisabledIfCabPowerSupplyOff(stf); }),
+                new STFReader.TokenProcessor("ortsdisplay", ()=>{ParseDisplay(stf); }),
+                new STFReader.TokenProcessor("ortsscreenpage", () => {ParseScreen(stf); })
             });
         }
         protected void ParseCustomParameters(STFReader stf)
