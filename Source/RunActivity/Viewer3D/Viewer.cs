@@ -1413,12 +1413,28 @@ namespace Orts.Viewer3D
             {
                 if (UserInput.IsMouseLeftButtonPressed)
                 {
-                    foreach (var controlRenderer in (PlayerLocomotiveViewer as MSTSLocomotiveViewer)._CabRenderer.ControlMap.Values)
+                    var cabRenderer = (PlayerLocomotiveViewer as MSTSLocomotiveViewer)._CabRenderer;
+                    foreach (var controlRenderer in cabRenderer.ControlMap.Values)
                     {
                         if (controlRenderer is ICabViewMouseControlRenderer mouseRenderer && mouseRenderer.IsMouseWithin())
                         {
-                            MouseChangingControl = mouseRenderer;
-                            break;
+                            if ((controlRenderer.Control.Screens == null || controlRenderer.Control.Screens[0] == "all"))
+                            {
+                                MouseChangingControl = mouseRenderer;
+                                break;
+                            }
+                            else
+                            {
+                                foreach (var screen in controlRenderer.Control.Screens)
+                                {
+                                    if (cabRenderer.ActiveScreen[controlRenderer.Control.Display] == screen)
+                                    {
+                                        MouseChangingControl = mouseRenderer;
+                                        break;
+                                    }
+                                }
+                                if (MouseChangingControl == mouseRenderer) break;
+                            }
                         }
                     }
                 }
@@ -1438,14 +1454,30 @@ namespace Orts.Viewer3D
             if (Camera is CabCamera && (PlayerLocomotiveViewer as MSTSLocomotiveViewer)._hasCabRenderer && MouseChangingControl == null && 
                 RenderProcess.IsMouseVisible)
             {
+                var cabRenderer = (PlayerLocomotiveViewer as MSTSLocomotiveViewer)._CabRenderer;
                 if (!UserInput.IsMouseLeftButtonPressed)
                 {
-                    foreach (var controlRenderer in (PlayerLocomotiveViewer as MSTSLocomotiveViewer)._CabRenderer.ControlMap.Values)
+                    foreach (var controlRenderer in cabRenderer.ControlMap.Values)
                     {
                         if (controlRenderer is ICabViewMouseControlRenderer mouseRenderer && mouseRenderer.IsMouseWithin())
                         {
-                            MousePickedControl = mouseRenderer;
-                            break;
+                            if ((controlRenderer.Control.Screens == null || controlRenderer.Control.Screens[0] == "all"))
+                            {
+                                MousePickedControl = mouseRenderer;
+                                break;
+                            }
+                            else
+                            {
+                                foreach (var screen in controlRenderer.Control.Screens)
+                                {
+                                    if (cabRenderer.ActiveScreen[controlRenderer.Control.Display] == screen)
+                                    {
+                                        MousePickedControl = mouseRenderer;
+                                        break;
+                                    }
+                                }
+                                if (MousePickedControl == mouseRenderer) break;
+                            }
                         }
                     }
                     if (MousePickedControl != null & MousePickedControl != OldMousePickedControl)
