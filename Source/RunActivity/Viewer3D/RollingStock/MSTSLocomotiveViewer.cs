@@ -1451,6 +1451,23 @@ namespace Orts.Viewer3D.RollingStock
             foreach (var cvcr in CabViewControlRenderersList[i])
                 cvcr.Mark();
         }
+
+        public void Save(BinaryWriter outf)
+        {
+            foreach (var activeScreen in ActiveScreen)
+                if (activeScreen != null)
+                    outf.Write(activeScreen);
+                else
+                    outf.Write("---");
+
+        }
+
+        public void Restore(BinaryReader inf)
+        {
+            for (int i = 0; i < ActiveScreen.Length; i++)
+                ActiveScreen[i] = inf.ReadString();
+        }
+
     }
 
     /// <summary>

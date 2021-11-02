@@ -369,6 +369,7 @@ namespace Orts.Viewer3D
             outf.Write(NightTexturesNotLoaded);
             outf.Write(DayTexturesNotLoaded);
             World.WeatherControl.SaveWeatherParameters(outf);
+            (PlayerLocomotiveViewer as MSTSLocomotiveViewer)._CabRenderer.Save(outf);
         }
 
         [CallOnThread("Render")]
@@ -405,6 +406,7 @@ namespace Orts.Viewer3D
             tryLoadingDayTextures = true;
 
             World.WeatherControl.RestoreWeatherParameters(inf);
+            (PlayerLocomotiveViewer as MSTSLocomotiveViewer)._CabRenderer.Restore(inf);
         }
 
         /// <summary>
