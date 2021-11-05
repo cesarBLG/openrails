@@ -1368,8 +1368,9 @@ namespace Orts.Viewer3D.RollingStock
             frame.AddPrimitive(_SpriteShader2DCabView, this, RenderPrimitiveGroup.Cab, ref _Scale);
             //frame.AddPrimitive(Materials.SpriteBatchMaterial, this, RenderPrimitiveGroup.Cab, ref _Scale);
 
-            if (_Location == 0)
-                foreach (var cvcr in CabViewControlRenderersList[i])
+            foreach (var cvcr in CabViewControlRenderersList[i])
+            {
+                if (cvcr.Control.CabViewpoint == _Location)
                 {
                     if (cvcr.Control.Screens != null && cvcr.Control.Screens[0] != "all")
                     {
@@ -1385,6 +1386,7 @@ namespace Orts.Viewer3D.RollingStock
                     }
                     cvcr.PrepareFrame(frame, elapsedTime);
                 }
+            }
         }
 
         public override void Draw(GraphicsDevice graphicsDevice)
@@ -3265,6 +3267,7 @@ namespace Orts.Viewer3D.RollingStock
         protected MSTSLocomotive MSTSLocomotive { get { return (MSTSLocomotive)Car; } }
         MSTSLocomotiveViewer LocoViewer;
         private SpriteBatchMaterial _Sprite2DCabView;
+        public bool[] MatrixVisible;
         public ThreeDimentionCabViewer(Viewer viewer, MSTSLocomotive car, MSTSLocomotiveViewer locoViewer)
             : base(viewer, car)
         {
@@ -3284,9 +3287,13 @@ namespace Orts.Viewer3D.RollingStock
             DigitParts3D = new Dictionary<int, ThreeDimCabDigit>();
             Gauges = new Dictionary<int, ThreeDimCabGaugeNative>();
             OnDemandAnimateParts = new Dictionary<int, AnimatedPart>();
+
             // Find the animated parts
             if (TrainCarShape != null && TrainCarShape.SharedShape.Animations != null)
             {
+                MatrixVisible = new bool[TrainCarShape.SharedShape.MatrixNames.Count + 1];
+                for (int i = 0; i < MatrixVisible.Length; i++)
+                    MatrixVisible[i] = true;
                 string matrixName = ""; string typeName = ""; AnimatedPartMultiState tmpPart = null;
                 for (int iMatrix = 0; iMatrix < TrainCarShape.SharedShape.MatrixNames.Count; ++iMatrix)
                 {
@@ -3405,6 +3412,11 @@ namespace Orts.Viewer3D.RollingStock
         /// </summary>
         public override void PrepareFrame(RenderFrame frame, ElapsedTime elapsedTime)
         {
+            var trainCarShape = LocoViewer.ThreeDimentionCabViewer.TrainCarShape;
+            var animatedParts = LocoViewer.ThreeDimentionCabViewer.AnimateParts;
+            var controlMap = LocoViewer.ThreeDimentionCabRenderer.ControlMap;
+            var doShow = true;
+            CabViewControlRenderer cabRenderer;
             foreach (var p in AnimateParts)
             {
                 if (p.Value.Type >= CABViewControlTypes.EXTERNALWIPERS) //for wipers, doors and mirrors
@@ -3427,14 +3439,66 @@ namespace Orts.Viewer3D.RollingStock
                             break;
                     }
                 }
-                else p.Value.Update(this.LocoViewer, elapsedTime); //for all other intruments with animations
+                else
+                {
+                   doShow = true;
+                    cabRenderer = null;
+                    if (LocoViewer.ThreeDimentionCabRenderer.ControlMap.TryGetValue(p.Key, out cabRenderer))
+                    { 
+                        if (cabRenderer is CabViewDiscreteRenderer)
+                        {
+                            var control = cabRenderer.Control;
+                            if (control.Screens != null && control.Screens[0] != "all")
+                            {
+                                doShow = false;
+                                foreach (var screen in control.Screens)
+                                {
+                                    if (LocoViewer.ThreeDimentionCabRenderer.ActiveScreen[control.Display] == screen)
+                                    {
+                                        doShow = true;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    foreach (var matrixIndex in p.Value.MatrixIndexes)
+                        MatrixVisible[matrixIndex + 1] = doShow;
+                    p.Value.Update(this.LocoViewer, elapsedTime); //for all other intruments with animations
+                }
             }
             foreach (var p in DigitParts3D)
             {
+                var digital = p.Value.CVFR.Control;
+                if (digital.Screens != null && digital.Screens[0] != "all")
+                {
+                    foreach (var screen in digital.Screens)
+                    {
+                        if (LocoViewer.ThreeDimentionCabRenderer.ActiveScreen[digital.Display] == screen)
+                        {
+                            p.Value.PrepareFrame(frame, elapsedTime);
+                            break;
+                        }
+                    }
+                    continue;
+                }
                 p.Value.PrepareFrame(frame, elapsedTime);
             }
             foreach (var p in Gauges)
             {
+                var gauge = p.Value.CVFR.Control;
+                if (gauge.Screens != null && gauge.Screens[0] != "all")
+                {
+                    foreach (var screen in gauge.Screens)
+                    {
+                        if (LocoViewer.ThreeDimentionCabRenderer.ActiveScreen[gauge.Display] == screen)
+                        {
+                            p.Value.PrepareFrame(frame, elapsedTime);
+                            break;
+                        }
+                    }
+                    continue;
+                }
                 p.Value.PrepareFrame(frame, elapsedTime);
             }
 
@@ -3446,7 +3510,7 @@ namespace Orts.Viewer3D.RollingStock
             }*/ //removed with 3D digits
 
             if (TrainCarShape != null)
-                TrainCarShape.PrepareFrame(frame, elapsedTime);
+                TrainCarShape.PrepareFrame(frame, MatrixVisible, elapsedTime);
         }
 
         internal override void Mark()
@@ -3467,7 +3531,7 @@ namespace Orts.Viewer3D.RollingStock
         Matrix XNAMatrix;
         Viewer Viewer;
         MutableShapePrimitive shapePrimitive;
-        CabViewDigitalRenderer CVFR;
+        public CabViewDigitalRenderer CVFR;
         Material Material;
         Material AlertMaterial;
         float Size;
@@ -3747,7 +3811,7 @@ namespace Orts.Viewer3D.RollingStock
         Matrix XNAMatrix;
         Viewer Viewer;
         MutableShapePrimitive shapePrimitive;
-        CabViewGaugeRenderer CVFR;
+        public CabViewGaugeRenderer CVFR;
         Material PositiveMaterial;
         Material NegativeMaterial;
         float width, maxLen; //width of the gauge, and the max length of the gauge

@@ -104,7 +104,9 @@ namespace Orts.Viewer3D
         public void Redo(int display, string screen)
         {
             if (ToState)
+            {
                 Receiver.ActiveScreen[display] = screen;
+            }
         }
 
         public override string ToString()

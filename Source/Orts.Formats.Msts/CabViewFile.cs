@@ -447,6 +447,7 @@ namespace Orts.Formats.Msts
 
         public int Display;
         public List<string> Screens;
+        public int CabViewpoint;
 
         public CABViewControlTypes ControlType = CABViewControlTypes.NONE;
         public CABViewControlStyles ControlStyle = CABViewControlStyles.NONE;
@@ -584,6 +585,15 @@ namespace Orts.Formats.Msts
                 Screens = new List<string>();
             Screens.Add(newScreen.ToLower());
         }
+
+        protected virtual void ParseCabViewpoint(STFReader stf)
+        {
+            stf.MustMatch("(");
+            CabViewpoint = stf.ReadInt(0);
+            stf.SkipRestOfBlock();
+        }
+
+
     }
     #endregion
 
@@ -653,6 +663,7 @@ namespace Orts.Formats.Msts
                 }),
                 new STFReader.TokenProcessor("ortsdisplay", ()=>{ParseDisplay(stf); }),
                 new STFReader.TokenProcessor("ortsscreenpage", () => {ParseScreen(stf); }),
+                new STFReader.TokenProcessor("ortscabviewpoint", ()=>{ParseCabViewpoint(stf); }),
             });
         }
     }
@@ -744,6 +755,9 @@ namespace Orts.Formats.Msts
                     Label = stf.ReadString();
                     stf.SkipRestOfBlock();
                 }),
+                new STFReader.TokenProcessor("ortsdisplay", ()=>{ParseDisplay(stf); }),
+                new STFReader.TokenProcessor("ortsscreenpage", () => {ParseScreen(stf); }),
+                new STFReader.TokenProcessor("ortscabviewpoint", ()=>{ParseCabViewpoint(stf); }),
             });
         }
     }
@@ -936,7 +950,8 @@ namespace Orts.Formats.Msts
                 new STFReader.TokenProcessor("ortsfont", ()=>{ParseFont(stf); }),
                 new STFReader.TokenProcessor("ortsangle", () => { Rotation = ParseRotation(stf); }),
                 new STFReader.TokenProcessor("ortsdisplay", ()=>{ParseDisplay(stf); }),
-                new STFReader.TokenProcessor("ortsscreenpage", () => {ParseScreen(stf); })
+                new STFReader.TokenProcessor("ortsscreenpage", () => {ParseScreen(stf); }),
+                new STFReader.TokenProcessor("ortscabviewpoint", ()=>{ParseCabViewpoint(stf); }),
             });
         }
 
@@ -1117,6 +1132,7 @@ namespace Orts.Formats.Msts
                 new STFReader.TokenProcessor("ortsdisplay", ()=>{ParseDisplay(stf); }),
                 new STFReader.TokenProcessor("ortsscreenpage", () => {ParseScreen(stf); }),
                 new STFReader.TokenProcessor("ortsnewscreenpage", () => {ParseNewScreen(stf); }),
+                new STFReader.TokenProcessor("ortscabviewpoint", ()=>{ParseCabViewpoint(stf); }),
                 });
 
                 // If no ACE, just don't need any fixup
@@ -1354,7 +1370,8 @@ namespace Orts.Formats.Msts
                         Values.Add(-10000);
                 }),
                 new STFReader.TokenProcessor("ortsdisplay", ()=>{ParseDisplay(stf); }),
-                new STFReader.TokenProcessor("ortsscreenpage", () => {ParseScreen(stf); })
+                new STFReader.TokenProcessor("ortsscreenpage", () => {ParseScreen(stf); }),
+                new STFReader.TokenProcessor("ortscabviewpoint", ()=>{ParseCabViewpoint(stf); }),
             });
         }
         protected int ParseNumStyle(STFReader stf)
@@ -1435,7 +1452,8 @@ namespace Orts.Formats.Msts
                 new STFReader.TokenProcessor("disablediflowvoltagepowersupplyoff", ()=>{ ParseDisabledIfLowVoltagePowerSupplyOff(stf); }),
                 new STFReader.TokenProcessor("disabledifcabpowersupplyoff", ()=>{ ParseDisabledIfCabPowerSupplyOff(stf); }),
                 new STFReader.TokenProcessor("ortsdisplay", ()=>{ParseDisplay(stf); }),
-                new STFReader.TokenProcessor("ortsscreenpage", () => {ParseScreen(stf); })
+                new STFReader.TokenProcessor("ortsscreenpage", () => {ParseScreen(stf); }),
+                new STFReader.TokenProcessor("ortscabviewpoint", ()=>{ParseCabViewpoint(stf); }),
             });
         }
         protected void ParseCustomParameters(STFReader stf)

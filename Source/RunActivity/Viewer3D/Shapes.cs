@@ -295,6 +295,11 @@ namespace Orts.Viewer3D
             SharedShape.PrepareFrame(frame, Location, XNAMatrices, Flags);
         }
 
+        public void PrepareFrame(RenderFrame frame, bool[] subObjVisible, ElapsedTime elapsedTime)
+        {
+            SharedShape.PrepareFrame(frame, Location, XNAMatrices, subObjVisible, Flags);
+        }
+
         /// <summary>
         /// Adjust the pose of the specified node to the frame position specifed by key.
         /// </summary>
