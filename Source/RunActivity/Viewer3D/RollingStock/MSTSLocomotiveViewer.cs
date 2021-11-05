@@ -3463,7 +3463,7 @@ namespace Orts.Viewer3D.RollingStock
                         }
                     }
                     foreach (var matrixIndex in p.Value.MatrixIndexes)
-                        MatrixVisible[matrixIndex + 1] = doShow;
+                        MatrixVisible[matrixIndex] = doShow;
                     p.Value.Update(this.LocoViewer, elapsedTime); //for all other intruments with animations
                 }
             }
@@ -3510,7 +3510,7 @@ namespace Orts.Viewer3D.RollingStock
             }*/ //removed with 3D digits
 
             if (TrainCarShape != null)
-                TrainCarShape.PrepareFrame(frame, MatrixVisible, elapsedTime);
+                TrainCarShape.PrepareFrame(frame, elapsedTime, MatrixVisible);
         }
 
         internal override void Mark()

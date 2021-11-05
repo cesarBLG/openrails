@@ -295,9 +295,9 @@ namespace Orts.Viewer3D
             SharedShape.PrepareFrame(frame, Location, XNAMatrices, Flags);
         }
 
-        public void PrepareFrame(RenderFrame frame, bool[] subObjVisible, ElapsedTime elapsedTime)
+        public void PrepareFrame(RenderFrame frame, ElapsedTime elapsedTime, bool[] matrixVisible = null)
         {
-            SharedShape.PrepareFrame(frame, Location, XNAMatrices, subObjVisible, Flags);
+            SharedShape.PrepareFrame(frame, Location, XNAMatrices, Flags, matrixVisible);
         }
 
         /// <summary>
@@ -2097,12 +2097,12 @@ namespace Orts.Viewer3D
             PrepareFrame(frame, location, Matrices, null, flags);
         }
 
-        public void PrepareFrame(RenderFrame frame, WorldPosition location, Matrix[] animatedXNAMatrices, ShapeFlags flags)
+        public void PrepareFrame(RenderFrame frame, WorldPosition location, Matrix[] animatedXNAMatrices, ShapeFlags flags, bool[] matrixVisible = null)
         {
-            PrepareFrame(frame, location, animatedXNAMatrices, null, flags);
+            PrepareFrame(frame, location, animatedXNAMatrices, null, flags, matrixVisible);
         }
 
-        public void PrepareFrame(RenderFrame frame, WorldPosition location, Matrix[] animatedXNAMatrices, bool[] subObjVisible, ShapeFlags flags)
+        public void PrepareFrame(RenderFrame frame, WorldPosition location, Matrix[] animatedXNAMatrices, bool[] subObjVisible, ShapeFlags flags, bool[] matrixVisible = null)
         {
             var lodBias = ((float)Viewer.Settings.LODBias / 100 + 1);
 
@@ -2169,6 +2169,7 @@ namespace Orts.Viewer3D
                     {
                         var xnaMatrix = Matrix.Identity;
                         var hi = shapePrimitive.HierarchyIndex;
+                        if (matrixVisible != null && !matrixVisible[hi]) continue;
                         while (hi >= 0 && hi < shapePrimitive.Hierarchy.Length)
                         {
                             Matrix.Multiply(ref xnaMatrix, ref animatedXNAMatrices[hi], out xnaMatrix);
