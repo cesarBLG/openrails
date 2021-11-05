@@ -1572,7 +1572,7 @@ namespace Orts.Viewer3D.Popups
                     (car.HUDBrakeSkid ? Viewer.Catalog.GetString("Yes") : Viewer.Catalog.GetString("No")),
                     FormatStrings.FormatTemperature(car.WheelBearingTemperatureDegC, car.IsMetric, false) + " " + car.DisplayWheelBearingTemperatureStatus,
                     car.Flipped ? Viewer.Catalog.GetString("Flipped") : "",
-                    car.DerailmentCoefficient.ToString("0.00") + (car.DerailmentCoefficient > 1 ? "!!!" : car.DerailmentCoefficient < 1 && car.DerailmentCoefficient > 0.66 ? "???" : "")
+                    car.DerailmentCoefficient.ToString("0.00") + (car.DerailExpected ? "!!!" : car.DerailPossible ? "???" : "")
                     ));
             }
             TableAddLine(table);
