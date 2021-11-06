@@ -1069,7 +1069,7 @@ namespace Orts.Viewer3D.RollingStock
         private bool _isNightTexture;
         private bool HasCabLightDirectory = false;
         public Dictionary<int, CabViewControlRenderer> ControlMap;
-        public string[] ActiveScreen = new string[4];
+        public string[] ActiveScreen = {"default", "default", "default", "default" };
 
         [CallOnThread("Loader")]
         public CabRenderer(Viewer viewer, MSTSLocomotive car)
