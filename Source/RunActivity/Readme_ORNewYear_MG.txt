@@ -1,5 +1,5 @@
-﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.108
-October 15th, 2021
+﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.109
+November 6th, 2021
 
 Please note that the installation and use of Open Rails software, even of its unofficial versions, is governed by the Open Rails End User License Agreement. 
 
@@ -11,8 +11,8 @@ INSTALLATION
 
 
 RELEASE NOTES
-This unofficial version has been derived from the latest official OpenRails Release candidate 1.4-rc6, and from the latest official Testing release
-T1.3.1-2088 
+This unofficial version has been derived from the latest official Testing release
+T1.4-44
 
 This unofficial version includes the cruise control software written by Jindrich with final adaptations by myself.
 
@@ -60,15 +60,14 @@ This version includes some features not (yet) available in the Open Rails testin
 - Cruise control: manage running in reverse
 - cabview controls ODOMETER, ODOMETER_RESET and ODOMETER_DIRECTION, see https://blueprints.launchpad.net/or/+spec/odometer-cabview-control 
 - Cruise control: improved support for auto/manual switch, including support for ON/OFF control and additional parameters for .eng file
-- NEW: Cruise control: keyboard command to set selected speed at zero
-- NEW: 2 cabview controls for generic items, see http://www.elvastower.com/forums/index.php?/topic/35572-cabview-controls-for-generic-items/
-- NEW: fix bug in .csproj file, by perpetualKid
-- NEW: Cruise control: allow optional setting of speed also in manual mode.
-
-Moreover following items have been added:
-- fix for https://bugs.launchpad.net/or/+bug/1945886 Impossible to start trains upnill with dynamic brake blending(PR #512 by Serana)
-- code of PR #515 (Correct issue with compressor not turning off), by steamer_ctn
-- code pf PR #514 (Locales not to be translated), by mbm_OR.
+- Cruise control: keyboard command to set selected speed at zero
+- 2 cabview controls for generic items, see http://www.elvastower.com/forums/index.php?/topic/35572-cabview-controls-for-generic-items/
+- Cruise control: allow optional setting of speed also in manual mode
+- Various fixes related to reversals and couplings, see e.g. http://www.elvastower.com/forums/index.php?/topic/29383-assistance-with-ai-shunting/page__view__findpost__p__277369
+- NEW: Manage multiple screen pages on a display in 2D and 3D cabs, see http://www.elvastower.com/forums/index.php?/topic/35612-managing-multiple-screen-pages-on-a-display-in-2d-and-3d-cabs/ 
+- NEW: Insert cabview controls in side views of 2D cabs, see http://www.elvastower.com/forums/index.php?/topic/35640-inserting-cabview-controls-in-side-views-of-2d-cabs/ 
+- NEW: fix ORNYMG bug of misaligned locomotive HUD
+- NEW: Correct issue with tender water mass, by steamer_ctn.
 
 The Monogame related code intentionally coincides only partly with the code of the OR official testing version.
 
