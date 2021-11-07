@@ -887,7 +887,8 @@ namespace Orts.Formats.Msts
                     stf.SkipRestOfBlock();
                 }),
                 new STFReader.TokenProcessor("ortsdisplay", ()=>{ParseDisplay(stf); }),
-                new STFReader.TokenProcessor("ortsscreenpage", () => {ParseScreen(stf); })
+                new STFReader.TokenProcessor("ortsscreenpage", () => {ParseScreen(stf); }),
+                new STFReader.TokenProcessor("ortscabviewpoint", ()=>{ParseCabViewpoint(stf); }),
             });
         }
 
