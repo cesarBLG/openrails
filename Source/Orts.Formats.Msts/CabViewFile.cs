@@ -207,6 +207,7 @@ namespace Orts.Formats.Msts
         ORTS_GENERIC_ITEM1,
         ORTS_GENERIC_ITEM2,
         ORTS_SCREEN_SELECT,
+        ORTS_STATIC_DISPLAY,
 
         // TCS Controls
         ORTS_TCS1,

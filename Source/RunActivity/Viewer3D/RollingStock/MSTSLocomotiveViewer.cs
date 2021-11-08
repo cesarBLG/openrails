@@ -2137,6 +2137,9 @@ namespace Orts.Viewer3D.RollingStock
                 case CABViewControlTypes.ORTS_SCREEN_SELECT:
                     index = ButtonState ? 1 : 0;
                     break;
+                case CABViewControlTypes.ORTS_STATIC_DISPLAY:
+                    index = 0;
+                    break;
 
                 // Train Control System controls
                 case CABViewControlTypes.ORTS_TCS1:
