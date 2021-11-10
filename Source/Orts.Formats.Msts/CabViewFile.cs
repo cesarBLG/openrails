@@ -1328,7 +1328,7 @@ namespace Orts.Formats.Msts
         protected void ParseNewScreen(STFReader stf)
         {
             stf.MustMatch("(");
-            NewScreen = stf.ReadString();
+            NewScreen = stf.ReadString().ToLower();
             stf.SkipRestOfBlock();
         }
     }
