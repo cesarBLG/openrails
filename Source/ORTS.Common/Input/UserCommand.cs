@@ -253,5 +253,13 @@
         [GetString("Control Select Speed 190 kph/mph")] ControlSelectSpeed190,
         [GetString("Control Select Speed 200 kph/mph")] ControlSelectSpeed200,
         [GetString("Control Selected Speed To Zero")] ControlSpeedRegulatorSelectedSpeedToZero,
+        //Distributed power
+        [GetString("Control DP Move To Front")] ControlDPMoveToFront,
+        [GetString("Control DP Move To Back")] ControlDPMoveToBack,
+        [GetString("Control DP Traction")] ControlDPTraction,
+        [GetString("Control DP Idle")] ControlDPIdle,
+        [GetString("Control DP Brake")] ControlDPBrake,
+        [GetString("Control DP More")] ControlDPMore,
+        [GetString("Control DP Less")] ControlDPLess,
     }
 }

@@ -868,6 +868,7 @@ namespace Orts.Simulation.AIs
             // sd.Name is the name of the service file.
             // srvFile.Name points to the name of the service within the Name() category such as Name ( "Eastbound Freight Train" ) in the service file.
             AITrain train = new AITrain(Simulator, sd, this, aiPath, srvFile.Efficiency, srvFile.Name, trfDef, maxVelocityA);
+            train.SetDPUnitIDs(); // distributed power
             Simulator.TrainDictionary.Add(train.Number, train);
 
             if (!Simulator.NameDictionary.ContainsKey(train.Name.ToLower()))
