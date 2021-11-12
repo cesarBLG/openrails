@@ -142,6 +142,7 @@ namespace Orts.Viewer3D.Popups
             textPages.Add(TextPageCommon);
             textPages.Add(TextPageConsistInfo);
             textPages.Add(TextPageLocomotiveInfo);
+            textPages.Add(TextPageDistributedPowerInfo);
             textPages.Add(TextPagePowerSupplyInfo);
             textPages.Add(TextPageBrakeInfo);
             textPages.Add(TextPageForceInfo);
@@ -721,34 +722,6 @@ namespace Orts.Viewer3D.Popups
             //Add new Header data here, if adding additional column.
             ));
 
-            int numberOfDieselLocomotives = 0;
-            int maxNumberOfEngines = 0;
-            for (var i = 0; i < train.Cars.Count; i++)
-            {
-                if (train.Cars[i] is MSTSDieselLocomotive)
-                {
-                    numberOfDieselLocomotives++;
-                    maxNumberOfEngines = Math.Max(maxNumberOfEngines, (train.Cars[i] as MSTSDieselLocomotive).DieselEngines.Count);
-                }
-            }
-
-            if (numberOfDieselLocomotives > 0)
-            {
-                var row = table.CurrentRow;
-                TableAddLines(table, MSTSDieselLocomotive.GetDebugTableBase(numberOfDieselLocomotives, maxNumberOfEngines));
-                var k = 0;
-                var dpUnitId = 0;
-                for (var i = 0; i < train.Cars.Count; i++)
-                    if (train.Cars[i] is MSTSDieselLocomotive)
-                    {
-                        k++;
-                        var status = train.Cars[i].GetDebugStatus().Split('\t');
-                        var fence = (dpUnitId != (dpUnitId = train.Cars[i].RemoteControlGroup)) ? "| " : "";
-                        for (var j = 0; j < status.Length; j++)
-                            table.Cells[row + j, 2 * k] = fence + status[j];
-                    }
-            }
-
             foreach (var car in train.Cars)
             {
                 if (car is MSTSLocomotive && (hudWindowLocoActualPage > 0 ? car.CarID == LocomotiveID[hudWindowLocoActualPage - 1] : true))
@@ -947,6 +920,44 @@ namespace Orts.Viewer3D.Popups
                         }
                     }
                 }
+            }
+        }
+
+        void TextPageDistributedPowerInfo(TableData table)
+        {
+            TextPageHeading(table, Viewer.Catalog.GetString("DISTRIBUTED POWER INFORMATION"));
+
+            var locomotive = Viewer.PlayerLocomotive;
+            var train = locomotive.Train;
+            ResetHudScroll();//Reset Hudscroll.
+            Viewer.HUDScrollWindow.Visible = WebServerPageNo > 0 ? true : false;//HudScroll
+
+            //HudScroll
+            int numberOfDieselLocomotives = 0;
+            int maxNumberOfEngines = 0;
+            for (var i = 0; i < train.Cars.Count; i++)
+            {
+                if (train.Cars[i] is MSTSDieselLocomotive)
+                {
+                    numberOfDieselLocomotives++;
+                    maxNumberOfEngines = Math.Max(maxNumberOfEngines, (train.Cars[i] as MSTSDieselLocomotive).DieselEngines.Count);
+                }
+            }
+            if (numberOfDieselLocomotives > 0)
+            {
+                var row = table.CurrentRow;
+                TableAddLines(table, MSTSDieselLocomotive.GetDebugTableBase(numberOfDieselLocomotives, maxNumberOfEngines));
+                var k = 0;
+                var dpUnitId = 0;
+                for (var i = 0; i < train.Cars.Count; i++)
+                    if (train.Cars[i] is MSTSDieselLocomotive)
+                    {
+                        k++;
+                        var status = (train.Cars[i] as MSTSDieselLocomotive).GetDPDebugStatus().Split('\t');
+                        var fence = (dpUnitId != (dpUnitId = train.Cars[i].RemoteControlGroup)) ? "| " : "";
+                        for (var j = 0; j < status.Length; j++)
+                            table.Cells[row + j, 2 * k] = fence + status[j];
+                    }
             }
         }
 
