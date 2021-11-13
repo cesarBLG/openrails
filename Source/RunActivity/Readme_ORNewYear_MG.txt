@@ -1,5 +1,5 @@
-﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.109
-November 6th, 2021
+﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.110
+November 13th, 2021
 
 Please note that the installation and use of Open Rails software, even of its unofficial versions, is governed by the Open Rails End User License Agreement. 
 
@@ -11,8 +11,7 @@ INSTALLATION
 
 
 RELEASE NOTES
-This unofficial version has been derived from the latest official Testing release
-T1.4-44
+This unofficial version has been derived from the latest official Testing release T1.4-55
 
 This unofficial version includes the cruise control software written by Jindrich with final adaptations by myself.
 
@@ -64,10 +63,12 @@ This version includes some features not (yet) available in the Open Rails testin
 - 2 cabview controls for generic items, see http://www.elvastower.com/forums/index.php?/topic/35572-cabview-controls-for-generic-items/
 - Cruise control: allow optional setting of speed also in manual mode
 - Various fixes related to reversals and couplings, see e.g. http://www.elvastower.com/forums/index.php?/topic/29383-assistance-with-ai-shunting/page__view__findpost__p__277369
-- NEW: Manage multiple screen pages on a display in 2D and 3D cabs, see http://www.elvastower.com/forums/index.php?/topic/35612-managing-multiple-screen-pages-on-a-display-in-2d-and-3d-cabs/ 
-- NEW: Insert cabview controls in side views of 2D cabs, see http://www.elvastower.com/forums/index.php?/topic/35640-inserting-cabview-controls-in-side-views-of-2d-cabs/ 
-- NEW: fix ORNYMG bug of misaligned locomotive HUD
-- NEW: Correct issue with tender water mass, by steamer_ctn.
+- Manage multiple screen pages on a display in 2D and 3D cabs, see http://www.elvastower.com/forums/index.php?/topic/35612-managing-multiple-screen-pages-on-a-display-in-2d-and-3d-cabs/ 
+- Insert cabview controls in side views of 2D cabs, see http://www.elvastower.com/forums/index.php?/topic/35640-inserting-cabview-controls-in-side-views-of-2d-cabs/ 
+- Multiple screens: add ORTS_STATIC_DISPLAY for background of screen pages and allow for uppercase chars in screenpage names
+- Bug fix for https://bugs.launchpad.net/or/+bug/1950578 Dyn Brake set up state not disappearing in cab
+- NEW: reassigned keys for two CC commands, see http://www.elvastower.com/forums/index.php?/topic/33841-cruise-control/page__st__110#entry277962 .
+- NEW: imported the distributed power feature code written by Peter Gulyas (gpz), see here http://www.elvastower.com/forums/index.php?/topic/26249-remote-control-dpu-units/page__st__70__gopid__277963#entry277963
 
 The Monogame related code intentionally coincides only partly with the code of the OR official testing version.
 
