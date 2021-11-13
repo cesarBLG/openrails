@@ -487,7 +487,6 @@ namespace ORTS.Settings
             Commands[(int)UserCommand.ControlDPTraction] = new UserCommandKeyInput(0x26, KeyModifiers.Control); //L
             Commands[(int)UserCommand.ControlDPIdle] = new UserCommandKeyInput(0x26, KeyModifiers.Control | KeyModifiers.Shift); //L
             Commands[(int)UserCommand.ControlDPBrake] = new UserCommandKeyInput(0x28, KeyModifiers.Control); //
-            Commands[(int)UserCommand.ControlDPIdle] = new UserCommandKeyInput(0x28, KeyModifiers.Control | KeyModifiers.Shift); //
             Commands[(int)UserCommand.ControlDPMore] = new UserCommandKeyInput(0x16, KeyModifiers.Control); //U
             Commands[(int)UserCommand.ControlDPLess] = new UserCommandKeyInput(0x16, KeyModifiers.Control | KeyModifiers.Shift); //U
 

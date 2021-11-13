@@ -497,6 +497,16 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Controllers
             return target;
         }
 
+        public float? DPSmoothMax()
+        {
+            float? target = null;
+            if (Notches.Count > 0 && CurrentNotch < Notches.Count - 1 && Notches[CurrentNotch].Smooth)
+                target = Notches[CurrentNotch + 1].Value;
+            else if (Notches.Count == 0 || CurrentNotch == Notches.Count - 1 && Notches[CurrentNotch].Smooth)
+                target = MaximumValue;
+            return target;
+        }
+
         public virtual string GetStatus()
         {
             if (Notches.Count == 0)

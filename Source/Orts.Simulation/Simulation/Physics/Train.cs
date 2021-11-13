@@ -1640,7 +1640,7 @@ namespace Orts.Simulation.Physics
         {
             if (controller == null)
                 return;
-            if (controller.SmoothMax() == null)
+            if (controller.DPSmoothMax() == null)
             {
                 controller.StartIncrease();
                 controller.StopIncrease();

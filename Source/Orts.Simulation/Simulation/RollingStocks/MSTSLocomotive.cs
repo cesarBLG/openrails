@@ -4481,6 +4481,17 @@ public List<CabView> CabViewList = new List<CabView>();
         {
             if (DynamicBrakeController == null)
                 return null;
+            if (DynamicBrakePercent < 0)
+                return string.Empty;
+            if (TrainControlSystem.FullDynamicBrakingOrder)
+                return string.Format("{0:F0}%", DynamicBrakePercent);
+            return string.Format("{0}", DynamicBrakeController.GetStatus());
+        }
+
+        public override string GetDPDynamicBrakeStatus()
+        {
+            if (DynamicBrakeController == null)
+                return null;
             var dpStatus = Train.DPMode == -1 ? string.Format("({0:F0}%)", Train.DPDynamicBrakePercent) : string.Empty;
             if (DynamicBrakePercent < 0)
                 return dpStatus;
