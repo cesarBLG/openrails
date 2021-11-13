@@ -481,6 +481,14 @@ namespace ORTS.Settings
             Commands[(int)UserCommand.ControlSelectSpeed190] = new UserCommandKeyInput(0x0A, KeyModifiers.Control | KeyModifiers.Shift);
             Commands[(int)UserCommand.ControlSelectSpeed200] = new UserCommandKeyInput(0x0B, KeyModifiers.Control | KeyModifiers.Shift);
             Commands[(int)UserCommand.ControlSpeedRegulatorSelectedSpeedToZero] = new UserCommandKeyInput(0x1E, KeyModifiers.Shift | KeyModifiers.Alt);
+            // Distributed power
+            Commands[(int)UserCommand.ControlDPMoveToFront] = new UserCommandKeyInput(0x18, KeyModifiers.Control); //O
+            Commands[(int)UserCommand.ControlDPMoveToBack] = new UserCommandKeyInput(0x18, KeyModifiers.Control | KeyModifiers.Shift); //O
+            Commands[(int)UserCommand.ControlDPTraction] = new UserCommandKeyInput(0x26, KeyModifiers.Control); //L
+            Commands[(int)UserCommand.ControlDPIdle] = new UserCommandKeyInput(0x26, KeyModifiers.Control | KeyModifiers.Shift); //L
+            Commands[(int)UserCommand.ControlDPBrake] = new UserCommandKeyInput(0x28, KeyModifiers.Control); //
+            Commands[(int)UserCommand.ControlDPMore] = new UserCommandKeyInput(0x16, KeyModifiers.Control); //U
+            Commands[(int)UserCommand.ControlDPLess] = new UserCommandKeyInput(0x16, KeyModifiers.Control | KeyModifiers.Shift); //U
 
             Commands[(int)UserCommand.DebugClockBackwards] = new UserCommandKeyInput(0x0C);
             Commands[(int)UserCommand.DebugClockForwards] = new UserCommandKeyInput(0x0D);
