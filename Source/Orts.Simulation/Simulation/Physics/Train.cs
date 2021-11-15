@@ -1562,6 +1562,8 @@ namespace Orts.Simulation.Physics
                 return;
             var dpDynamicBrakePercent = LeadLocomotive.DynamicBrakePercent;
             var dpThrottlePercent = LeadLocomotive.ThrottlePercent;
+            var dpDynamicBrakeCurrentNotch = (LeadLocomotive as MSTSLocomotive).DynamicBrakeController.CurrentNotch;
+            var dpThrottleCurrentNotch = (LeadLocomotive as MSTSLocomotive).ThrottleController.CurrentNotch;
             int idToMove = -1;
             int idLead = LeadLocomotive != null ? (Cars[LeadLocomotiveIndex] as MSTSLocomotive).DPUnitID : -1;
             for (var i = Cars.Count - 1; i >= 0; i--)
@@ -1572,6 +1574,8 @@ namespace Orts.Simulation.Physics
                 {
                     dpDynamicBrakePercent = DPDynamicBrakePercent;
                     dpThrottlePercent = DPThrottlePercent;
+                    dpDynamicBrakeCurrentNotch = (LeadLocomotive as MSTSLocomotive).DPDynamicBrakeController.CurrentNotch;
+                    dpThrottleCurrentNotch = (LeadLocomotive as MSTSLocomotive).DPThrottleController.CurrentNotch;
                     continue;
                 }
                 if (idToMove == -1 && Cars[i].RemoteControlGroup == 0)
@@ -1585,6 +1589,8 @@ namespace Orts.Simulation.Physics
                     Cars[i].RemoteControlGroup = 1;
                     DPDynamicBrakePercent = dpDynamicBrakePercent;
                     DPThrottlePercent = dpThrottlePercent;
+                    (LeadLocomotive as MSTSLocomotive).DPDynamicBrakeController.CurrentNotch = dpDynamicBrakeCurrentNotch;
+                    (LeadLocomotive as MSTSLocomotive).DPThrottleController.CurrentNotch = dpThrottleCurrentNotch;
                 }
                 else if (idToMove > -1 && Cars[i].RemoteControlGroup == 1)
                     Cars[i].RemoteControlGroup = 0;
@@ -1688,7 +1694,7 @@ namespace Orts.Simulation.Physics
             if (percent <= 0)
             {
                 percent = 0;
-                DPMore(controller, ref percent);
+//                DPMore(controller, ref percent);
             }
         }
 
@@ -1697,8 +1703,7 @@ namespace Orts.Simulation.Physics
         /// </summary>
         protected void DistributedPowerUpdate()
         {
-            if (LeadLocomotive != null && (LeadLocomotive.Direction == Direction.N
-                || LeadLocomotive.BrakeSystem.GetCylPressurePSI() > 20))
+            if (LeadLocomotive != null && LeadLocomotive.Direction == Direction.N)
                 DPIdle();
         }
 
