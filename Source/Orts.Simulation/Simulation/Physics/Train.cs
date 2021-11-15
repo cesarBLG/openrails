@@ -933,11 +933,10 @@ namespace Orts.Simulation.Physics
                     LeadLocomotive = Cars[LeadLocomotiveIndex];
                     if (TrainType != TRAINTYPE.STATIC)
                         Simulator.PlayerLocomotive = LeadLocomotive;
+                    (LeadLocomotive as MSTSLocomotive).DPThrottleController.SetValue(DPThrottlePercent / 100f);
+                    if ((LeadLocomotive as MSTSLocomotive).DPDynamicBrakeController != null)
+                        (LeadLocomotive as MSTSLocomotive).DPDynamicBrakeController.SetValue(DPDynamicBrakePercent / 100f);
                 }
-
-                (LeadLocomotive as MSTSLocomotive).DPThrottleController.SetValue(DPThrottlePercent / 100f);
-                if ((LeadLocomotive as MSTSLocomotive).DPDynamicBrakeController != null)
-                    (LeadLocomotive as MSTSLocomotive).DPDynamicBrakeController.SetValue(DPDynamicBrakePercent / 100f);
 
                 // restore logfile
                 if (DatalogTrainSpeed)
@@ -1559,6 +1558,10 @@ namespace Orts.Simulation.Physics
         /// </summary>
         public void DPMoveToBack()
         {
+            if (LeadLocomotive == null)
+                return;
+            var dpDynamicBrakePercent = LeadLocomotive.DynamicBrakePercent;
+            var dpThrottlePercent = LeadLocomotive.ThrottlePercent;
             int idToMove = -1;
             int idLead = LeadLocomotive != null ? (Cars[LeadLocomotiveIndex] as MSTSLocomotive).DPUnitID : -1;
             for (var i = Cars.Count - 1; i >= 0; i--)
@@ -1566,7 +1569,11 @@ namespace Orts.Simulation.Physics
                 if (!(Cars[i] is MSTSLocomotive))
                     continue;
                 if (idToMove == -1 && Cars[i].RemoteControlGroup == 1)
+                {
+                    dpDynamicBrakePercent = DPDynamicBrakePercent;
+                    dpThrottlePercent = DPThrottlePercent;
                     continue;
+                }
                 if (idToMove == -1 && Cars[i].RemoteControlGroup == 0)
                     idToMove = (Cars[i] as MSTSLocomotive).DPUnitID;
 
@@ -1574,7 +1581,11 @@ namespace Orts.Simulation.Physics
                     idToMove = int.MaxValue;
 
                 if ((Cars[i] as MSTSLocomotive).DPUnitID == idToMove && Cars[i].RemoteControlGroup != -1)
+                {
                     Cars[i].RemoteControlGroup = 1;
+                    DPDynamicBrakePercent = dpDynamicBrakePercent;
+                    DPThrottlePercent = dpThrottlePercent;
+                }
                 else if (idToMove > -1 && Cars[i].RemoteControlGroup == 1)
                     Cars[i].RemoteControlGroup = 0;
             }
@@ -1686,8 +1697,8 @@ namespace Orts.Simulation.Physics
         /// </summary>
         protected void DistributedPowerUpdate()
         {
-            if (LeadLocomotive.Direction == Direction.N
-                || LeadLocomotive.BrakeSystem.GetCylPressurePSI() > 20)
+            if (LeadLocomotive != null && (LeadLocomotive.Direction == Direction.N
+                || LeadLocomotive.BrakeSystem.GetCylPressurePSI() > 20))
                 DPIdle();
         }
 

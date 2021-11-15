@@ -2240,7 +2240,7 @@ public List<CabView> CabViewList = new List<CabView>();
                 ConfirmWheelslip(elapsedClockSeconds);
                 LocalThrottlePercent = (ThrottleIntervention < 0 ? ThrottleController.CurrentValue : ThrottleIntervention) * 100.0f;
                 DPThrottleController.Update(elapsedClockSeconds);
-                DPDynamicBrakeController.Update(elapsedClockSeconds);
+                if (DPDynamicBrakeController != null) DPDynamicBrakeController.Update(elapsedClockSeconds);
             }
             else
             {

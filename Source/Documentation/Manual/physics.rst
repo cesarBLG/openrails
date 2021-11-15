@@ -2040,8 +2040,8 @@ unit) signals for braking and throttle position, etc. The
 player-controlled locomotive generates the MU signals which are passed 
 along to every unit in the train. 
 
-Distributed Power
------------------
+Distributed Power (OR NewYear MG only)
+--------------------------------------
 
 Remote engines can be controlled in two modes: *synchronous* or 
 *asynchronous*. Engines in the player consist can be arranged to be part of 

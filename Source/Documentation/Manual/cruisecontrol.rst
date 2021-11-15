@@ -1,8 +1,8 @@
 .. _cruisecontrol:
 
-**************
-Cruise Control
-**************
+***********************************
+Cruise Control (OR NewYear MG only)
+***********************************
 
 General
 =======
