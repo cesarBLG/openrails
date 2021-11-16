@@ -577,7 +577,10 @@ public List<CabView> CabViewList = new List<CabView>();
                 {
                     HasSmoothStruc = true;
                 }
-                DPDynamicBrakeController = (MSTSNotchController)DynamicBrakeController.Clone();
+                if (DynamicBrakeController.NotchCount() > 3)
+                    DPDynamicBrakeController = (MSTSNotchController)DynamicBrakeController.Clone();
+                else
+                    DPDynamicBrakeController = BuildDPDynamicBrakeController();
             }
             else
             {
@@ -602,6 +605,60 @@ public List<CabView> CabViewList = new List<CabView>();
                 interp[100] = 0;
                 DynamicBrakeForceCurves[1] = interp;
             }
+        }
+
+        protected MSTSNotchController BuildDPDynamicBrakeController()
+        {
+            var dpDynController = new MSTSNotchController();
+            CabView cabView;
+            if (CabViewList[0].CabViewType == CabViewType.Front)
+                cabView = CabViewList[0];
+            else
+                cabView = CabViewList[1];
+            CVCMultiStateDisplay msDisplay = null;
+            try
+            {
+                msDisplay = (CVCMultiStateDisplay)cabView.CVFFile.CabViewControls.Where(
+                    control => control is CVCMultiStateDisplay &&
+                    (((CVCMultiStateDisplay)control).ControlType == CABViewControlTypes.DYNAMIC_BRAKE_DISPLAY ||
+                    ((CVCMultiStateDisplay)control).ControlType == CABViewControlTypes.CPH_DISPLAY)).First();
+            }
+            catch
+            {
+
+            }
+            if (msDisplay != null)
+            {
+                if (msDisplay.ControlType == CABViewControlTypes.DYNAMIC_BRAKE_DISPLAY)
+                {
+                    foreach (var switchval in msDisplay.Values)
+                        dpDynController.AddNotch((float)switchval);
+                }
+                else
+                {
+                    foreach (var switchval in msDisplay.Values)
+                    {
+                        if (switchval < CombinedControlSplitPosition)
+                            continue;
+                        dpDynController.AddNotch((float)(switchval - CombinedControlSplitPosition) / (1 - CombinedControlSplitPosition));
+                    }
+                }
+            }
+            else
+            // Use default Dash9 arrangement if no display is found
+            {
+                var switchval = 0f;
+                while (switchval <= 1)
+                {
+                    if (switchval == 0.99f)
+                        switchval = 1;
+                    dpDynController.AddNotch(switchval);
+                    switchval += 0.11f;
+                }
+            }
+
+
+            return dpDynController;
         }
 
         protected float checkAccBitsPreviousSpeed = 0;
@@ -1126,7 +1183,15 @@ public List<CabView> CabViewList = new List<CabView>();
             BrakemanBrakeController = locoCopy.BrakemanBrakeController != null ? locoCopy.BrakemanBrakeController.Clone(this) : null;
             DynamicBrakeController = locoCopy.DynamicBrakeController != null ? (MSTSNotchController)locoCopy.DynamicBrakeController.Clone() : null;
             DPThrottleController = (MSTSNotchController)ThrottleController.Clone();
-            DPDynamicBrakeController = DynamicBrakeController != null ? (MSTSNotchController)DynamicBrakeController.Clone() : null;
+            if (DynamicBrakeController != null)
+            {
+                if (DynamicBrakeController.NotchCount() > 3)
+                    DPDynamicBrakeController = (MSTSNotchController)DynamicBrakeController.Clone();
+                else
+                    DPDynamicBrakeController = BuildDPDynamicBrakeController();
+            }
+            else
+                DPDynamicBrakeController = null;
 
             LocomotivePowerSupply.Copy(locoCopy.LocomotivePowerSupply);
             TrainControlSystem.Copy(locoCopy.TrainControlSystem);
@@ -1205,6 +1270,7 @@ public List<CabView> CabViewList = new List<CabView>();
             outf.Write(GenericItem1);
             outf.Write(GenericItem2);
             outf.Write(RemoteControlGroup);
+            outf.Write(DPUnitID);
 
             base.Save(outf);
 
@@ -1261,6 +1327,7 @@ public List<CabView> CabViewList = new List<CabView>();
             GenericItem1 = inf.ReadBoolean();
             GenericItem2 = inf.ReadBoolean();
             RemoteControlGroup = inf.ReadInt32();
+            DPUnitID = inf.ReadInt32();
 
             base.Restore(inf);
 

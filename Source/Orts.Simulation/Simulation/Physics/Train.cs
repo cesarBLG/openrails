@@ -954,7 +954,7 @@ namespace Orts.Simulation.Physics
                 for (int i = 0; i < count; ++i)
                     Cars.Add(RollingStock.Restore(simulator, inf, this));
             }
-            SetDPUnitIDs();
+            SetDPUnitIDs(true);
         }
 
         static Traffic_Service_Definition RestoreTrafficSDefinition(BinaryReader inf)
@@ -1514,7 +1514,7 @@ namespace Orts.Simulation.Physics
         /// <summary>
         /// Set Distributed Power locomotive groups IDs, and reset async/back group assignments
         /// </summary>
-        public void SetDPUnitIDs()
+        public void SetDPUnitIDs(bool keepRemoteGroups = false)
         {
             var id = 0;
             foreach (var car in Cars)
@@ -1523,7 +1523,7 @@ namespace Orts.Simulation.Physics
                 if (car is MSTSLocomotive)
                 {
                     (car as MSTSLocomotive).DPUnitID = id;
-                    if (car.RemoteControlGroup == 1)
+                    if (car.RemoteControlGroup == 1 && !keepRemoteGroups)
                         car.RemoteControlGroup = 0;
                 }
                 else
@@ -1562,7 +1562,7 @@ namespace Orts.Simulation.Physics
                 return;
             var dpDynamicBrakePercent = LeadLocomotive.DynamicBrakePercent;
             var dpThrottlePercent = LeadLocomotive.ThrottlePercent;
-            var dpDynamicBrakeCurrentNotch = (LeadLocomotive as MSTSLocomotive).DynamicBrakeController.CurrentNotch;
+            var dpDynamicBrakeCurrentNotch = MathHelper.Clamp((LeadLocomotive as MSTSLocomotive).DPDynamicBrakeController.GetNotch(dpDynamicBrakePercent/100), 1, 8);
             var dpThrottleCurrentNotch = (LeadLocomotive as MSTSLocomotive).ThrottleController.CurrentNotch;
             int idToMove = -1;
             int idLead = LeadLocomotive != null ? (Cars[LeadLocomotiveIndex] as MSTSLocomotive).DPUnitID : -1;
