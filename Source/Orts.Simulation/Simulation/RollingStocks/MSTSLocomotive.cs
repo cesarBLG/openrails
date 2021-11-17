@@ -610,41 +610,49 @@ public List<CabView> CabViewList = new List<CabView>();
         protected MSTSNotchController BuildDPDynamicBrakeController()
         {
             var dpDynController = new MSTSNotchController();
-            CabView cabView;
-            if (CabViewList[0].CabViewType == CabViewType.Front)
-                cabView = CabViewList[0];
-            else
-                cabView = CabViewList[1];
+            CabView cabView = null;
             CVCMultiStateDisplay msDisplay = null;
-            try
+            if (CabView3D != null)
+                cabView = CabView3D;
+            else if (CabViewList.Count > 0)
             {
-                msDisplay = (CVCMultiStateDisplay)cabView.CVFFile.CabViewControls.Where(
-                    control => control is CVCMultiStateDisplay &&
-                    (((CVCMultiStateDisplay)control).ControlType == CABViewControlTypes.DYNAMIC_BRAKE_DISPLAY ||
-                    ((CVCMultiStateDisplay)control).ControlType == CABViewControlTypes.CPH_DISPLAY)).First();
-            }
-            catch
-            {
-
-            }
-            if (msDisplay != null)
-            {
-                if (msDisplay.ControlType == CABViewControlTypes.DYNAMIC_BRAKE_DISPLAY)
-                {
-                    foreach (var switchval in msDisplay.Values)
-                        dpDynController.AddNotch((float)switchval);
-                }
+                if (CabViewList[0].CabViewType == CabViewType.Front)
+                    cabView = CabViewList[0];
                 else
+                    cabView = CabViewList[1];
+            }
+            if (cabView != null)
+            {
+                try
                 {
-                    foreach (var switchval in msDisplay.Values)
+                    msDisplay = (CVCMultiStateDisplay)cabView.CVFFile.CabViewControls.Where(
+                        control => control is CVCMultiStateDisplay &&
+                        (((CVCMultiStateDisplay)control).ControlType == CABViewControlTypes.DYNAMIC_BRAKE_DISPLAY ||
+                        ((CVCMultiStateDisplay)control).ControlType == CABViewControlTypes.CPH_DISPLAY)).First();
+                }
+                catch
+                {
+
+                }
+                if (msDisplay != null)
+                {
+                    if (msDisplay.ControlType == CABViewControlTypes.DYNAMIC_BRAKE_DISPLAY)
                     {
-                        if (switchval < CombinedControlSplitPosition)
-                            continue;
-                        dpDynController.AddNotch((float)(switchval - CombinedControlSplitPosition) / (1 - CombinedControlSplitPosition));
+                        foreach (var switchval in msDisplay.Values)
+                            dpDynController.AddNotch((float)switchval);
+                    }
+                    else
+                    {
+                        foreach (var switchval in msDisplay.Values)
+                        {
+                            if (switchval < CombinedControlSplitPosition)
+                                continue;
+                            dpDynController.AddNotch((float)(switchval - CombinedControlSplitPosition) / (1 - CombinedControlSplitPosition));
+                        }
                     }
                 }
             }
-            else
+            if (cabView == null || msDisplay == null)
             // Use default Dash9 arrangement if no display is found
             {
                 var switchval = 0f;

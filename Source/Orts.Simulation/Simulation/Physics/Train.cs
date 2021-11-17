@@ -1562,7 +1562,7 @@ namespace Orts.Simulation.Physics
                 return;
             var dpDynamicBrakePercent = LeadLocomotive.DynamicBrakePercent;
             var dpThrottlePercent = LeadLocomotive.ThrottlePercent;
-            var dpDynamicBrakeCurrentNotch = MathHelper.Clamp((LeadLocomotive as MSTSLocomotive).DPDynamicBrakeController.GetNotch(dpDynamicBrakePercent/100), 1, 8);
+            var dpDynamicBrakeCurrentNotch = MathHelper.Clamp((LeadLocomotive as MSTSLocomotive).DPDynamicBrakeController.GetNotch(dpDynamicBrakePercent/100), 0, 8);
             var dpThrottleCurrentNotch = (LeadLocomotive as MSTSLocomotive).ThrottleController.CurrentNotch;
             int idToMove = -1;
             int idLead = LeadLocomotive != null ? (Cars[LeadLocomotiveIndex] as MSTSLocomotive).DPUnitID : -1;
@@ -1628,12 +1628,14 @@ namespace Orts.Simulation.Physics
         /// </summary>
         public void DPDynamicBrake()
         {
-            DPMode = -1;
             DPThrottlePercent = 0;
             if (DPDynamicBrakePercent == -1)
                 DPDynamicBrakePercent = 0;
-            if (DPDynamicBrakePercent == 0)
+            if (DPDynamicBrakePercent == 0 && DPMode != -1)
+            {
+                DPMode = -1;
                 DPMore();
+            }
             DistributedPowerUpdate();
         }
 
