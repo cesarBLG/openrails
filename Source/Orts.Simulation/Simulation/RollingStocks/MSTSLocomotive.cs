@@ -4567,7 +4567,7 @@ public List<CabView> CabViewList = new List<CabView>();
         {
             if (DynamicBrakeController == null)
                 return null;
-            var dpStatus = Train.DPMode == -1 ? string.Format("({0:F0}%)", Train.DPDynamicBrakePercent) : string.Empty;
+            var dpStatus = this is MSTSDieselLocomotive && Train.DPMode == -1 ? string.Format("({0:F0}%)", Train.DPDynamicBrakePercent) : string.Empty;
             if (DynamicBrakePercent < 0)
                 return dpStatus;
             if (TrainControlSystem.FullDynamicBrakingOrder)

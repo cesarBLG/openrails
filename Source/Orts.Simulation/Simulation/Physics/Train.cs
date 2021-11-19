@@ -1536,6 +1536,8 @@ namespace Orts.Simulation.Physics
         /// </summary>
         public void DPMoveToFront()
         {
+            if (LeadLocomotive == null || (LeadLocomotive as MSTSLocomotive).DPDynamicBrakeController == null)
+                return;
             int idToMove = -1;
             for (var i = 0; i < Cars.Count; i++)
             {
@@ -1558,7 +1560,7 @@ namespace Orts.Simulation.Physics
         /// </summary>
         public void DPMoveToBack()
         {
-            if (LeadLocomotive == null)
+            if (LeadLocomotive == null || (LeadLocomotive as MSTSLocomotive).DPDynamicBrakeController == null)
                 return;
             var dpDynamicBrakePercent = LeadLocomotive.DynamicBrakePercent;
             var dpThrottlePercent = LeadLocomotive.ThrottlePercent;
@@ -1602,6 +1604,8 @@ namespace Orts.Simulation.Physics
         /// </summary>
         public void DPTraction()
         {
+            if (LeadLocomotive == null || (LeadLocomotive as MSTSLocomotive).DPDynamicBrakeController == null)
+                return;
             DPMode = 1;
             DPDynamicBrakePercent = -1;
             if (DPThrottlePercent == 0)
@@ -1614,6 +1618,8 @@ namespace Orts.Simulation.Physics
         /// </summary>
         public void DPIdle()
         {
+            if (LeadLocomotive == null || (LeadLocomotive as MSTSLocomotive).DPDynamicBrakeController == null)
+                return;
             DPMode = 0;
             if (DPDynamicBrakePercent >= 0)
                 DPDynamicBrakePercent = 0;
@@ -1628,6 +1634,8 @@ namespace Orts.Simulation.Physics
         /// </summary>
         public void DPDynamicBrake()
         {
+            if (LeadLocomotive == null || (LeadLocomotive as MSTSLocomotive).DPDynamicBrakeController == null)
+                return;
             DPThrottlePercent = 0;
             if (DPDynamicBrakePercent == -1)
                 DPDynamicBrakePercent = 0;
@@ -1649,6 +1657,8 @@ namespace Orts.Simulation.Physics
         /// </summary>
         public void DPMore()
         {
+            if (LeadLocomotive == null || (LeadLocomotive as MSTSLocomotive).DPDynamicBrakeController == null)
+                return;
             if (DPMode == 1)
                 DPMore((LeadLocomotive as MSTSLocomotive).DPThrottleController, ref DPThrottlePercent);
             else if (DPMode == -1)
@@ -1675,6 +1685,8 @@ namespace Orts.Simulation.Physics
         /// </summary>
         public void DPLess()
         {
+            if (LeadLocomotive == null || (LeadLocomotive as MSTSLocomotive).DPDynamicBrakeController == null)
+                return;
             if (DPMode == 1)
                 DPLess((LeadLocomotive as MSTSLocomotive).DPThrottleController, ref DPThrottlePercent);
             else if (DPMode == -1)

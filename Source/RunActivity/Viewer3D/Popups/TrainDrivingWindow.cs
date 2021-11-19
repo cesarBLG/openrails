@@ -734,7 +734,7 @@ namespace Orts.Viewer3D.Popups
                 {
                     FirstCol = Viewer.Catalog.GetString(locomotive is MSTSSteamLocomotive ? "Regulator" : "Throttle"),
                     LastCol = $"{Round(locomotive.ThrottlePercent)}%" +
-                    (train.DPMode == 1 ? $"({Round(train.DPThrottlePercent)}%)" : ""),
+                    (locomotive is MSTSDieselLocomotive && train.DPMode == 1 ? $"({Round(train.DPThrottlePercent)}%)" : ""),
                     KeyPressed = throttleKey,
                     SymbolCol = ""//throttleKey,
                 });
@@ -947,7 +947,7 @@ namespace Orts.Viewer3D.Popups
                     {
                         FirstCol = Viewer.Catalog.GetString("Dynamic brake"),
                         LastCol = locomotive.DynamicBrake ? dynamicBrakeStatus : Viewer.Catalog.GetString("Setup") + ColorCode[Color.Cyan] +
-                         (train.DPMode == -1 ? string.Format("({0:F0}%)", train.DPDynamicBrakePercent) : string.Empty),
+                         (locomotive is MSTSDieselLocomotive && train.DPMode == -1 ? string.Format("({0:F0}%)", train.DPDynamicBrakePercent) : string.Empty),
                     });
                 }
                 else
@@ -955,7 +955,7 @@ namespace Orts.Viewer3D.Popups
                     AddLabel(new ListLabel
                     {
                         FirstCol = Viewer.Catalog.GetString("Dynamic brake"),
-                        LastCol = Viewer.Catalog.GetString("Off") + (train.DPMode == -1 ? string.Format("({0:F0}%)", train.DPDynamicBrakePercent) : string.Empty),
+                        LastCol = Viewer.Catalog.GetString("Off") + (locomotive is MSTSDieselLocomotive && train.DPMode == -1 ? string.Format("({0:F0}%)", train.DPDynamicBrakePercent) : string.Empty),
                     });
                 }
             }
@@ -1096,7 +1096,7 @@ namespace Orts.Viewer3D.Popups
 
             // Distributed Power
 
-            if (multipleUnitsConfiguration != null)
+            if (locomotive is MSTSDieselLocomotive && multipleUnitsConfiguration != null)
             { 
                 AddLabel(new ListLabel
                 {
