@@ -1032,7 +1032,13 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                 Locomotive.TrainBrakeController.TrainBrakeControllerState == ORTS.Scripting.Api.ControllerState.Neutral)
             {
                 if (TrainBrakePriority && SelectedMaxAccelerationStep > 0 && ForceResetRequiredAfterBraking)
+                {
+                    if (Locomotive.DynamicBrakePercent > 0 && SelectedSpeedMpS > 0)
+                        Locomotive.SetDynamicBrakePercent(0);
+                    controllerVolts = 0;
+                    Locomotive.ThrottlePercent = 0;
                     return;
+                }
                 TrainBrakePriority = false;
             }
 
@@ -1060,6 +1066,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                     if (Locomotive.DynamicBrakePercent > 0 && SelectedSpeedMpS > 0)
                         Locomotive.SetDynamicBrakePercent(0);
                     controllerVolts = 0;
+                    Locomotive.ThrottlePercent = 0;
                     return;
                 }
             }
@@ -1074,7 +1081,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                 if (SpeedRegMode == SpeedRegulatorMode.Auto && UseThrottleAsForceSelector) Locomotive.ThrottleController.SetPercent(0);
                 Locomotive.SetThrottlePercent(0);
             }
-            if (ResetForceAfterAnyBraking && WasBraking && (SelectedMaxAccelerationStep > 0 || SelectedMaxAccelerationPercent > 0))
+            if (ForceResetRequiredAfterBraking && WasBraking && (SelectedMaxAccelerationStep > 0 || SelectedMaxAccelerationPercent > 0))
             {
                 Locomotive.SetThrottlePercent(0);
                 controllerVolts = 0;
@@ -1085,7 +1092,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                 return;
             }
 
-            if (ResetForceAfterAnyBraking && !WasForceReset)
+            if (ForceResetRequiredAfterBraking && !WasForceReset)
             {
                 Locomotive.SetThrottlePercent(0);
                 controllerVolts = 0;
