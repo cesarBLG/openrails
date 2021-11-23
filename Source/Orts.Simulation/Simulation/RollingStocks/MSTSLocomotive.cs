@@ -3432,7 +3432,8 @@ public List<CabView> CabViewList = new List<CabView>();
             }
             if (CruiseControl != null)
             {
-                if (CruiseControl.UseThrottleAsForceSelector && CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto)
+                if (CruiseControl.UseThrottleAsForceSelector && CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto &&
+                    !(CruiseControl.UseThrottleInCombinedControl && CruiseControl.DynamicBrakePriority))
                 {
                     CruiseControl.SpeedRegulatorMaxForceStopIncrease();
                     return;
@@ -3514,7 +3515,8 @@ public List<CabView> CabViewList = new List<CabView>();
             if (CruiseControl != null && (CombinedControlType == CombinedControl.None || CruiseControl.UseThrottleInCombinedControl))
             {
                 if (CruiseControl.UseThrottleAsForceSelector && CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto && 
-                    !(CruiseControl.DynamicBrakeCommandHasPriorityOverCruiseControl && CruiseControl.DynamicBrakePriority))
+                    !(CruiseControl.DynamicBrakeCommandHasPriorityOverCruiseControl && (CruiseControl.DynamicBrakePriority ||
+                    (CruiseControl.SelectedMaxAccelerationPercent == 0 && CruiseControl.SelectedMaxAccelerationStep == 0))))
                 {
                     CruiseControl.SpeedRegulatorMaxForceStartDecrease();
                     return;
@@ -3573,7 +3575,8 @@ public List<CabView> CabViewList = new List<CabView>();
                 }
                 if (CombinedControlType == CombinedControl.None || CruiseControl.UseThrottleInCombinedControl)
                 {
-                    if (CruiseControl.UseThrottleAsForceSelector && CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto)
+                    if (CruiseControl.UseThrottleAsForceSelector && CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto
+                        && (CruiseControl.SelectedMaxAccelerationPercent > 0 || CruiseControl.SelectedMaxAccelerationStep > 0))
                     {
                         CruiseControl.SpeedRegulatorMaxForceStopDecrease();
                         return;
