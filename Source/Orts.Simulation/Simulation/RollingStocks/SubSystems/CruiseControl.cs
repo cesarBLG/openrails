@@ -124,7 +124,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
         public bool SpeedSelectorIsDiscrete = false;
         public bool DoComputeNumberOfAxles = false;
         public bool DisableManualSwitchToManualWhenSetForceNotAtZero = false;
-        public bool DisableManualSwitchToAutoWhenSetForceNotAtZero = false;
+        public bool DisableManualSwitchToAutoWhenThrottleNotAtZero = false;
         public bool DisableManualSwitchToAutoWhenSetSpeedNotAtTop = false;
         public bool EnableSelectedSpeedSelectionWhenManualModeSet = false;
         protected float speedRegulatorIntermediateValue = 0;
@@ -167,7 +167,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                 case "engine(ortscruisecontrol(disablecruisecontrolonthrottleandzeroforce": DisableCruiseControlOnThrottleAndZeroForce = stf.ReadBoolBlock(false); break;
                 case "engine(ortscruisecontrol(disablecruisecontrolonthrottleandzeroforceandzerospeed": DisableCruiseControlOnThrottleAndZeroForceAndZeroSpeed = stf.ReadBoolBlock(false); break;
                 case "engine(ortscruisecontrol(disablemanualswitchtomanualwhensetforcenotatzero": DisableManualSwitchToManualWhenSetForceNotAtZero = stf.ReadBoolBlock(false); break;
-                case "engine(ortscruisecontrol(disablemanualswitchtoautowhensetforcenotatzero": DisableManualSwitchToAutoWhenSetForceNotAtZero = stf.ReadBoolBlock(false); break;
+                case "engine(ortscruisecontrol(disablemanualswitchtoautowhenthrottlenotatzero": DisableManualSwitchToAutoWhenThrottleNotAtZero = stf.ReadBoolBlock(false); break;
                 case "engine(ortscruisecontrol(disablemanualswitchtoautowhensetspeednotattop": DisableManualSwitchToAutoWhenSetSpeedNotAtTop = stf.ReadBoolBlock(false); break;
                 case "engine(ortscruisecontrol(enableselectedspeedselectionwhenmanualmodeset": EnableSelectedSpeedSelectionWhenManualModeSet = stf.ReadBoolBlock(false); break;
                 case "engine(ortscruisecontrol(forcestepsthrottletable":
@@ -314,7 +314,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
             HasIndependentThrottleDynamicBrakeLever = other.HasIndependentThrottleDynamicBrakeLever;
             HasProportionalSpeedSelector = other.HasProportionalSpeedSelector;
             DisableManualSwitchToManualWhenSetForceNotAtZero = other.DisableManualSwitchToManualWhenSetForceNotAtZero;
-            DisableManualSwitchToAutoWhenSetForceNotAtZero = other.DisableManualSwitchToAutoWhenSetForceNotAtZero;
+            DisableManualSwitchToAutoWhenThrottleNotAtZero = other.DisableManualSwitchToAutoWhenThrottleNotAtZero;
             DisableManualSwitchToAutoWhenSetSpeedNotAtTop = other.DisableManualSwitchToAutoWhenSetSpeedNotAtTop;
             EnableSelectedSpeedSelectionWhenManualModeSet = other.EnableSelectedSpeedSelectionWhenManualModeSet;
             SpeedSelectorIsDiscrete = other.SpeedSelectorIsDiscrete;
@@ -452,7 +452,8 @@ namespace Orts.Simulation.RollingStocks.SubSystems
             if (!Equipped) return;
             if (SpeedRegMode == SpeedRegulatorMode.Testing) return;
             if (SpeedRegMode == SpeedRegulatorMode.Manual &&
-               ((DisableManualSwitchToAutoWhenSetForceNotAtZero && SelectedMaxAccelerationStep != 0) ||
+               ((DisableManualSwitchToAutoWhenThrottleNotAtZero && (Locomotive.ThrottlePercent != 0 || 
+               (Locomotive.DynamicBrakePercent != -1 && Locomotive.DynamicBrakePercent != 0))) ||
                (DisableManualSwitchToAutoWhenSetSpeedNotAtTop && SelectedSpeedMpS != Locomotive.MaxSpeedMpS && Locomotive.AbsSpeedMpS > Simulator.MaxStoppedMpS)))
                 return;
             bool test = false;
