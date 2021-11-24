@@ -132,7 +132,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
         protected float speedRegulatorIntermediateValue = 0;
         protected float StepSize = 20;
         protected float RelativeAccelerationMpSS = 0; // Acceleration relative to state of reverser
-        protected bool CCIsUsingTrainBrake = false; // Cruise control is using (also) train brake to brake
+        public bool CCIsUsingTrainBrake = false; // Cruise control is using (also) train brake to brake
         protected float TrainBrakeMinPercentValue = 30f; // Minimum train brake settable percent Value
         protected float TrainBrakeMaxPercentValue = 85f; // Maximum train brake settable percent Value
 
@@ -1384,21 +1384,26 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                                 }
                                 Locomotive.SetTrainBrakePercent(brakePercent);
                             }
-                            if (UseTrainBrakeAndDynBrake && -delta > SpeedDeltaToEnableTrainBrake )
+                            if (UseTrainBrakeAndDynBrake)
                             {
-                                CCIsUsingTrainBrake = true;
-/*                               brakePercent = Math.Max(TrainBrakeMinPercentValue + 3.0f, -delta * 2);
-                                if (brakePercent > TrainBrakeMaxPercentValue)
-                                brakePercent = TrainBrakeMaxPercentValue;*/
-                                brakePercent = (TrainBrakeMaxPercentValue - TrainBrakeMinPercentValue - 3.0f) * SelectedMaxAccelerationPercent / 100 + TrainBrakeMinPercentValue + 3.0f;
-                                Locomotive.SetTrainBrakePercent(brakePercent);
-                            }
-                            else if (UseTrainBrakeAndDynBrake && -delta < SpeedDeltaToEnableTrainBrake)
-                            {
-                                brakePercent = 0;
-                                Locomotive.SetTrainBrakePercent(brakePercent);
-                                if (Bar.FromPSI(Locomotive.BrakeSystem.BrakeLine1PressurePSI) >= 4.98)
-                                    CCIsUsingTrainBrake = false;
+                                if (-delta > SpeedDeltaToEnableTrainBrake)
+                                {
+                                    CCIsUsingTrainBrake = true;
+                                    /*                               brakePercent = Math.Max(TrainBrakeMinPercentValue + 3.0f, -delta * 2);
+                                                                    if (brakePercent > TrainBrakeMaxPercentValue)
+                                                                    brakePercent = TrainBrakeMaxPercentValue;*/
+                                    brakePercent = (TrainBrakeMaxPercentValue - TrainBrakeMinPercentValue - 3.0f) * SelectedMaxAccelerationPercent / 100 + TrainBrakeMinPercentValue + 3.0f;
+                                    if (-delta < SpeedDeltaToEnableTrainBrake + 5)
+                                        brakePercent = Math.Min(brakePercent, TrainBrakeMinPercentValue + 13.0f);
+                                    Locomotive.SetTrainBrakePercent(brakePercent);
+                                }
+                                else if (-delta < SpeedDeltaToEnableTrainBrake)
+                                {
+                                    brakePercent = 0;
+                                    Locomotive.SetTrainBrakePercent(brakePercent);
+                                    if (Bar.FromPSI(Locomotive.BrakeSystem.BrakeLine1PressurePSI) >= 4.98)
+                                        CCIsUsingTrainBrake = false;
+                                }
                             }
                         }
                     }
@@ -1583,22 +1588,27 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                                     }
                                     Locomotive.SetTrainBrakePercent(brakePercent);
                                 }
-                                if (UseTrainBrakeAndDynBrake && -delta > SpeedDeltaToEnableTrainBrake)
+                                                           if (UseTrainBrakeAndDynBrake)
+                            {
+                                if (-delta > SpeedDeltaToEnableTrainBrake)
                                 {
                                     CCIsUsingTrainBrake = true;
-                                    /*                                    brakePercent = Math.Max(TrainBrakeMinPercentValue + 3.0f, -delta * 2);
-                                                                        if (brakePercent > TrainBrakeMaxPercentValue)
-                                                                            brakePercent = TrainBrakeMaxPercentValue;*/
+                                    /*                               brakePercent = Math.Max(TrainBrakeMinPercentValue + 3.0f, -delta * 2);
+                                                                    if (brakePercent > TrainBrakeMaxPercentValue)
+                                                                    brakePercent = TrainBrakeMaxPercentValue;*/
                                     brakePercent = (TrainBrakeMaxPercentValue - TrainBrakeMinPercentValue - 3.0f) * SelectedMaxAccelerationPercent / 100 + TrainBrakeMinPercentValue + 3.0f;
-                                    Locomotive.SetTrainBrakePercent(brakePercent);
+                                    if (-delta < SpeedDeltaToEnableTrainBrake + 5)
+                                        brakePercent = Math.Min(brakePercent, TrainBrakeMinPercentValue + 13.0f);
+                                        Locomotive.SetTrainBrakePercent(brakePercent);
                                 }
-                                else if (UseTrainBrakeAndDynBrake && -delta < SpeedDeltaToEnableTrainBrake)
+                                else if (-delta < SpeedDeltaToEnableTrainBrake)
                                 {
                                     brakePercent = 0;
                                     Locomotive.SetTrainBrakePercent(brakePercent);
                                     if (Bar.FromPSI(Locomotive.BrakeSystem.BrakeLine1PressurePSI) >= 4.98)
                                         CCIsUsingTrainBrake = false;
                                 }
+                            }
                             }
                         }
                     }

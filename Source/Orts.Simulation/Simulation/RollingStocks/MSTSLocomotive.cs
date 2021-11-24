@@ -5322,6 +5322,8 @@ public List<CabView> CabViewList = new List<CabView>();
                     }
                 case CABViewControlTypes.TRAIN_BRAKE:
                     {
+                        if (CruiseControl != null)
+                            if (CruiseControl.CCIsUsingTrainBrake) break;
                         data = (TrainBrakeController == null) ? 0.0f : TrainBrakeController.CurrentValue;
                         break;
                     }
