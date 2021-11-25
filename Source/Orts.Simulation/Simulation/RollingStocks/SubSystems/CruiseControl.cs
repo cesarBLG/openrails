@@ -129,6 +129,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
         public bool EnableSelectedSpeedSelectionWhenManualModeSet = false;
         public bool UseTrainBrakeAndDynBrake = false;
         protected float SpeedDeltaToEnableTrainBrake = 5;
+        protected float SpeedDeltaToEnableFullTrainBrake = 10;
         protected float speedRegulatorIntermediateValue = 0;
         protected float StepSize = 20;
         protected float RelativeAccelerationMpSS = 0; // Acceleration relative to state of reverser
@@ -222,6 +223,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                 case "engine(ortscruisecontrol(speedselectorisdiscrete": SpeedSelectorIsDiscrete = stf.ReadBoolBlock(false); break;
                 case "engine(ortscruisecontrol(usetrainbrakeanddynbrake": UseTrainBrakeAndDynBrake = stf.ReadBoolBlock(false); break;
                 case "engine(ortscruisecontrol(speeddeltatoenabletrainbrake": SpeedDeltaToEnableTrainBrake = stf.ReadFloatBlock(STFReader.UNITS.Speed, 5f); break;
+                case "engine(ortscruisecontrol(speeddeltatoenablefulltrainbrake": SpeedDeltaToEnableFullTrainBrake = stf.ReadFloatBlock(STFReader.UNITS.Speed, 10f); break;
                 case "engine(ortscruisecontrol(trainbrakeminpercentvalue": TrainBrakeMinPercentValue = stf.ReadFloatBlock(STFReader.UNITS.Any, 0.3f); break;
                 case "engine(ortscruisecontrol(trainbrakemaxpercentvalue": TrainBrakeMaxPercentValue = stf.ReadFloatBlock(STFReader.UNITS.Any, 0.3f); break;
                 case "engine(ortscruisecontrol(docomputenumberofaxles": DoComputeNumberOfAxles = stf.ReadBoolBlock(false); break;
@@ -331,6 +333,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
             SpeedRegulatorOptions = other.SpeedRegulatorOptions;
             UseTrainBrakeAndDynBrake = other.UseTrainBrakeAndDynBrake;
             SpeedDeltaToEnableTrainBrake = other.SpeedDeltaToEnableTrainBrake;
+            SpeedDeltaToEnableFullTrainBrake = other.SpeedDeltaToEnableFullTrainBrake;
             TrainBrakeMinPercentValue = other.TrainBrakeMinPercentValue;
             TrainBrakeMaxPercentValue = other.TrainBrakeMaxPercentValue;
         }
@@ -1393,7 +1396,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                                                                     if (brakePercent > TrainBrakeMaxPercentValue)
                                                                     brakePercent = TrainBrakeMaxPercentValue;*/
                                     brakePercent = (TrainBrakeMaxPercentValue - TrainBrakeMinPercentValue - 3.0f) * SelectedMaxAccelerationPercent / 100 + TrainBrakeMinPercentValue + 3.0f;
-                                    if (-delta < SpeedDeltaToEnableTrainBrake + 5)
+                                    if (-delta < SpeedDeltaToEnableFullTrainBrake)
                                         brakePercent = Math.Min(brakePercent, TrainBrakeMinPercentValue + 13.0f);
                                     Locomotive.SetTrainBrakePercent(brakePercent);
                                 }
@@ -1597,7 +1600,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                                                                     if (brakePercent > TrainBrakeMaxPercentValue)
                                                                     brakePercent = TrainBrakeMaxPercentValue;*/
                                     brakePercent = (TrainBrakeMaxPercentValue - TrainBrakeMinPercentValue - 3.0f) * SelectedMaxAccelerationPercent / 100 + TrainBrakeMinPercentValue + 3.0f;
-                                    if (-delta < SpeedDeltaToEnableTrainBrake + 5)
+                                    if (-delta < SpeedDeltaToEnableFullTrainBrake)
                                         brakePercent = Math.Min(brakePercent, TrainBrakeMinPercentValue + 13.0f);
                                         Locomotive.SetTrainBrakePercent(brakePercent);
                                 }
