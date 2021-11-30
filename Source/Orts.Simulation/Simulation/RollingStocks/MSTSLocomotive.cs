@@ -1994,7 +1994,7 @@ public List<CabView> CabViewList = new List<CabView>();
             {
                 case Train.TRAINTYPE.AI:
                 case Train.TRAINTYPE.AI_PLAYERHOSTING:
-                    if (AcceptMUSignals)
+                    if (RemoteControlGroup != -1)
                     {
                         if (!LocomotivePowerSupply.MainPowerSupplyOn)
                         {
@@ -5587,7 +5587,7 @@ public List<CabView> CabViewList = new List<CabView>();
                         foreach (var car in Train.Cars)
                         {
                             var dieselLoco = car as MSTSDieselLocomotive;
-                            if (dieselLoco != null && dieselLoco.AcceptMUSignals)
+                            if (dieselLoco != null && dieselLoco.RemoteControlGroup != -1)
                             {
                                 if (car == Simulator.PlayerLocomotive && dieselLoco.DieselEngines.Count > 1)
                                 {
