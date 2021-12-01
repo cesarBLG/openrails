@@ -1,5 +1,5 @@
-﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.110
-November 13th, 2021
+﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.111
+December 1st, 2021
 
 Please note that the installation and use of Open Rails software, even of its unofficial versions, is governed by the Open Rails End User License Agreement. 
 
@@ -11,7 +11,7 @@ INSTALLATION
 
 
 RELEASE NOTES
-This unofficial version has been derived from the latest official Testing release T1.4-55
+This unofficial version has been derived from the latest official Testing release T1.4-55, and from the latest master release (up to PR #536)
 
 This unofficial version includes the cruise control software written by Jindrich with final adaptations by myself.
 
@@ -25,8 +25,6 @@ This version includes some features not (yet) available in the Open Rails testin
 - signal script parser (by perpetualKid): reduces CPU time needed for signal management
 - true 64-bit management, allowing to use more than 4 GB of memory, if available, in Win64 systems (mainly by perpetualKid)
 - general options checkbox for optional run at 32 bit on Win64 (consumes less memory, recommended for computers with 4 GB RAM)
-- translatable Train Driving Info window (see http://www.elvastower.com/forums/index.php?/topic/33401-f5-hud-scrolling/page__view__findpost__p__251671 and following posts), by mbm_OR
-- extended Raildriver setup (by perpetualKid)
 - panto commands and animations now swapped when in rear cab
 - correction to reduce transfer flickering at short distance
 - allow passing a red signal for shunting through dispatcher window, see https://trello.com/c/I19VVKlz/450-manual-callon-from-dispatcher-window , by césarbl
@@ -47,8 +45,6 @@ This version includes some features not (yet) available in the Open Rails testin
 - preliminary bug fix for http://www.elvastower.com/forums/index.php?/topic/35112-problem-with-tcs-scripts-and-timetable-mode/
 - max fog distance increased to 300 km
 - first cruise control implementation, by Jindrich and slightly adapted by me
-- added AIFireman info in web and main display TrainDrivingInfo, by mbm_OR
-- tentative improvement to sound deactivation in long player trains, see http://www.elvastower.com/forums/index.php?/topic/35244-problem-in-locomotive-sound/
 - camera following detached wagons in hump yard operation by pressing Ctrl key while clicking with mouse on coupler in Train Operations Window to uncouple wagon
 - bug fix that didn't check for null label text, see http://www.elvastower.com/forums/index.php?/topic/32640-or-newyear-mg/page__view__findpost__p__273496
 - re-introduced bug fix for missing shapes http://www.elvastower.com/forums/index.php?/topic/32640-or-newyear-mg/page__view__findpost__p__272585
@@ -57,7 +53,6 @@ This version includes some features not (yet) available in the Open Rails testin
 - Fix bug in stating whether tractive or braking force of ORTS_SIGNED_TRACTION_TOTAL_BRAKING
 - Cruise control: add variable to adjust dynamic braking force change speed
 - Cruise control: manage running in reverse
-- cabview controls ODOMETER, ODOMETER_RESET and ODOMETER_DIRECTION, see https://blueprints.launchpad.net/or/+spec/odometer-cabview-control 
 - Cruise control: improved support for auto/manual switch, including support for ON/OFF control and additional parameters for .eng file
 - Cruise control: keyboard command to set selected speed at zero
 - 2 cabview controls for generic items, see http://www.elvastower.com/forums/index.php?/topic/35572-cabview-controls-for-generic-items/
@@ -67,8 +62,12 @@ This version includes some features not (yet) available in the Open Rails testin
 - Insert cabview controls in side views of 2D cabs, see http://www.elvastower.com/forums/index.php?/topic/35640-inserting-cabview-controls-in-side-views-of-2d-cabs/ 
 - Multiple screens: add ORTS_STATIC_DISPLAY for background of screen pages and allow for uppercase chars in screenpage names
 - Bug fix for https://bugs.launchpad.net/or/+bug/1950578 Dyn Brake set up state not disappearing in cab
-- NEW: reassigned keys for two CC commands, see http://www.elvastower.com/forums/index.php?/topic/33841-cruise-control/page__st__110#entry277962 .
-- NEW: imported the distributed power feature code written by Peter Gulyas (gpz), see here http://www.elvastower.com/forums/index.php?/topic/26249-remote-control-dpu-units/page__st__70__gopid__277963#entry277963
+- imported the distributed power feature code written by Peter Gulyas (gpz), see here http://www.elvastower.com/forums/index.php?/topic/26249-remote-control-dpu-units/page__st__70__gopid__277963#entry277963
+- update Russian locale .dlls, by Weter
+- distributed power: various improvements and fixes
+- workaround for http://www.elvastower.com/forums/index.php?/topic/32640-or-newyear-mg/page__view__findpost__p__278074 
+- NEW: distributed power: Train DPU Info pop-up window, see http://www.elvastower.com/forums/index.php?/topic/26249-remote-control-dpu-units/page__view__findpost__p__278535 , by mbm_OR
+- NEW: Cruise control: CC can control dyn and train brake together, see http://www.elvastower.com/forums/index.php?/topic/33841-cruise-control/page__view__findpost__p__278575 .
 
 The Monogame related code intentionally coincides only partly with the code of the OR official testing version.
 
