@@ -580,6 +580,7 @@ namespace Orts.Viewer3D.Popups
             var multipleUnitsConfiguration = locomotive.GetMultipleUnitsConfiguration();
             var lastCol = new List<string>();
             var symbolCol = new List<string>();
+            var notDpuTrain = false;
 
             labels.Clear();
             UpdateDataEnded = false;
@@ -627,9 +628,10 @@ namespace Orts.Viewer3D.Popups
                     SymbolCol = symbolCol,
                     LastCol = lastCol
                 });
+                notDpuTrain = true;
             }
 
-            if (locomotive != null)
+            if (locomotive != null && !notDpuTrain)
             {
                 int numberOfDieselLocomotives = 0;
                 int maxNumberOfEngines = 0;

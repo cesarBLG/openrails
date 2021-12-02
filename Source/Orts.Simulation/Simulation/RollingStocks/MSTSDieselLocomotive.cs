@@ -1002,9 +1002,13 @@ namespace Orts.Simulation.RollingStocks
         string brakeValue(string tokenIni, string tokenEnd) // used by GetDpuStatus(bool dataHud)
         {
             string trainBrakeStatus = Simulator.PlayerLocomotive.GetTrainBrakeStatus();
-            var indexIni = trainBrakeStatus.IndexOf(tokenIni) + tokenIni.Length + 1;
-            var indexEnd = trainBrakeStatus.IndexOf(tokenEnd) - indexIni;
-            var brakeInfoValue = trainBrakeStatus.Substring(indexIni, indexEnd).TrimEnd();
+            var brakeInfoValue = "-";
+            if (trainBrakeStatus.Contains(tokenIni) && trainBrakeStatus.Contains(tokenEnd))
+            {
+                var indexIni = trainBrakeStatus.IndexOf(tokenIni) + tokenIni.Length + 1;
+                var indexEnd = trainBrakeStatus.IndexOf(tokenEnd) - indexIni;
+                brakeInfoValue = trainBrakeStatus.Substring(indexIni, indexEnd).TrimEnd();
+            }
             return brakeInfoValue;
         }
 
