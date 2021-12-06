@@ -1689,7 +1689,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                             }
                             else
                             {
-                                if (controllerVolts < demandedVolts && controllerVolts >= 0)
+                                if (controllerVolts < demandedVolts && demandedVolts >= 0)
                                 {
                                     float step = 100 / ThrottleFullRangeIncreaseTimeSeconds;
                                     step *= elapsedClockSeconds;

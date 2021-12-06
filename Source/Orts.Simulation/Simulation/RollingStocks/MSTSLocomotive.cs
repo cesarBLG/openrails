@@ -1936,7 +1936,7 @@ public List<CabView> CabViewList = new List<CabView>();
                 if (IsPlayerTrain)
                     CruiseControl.UpdateSelectedSpeed(elapsedClockSeconds);
 
-                 if (!IsPlayerTrain || CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Manual || CruiseControl.UseThrottle ||
+                 if (!IsPlayerTrain || CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Manual || 
                     CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto && CruiseControl.DynamicBrakePriority)
                 {
                     CruiseControl.WasForceReset = false;
@@ -3853,7 +3853,7 @@ public List<CabView> CabViewList = new List<CabView>();
         public void SetCombinedHandleValue(float value)
         {
             if (CombinedControlType == CombinedControl.ThrottleDynamic && DynamicBrake && !TrainControlSystem.FullDynamicBrakingOrder &&
-                !(CruiseControl != null && CruiseControl.UseThrottleAsForceSelector && CruiseControl.UseThrottleInCombinedControl && !CruiseControl.DynamicBrakePriority && CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto))
+                !(CruiseControl != null && (CruiseControl.UseThrottleAsForceSelector || CruiseControl.UseThrottleAsSpeedSelector) && CruiseControl.UseThrottleInCombinedControl && !CruiseControl.DynamicBrakePriority && CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto))
             {
                 if (DynamicBrakeController.CurrentValue == 0 && value < CombinedControlSplitPosition)
                     DynamicBrakeChangeActiveState(false);
@@ -3872,7 +3872,7 @@ public List<CabView> CabViewList = new List<CabView>();
                     if (CruiseControl != null && CruiseControl.DynamicBrakeCommandHasPriorityOverCruiseControl) CruiseControl.DynamicBrakePriority = true;
                 }
                 else if (DynamicBrakePercent < 0 || TrainControlSystem.FullDynamicBrakingOrder ||
-                    CruiseControl != null && CruiseControl.UseThrottleAsForceSelector && CruiseControl.UseThrottleInCombinedControl && !CruiseControl.DynamicBrakePriority && CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto)
+                    CruiseControl != null && (CruiseControl.UseThrottleAsForceSelector || CruiseControl.UseThrottleAsSpeedSelector ) && CruiseControl.UseThrottleInCombinedControl && !CruiseControl.DynamicBrakePriority && CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto)
                     SetThrottleValue(1 - MathHelper.Clamp(value, 0, CombinedControlSplitPosition) / CombinedControlSplitPosition);
             }
         }
@@ -3891,6 +3891,9 @@ public List<CabView> CabViewList = new List<CabView>();
             if (CruiseControl?.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto && CruiseControl.UseThrottleAsForceSelector && CruiseControl.UseThrottleInCombinedControl && !CruiseControl.DynamicBrakePriority
                 && CombinedControlType == CombinedControl.ThrottleDynamic)
                 return CombinedControlSplitPosition * (1 - (CruiseControl.SelectedMaxAccelerationStep / CruiseControl.SpeedRegulatorMaxForceSteps));
+            if (CruiseControl?.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto && CruiseControl.UseThrottleAsSpeedSelector && CruiseControl.UseThrottleInCombinedControl && !CruiseControl.DynamicBrakePriority
+                && CombinedControlType == CombinedControl.ThrottleDynamic)
+                return CombinedControlSplitPosition * (1 - (CruiseControl.SelectedSpeedMpS / MaxSpeedMpS));
 
             if (CombinedControlType == CombinedControl.ThrottleDynamic && DynamicBrake && !TrainControlSystem.FullDynamicBrakingOrder)
             {
