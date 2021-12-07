@@ -1356,6 +1356,7 @@ namespace Orts.Simulation
                     train.InitializeBrakes();
                     train.CheckFreight();
                     train.ReverseFormation(false); // When using autopilot mode this is needed for correct working of train switching
+                    train.SetDPUnitIDs();
                     bool validPosition = train.PostInit();
                     if (validPosition)
                         Trains.Add(train);
@@ -1688,7 +1689,9 @@ namespace Orts.Simulation
 
 
             train.CheckFreight();
+            train.SetDPUnitIDs();
             train2.CheckFreight();
+            train2.SetDPUnitIDs();
 
             train.Update(0);   // stop the wheels from moving etc
             train2.Update(0);  // stop the wheels from moving etc
@@ -1835,6 +1838,7 @@ namespace Orts.Simulation
 
 
                     selectedAsPlayer.CheckFreight();
+                    selectedAsPlayer.SetDPUnitIDs(true);
 
                     selectedAsPlayer.Update(0);  // stop the wheels from moving etc
                     TrainSwitcher.PickedTrainFromList = selectedAsPlayer;
@@ -1866,6 +1870,7 @@ namespace Orts.Simulation
                         playerTrain.SpeedMpS = 0;
                         foreach (TrainCar car in playerTrain.Cars) car.SpeedMpS = 0;
                         playerTrain.CheckFreight();
+                        playerTrain.SetDPUnitIDs();
                         playerTrain.InitializeBrakes();
                     }
                 }
