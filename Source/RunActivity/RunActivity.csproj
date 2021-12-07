@@ -884,5 +884,11 @@ date /t&gt;&gt;Revision.txt
 time /t&gt;&gt;Revision.txt
 XCOPY "$(SolutionDir)RunActivity\Viewer3D\WebServices\Web" "$(TargetDir)Content\Web" /s /i /y
     </PostBuildEvent>
+    <PostBuildEvent>CD ..\
+IF EXIST "Program\Content\Web" RMDIR "Program\Content\Web" /S /Q
+IF NOT EXIST "Program\Content\Web" MKDIR "Program\Content\Web"
+XCOPY "Source\RunActivity\Viewer3D\WebServices\Web" "Program\Content\Web" /S /Y
+DEL "Program\RunActivityLAA.*"
+</PostBuildEvent>
   </PropertyGroup>
 </Project>
