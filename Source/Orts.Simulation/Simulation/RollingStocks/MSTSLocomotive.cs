@@ -1428,6 +1428,8 @@ public List<CabView> CabViewList = new List<CabView>();
             BrakemanBrakeController.Initialize();
             LocomotivePowerSupply?.Initialize();
             TrainControlSystem.Initialize();
+            if (CruiseControl != null)
+                CruiseControl.Initialize();
 
             if (MaxSteamHeatPressurePSI == 0)       // Check to see if steam heating is fitted to locomotive
             {
@@ -1699,7 +1701,6 @@ public List<CabView> CabViewList = new List<CabView>();
         public void SetUpCruiseControl()
         {
             CruiseControl = new CruiseControl(this);
-            CruiseControl.Initialize();
             CruiseControl.Equipped = true;
         }
 

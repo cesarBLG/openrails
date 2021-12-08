@@ -136,6 +136,13 @@ namespace Orts.Simulation.RollingStocks.SubSystems
         public bool CCIsUsingTrainBrake = false; // Cruise control is using (also) train brake to brake
         protected float TrainBrakeMinPercentValue = 30f; // Minimum train brake settable percent Value
         protected float TrainBrakeMaxPercentValue = 85f; // Maximum train brake settable percent Value
+        public bool StartInAutoMode = false; // at startup cruise control is in auto mode
+        public bool ThrottleNeutralPosition = false; // when UseThrottleAsSpeedSelector is true and this is true
+                                                     // and we are in auto mode, the throttle zero position is a neutral position
+        public bool ThrottleLowSpeedPosition = false; // when UseThrottleAsSpeedSelector is true and this is true
+                                                     // and we are in auto mode, the first throttle above zero position is used to run at low speed
+        public float LowSpeed = 2f; // default parking speed
+        public bool HasTwoForceValues = false; // when UseThrottleAsSpeedSelector is true, two max force values (50% and 100%) are available
 
         public CruiseControl(MSTSLocomotive locomotive)
         {
@@ -226,6 +233,11 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                 case "engine(ortscruisecontrol(speeddeltatoenablefulltrainbrake": SpeedDeltaToEnableFullTrainBrake = stf.ReadFloatBlock(STFReader.UNITS.Speed, 10f); break;
                 case "engine(ortscruisecontrol(trainbrakeminpercentvalue": TrainBrakeMinPercentValue = stf.ReadFloatBlock(STFReader.UNITS.Any, 0.3f); break;
                 case "engine(ortscruisecontrol(trainbrakemaxpercentvalue": TrainBrakeMaxPercentValue = stf.ReadFloatBlock(STFReader.UNITS.Any, 0.85f); break;
+                case "engine(ortscruisecontrol(startinautomode": StartInAutoMode = stf.ReadBoolBlock(false); break;
+                case "engine(ortscruisecontrol(throttleneutralposition": ThrottleNeutralPosition = stf.ReadBoolBlock(false); break;
+                case "engine(ortscruisecontrol(throttlelowspeedposition": ThrottleLowSpeedPosition = stf.ReadBoolBlock(false); break;
+                case "engine(ortscruisecontrol(lowspeed": LowSpeed = stf.ReadFloatBlock(STFReader.UNITS.Speed, 2f); break;
+                case "engine(ortscruisecontrol(hasttwoforcevalues": HasTwoForceValues = stf.ReadBoolBlock(false); break;
                 case "engine(ortscruisecontrol(docomputenumberofaxles": DoComputeNumberOfAxles = stf.ReadBoolBlock(false); break;
                 case "engine(ortscruisecontrol(options":
                     foreach (var speedRegulatorOption in stf.ReadStringBlock("").ToLower().Replace(" ", "").Split(','))
@@ -330,12 +342,17 @@ namespace Orts.Simulation.RollingStocks.SubSystems
             EnableSelectedSpeedSelectionWhenManualModeSet = other.EnableSelectedSpeedSelectionWhenManualModeSet;
             SpeedSelectorIsDiscrete = other.SpeedSelectorIsDiscrete;
             DoComputeNumberOfAxles = other.DoComputeNumberOfAxles;
-            SpeedRegulatorOptions = other.SpeedRegulatorOptions;
             UseTrainBrakeAndDynBrake = other.UseTrainBrakeAndDynBrake;
             SpeedDeltaToEnableTrainBrake = other.SpeedDeltaToEnableTrainBrake;
             SpeedDeltaToEnableFullTrainBrake = other.SpeedDeltaToEnableFullTrainBrake;
             TrainBrakeMinPercentValue = other.TrainBrakeMinPercentValue;
             TrainBrakeMaxPercentValue = other.TrainBrakeMaxPercentValue;
+            StartInAutoMode = other.StartInAutoMode;
+            ThrottleNeutralPosition = other.ThrottleNeutralPosition;
+            ThrottleLowSpeedPosition = other.ThrottleLowSpeedPosition;
+            LowSpeed = other.LowSpeed;
+            HasTwoForceValues = other.HasTwoForceValues;
+
         }
 
         public void Initialize()
@@ -345,6 +362,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
             if (DoComputeNumberOfAxles)
                 ComputeNumberOfAxles();
             if (StartReducingSpeedDeltaDownwards == 0) StartReducingSpeedDeltaDownwards = StartReducingSpeedDelta;
+            if (StartInAutoMode) SpeedRegMode = SpeedRegulatorMode.Auto;
         }
 
         private void ComputeNumberOfAxles()
