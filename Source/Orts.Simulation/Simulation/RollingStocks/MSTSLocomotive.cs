@@ -1941,6 +1941,7 @@ public List<CabView> CabViewList = new List<CabView>();
                     CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto && CruiseControl.DynamicBrakePriority)
                 {
                     CruiseControl.WasForceReset = false;
+                    CruiseControl.controllerVolts = 0;
                     UpdateTractiveForce(elapsedClockSeconds, t, AbsSpeedMpS, AbsWheelSpeedMpS);
                 }
                 else if (CruiseControl.SelectedSpeedMpS > 0)
