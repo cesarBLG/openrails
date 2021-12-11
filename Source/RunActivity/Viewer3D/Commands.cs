@@ -95,7 +95,7 @@ namespace Orts.Viewer3D
     {
         public static CabRenderer Receiver { get; set; }
 
-        public SelectScreenCommand(CommandLog log, bool toState, int display, string screen)
+        public SelectScreenCommand(CommandLog log, bool toState, string screen, int display)
             : base(log, toState)
         {
             Redo(display, screen);

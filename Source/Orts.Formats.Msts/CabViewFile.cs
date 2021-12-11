@@ -990,7 +990,13 @@ namespace Orts.Formats.Msts
         private int numPositions;
         private bool canFill = true;
 
-        public string NewScreen;
+        public struct NewScreenData
+        {
+            public string NewScreen;
+            public int NewScreenDisplay;
+
+        }
+        public List<NewScreenData> NewScreens;
 
         public CVCDiscrete(STFReader stf, string basepath, DiscreteStates discreteState)
         {
@@ -1328,8 +1334,13 @@ namespace Orts.Formats.Msts
         protected void ParseNewScreen(STFReader stf)
         {
             stf.MustMatch("(");
-            NewScreen = stf.ReadString().ToLower();
+            var newScreen = new NewScreenData();
+            newScreen.NewScreen = stf.ReadString().ToLower();
+            newScreen.NewScreenDisplay = stf.ReadInt(-1);
             stf.SkipRestOfBlock();
+            if (NewScreens == null)
+                NewScreens = new List<NewScreenData>();
+            NewScreens.Add(newScreen);
         }
     }
     #endregion

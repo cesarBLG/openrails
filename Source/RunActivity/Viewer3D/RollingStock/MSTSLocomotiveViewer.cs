@@ -2509,7 +2509,14 @@ namespace Orts.Viewer3D.RollingStock
                     if ((Locomotive.GenericItem2 ? 1 : 0) != ChangedValue(Locomotive.GenericItem2 ? 1 : 0)) new ToggleGenericItem2Command(Viewer.Log); break;
                 case CABViewControlTypes.ORTS_SCREEN_SELECT:
                     bool buttonState = ChangedValue(ButtonState ? 1 : 0) > 0;
-                    new SelectScreenCommand(Viewer.Log, buttonState, ((CVCDiscrete)Control).Display, ((CVCDiscrete)Control).NewScreen);
+                    if (((CVCDiscrete)Control).NewScreens != null)
+                        foreach (var newScreen in ((CVCDiscrete)Control).NewScreens)
+                        {
+                            var newScreenDisplay = newScreen.NewScreenDisplay;
+                            if (newScreen.NewScreenDisplay == -1)
+                                newScreenDisplay = ((CVCDiscrete)Control).Display;
+                            new SelectScreenCommand(Viewer.Log, buttonState, newScreen.NewScreen, newScreenDisplay);
+                        }
                     ButtonState = buttonState;
                     break;
 
