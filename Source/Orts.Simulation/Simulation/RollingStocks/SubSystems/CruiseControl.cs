@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Open Rails.  If not, see <http://www.gnu.org/licenses/>.
 
+using Microsoft.Xna.Framework;
 using Orts.Formats.Msts;
 using Orts.Parsers.Msts;
 using ORTS.Common;
@@ -50,8 +51,8 @@ namespace Orts.Simulation.RollingStocks.SubSystems
         public int SelectedNumberOfAxles = 0;
         public float SpeedRegulatorNominalSpeedStepMpS = 0;
         public float SpeedRegulatorNominalSpeedStepKpHOrMpH = 0;
-        public float MaxAccelerationMpSS = 0;
-        public float MaxDecelerationMpSS = 0;
+        public float MaxAccelerationMpSS = 1;
+        public float MaxDecelerationMpSS = 0.5f;
         public bool UseThrottle = false;
         public bool UseThrottleInCombinedControl = false;
         public bool AntiWheelSpinEquipped = false;
@@ -1408,7 +1409,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                                             Locomotive.ThrottleController.SetPercent(0);
                                         throttleIsZero = true;
 
-                                        brakePercent = 10 + (-delta * 10);
+                                        brakePercent = TrainBrakeMinPercentValue - 3.0f + (-delta * 10);
                                     }
                                     else
                                     {
@@ -1417,12 +1418,11 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                                             Locomotive.ThrottleController.SetPercent(0);
                                         throttleIsZero = true;
 
-                                        if (_AccelerationMpSS > -MaxDecelerationMpSS)
+                                        if (RelativeAccelerationMpSS > -MaxDecelerationMpSS + 0.01f)
                                             brakePercent += 0.5f;
-                                        else if (_AccelerationMpSS < -MaxDecelerationMpSS)
+                                        else if (RelativeAccelerationMpSS < -MaxDecelerationMpSS - 0.01f)
                                             brakePercent -= 1;
-                                        if (brakePercent > 100)
-                                            brakePercent = 100;
+                                        brakePercent = MathHelper.Clamp(brakePercent, TrainBrakeMinPercentValue - 3.0f, TrainBrakeMaxPercentValue);
                                     }
                                     Locomotive.SetTrainBrakePercent(brakePercent);
                                 }
@@ -1612,7 +1612,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                                                 Locomotive.ThrottleController.SetPercent(0);
                                             throttleIsZero = true;
 
-                                            brakePercent = 10 + (-delta * 10);
+                                            brakePercent = TrainBrakeMinPercentValue -3.0f + (-delta * 10);
                                         }
                                         else
                                         {
@@ -1621,12 +1621,11 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                                                 Locomotive.ThrottleController.SetPercent(0);
                                             throttleIsZero = true;
 
-                                            if (_AccelerationMpSS > -MaxDecelerationMpSS)
+                                            if (RelativeAccelerationMpSS > -MaxDecelerationMpSS + 0.01f)
                                                 brakePercent += 0.5f;
-                                            else if (_AccelerationMpSS < -MaxDecelerationMpSS)
+                                            else if (RelativeAccelerationMpSS < -MaxDecelerationMpSS - 0.01f)
                                                 brakePercent -= 1;
-                                            if (brakePercent > 100)
-                                                brakePercent = 100;
+                                            brakePercent = MathHelper.Clamp(brakePercent, TrainBrakeMinPercentValue - 3.0f, TrainBrakeMaxPercentValue);
                                         }
                                         Locomotive.SetTrainBrakePercent(brakePercent);
                                     }
@@ -1870,22 +1869,27 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                     {
                         if (maxForceN > 0) maxForceN = 0;
                         if (Locomotive.ThrottlePercent > 0) Locomotive.ThrottleController.SetPercent(0);
-                        if (Locomotive.DynamicBrakePercent <= 0)
+                        if (Locomotive.DynamicBrakeAvailable)
                         {
-                            string status = Locomotive.GetDynamicBrakeStatus();
-                            Locomotive.DynamicBrakeChangeActiveState(true);
+                            if (Locomotive.DynamicBrakePercent <= 0)
+                            {
+                                string status = Locomotive.GetDynamicBrakeStatus();
+                                Locomotive.DynamicBrakeChangeActiveState(true);
+                            }
+                            if (SelectedMaxAccelerationPercent == 0 && SelectedMaxAccelerationStep == 0)
+                            {
+                                Locomotive.SetDynamicBrakePercent(0);
+                                Locomotive.DynamicBrakePercent = 0;
+                                controllerVolts = 0;
+                            }
+                            else
+                            {
+                                Locomotive.SetDynamicBrakePercent(-controllerVolts);
+                                Locomotive.DynamicBrakePercent = -controllerVolts;
+                            }
                         }
-                        if (SelectedMaxAccelerationPercent == 0 && SelectedMaxAccelerationStep == 0)
-                        {
-                            Locomotive.SetDynamicBrakePercent(0);
-                            Locomotive.DynamicBrakePercent = 0;
+                        else if (SelectedMaxAccelerationPercent == 0 && SelectedMaxAccelerationStep == 0)
                             controllerVolts = 0;
-                        }
-                        else
-                        {
-                            Locomotive.SetDynamicBrakePercent(-controllerVolts);
-                            Locomotive.DynamicBrakePercent = -controllerVolts;
-                        }
                     }
                     else if (controllerVolts == 0)
                     {
@@ -1900,7 +1904,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                             {*/
                             if (maxForceN > 0) maxForceN = 0;
                             if (Locomotive.ThrottlePercent > 0 && !UseThrottle) Locomotive.ThrottleController.SetPercent(0);
-                            if (Locomotive.DynamicBrakePercent > -1)
+                            if (Locomotive.DynamicBrakeAvailable && Locomotive.DynamicBrakePercent > -1)
                             {
                                 Locomotive.SetDynamicBrakePercent(0);
                                 Locomotive.DynamicBrakeChangeActiveState(false);
@@ -1912,7 +1916,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                     {
                         controllerVolts = 0;
                         Locomotive.ThrottleController.SetPercent(0);
-                        if (Locomotive.DynamicBrakePercent > 0)
+                        if (Locomotive.DynamicBrakeAvailable && Locomotive.DynamicBrakePercent > 0)
                             Locomotive.SetDynamicBrakePercent(0);
                         Locomotive.DynamicBrakeIntervention = -1;
                         maxForceN = 0;
