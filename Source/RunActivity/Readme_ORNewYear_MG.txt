@@ -1,5 +1,5 @@
-﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.111
-December 1st, 2021
+﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.112
+December 17th, 2021
 
 Please note that the installation and use of Open Rails software, even of its unofficial versions, is governed by the Open Rails End User License Agreement. 
 
@@ -11,7 +11,7 @@ INSTALLATION
 
 
 RELEASE NOTES
-This unofficial version has been derived from the latest official Testing release T1.4-55, and from the latest master release (up to PR #536)
+This unofficial version has been derived from the latest official Testing release T1.4-55, and from the latest master release (up to PR #546)
 
 This unofficial version includes the cruise control software written by Jindrich with final adaptations by myself.
 
@@ -66,8 +66,19 @@ This version includes some features not (yet) available in the Open Rails testin
 - update Russian locale .dlls, by Weter
 - distributed power: various improvements and fixes
 - workaround for http://www.elvastower.com/forums/index.php?/topic/32640-or-newyear-mg/page__view__findpost__p__278074 
-- NEW: distributed power: Train DPU Info pop-up window, see http://www.elvastower.com/forums/index.php?/topic/26249-remote-control-dpu-units/page__view__findpost__p__278535 , by mbm_OR
-- NEW: Cruise control: CC can control dyn and train brake together, see http://www.elvastower.com/forums/index.php?/topic/33841-cruise-control/page__view__findpost__p__278575 .
+- distributed power: Train DPU Info pop-up window, see http://www.elvastower.com/forums/index.php?/topic/26249-remote-control-dpu-units/page__view__findpost__p__278535 , by mbm_OR
+- Cruise control: CC can control dyn and train brake together, see http://www.elvastower.com/forums/index.php?/topic/33841-cruise-control/page__view__findpost__p__278575 
+- NEW: Cruise control: fix bugs for locos with throttle used as speed selector
+- NEW: Distributed power: recalculate locomotive groups after coupling and uncoupling, see http://www.elvastower.com/forums/index.php?/topic/26249-remote-control-dpu-units/page__view__findpost__p__278816
+- NEW: Cruise control: option to start game in auto mode
+- NEW: Cruise control: option for neutral position at zero throttle
+- NEW: Multiple screens: a button can activate also screen pages of other displays, see http://www.elvastower.com/forums/index.php?/topic/35612-managing-multiple-screen-pages-on-a-display-in-2d-and-3d-cabs/page__view__findpost__p__277362
+- NEW: Multiple screens: implement the number of managed displays to 8
+- NEW: Cruise Control: manage locomotives with no dynamic brake
+- NEW: Generic items: optional internal 3DCab animation linked to them, see http://www.elvastower.com/forums/index.php?/topic/35572-cabview-controls-for-generic-items/page__view__findpost__p__279164
+- NEW: Add support for dual-screen ETCS DMI, by cesarBLG, see http://www.elvastower.com/forums/index.php?/topic/34577-planning-area-of-the-etcs-dmi/page__view__findpost__p__279099
+- NEW: Adjust diesel fuel consumption, by steamer_ctm, see http://www.elvastower.com/forums/index.php?/topic/35716-diesel-fuel-consumption-issue/page__view__findpost__p__278539
+- NEW: Merging Serana's work with what was already available in ORNYMG about optimizing VRAM usage, see http://www.elvastower.com/forums/index.php?/topic/35644-memory-using-monogame-or/page__view__findpost__p__278919 .
 
 The Monogame related code intentionally coincides only partly with the code of the OR official testing version.
 
