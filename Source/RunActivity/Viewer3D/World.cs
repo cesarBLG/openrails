@@ -101,6 +101,7 @@ namespace Orts.Viewer3D
                 Viewer.ShapeManager.Mark();
                 Viewer.MaterialManager.Mark();
                 Viewer.TextureManager.Mark();
+                Viewer.SignalTypeDataManager.Mark();
                 if (Viewer.Settings.UseMSTSEnv)
                     MSTSSky.Mark();
                 else
@@ -114,6 +115,7 @@ namespace Orts.Viewer3D
                 Viewer.ShapeManager.Sweep();
                 Viewer.MaterialManager.Sweep();
                 Viewer.TextureManager.Sweep();
+                Viewer.SignalTypeDataManager.Sweep();
             }
         }
 

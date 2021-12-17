@@ -3560,8 +3560,11 @@ namespace Orts.Viewer3D.RollingStock
 
         internal override void Mark()
         {
-            if (TrainCarShape != null)
-                TrainCarShape.Mark();
+            TrainCarShape?.Mark();
+            foreach (ThreeDimCabDigit threeDimCabDigit in DigitParts3D.Values)
+            {
+                threeDimCabDigit.Mark();
+            }
         }
     } // Class ThreeDimentionCabViewer
 
