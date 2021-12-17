@@ -94,7 +94,8 @@ found in sheet *Options* of the same file.
 The presence of ForceStepsThrottleTable and AccelerationTable is 
 optional.
 
-Braking by CC can occur either using only the dynamic brake (default) 
+Braking by CC can occur either using only the dynamic brake (default) or 
+using only the train brake, when the locomotive has no dynamic brake, 
 or using both the dynamic brake and the train brake. For this to occur 
 parameter UseTrainBrakeAndDynBrake must be set to true in the CruiseControl 
 block within the .eng file.
