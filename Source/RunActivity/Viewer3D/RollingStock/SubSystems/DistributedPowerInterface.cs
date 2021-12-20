@@ -540,13 +540,32 @@ namespace Orts.Viewer3D.RollingStock.SubSystems
         private const int NumberOfRowsFull = 9;
         private const int NumberOfRowsPartial = 6;
         private const int NumberOfColumns = 7;
+        public const string Fence = "\u2590";
         public string[] TableRows = new string[NumberOfRowsFull];
         TextPrimitive[,] TableText = new TextPrimitive[NumberOfRowsFull, NumberOfColumns];
+        TextPrimitive[,] TableSymbol = new TextPrimitive[NumberOfRowsFull, NumberOfColumns];
         WindowTextFont TableTextFont;
+        WindowTextFont TableSymbolFont;
         readonly int FontHeightTableText = 32;
+        readonly int FontHeightTableSymbol = 38;
         readonly int RowHeight = 34;
         readonly int ColLength = 88;
         public bool FullTable = true;
+
+        // Change text color
+        readonly Dictionary<string, Color> ColorCodeCtrl = new Dictionary<string, Color>
+        {
+            { "!!!", Color.OrangeRed },
+            { "!!?", Color.Orange },
+            { "!??", Color.White },
+            { "?!?", Color.Black },
+            { "???", Color.Yellow },
+            { "??!", Color.Green },
+            { "?!!", Color.PaleGreen },
+            { "$$$", Color.LightSkyBlue},
+            { "%%%", Color.Cyan}
+        };
+
         /// <summary>
         /// A Train Dpu row with data fields.
         /// </summary>
@@ -560,8 +579,6 @@ namespace Orts.Viewer3D.RollingStock.SubSystems
             public bool ChangeColWidth;
             public string KeyPressed;
         }
-
-        public List<ListLabel> labels = new List<ListLabel>();
 
         public List<ListLabel> TempListToLabel = new List<ListLabel>();// used when listtolabel is changing
 
@@ -580,7 +597,8 @@ namespace Orts.Viewer3D.RollingStock.SubSystems
                 for (int iCol = 0; iCol < NumberOfColumns; iCol++)
                 {
 //                    text = iCol.ToString() + "--" + iRow.ToString();
-                    TableText[iRow, iCol] = new TextPrimitive(new Point(20 + ColLength * iCol, (iRow + 1) * (FontHeightTableText - 1)), Color.White, text, TableTextFont);
+                    TableText[iRow, iCol] = new TextPrimitive(new Point(20 + ColLength * iCol, (iRow + 1) * (FontHeightTableText - 8)), Color.White, text, TableTextFont);
+                    TableSymbol[iRow, iCol] = new TextPrimitive(new Point(10 + ColLength * iCol, (iRow + 1) * (FontHeightTableText - 8)), Color.Green, text, TableSymbolFont);
                 }
             }
         }
@@ -593,6 +611,7 @@ namespace Orts.Viewer3D.RollingStock.SubSystems
         void SetFont()
         {
             TableTextFont = GetFont(FontHeightTableText);
+            TableSymbolFont = GetFont(FontHeightTableSymbol);
         }
         public override void Draw(SpriteBatch spriteBatch, Point drawPosition)
         {
@@ -605,6 +624,9 @@ namespace Orts.Viewer3D.RollingStock.SubSystems
                     int x = drawPosition.X + (int)Math.Round(TableText[iRow, iCol].Position.X * Scale);
                     int y = drawPosition.Y + (int)Math.Round(TableText[iRow, iCol].Position.Y * Scale);
                     TableText[iRow, iCol].Draw(spriteBatch, new Point(x, y));
+                    x = drawPosition.X + (int)Math.Round(TableSymbol[iRow, iCol].Position.X * Scale);
+                    y = drawPosition.Y + (int)Math.Round(TableSymbol[iRow, iCol].Position.Y * Scale);
+                    TableSymbol[iRow, iCol].Draw(spriteBatch, new Point(x, y));
                 }
         }
 
@@ -653,10 +675,11 @@ namespace Orts.Viewer3D.RollingStock.SubSystems
                             {
                                 var status = (train.Cars[i] as MSTSDieselLocomotive).GetDpuStatus(true).Split('\t');
                                 var fence = ((dpUnitId != (dpUnitId = train.Cars[i].RemoteControlGroup)) ? "| " : "  ");
-                                for (var j = 0; j < status.Length; j++)
+                                tempStatus[k, 0] = fence + status[0].Split('(').First();
+                                for (var j = 1; j < status.Length; j++)
                                 {
                                     // fence
-                                    tempStatus[k, j] = fence + status[j];
+                                    tempStatus[k, j] = fence + status[j].Split(' ').First();
                                 }
                                 dpUId = (train.Cars[i] as MSTSLocomotive).DPUnitID;
                                 k++;
@@ -666,15 +689,7 @@ namespace Orts.Viewer3D.RollingStock.SubSystems
 
                     dieselLocomotivesCount = k;// only leaders loco group
 
-                    i = 0;
-                    for (int j = 0; j < dieselLocomotivesCount; j++)
-                    {
-                         TableText[i, j + 1].Text = tempStatus[j, i].Split('(').First();
-                    }
-
-                    TableText[i, 0].Text = dieselLocoHeader[i];
-
-                    for (i = 1; i < dieselLocoHeader.Count(); i++)
+                    for (i = 0; i < dieselLocoHeader.Count(); i++)
                     {
 //                        lastCol = new List<string>();
  //                       symbolCol = new List<string>();
@@ -682,7 +697,11 @@ namespace Orts.Viewer3D.RollingStock.SubSystems
                         for (int j = 0; j < dieselLocomotivesCount; j++)
                         {
                             //                           symbolCol.Add(tempStatus[i, j] != null && tempStatus[i, j].Contains("|") ? Symbols.Fence + ColorCode[Color.Green] : "");
-                            TableText[i, j + 1].Text = "  " + tempStatus[j, i].Split(' ')[2];
+                            var text = tempStatus[j, i].Replace('|', ' ');
+                            var colorFirstColEndsWith = ColorCodeCtrl.Keys.Any(text.EndsWith) ? ColorCodeCtrl[text.Substring(text.Length - 3)] : Color.White;
+                            TableText[i, j + 1].Text = (colorFirstColEndsWith == Color.White) ? text : text.Substring(0, text.Length - 3); ;
+                            TableText[i, j + 1].Color = colorFirstColEndsWith;
+                            TableSymbol[i, j + 1].Text = (tempStatus[j, i] != null && tempStatus[j, i].Contains("|")) ? Fence : "";
                         }
 
                         TableText[i, 0].Text = dieselLocoHeader[i];
