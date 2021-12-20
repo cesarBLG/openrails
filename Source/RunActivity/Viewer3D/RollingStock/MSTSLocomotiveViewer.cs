@@ -1226,6 +1226,15 @@ namespace Orts.Viewer3D.RollingStock
                                 count[(int)cvc.ControlType]++;
                                 continue;
                             }
+                            else if (screen.ControlType == CABViewControlTypes.ORTS_DISTRIBUTED_POWER)
+                            {
+                                var cvr = new DistributedPowerInterfaceRenderer(viewer, car, screen, _Shader);
+                                cvr.SortIndex = controlSortIndex;
+                                CabViewControlRenderersList[i].Add(cvr);
+                                if (!ControlMap.ContainsKey(key)) ControlMap.Add(key, cvr);
+                                count[(int)cvc.ControlType]++;
+                                continue;
+                            }
                         }
                     }
                 }
@@ -1333,6 +1342,15 @@ namespace Orts.Viewer3D.RollingStock
                     if (screen.ControlType == CABViewControlTypes.ORTS_ETCS)
                     {
                         var cvr = new DriverMachineInterfaceRenderer(viewer, car, screen, _Shader);
+                        cvr.SortIndex = controlSortIndex;
+                        CabViewControlRenderersList[i].Add(cvr);
+                        if (!ControlMap.ContainsKey(key)) ControlMap.Add(key, cvr);
+                        count[(int)cvc.ControlType]++;
+                        continue;
+                    }
+                    else if (screen.ControlType == CABViewControlTypes.ORTS_DISTRIBUTED_POWER)
+                    {
+                        var cvr = new DistributedPowerInterfaceRenderer(viewer, car, screen, _Shader);
                         cvr.SortIndex = controlSortIndex;
                         CabViewControlRenderersList[i].Add(cvr);
                         if (!ControlMap.ContainsKey(key)) ControlMap.Add(key, cvr);
