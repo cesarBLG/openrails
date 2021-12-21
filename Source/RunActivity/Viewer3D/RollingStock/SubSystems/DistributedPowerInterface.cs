@@ -43,7 +43,7 @@ namespace Orts.Viewer3D.RollingStock.SubSystems
         bool Active;
         public float Scale { get; private set; }
         public float MipMapScale { get; private set; }
-        readonly int Height = 480;
+        readonly int Height = 240;
         readonly int Width = 640;
 
         public readonly DPDefaultWindow DPDefaultWindow;
@@ -257,37 +257,15 @@ namespace Orts.Viewer3D.RollingStock.SubSystems
  //       TargetDistance TargetDistance;
  //       TTIandLSSMArea TTIandLSSMArea;
         MenuBar MenuBar;
-        public DPDefaultWindow(DistributedPowerInterface dpi, CabViewControl control) : base(dpi, 640, 480)
+        public DPDefaultWindow(DistributedPowerInterface dpi, CabViewControl control) : base(dpi, 640, 240)
         {
             var param = (control as CVCScreen).CustomParameters;
             int maxSpeed = 400;
             if (param.ContainsKey("maxspeed")) int.TryParse(param["maxspeed"], out maxSpeed);
             int maxVisibleSpeed = maxSpeed;
             if (param.ContainsKey("maxvisiblespeed")) int.TryParse(param["maxvisiblespeed"], out maxVisibleSpeed);
-//            PlanningWindow = new PlanningWindow(dpi);
-//           TTIandLSSMArea = new TTIandLSSMArea(dpi);
- //           TargetDistance = new TargetDistance(dpi);
-//           MessageArea = new MessageArea(dpi);
-//            MenuBar = new MenuBar(dpi);
-//            TargetDistance.Layer = -1;
-//            TTIandLSSMArea.Layer = -1;
-//           MessageArea.Layer = -1;
-            /*            AddToLayout(PlanningWindow, new Point(334, DPI.IsSoftLayout ? 0 : 15));
-                        AddToLayout(PlanningWindow.ButtonScaleDown, new Point(334, DPI.IsSoftLayout ? 0 : 15));
-                        AddToLayout(PlanningWindow.ButtonScaleUp, new Point(334, 285 + (DPI.IsSoftLayout ? 0 : 15)));
-                        AddToLayout(TTIandLSSMArea, new Point(0, DPI.IsSoftLayout ? 0 : 15));
-                        AddToLayout(TargetDistance, new Point(0, 54 + (DPI.IsSoftLayout ? 0 : 15)));
-                        AddToLayout(MessageArea, new Point(54, DPI.IsSoftLayout ? 350 : 365));
-                        AddToLayout(MessageArea.ButtonScrollUp, new Point(54+234, DPI.IsSoftLayout ? 350 : 365));
-                        AddToLayout(MessageArea.ButtonScrollDown, new Point(54+234, MessageArea.Height / 2 + (DPI.IsSoftLayout ? 350 : 365)));*/
-            /*           foreach (int i in Enumerable.Range(0, MenuBar.Buttons.Count))
-                       {
-                           AddToLayout(MenuBar.Buttons[i], new Point(580, 15 + 50*i));
-                       }*/
-            DPISubwindow FixedText = new DPISubwindow("Distributed Power Operation", true, dpi);
-            AddToLayout(FixedText, new Point(0, 0));
             DPITable DPITable = new DPITable(fullTable:true, fullScreen:true, dpi:dpi);
-            AddToLayout(DPITable, new Point(0, 76));
+            AddToLayout(DPITable, new Point(0, 0));
         }
     }
 
@@ -500,11 +478,8 @@ namespace Orts.Viewer3D.RollingStock.SubSystems
         {
             WindowTitle = title;
             FullScreen = fullScreen;
-            CloseButton = new DPIIconButton("NA_11.bmp", "NA_12.bmp", Viewer.Catalog.GetString("Close"), true, () => dpi.ExitWindow(this), 82, 50, dpi);
-            CloseButton.Enabled = true;
             BackgroundColor = DPI.BlackWhiteTheme ? Color.Black : ColorBackground;
             SetFont();
-            AddToLayout(CloseButton, new Point(0, fullScreen ? 440 : 396));
         }
         public override void ScaleChanged()
         {
@@ -584,7 +559,7 @@ namespace Orts.Viewer3D.RollingStock.SubSystems
 
         protected string[] FirstColumn = { "ID", "Throttle", "Load", "BP", "Flow", "Remote", "ER", "BC", "MR" };
 
-        public DPITable(bool fullTable, bool fullScreen, DistributedPowerInterface dpi) : base(dpi, 640,  fullScreen? 404 : 260)
+        public DPITable(bool fullTable, bool fullScreen, DistributedPowerInterface dpi) : base(dpi, 640,  fullScreen? 230 : 180)
         {
             DPI = dpi;
             FullScreen = fullScreen;
@@ -597,8 +572,8 @@ namespace Orts.Viewer3D.RollingStock.SubSystems
                 for (int iCol = 0; iCol < NumberOfColumns; iCol++)
                 {
 //                    text = iCol.ToString() + "--" + iRow.ToString();
-                    TableText[iRow, iCol] = new TextPrimitive(new Point(20 + ColLength * iCol, (iRow + 1) * (FontHeightTableText - 8)), Color.White, text, TableTextFont);
-                    TableSymbol[iRow, iCol] = new TextPrimitive(new Point(10 + ColLength * iCol, (iRow + 1) * (FontHeightTableText - 8)), Color.Green, text, TableSymbolFont);
+                    TableText[iRow, iCol] = new TextPrimitive(new Point(20 + ColLength * iCol, (iRow) * (FontHeightTableText - 8)), Color.White, text, TableTextFont);
+                    TableSymbol[iRow, iCol] = new TextPrimitive(new Point(10 + ColLength * iCol, (iRow) * (FontHeightTableText - 8)), Color.Green, text, TableSymbolFont);
                 }
             }
         }
