@@ -38,7 +38,7 @@ namespace Orts.Viewer3D.RollingStock.SubSystems
         public readonly Viewer Viewer;
         public IList<DPIWindow> Windows = new List<DPIWindow>();
         float PrevScale = 1;
-        public ETCSStatus ETCSStatus { get; private set; }
+        public DPIStatus DPIStatus = new DPIStatus();
 
         bool Active;
         public float Scale { get; private set; }
@@ -123,9 +123,7 @@ namespace Orts.Viewer3D.RollingStock.SubSystems
         }
         public void PrepareFrame(float elapsedSeconds)
         {
-            ETCSStatus currentStatus = Locomotive.TrainControlSystem.ETCSStatus;
-            ETCSStatus = currentStatus;
-            Active = currentStatus != null && currentStatus.DMIActive;
+            Active = DPIStatus != null && DPIStatus.DPIActive;
             if (!Active) return;
 
             BlinkerTime += elapsedSeconds;
@@ -135,7 +133,7 @@ namespace Orts.Viewer3D.RollingStock.SubSystems
 
             foreach (var area in Windows)
             {
-                area.PrepareFrame(currentStatus);
+                area.PrepareFrame(DPIStatus);
             }
         }
         public void SizeTo(float width, float height)
@@ -252,19 +250,12 @@ namespace Orts.Viewer3D.RollingStock.SubSystems
     }
     public class DPDefaultWindow : DPIWindow
     {
- //       PlanningWindow PlanningWindow;
-        MessageArea MessageArea;
- //       TargetDistance TargetDistance;
- //       TTIandLSSMArea TTIandLSSMArea;
-        MenuBar MenuBar;
+        public bool FullTable;
         public DPDefaultWindow(DistributedPowerInterface dpi, CabViewControl control) : base(dpi, 640, 240)
         {
             var param = (control as CVCScreen).CustomParameters;
-            int maxSpeed = 400;
-            if (param.ContainsKey("maxspeed")) int.TryParse(param["maxspeed"], out maxSpeed);
-            int maxVisibleSpeed = maxSpeed;
-            if (param.ContainsKey("maxvisiblespeed")) int.TryParse(param["maxvisiblespeed"], out maxVisibleSpeed);
-            DPITable DPITable = new DPITable(fullTable:true, fullScreen:true, dpi:dpi);
+            if (param.ContainsKey("fulltable")) bool.TryParse(param["fulltable"], out FullTable);
+            DPITable DPITable = new DPITable(FullTable, fullScreen:true, dpi:dpi);
             AddToLayout(DPITable, new Point(0, 0));
         }
     }
@@ -395,7 +386,7 @@ namespace Orts.Viewer3D.RollingStock.SubSystems
                 DrawIntRectangle(spriteBatch, drawPosition, 0, Height - 1, Width, 1, ColorShadow);
             }
         }
-        public virtual void PrepareFrame(ETCSStatus status) { }
+        public virtual void PrepareFrame(DPIStatus status) { }
 
         public void DrawRectangle(SpriteBatch spriteBatch, Point drawPosition, float x, float y, float width, float height, Color color)
         {
@@ -434,7 +425,7 @@ namespace Orts.Viewer3D.RollingStock.SubSystems
         protected DPIWindow(DistributedPowerInterface dpi, int width, int height) : base(dpi, width, height)
         {
         }
-        public override void PrepareFrame(ETCSStatus status)
+        public override void PrepareFrame(DPIStatus status)
         {
             if (!Visible) return;
             base.PrepareFrame(status);
@@ -541,25 +532,10 @@ namespace Orts.Viewer3D.RollingStock.SubSystems
             { "%%%", Color.Cyan}
         };
 
-        /// <summary>
-        /// A Train Dpu row with data fields.
-        /// </summary>
-        public struct ListLabel
-        {
-            public string FirstCol;
-            public int FirstColWidth;
-            public List<string> LastCol;
-            public List<int> LastColWidth;
-            public List<string> SymbolCol;
-            public bool ChangeColWidth;
-            public string KeyPressed;
-        }
-
-        public List<ListLabel> TempListToLabel = new List<ListLabel>();// used when listtolabel is changing
 
         protected string[] FirstColumn = { "ID", "Throttle", "Load", "BP", "Flow", "Remote", "ER", "BC", "MR" };
 
-        public DPITable(bool fullTable, bool fullScreen, DistributedPowerInterface dpi) : base(dpi, 640,  fullScreen? 230 : 180)
+        public DPITable(bool fullTable, bool fullScreen, DistributedPowerInterface dpi) : base(dpi, 640,  fullTable? 230 : 162)
         {
             DPI = dpi;
             FullScreen = fullScreen;
@@ -592,7 +568,8 @@ namespace Orts.Viewer3D.RollingStock.SubSystems
         {
             if (!Visible) return;
             base.Draw(spriteBatch, drawPosition);
-            for (int iRow = 0; iRow < NumberOfRowsFull; iRow++)
+            var nRows = FullTable ? NumberOfRowsFull : NumberOfRowsPartial;
+            for (int iRow = 0; iRow < nRows; iRow++)
                 for (int iCol = 0; iCol < NumberOfColumns; iCol++)
                 {
                     //            DrawRectangle(spriteBatch, drawPosition, 0, 0, FullScreen ? 334 : 306, 24, Color.Black);
@@ -605,21 +582,12 @@ namespace Orts.Viewer3D.RollingStock.SubSystems
                 }
         }
 
-        public override void PrepareFrame(ETCSStatus etcsstatus)
+        public override void PrepareFrame(DPIStatus dpiStatus)
         {
-            int tRIndex = 0;
-            var tableRow = TableRows[tRIndex];
-            tableRow = "";
             var locomotive = DPI.Locomotive;
             var train = locomotive.Train;
             var multipleUnitsConfiguration = locomotive.GetMultipleUnitsConfiguration();
             int dieselLocomotivesCount = 0;
-
-//            var firstCol = label.FirstCol;
-            var firstColWidth = 0;
- //           var lastCol = label.LastCol;
-            List<int> lastColWidth = new List<int>();
-//            var symbolCol = label.SymbolCol;
 
             if (locomotive != null)
             {
@@ -663,15 +631,13 @@ namespace Orts.Viewer3D.RollingStock.SubSystems
                     }
 
                     dieselLocomotivesCount = k;// only leaders loco group
+                    var nRows = Math.Min (FullTable ? NumberOfRowsFull : NumberOfRowsPartial, dieselLocoHeader.Count());
 
-                    for (i = 0; i < dieselLocoHeader.Count(); i++)
+                    for (i = 0; i < nRows; i++)
                     {
-//                        lastCol = new List<string>();
- //                       symbolCol = new List<string>();
 
                         for (int j = 0; j < dieselLocomotivesCount; j++)
                         {
-                            //                           symbolCol.Add(tempStatus[i, j] != null && tempStatus[i, j].Contains("|") ? Symbols.Fence + ColorCode[Color.Green] : "");
                             var text = tempStatus[j, i].Replace('|', ' ');
                             var colorFirstColEndsWith = ColorCodeCtrl.Keys.Any(text.EndsWith) ? ColorCodeCtrl[text.Substring(text.Length - 3)] : Color.White;
                             TableText[i, j + 1].Text = (colorFirstColEndsWith == Color.White) ? text : text.Substring(0, text.Length - 3); ;
@@ -749,7 +715,7 @@ namespace Orts.Viewer3D.RollingStock.SubSystems
         {
             CaptionFont = GetFont(FontHeightButton);
         }
-        public override void PrepareFrame(ETCSStatus status)
+        public override void PrepareFrame(DPIStatus status)
         {
             base.PrepareFrame(status);
             foreach (var text in CaptionText)
@@ -840,6 +806,15 @@ namespace Orts.Viewer3D.RollingStock.SubSystems
                 text.Draw(spriteBatch, new Point(x, y));
             }
         }
+    }
+
+    public class DPIStatus
+    {
+        // General status
+        /// <summary>
+        /// True if the DPI is active and will be shown
+        /// </summary>
+        public bool DPIActive = true;
     }
 
     public class DistributedPowerInterfaceRenderer : CabViewControlRenderer, ICabViewMouseControlRenderer
