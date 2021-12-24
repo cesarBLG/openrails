@@ -22,9 +22,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Orts.Formats.Msts;
 using Orts.Simulation.RollingStocks;
 using Orts.Viewer3D.Popups;
-using Orts.Viewer3D.RollingStock.SubSystems.ETCS;
 using ORTS.Common;
-using ORTS.Scripting.Api.ETCS;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -68,10 +66,6 @@ namespace Orts.Viewer3D.RollingStock.SubSystems
 
         public Texture2D ColorTexture { get; private set; }
 
-        public bool Blinker2Hz { get; private set; }
-        public bool Blinker4Hz { get; private set; }
-        float BlinkerTime;
-
         public float CurrentTime => (float)Viewer.Simulator.ClockTime;
 
         /// <summary>
@@ -85,7 +79,6 @@ namespace Orts.Viewer3D.RollingStock.SubSystems
         /// </summary>
         public bool IsSoftLayout;
         public DPIWindow ActiveWindow;
-        DPIButton ActiveButton;
         public DistributedPowerInterface(float height, float width, MSTSLocomotive locomotive, Viewer viewer, CabViewControl control)
         {
             Viewer = viewer;
@@ -101,10 +94,7 @@ namespace Orts.Viewer3D.RollingStock.SubSystems
             AddToLayout(DPDefaultWindow, Point.Zero);
             ActiveWindow = DPDefaultWindow;
         }
-        public void ShowSubwindow(DPISubwindow window)
-        {
-            AddToLayout(window, new Point(window.FullScreen ? 0 : 334, 15));
-        }
+
         public void AddToLayout(DPIWindow window, Point position)
         {
             window.Position = position;
@@ -112,24 +102,11 @@ namespace Orts.Viewer3D.RollingStock.SubSystems
             ActiveWindow = window;
             Windows.Add(window);
         }
-        public Texture2D LoadTexture(string name)
-        {
-            string path;
-            if (MipMapScale == 2)
-                path = System.IO.Path.Combine(Viewer.ContentPath, "ETCS", "mipmap-2", name);
-            else
-                path = System.IO.Path.Combine(Viewer.ContentPath, "ETCS", name);
-            return SharedTextureManager.Get(Viewer.RenderProcess.GraphicsDevice, path);
-        }
+
         public void PrepareFrame(float elapsedSeconds)
         {
             Active = DPIStatus != null && DPIStatus.DPIActive;
             if (!Active) return;
-
-            BlinkerTime += elapsedSeconds;
-            BlinkerTime -= (int)BlinkerTime;
-            Blinker2Hz = BlinkerTime < 0.5;
-            Blinker4Hz = BlinkerTime < 0.25 || (BlinkerTime > 0.5 && BlinkerTime < 0.75);
 
             foreach (var area in Windows)
             {
@@ -168,77 +145,6 @@ namespace Orts.Viewer3D.RollingStock.SubSystems
             }
         }
 
-        public void HandleMouseInput(bool pressed, int x, int y)
-        {
-            DPIButton pressedButton = null;
-            if (ActiveButton != null)
-            {
-                if (!ActiveButton.Enabled)
-                {
-                    ActiveButton.Pressed = false;
-                    ActiveButton = null;
-                }
-                else if (ActiveButton.SensitiveArea(ActiveWindow.Position).Contains(x, y))
-                {
-                    if (ActiveButton.UpType)
-                    {
-                        if (ActiveButton.DelayType && ActiveButton.FirstPressed + 2 > CurrentTime)
-                        {
-                            ActiveButton.Pressed = ((int)((CurrentTime - ActiveButton.FirstPressed) * 4)) % 2 == 0;
-                        }
-                        else
-                        {
-                            ActiveButton.Pressed = true;
-                            if (!pressed)
-                            {
-                                pressedButton = ActiveButton;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        ActiveButton.Pressed = false;
-                        if (ActiveButton.FirstPressed + 1.5 < CurrentTime)
-                        {
-                            if (ActiveButton.LastPressed + 0.3 < CurrentTime)
-                            {
-                                pressedButton = ActiveButton;
-                                ActiveButton.Pressed = true;
-                                ActiveButton.LastPressed = CurrentTime;
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    ActiveButton.FirstPressed = CurrentTime;
-                    ActiveButton.Pressed = false;
-                }
-            }
-            else if (pressed)
-            {
-                foreach (var area in ActiveWindow.SubAreas)
-                {
-                    if (!(area is DPIButton)) continue;
-                    var b = (DPIButton)area;
-                    b.Pressed = false;
-                    if (b.SensitiveArea(ActiveWindow.Position).Contains(x, y))
-                    {
-                        ActiveButton = b;
-                        ActiveButton.Pressed = true;
-                        ActiveButton.FirstPressed = CurrentTime;
-                        if (!b.UpType && b.Enabled) pressedButton = ActiveButton;
-                        break;
-                    }
-                }
-            }
-            if (!pressed && ActiveButton != null)
-            {
-                ActiveButton.Pressed = false;
-                ActiveButton = null;
-            }
-            pressedButton?.PressedAction();
-        }
         public void ExitWindow(DPIWindow window)
         {
             var windows = new List<DPIWindow>(Windows);
@@ -349,34 +255,12 @@ namespace Orts.Viewer3D.RollingStock.SubSystems
             {
                 DrawSymbol(spriteBatch, tex.Texture, drawPosition, tex.Position.Y, tex.Position.Y);
             }
-            if (FlashingFrame && DPI.Blinker4Hz)
-            {
-                DrawIntRectangle(spriteBatch, drawPosition, 0, 0, 2, Height, ColorYellow);
-                DrawIntRectangle(spriteBatch, drawPosition, Width - 2, 0, 2, Height, ColorYellow);
-                DrawIntRectangle(spriteBatch, drawPosition, 0, 0, Width, 2, ColorYellow);
-                DrawIntRectangle(spriteBatch, drawPosition, 0, Height - 2, Width, 2, ColorYellow);
-            }
-            else if (DPI.BlackWhiteTheme)
+            if (DPI.BlackWhiteTheme)
             {
                 DrawIntRectangle(spriteBatch, drawPosition, 0, 0, 1, Height, Color.White);
                 DrawIntRectangle(spriteBatch, drawPosition, Width - 1, 0, 1, Height, Color.White);
                 DrawIntRectangle(spriteBatch, drawPosition, 0, 0, Width, 1, Color.White);
                 DrawIntRectangle(spriteBatch, drawPosition, 0, Height - 1, Width, 1, Color.White);
-            }
-            else if (this is DPIButton && (this as DPIButton).ShowButtonBorder)
-            {
-                DrawIntRectangle(spriteBatch, drawPosition, 0, 0, 1, Height, Color.Black);
-                DrawIntRectangle(spriteBatch, drawPosition, Width - 1, 0, 1, Height, ColorShadow);
-                DrawIntRectangle(spriteBatch, drawPosition, 0, 0, Width, 1, Color.Black);
-                DrawIntRectangle(spriteBatch, drawPosition, 0, Height - 1, Width, 1, ColorShadow);
-
-                if (!Pressed)
-                {
-                    DrawIntRectangle(spriteBatch, drawPosition, 1, 1, 1, Height - 2, ColorShadow);
-                    DrawIntRectangle(spriteBatch, drawPosition, Width - 2, 1, 1, Height - 2, Color.Black);
-                    DrawIntRectangle(spriteBatch, drawPosition, 1, 1, Width - 2, 1, ColorShadow);
-                    DrawIntRectangle(spriteBatch, drawPosition, 1, Height - 2, Width - 2, 1, Color.Black);
-                }
             }
             else if (Layer < 0)
             {
@@ -456,47 +340,6 @@ namespace Orts.Viewer3D.RollingStock.SubSystems
             {
                 area.ScaleChanged();
             }
-        }
-    }
-    public class DPISubwindow : DPIWindow
-    {
-        public string WindowTitle { get; private set; }
-        TextPrimitive WindowTitleText;
-        WindowTextFont WindowTitleFont;
-        readonly int FontHeightWindowTitle = 20;
-        protected readonly DPIIconButton CloseButton;
-        public DPISubwindow(string title, bool fullScreen, DistributedPowerInterface dpi) : base(dpi, fullScreen ? 640 : 306, 450)
-        {
-            WindowTitle = title;
-            FullScreen = fullScreen;
-            BackgroundColor = DPI.BlackWhiteTheme ? Color.Black : ColorBackground;
-            SetFont();
-        }
-        public override void ScaleChanged()
-        {
-            base.ScaleChanged();
-            SetFont();
-        }
-        void SetFont()
-        {
-            WindowTitleFont = GetFont(FontHeightWindowTitle);
-            SetTitle(WindowTitle);
-        }
-        public override void Draw(SpriteBatch spriteBatch, Point drawPosition)
-        {
-            if (!Visible) return;
-            base.Draw(spriteBatch, drawPosition);
-//            DrawRectangle(spriteBatch, drawPosition, 0, 0, FullScreen ? 334 : 306, 24, Color.Black);
-            int x = drawPosition.X + (int)Math.Round(WindowTitleText.Position.X * Scale);
-            int y = drawPosition.Y + (int)Math.Round(WindowTitleText.Position.Y * Scale);
-            WindowTitleText.Draw(spriteBatch, new Point(x, y));
-        }
-        public void SetTitle(string s)
-        {
-            WindowTitle = s;
-            int length = (int)(WindowTitleFont.MeasureString(s));
-            int x = (int)((640 - length) / 2 * Scale);
-            WindowTitleText = new TextPrimitive(new Point(x, (int)((FontHeightWindowTitle + 3) * Scale)), ColorWhite, WindowTitle, WindowTitleFont);
         }
     }
 
@@ -651,162 +494,6 @@ namespace Orts.Viewer3D.RollingStock.SubSystems
             }
         }
     }
-    public class DPIButton : DPIArea
-    {
-        public Rectangle SensitiveArea(Point WindowPosition) => new Rectangle(WindowPosition.X + Position.X - ExtendedSensitiveArea.X, WindowPosition.Y + Position.Y - ExtendedSensitiveArea.Y, Width + ExtendedSensitiveArea.Width + ExtendedSensitiveArea.X, Height + ExtendedSensitiveArea.Height + ExtendedSensitiveArea.Y);
-        public Rectangle ExtendedSensitiveArea;
-        public Action PressedAction = null;
-        public string ConfirmerCaption;
-        public readonly string DisplayName;
-        public bool Enabled;
-        public bool PressedEffect;
-        public readonly bool UpType;
-        public bool DelayType;
-        public bool ShowButtonBorder;
-        public float FirstPressed;
-        public float LastPressed;
-        public DPIButton(string displayName, bool upType, DistributedPowerInterface dpi, bool showButtonBorder) : base(dpi)
-        {
-            DisplayName = displayName;
-            Enabled = false;
-            UpType = upType;
-            ShowButtonBorder = showButtonBorder;
-        }
-        public DPIButton(string displayName, bool upType, Action pressedAction, int width, int height, DistributedPowerInterface dpi, bool showButtonBorder=false) : base(dpi, width, height)
-        {
-            DisplayName = displayName;
-            Enabled = false;
-            UpType = upType;
-            PressedAction = pressedAction;
-            ShowButtonBorder = showButtonBorder;
-        }
-    }
-    public class DPITextButton : DPIButton
-    {
-        string[] Caption;
-        WindowTextFont CaptionFont;
-        int FontHeightButton = 12;
-        TextPrimitive[] CaptionText;
-        public DPITextButton(string caption, string displayName, bool upType, Action pressedAction, int width, int height, DistributedPowerInterface dpi, int fontHeight = 12) :
-            base(displayName, upType, pressedAction, width, height, dpi, true)
-        {
-            Caption = caption.Split('\n');
-            CaptionText = new TextPrimitive[Caption.Length];
-            ConfirmerCaption = caption;
-            FontHeightButton = fontHeight;
-            SetFont();
-            SetText();
-        }
-        void SetText()
-        {
-            foreach (int i in Enumerable.Range(0, Caption.Length))
-            {
-                int fontWidth = (int)(CaptionFont.MeasureString(Caption[i]) / Scale);
-                CaptionText[i] = new TextPrimitive(new Point((Width - fontWidth) / 2, (Height - FontHeightButton) / 2 + FontHeightButton * (2 * i - Caption.Length + 1)), Color.White, Caption[i], CaptionFont);
-            }
-        }
-        public override void ScaleChanged()
-        {
-            base.ScaleChanged();
-            SetFont();
-            SetText();
-        }
-        void SetFont()
-        {
-            CaptionFont = GetFont(FontHeightButton);
-        }
-        public override void PrepareFrame(DPIStatus status)
-        {
-            base.PrepareFrame(status);
-            foreach (var text in CaptionText)
-                text.Color = Enabled ? ColorGrey : ColorDarkGrey;
-        }
-        public override void Draw(SpriteBatch spriteBatch, Point drawPosition)
-        {
-            base.Draw(spriteBatch, drawPosition);
-            foreach (var text in CaptionText)
-            {
-                int x = drawPosition.X + (int)Math.Round(text.Position.X * Scale);
-                int y = drawPosition.Y + (int)Math.Round(text.Position.Y * Scale);
-                text.Draw(spriteBatch, new Point(x, y));
-            }
-        }
-    }
-    public class DPIIconButton : DPIButton
-    {
-        readonly string DisabledSymbol;
-        readonly string EnabledSymbol;
-        TexturePrimitive DisabledTexture;
-        TexturePrimitive EnabledTexture;
-        public DPIIconButton(string enabledSymbol, string disabledSymbol, string displayName, bool upType , Action pressedAction, int width, int height, DistributedPowerInterface dpi) :
-            base(displayName, upType, pressedAction, width, height, dpi, true)
-        {
-            DisabledSymbol = disabledSymbol;
-            EnabledSymbol = enabledSymbol;
-            SetIcon();
-        }
-        void SetIcon()
-        {
-            Texture2D tex1 = DPI.LoadTexture(EnabledSymbol);
-            Texture2D tex2 = DPI.LoadTexture(DisabledSymbol);
-            EnabledTexture = new TexturePrimitive(tex1, new Vector2((Width - tex1.Width * DPI.MipMapScale) / 2, (Height - tex1.Height * DPI.MipMapScale) / 2));
-            DisabledTexture = new TexturePrimitive(tex2, new Vector2((Width - tex2.Width * DPI.MipMapScale) / 2, (Height - tex2.Height * DPI.MipMapScale) / 2));
-        }
-        public override void ScaleChanged()
-        {
-            base.ScaleChanged();
-            SetIcon();
-        }
-        public override void Draw(SpriteBatch spriteBatch, Point drawPosition)
-        {
-            base.Draw(spriteBatch, drawPosition);
-            var tex = Enabled ? EnabledTexture : DisabledTexture;
-            DrawSymbol(spriteBatch, tex.Texture, drawPosition, tex.Position.X, tex.Position.Y);
-        }
-    }
-    public class DPITextLabel : DPIArea
-    {
-        string[] Caption;
-        WindowTextFont CaptionFont;
-        int FontHeightButton = 12;
-        TextPrimitive[] CaptionText;
-        public DPITextLabel(string caption, int width, int height, DistributedPowerInterface dpi) :
-            base(dpi, width, height)
-        {
-            Caption = caption.Split('\n');
-            CaptionText = new TextPrimitive[Caption.Length];
-            SetFont();
-            SetText();
-        }
-        void SetText()
-        {
-            foreach (int i in Enumerable.Range(0, Caption.Length))
-            {
-                int fontWidth = (int)(CaptionFont.MeasureString(Caption[i]) / Scale);
-                CaptionText[i] = new TextPrimitive(new Point((Width - fontWidth) / 2, (Height - FontHeightButton) / 2 + FontHeightButton * (2 * i - Caption.Length + 1)), ColorGrey, Caption[i], CaptionFont);
-            }
-        }
-        public override void ScaleChanged()
-        {
-            base.ScaleChanged();
-            SetFont();
-            SetText();
-        }
-        void SetFont()
-        {
-            CaptionFont = GetFont(FontHeightButton);
-        }
-        public override void Draw(SpriteBatch spriteBatch, Point drawPosition)
-        {
-            base.Draw(spriteBatch, drawPosition);
-            foreach (var text in CaptionText)
-            {
-                int x = drawPosition.X + (int)Math.Round(text.Position.X * Scale);
-                int y = drawPosition.Y + (int)Math.Round(text.Position.Y * Scale);
-                text.Draw(spriteBatch, new Point(x, y));
-            }
-        }
-    }
 
     public class DPIStatus
     {
@@ -817,7 +504,7 @@ namespace Orts.Viewer3D.RollingStock.SubSystems
         public bool DPIActive = true;
     }
 
-    public class DistributedPowerInterfaceRenderer : CabViewControlRenderer, ICabViewMouseControlRenderer
+    public class DistributedPowerInterfaceRenderer : CabViewControlRenderer
     {
         DistributedPowerInterface DPI;
         bool Zoomed = false;
@@ -860,41 +547,6 @@ namespace Orts.Viewer3D.RollingStock.SubSystems
             DPI.PrepareFrame(elapsedTime.ClockSeconds);
         }
 
-        public bool IsMouseWithin()
-        {
-            int x = (int)((UserInput.MouseX - DrawPosition.X) / DPI.Scale);
-            int y = (int)((UserInput.MouseY - DrawPosition.Y) / DPI.Scale);
-            if (UserInput.IsMouseRightButtonPressed && new Rectangle(0, 0, 640, 480).Contains(x, y)) Zoomed = !Zoomed;
-            foreach (var area in DPI.ActiveWindow.SubAreas)
-            {
-                if (!(area is DPIButton)) continue;
-                var b = (DPIButton)area;
-                if (b.SensitiveArea(DPI.ActiveWindow.Position).Contains(x, y) && b.Enabled) return true;
-            }
-            return false;
-        }
-
-        public void HandleUserInput()
-        {
-            DPI.HandleMouseInput(UserInput.IsMouseLeftButtonDown, (int)((UserInput.MouseX - DrawPosition.X) / DPI.Scale), (int)((UserInput.MouseY - DrawPosition.Y) / DPI.Scale));
-        }
-
-        public string GetControlName()
-        {
-            int x = (int)((UserInput.MouseX - DrawPosition.X) / DPI.Scale);
-            int y = (int)((UserInput.MouseY - DrawPosition.Y) / DPI.Scale);
-            foreach (var area in DPI.ActiveWindow.SubAreas)
-            {
-                if (!(area is DPIButton)) continue;
-                var b = (DPIButton)area;
-                if (b.SensitiveArea(DPI.ActiveWindow.Position).Contains(x, y)) return b.DisplayName;
-            }
-            return "";
-        }
-        public string GetControlLabel()
-        {
-            return GetControlName();
-        }
         public override void Draw(GraphicsDevice graphicsDevice)
         {
             DPI.Draw(CabShaderControlView.SpriteBatch, new Point(DrawPosition.X, DrawPosition.Y));
