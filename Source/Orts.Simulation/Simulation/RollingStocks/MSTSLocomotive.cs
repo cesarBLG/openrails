@@ -1925,39 +1925,12 @@ public List<CabView> CabViewList = new List<CabView>();
                 AbsTractionSpeedMpS = AbsSpeedMpS;
             }
 
-            // Jindrich
-            //UpdateMotiveForce(elapsedClockSeconds, t, AbsSpeedMpS, AbsWheelSpeedMpS);
             CheckAccelerationBits(elapsedClockSeconds, AbsWheelSpeedMpS);
 
-            if (CruiseControl != null && !TrainBrakeController.TCSEmergencyBraking)
-            {
-                if (CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Manual)
-                    CruiseControl.SkipThrottleDisplay = false;
-
-                if (IsPlayerTrain)
-                    CruiseControl.UpdateSelectedSpeed(elapsedClockSeconds);
-
-                 if (!IsPlayerTrain || CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Manual || 
-                    CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto && CruiseControl.DynamicBrakePriority)
-                {
-                    CruiseControl.WasForceReset = false;
-                    CruiseControl.controllerVolts = 0;
-                    UpdateTractiveForce(elapsedClockSeconds, t, AbsSpeedMpS, AbsWheelSpeedMpS);
-                }
-                else if (CruiseControl.SelectedSpeedMpS > 0)
-                    CruiseControl.Update(elapsedClockSeconds, AbsWheelSpeedMpS);
-                else if (CruiseControl.SpeedRegMode == CruiseControl.SpeedRegulatorMode.Auto)
-                    CruiseControl.Update(elapsedClockSeconds, AbsWheelSpeedMpS);
-                else
-                    UpdateTractiveForce(elapsedClockSeconds, t, AbsSpeedMpS, AbsWheelSpeedMpS);
-
-            }
-            else
-            {
-                if (CruiseControl != null && (TrainBrakeController.TCSEmergencyBraking || TrainBrakeController.TCSFullServiceBraking))
-                    CruiseControl.WasBraking = true;
-                UpdateTractiveForce(elapsedClockSeconds, t, AbsSpeedMpS, AbsWheelSpeedMpS);
-            }
+            // Jindrich
+            CruiseControl?.Update(elapsedClockSeconds);
+            if (CruiseControl != null && CruiseControl.OverrideForceCalculation) CruiseControl.UpdateMotiveForce(elapsedClockSeconds, AbsWheelSpeedMpS);
+            else UpdateTractiveForce(elapsedClockSeconds, t, AbsSpeedMpS, AbsWheelSpeedMpS);
 
             if (MultiPositionControllers != null)
             {

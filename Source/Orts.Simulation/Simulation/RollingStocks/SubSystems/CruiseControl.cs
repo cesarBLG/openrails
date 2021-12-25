@@ -75,6 +75,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
         public float StartReducingSpeedDeltaDownwards = 0f;
         public bool Battery = false;
         public bool DynamicBrakePriority = false;
+        protected bool ThrottleNeutralPriority = false;
         public List<int> ForceStepsThrottleTable = new List<int>();
         public List<float> AccelerationTable = new List<float>();
         public enum SpeedRegulatorMode { Manual, Auto, Testing, AVV }
@@ -144,6 +145,8 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                                                      // and we are in auto mode, the first throttle above zero position is used to run at low speed
         public float LowSpeed = 2f; // default parking speed
         public bool HasTwoForceValues = false; // when UseThrottleAsSpeedSelector is true, two max force values (50% and 100%) are available
+
+        public bool OverrideForceCalculation = false;
 
         public CruiseControl(MSTSLocomotive locomotive)
         {
@@ -378,33 +381,63 @@ namespace Orts.Simulation.RollingStocks.SubSystems
             }
         }
 
-        public void Update(float elapsedClockSeconds, float AbsWheelSpeedMpS)
+        public void Update(float elapsedClockSeconds)
         {
-            RelativeAccelerationMpSS = Locomotive.AccelerationMpSS;
-            if (Locomotive.Direction == Direction.Reverse) RelativeAccelerationMpSS *= -1;
-            if (maxForceIncreasing) SpeedRegulatorMaxForceIncrease(elapsedClockSeconds);
-            if (maxForceDecreasing)
+            OverrideForceCalculation = false;
+            if (!Locomotive.IsPlayerTrain)
             {
-                if (SelectedMaxAccelerationStep <= 0)
-                {
-                    maxForceDecreasing = false;
-                }
-                else
-                    SpeedRegulatorMaxForceDecrease(elapsedClockSeconds);
-            }
-            if (SpeedRegMode == SpeedRegulatorMode.Manual)
-            {
+                WasForceReset = false;
+                controllerVolts = 0;
                 return;
             }
 
-            if (absMaxForceN == 0) absMaxForceN = Locomotive.MaxForceN;
+            UpdateSelectedSpeed(elapsedClockSeconds);
 
-            if (Locomotive.DynamicBrakePercent > 0)
-                if (Locomotive.DynamicBrakePercent > 100)
-                    Locomotive.DynamicBrakePercent = 100;
-                ForceThrottleAndDynamicBrake = Locomotive.DynamicBrakePercent;
+            if (!ThrottleNeutralPosition || SelectedSpeedMpS > 0) ThrottleNeutralPriority = false;
 
-            UpdateMotiveForce(elapsedClockSeconds, AbsWheelSpeedMpS);
+            if (Locomotive.TrainBrakeController.TCSEmergencyBraking || Locomotive.TrainBrakeController.TCSFullServiceBraking)
+            {
+                WasBraking = true;
+            }
+            else if (SpeedRegMode == SpeedRegulatorMode.Manual || (SpeedRegMode == SpeedRegulatorMode.Auto && (DynamicBrakePriority || ThrottleNeutralPriority)))
+            {
+                WasForceReset = false;
+                controllerVolts = 0;
+            }
+            else if (SpeedRegMode == SpeedRegulatorMode.Auto)
+            {
+                if (ThrottleNeutralPosition && SelectedSpeedMpS == 0)
+                {
+                    // we are in the neutral position
+                    ThrottleNeutralPriority = true;
+                    Locomotive.ThrottleController.SetPercent(0);
+                    if (Locomotive.DynamicBrakePercent != -1)
+                    {
+                        Locomotive.SetDynamicBrakePercent(0);
+                        Locomotive.DynamicBrakeChangeActiveState(false);
+                    }
+                    controllerVolts = 0;
+                    WasForceReset = false;
+                    Locomotive.DynamicBrakeIntervention = -1;
+                }
+                else
+                {
+                    OverrideForceCalculation = true;
+                }
+            }
+
+            if (SpeedRegMode == SpeedRegulatorMode.Manual)
+                SkipThrottleDisplay = false;
+
+            RelativeAccelerationMpSS = Locomotive.AccelerationMpSS;
+            if (Locomotive.Direction == Direction.Reverse) RelativeAccelerationMpSS *= -1;
+            if (maxForceIncreasing) SpeedRegulatorMaxForceIncrease(elapsedClockSeconds);
+            if (maxForceIncreasing) SpeedRegulatorMaxForceIncrease(elapsedClockSeconds);
+            if (maxForceDecreasing)
+            {
+                if (SelectedMaxAccelerationStep <= 0) maxForceDecreasing = false;
+                else SpeedRegulatorMaxForceDecrease(elapsedClockSeconds);
+            }
         }
 
         public void Save(BinaryWriter outf)
@@ -1034,8 +1067,15 @@ namespace Orts.Simulation.RollingStocks.SubSystems
         public bool WasBraking = false;
         public bool WasForceReset = true;
 
-        protected virtual void UpdateMotiveForce(float elapsedClockSeconds, float AbsWheelSpeedMpS)
+        public virtual void UpdateMotiveForce(float elapsedClockSeconds, float AbsWheelSpeedMpS)
         {
+            if (absMaxForceN == 0) absMaxForceN = Locomotive.MaxForceN;
+
+            if (Locomotive.DynamicBrakePercent > 0)
+                if (Locomotive.DynamicBrakePercent > 100)
+                    Locomotive.DynamicBrakePercent = 100;
+            ForceThrottleAndDynamicBrake = Locomotive.DynamicBrakePercent;
+
             if (DynamicBrakeFullRangeIncreaseTimeSeconds == 0)
                 DynamicBrakeFullRangeIncreaseTimeSeconds = 4;
             if (DynamicBrakeFullRangeDecreaseTimeSeconds == 0)
@@ -1080,25 +1120,6 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                 TrainBrakePriority = false;
             }
             if (DynamicBrakePriority) controllerVolts = 0;
-            if (ThrottleNeutralPosition && SelectedSpeedMpS == 0)
-            {
-                // we are in the neutral position
-                Locomotive.ThrottleController.SetPercent(0);
-                if (Locomotive.DynamicBrakePercent != -1)
-                {
-                    Locomotive.SetDynamicBrakePercent(0);
-                    Locomotive.DynamicBrakeChangeActiveState(false);
-                }
-                Locomotive.MotiveForceN = 0;
-                Locomotive.TractiveForceN = 0;
-                controllerVolts = 0;
-                Locomotive.DynamicBrakeIntervention = -1;
-                ForceThrottleAndDynamicBrake = 0;
-                Ampers = 0;
-                maxForceN = 0;
-            }
-
-            else
             {
 
                 if (TrainBrakePriority || DynamicBrakePriority)
