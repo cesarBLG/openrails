@@ -259,9 +259,7 @@ namespace Orts.Formats.Msts
         ORTS_TCS47,
         ORTS_TCS48,
         ORTS_ETCS,
-        ORTS_ODOMETER,
-        ORTS_ODOMETER_RESET,
-        ORTS_ODOMETER_DIRECTION,
+
         ORTS_SELECTED_SPEED,
         ORTS_SELECTED_SPEED_DISPLAY,
         ORTS_SELECTED_SPEED_MODE,
@@ -308,6 +306,18 @@ namespace Orts.Formats.Msts
         ORTS_CC_SPEED_180,
         ORTS_CC_SPEED_190,
         ORTS_CC_SPEED_200,
+
+        ORTS_ODOMETER,
+        ORTS_ODOMETER_RESET,
+        ORTS_ODOMETER_DIRECTION,
+        ORTS_DISTRIBUTED_POWER,
+        ORTS_DP_MOVE_TO_FRONT,
+        ORTS_DP_MOVE_TO_BACK,
+        ORTS_DP_IDLE,
+        ORTS_DP_TRACTION,
+        ORTS_DP_BRAKE,
+        ORTS_DP_MORE,
+        ORTS_DP_LESS,
 
         // Further CabViewControlTypes must be added above this line, to avoid their malfunction in 3DCabs
         EXTERNALWIPERS,
