@@ -465,14 +465,16 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Controllers
                     {
                         if (!Locomotive.CruiseControl.ContinuousSpeedIncreasing && movedForward) return;
                         movedForward = true;
-                        Locomotive.CruiseControl.SelectedSpeedMpS = Locomotive.CruiseControl.SelectedSpeedMpS + Locomotive.CruiseControl.SpeedRegulatorNominalSpeedStepMpS;
+                        Locomotive.CruiseControl.SelectedSpeedMpS = Math.Max(Locomotive.CruiseControl.MinimumSpeedForCCEffectMpS,
+                            Locomotive.CruiseControl.SelectedSpeedMpS + Locomotive.CruiseControl.SpeedRegulatorNominalSpeedStepMpS);
                         if (Locomotive.CruiseControl.SelectedSpeedMpS > Locomotive.MaxSpeedMpS) Locomotive.CruiseControl.SelectedSpeedMpS = Locomotive.MaxSpeedMpS;
                     }
                     if (controllerPosition == ControllerPosition.ThrottleIncreaseFast)
                     {
                         if (!Locomotive.CruiseControl.ContinuousSpeedIncreasing && movedForward) return;
                         movedForward = true;
-                        Locomotive.CruiseControl.SelectedSpeedMpS = Locomotive.CruiseControl.SelectedSpeedMpS + Locomotive.CruiseControl.SpeedRegulatorNominalSpeedStepMpS * 2;
+                        Locomotive.CruiseControl.SelectedSpeedMpS = Math.Max(Locomotive.CruiseControl.MinimumSpeedForCCEffectMpS,
+                            Locomotive.CruiseControl.SelectedSpeedMpS + Locomotive.CruiseControl.SpeedRegulatorNominalSpeedStepMpS * 2);
                         if (Locomotive.CruiseControl.SelectedSpeedMpS > Locomotive.MaxSpeedMpS) Locomotive.CruiseControl.SelectedSpeedMpS = Locomotive.MaxSpeedMpS;
                     }
                     if (controllerPosition == ControllerPosition.ThrottleDecrease)
@@ -481,6 +483,8 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Controllers
                         movedAft = true;
                         Locomotive.CruiseControl.SelectedSpeedMpS = Locomotive.CruiseControl.SelectedSpeedMpS - Locomotive.CruiseControl.SpeedRegulatorNominalSpeedStepMpS;
                         if (Locomotive.CruiseControl.SelectedSpeedMpS < 0) Locomotive.CruiseControl.SelectedSpeedMpS = 0;
+                        if (Locomotive.CruiseControl.MinimumSpeedForCCEffectMpS > 0 && Locomotive.CruiseControl.SelectedSpeedMpS < Locomotive.CruiseControl.MinimumSpeedForCCEffectMpS)
+                            Locomotive.CruiseControl.SelectedSpeedMpS = 0;
                     }
                     if (controllerPosition == ControllerPosition.ThrottleDecreaseFast)
                     {
@@ -488,6 +492,8 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Controllers
                         movedAft = true;
                         Locomotive.CruiseControl.SelectedSpeedMpS = Locomotive.CruiseControl.SelectedSpeedMpS - Locomotive.CruiseControl.SpeedRegulatorNominalSpeedStepMpS * 2;
                         if (Locomotive.CruiseControl.SelectedSpeedMpS < 0) Locomotive.CruiseControl.SelectedSpeedMpS = 0;
+                        if (Locomotive.CruiseControl.MinimumSpeedForCCEffectMpS > 0 && Locomotive.CruiseControl.SelectedSpeedMpS < Locomotive.CruiseControl.MinimumSpeedForCCEffectMpS)
+                            Locomotive.CruiseControl.SelectedSpeedMpS = 0;
                     }
                     return;
                 }
