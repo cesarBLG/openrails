@@ -55,7 +55,7 @@ namespace Orts.Viewer3D.RollingStock.SubSystems
         public static readonly Color ColorYellow = new Color(223, 223, 0);
         public static readonly Color ColorOrange = new Color(234, 145, 0);
         public static readonly Color ColorRed = new Color(191, 0, 2);
-        public static readonly Color ColorBackground = new Color(8, 8, 8); // almost black
+        public static readonly Color ColorBackground = new Color(0, 0, 0, 0); // transparent
         public static readonly Color ColorPASPlight = new Color(41, 74, 107);
         public static readonly Color ColorPASPdark = new Color(33, 49, 74);
         public static readonly Color ColorShadow = new Color(8, 24, 57);
