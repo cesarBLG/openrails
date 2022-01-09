@@ -11,9 +11,8 @@ INSTALLATION
 
 
 RELEASE NOTES
-This unofficial version has been derived from the latest official Testing release T1.4-109.
+This unofficial version has been derived from the latest official Testing release T1.4-120.
 
-This unofficial version includes the cruise control software written by Jindrich with final adaptations by myself.
 
 This version includes some features not (yet) available in the Open Rails testing official version, that is:
 - addition of track sounds in the sound debug window (by dennisat)
@@ -30,7 +29,6 @@ This version includes some features not (yet) available in the Open Rails testin
 - Fix memory usage indication that was clamped to 4 GB, see http://www.elvastower.com/forums/index.php?/topic/33907-64-bit-openrails-consumes-more-memory/page__view__findpost__p__257699
 - option to skip saving commands (reduces save time on long activities), see http://www.elvastower.com/forums/index.php?/topic/33907-64-bit-openrails-consumes-more-memory/page__view__findpost__p__257687
 - skip warning messages related to ruler token, that is introduced by TSRE5
-- General Option to reduce memory usage
 - track gauge can be changed over the whole route, see http://www.elvastower.com/forums/index.php?/topic/34022-adjusting-track-gauge/
 - re-introduced advanced coupling, by steamer_ctn
 - bug fix for https://bugs.launchpad.net/or/+bug/1895391 Calculation of reversal point distance failing
