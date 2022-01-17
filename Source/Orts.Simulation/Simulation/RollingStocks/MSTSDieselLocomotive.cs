@@ -1,4 +1,4 @@
-﻿// COPYRIGHT 2009, 2010, 2011, 2012, 2013 by the Open Rails project.
+// COPYRIGHT 2009, 2010, 2011, 2012, 2013 by the Open Rails project.
 // 
 // This file is part of Open Rails.
 // 
@@ -968,6 +968,7 @@ namespace Orts.Simulation.RollingStocks
             status.AppendFormat("{0}({1})\t", CarID, DPUnitID);
             // Throttle
             status.AppendFormat("{0}\t", throttle);
+
             // Load
             var data = 0f;
             if (FilteredMotiveForceN != 0)
@@ -1014,13 +1015,14 @@ namespace Orts.Simulation.RollingStocks
                     status.AppendFormat("{0:F0} K", data);
                     break;
             }
+
             status.AppendFormat((data < 0 ? "???" : " ") + "\t");
 
             // BP
             var brakeInfoValue = brakeValue(Simulator.Catalog.GetString("BP"), Simulator.Catalog.GetString("EOT"));
             status.AppendFormat("{0:F0}\t", brakeInfoValue);
 
-            // Flow
+            // Flow.
             // TODO:The BP air flow that feeds the brake tube is not yet modeled in Open Rails.
 
             // Remote
