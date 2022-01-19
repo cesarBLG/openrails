@@ -640,6 +640,13 @@ namespace Orts.Viewer3D
             DPDynamicBrakeCommand.Receiver = (MSTSLocomotive)PlayerLocomotive;
             DPMoreCommand.Receiver = (MSTSLocomotive)PlayerLocomotive;
             DPLessCommand.Receiver = (MSTSLocomotive)PlayerLocomotive;
+
+            //EOT
+            EOTCommTestCommand.Receiver = (MSTSLocomotive)PlayerLocomotive;
+            EOTDisarmCommand.Receiver = (MSTSLocomotive)PlayerLocomotive;
+            EOTArmTwoWayCommand.Receiver = (MSTSLocomotive)PlayerLocomotive;
+            EOTEmergencyBrakeCommand.Receiver = (MSTSLocomotive)PlayerLocomotive;
+            ToggleEOTEmergencyBrakeCommand.Receiver = (MSTSLocomotive)PlayerLocomotive;
         }
 
         public void ChangeToPreviousFreeRoamCamera()

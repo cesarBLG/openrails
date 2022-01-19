@@ -25,7 +25,7 @@ using Orts.MultiPlayer;
 using Orts.Simulation.AIs;
 using Orts.Simulation.Physics;
 using Orts.Simulation.RollingStocks;
-using Orts.Simulation.RollingStocks.SubSystems.Brakes.MSTS;
+using Orts.Simulation.RollingStocks.SubSystems.Brakes;
 using Orts.Simulation.Signalling;
 using Orts.Simulation.Timetables;
 using ORTS.Common;
@@ -1203,6 +1203,10 @@ namespace Orts.Simulation
             float prevEQres = train.EqualReservoirPressurePSIorInHg;
             train.AITrainBrakePercent = 100; //<CSComment> This seems a tricky way for the brake modules to test if it is an AI train or not
             train.EqualReservoirPressurePSIorInHg = prevEQres; // The previous command modifies EQ reservoir pressure, causing issues with EP brake systems, so restore to prev value
+
+            if ((PlayerLocomotive as MSTSLocomotive).EOTEnabled != MSTSLocomotive.EOTenabled.no)
+                train.EOT = new EOT((PlayerLocomotive as MSTSLocomotive).EOTEnabled, false, train);
+
             return (train);
         }
 
@@ -1276,6 +1280,9 @@ namespace Orts.Simulation
             }
 
             if (conFileName.Contains("tilted")) train.IsTilting = true;
+
+            if ((PlayerLocomotive as MSTSLocomotive).EOTEnabled != MSTSLocomotive.EOTenabled.no)
+                train.EOT = new EOT((PlayerLocomotive as MSTSLocomotive).EOTEnabled, false, train);
 
             return train;
         }
@@ -1690,8 +1697,10 @@ namespace Orts.Simulation
 
             train.CheckFreight();
             train.SetDPUnitIDs();
+            train.ReinitializeEOT();
             train2.CheckFreight();
             train2.SetDPUnitIDs();
+            train2.ReinitializeEOT();
 
             train.Update(0);   // stop the wheels from moving etc
             train2.Update(0);  // stop the wheels from moving etc
