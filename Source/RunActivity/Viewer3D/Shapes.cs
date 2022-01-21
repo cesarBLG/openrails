@@ -103,7 +103,6 @@ namespace Orts.Viewer3D
             foreach (var path in ShapeMarks.Where(kvp => !kvp.Value).Select(kvp => kvp.Key))
             {
                 var shape = Shapes[path];
-                Shapes.Remove(path);
                 if (Viewer.Settings.ReduceMemory)
                 {
                     foreach (var lod in shape.LodControls)
@@ -112,9 +111,10 @@ namespace Orts.Viewer3D
                             {
                                 prim.VertexBuffer.Dispose();
                                 prim.IndexBuffer.Dispose();
+                                prim.PrimitiveCount = 0;
                             }
-                    shape = null;
                 }
+                Shapes.Remove(path);
             }
         }
 
