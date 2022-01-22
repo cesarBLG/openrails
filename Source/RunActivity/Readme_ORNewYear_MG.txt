@@ -1,5 +1,5 @@
-﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.114
-January 9th, 2022
+﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.115
+January 22nd, 2022
 
 Please note that the installation and use of Open Rails software, even of its unofficial versions, is governed by the Open Rails End User License Agreement. 
 
@@ -11,7 +11,7 @@ INSTALLATION
 
 
 RELEASE NOTES
-This unofficial version has been derived from the latest official Testing release T1.4-120.
+This unofficial version has been derived from the latest official Testing release T1.4-148.
 
 
 This version includes some features not (yet) available in the Open Rails testing official version, that is:
@@ -51,10 +51,9 @@ This version includes some features not (yet) available in the Open Rails testin
 - Bug fix for https://bugs.launchpad.net/or/+bug/1950578 Dyn Brake set up state not disappearing in cab
 - update Russian locale .dlls, by Weter
 - workaround for http://www.elvastower.com/forums/index.php?/topic/32640-or-newyear-mg/page__view__findpost__p__278074 
-- Merging Serana's work with what was already available in ORNYMG about optimizing VRAM usage, see http://www.elvastower.com/forums/index.php?/topic/35644-memory-using-monogame-or/page__view__findpost__p__278919 
-- NEW: Distributed power: various small improvements in cab's DP screen page and in DP info window, with the contribution of mbm_OR, see http://www.elvastower.com/forums/index.php?/topic/26249-remote-control-dpu-units/page__view__findpost__p__280531
-- NEW: Cruise Control: added optional speed parameter below which CC is ineffective, see http://www.elvastower.com/forums/index.php?/topic/33841-cruise-control/page__view__findpost__p__280530
-- NEW: bug fix for https://bugs.launchpad.net/or/+bug/1956262. F5 causes OR crash, by mbm_OR, already available in Unstable release.
+- NEW: accept also "ORTSLabel" in alternative to "Label" as cussomized tooltip for cabview controls
+- NEW: first phase of EOT management, see http://www.elvastower.com/forums/index.php?/topic/35912-eot/
+
 
 
 The Monogame related code intentionally coincides only partly with the code of the OR official testing version.
