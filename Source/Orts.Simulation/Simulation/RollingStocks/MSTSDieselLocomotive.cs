@@ -117,6 +117,7 @@ namespace Orts.Simulation.RollingStocks
             DieselEngines = new DieselEngines(this);
             PowerSupply = new ScriptedDieselPowerSupply(this);
             RefillImmediately();
+            EOTEnabled = EOTenabled.twoway;
         }
 
         /// <summary>

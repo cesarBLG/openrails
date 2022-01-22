@@ -1109,6 +1109,18 @@ namespace Orts.Viewer3D.Popups
                 AddSeparator();
             }
 
+            // EOT
+
+            if (locomotive.Train.EOT?.EOTState != EOT.EOTstate.Disarmed)
+            {
+                AddLabel(new ListLabel
+                {
+                    FirstCol = Viewer.Catalog.GetString("EOT"),
+                    LastCol = $"{locomotive.Train.EOT?.EOTState.ToString()}"
+                });
+                AddSeparator();
+            }
+
             // Distributed Power
 
             if (locomotive is MSTSDieselLocomotive && multipleUnitsConfiguration != null)

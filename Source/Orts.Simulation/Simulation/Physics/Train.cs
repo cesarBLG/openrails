@@ -288,6 +288,8 @@ namespace Orts.Simulation.Physics
         public Train IncorporatingTrain;                      // train incorporating another train
         public int IncorporatingTrainNo = -1;                   // number of train incorporating the actual train
 
+        public EOT EOT;
+
         public Traffic_Service_Definition TrafficService;
         public int[,] MisalignedSwitch = new int[2, 2] { { -1, -1 }, { -1, -1 } };  // misaligned switch indication per direction:
         // cell 0 : index of switch, cell 1 : required linked section; -1 if not valid
@@ -925,6 +927,10 @@ namespace Orts.Simulation.Physics
             InitialSpeed = inf.ReadSingle();
             IsPathless = inf.ReadBoolean();
 
+            var hasEOT = inf.ReadInt32();
+            if (hasEOT == 1)
+                EOT = new EOT(inf, this);
+
             if (TrainType != TRAINTYPE.REMOTE)
             {
                 // restore leadlocomotive
@@ -1203,6 +1209,13 @@ namespace Orts.Simulation.Physics
             // Save initial speed
             outf.Write(InitialSpeed);
             outf.Write(IsPathless);
+            if (EOT != null)
+            {
+                outf.Write(1);
+                EOT.Save(outf);
+            }
+            else
+                outf.Write(-1);
         }
 
         private void SaveCars(BinaryWriter outf)
@@ -1940,7 +1953,7 @@ namespace Orts.Simulation.Physics
                 return;
             }
             // Update train physics, position and movement
-
+            if (EOT != null) EOT.Update();
             PropagateBrakePressure(elapsedClockSeconds);
 
             bool whlslp = false;
@@ -11286,6 +11299,7 @@ namespace Orts.Simulation.Physics
 
             CheckFreight();
             SetDPUnitIDs();
+            ReinitializeEOT();
 
             // clear all track occupation actions
 
@@ -13611,6 +13625,7 @@ namespace Orts.Simulation.Physics
             IsPathless = true;
             CheckFreight();
             SetDPUnitIDs();
+            ReinitializeEOT();
             ToggleToManualMode();
             InitializeBrakes();
             InitializeSpeeds();
@@ -21562,5 +21577,16 @@ namespace Orts.Simulation.Physics
             else ToggleToManualMode();
             Simulator.Confirmer.Confirm(CabControl.SignalMode, CabSetting.Off);
         }
+
+        public void ReinitializeEOT()
+        {
+            if (EOT != null) EOT = null;
+            if (Simulator.PlayerLocomotive.Train == this)
+                if ((Simulator.PlayerLocomotive as MSTSLocomotive).EOTEnabled != MSTSLocomotive.EOTenabled.no)
+                    EOT = new EOT((Simulator.PlayerLocomotive as MSTSLocomotive).EOTEnabled, false, this);
+                else if (Cars[0] is MSTSLocomotive && (Cars[0] as MSTSLocomotive).EOTEnabled != MSTSLocomotive.EOTenabled.no)
+                    EOT = new EOT((Cars[0] as MSTSLocomotive).EOTEnabled, true, this);
+        }
+
     }// class Train
 }

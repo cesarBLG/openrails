@@ -35,6 +35,7 @@ using Orts.MultiPlayer;
 using Orts.Simulation.Physics;
 using Orts.Simulation.RollingStocks;
 using Orts.Simulation.Timetables;
+using Orts.Simulation.RollingStocks.SubSystems.Brakes;
 using Orts.Simulation.Signalling;
 using ORTS.Common;
 using ORTS.Scripting.Api;
@@ -833,6 +834,8 @@ namespace Orts.Simulation.AIs
                 StartList.InsertTrain(train);
                 Simulator.StartReference.Add(train.Number);
             }
+            if (train.Cars[0] is MSTSLocomotive && (train.Cars[0] as MSTSLocomotive).EOTEnabled != MSTSLocomotive.EOTenabled.no)
+                    train.EOT = new EOT((train.Cars[0] as MSTSLocomotive).EOTEnabled, true, train);
             return train;
         }
 

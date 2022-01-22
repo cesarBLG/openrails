@@ -150,6 +150,7 @@
         [GetString("Control Brake Hose Disconnect")] ControlBrakeHoseDisconnect,
         [GetString("Control Alerter")] ControlAlerter,
         [GetString("Control Emergency Push Button")] ControlEmergencyPushButton,
+        [GetString("Control EOT Emergency Brake")] ControlEOTEmergencyBrake,
         [GetString("Control Sander")] ControlSander,
         [GetString("Control Sander Toggle")] ControlSanderToggle,
         [GetString("Control Wiper")] ControlWiper,
