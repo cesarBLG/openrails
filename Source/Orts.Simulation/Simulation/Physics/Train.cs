@@ -21581,11 +21581,13 @@ namespace Orts.Simulation.Physics
         public void ReinitializeEOT()
         {
             if (EOT != null) EOT = null;
-            if (Simulator.PlayerLocomotive.Train == this)
+            if (Simulator.PlayerLocomotive?.Train != null && Simulator.PlayerLocomotive.Train == this)
+            {
                 if ((Simulator.PlayerLocomotive as MSTSLocomotive).EOTEnabled != MSTSLocomotive.EOTenabled.no)
                     EOT = new EOT((Simulator.PlayerLocomotive as MSTSLocomotive).EOTEnabled, false, this);
-                else if (Cars[0] is MSTSLocomotive && (Cars[0] as MSTSLocomotive).EOTEnabled != MSTSLocomotive.EOTenabled.no)
-                    EOT = new EOT((Cars[0] as MSTSLocomotive).EOTEnabled, true, this);
+            }
+            else if (Cars[0] is MSTSLocomotive && (Cars[0] as MSTSLocomotive).EOTEnabled != MSTSLocomotive.EOTenabled.no)
+                EOT = new EOT((Cars[0] as MSTSLocomotive).EOTEnabled, true, this);
         }
 
     }// class Train

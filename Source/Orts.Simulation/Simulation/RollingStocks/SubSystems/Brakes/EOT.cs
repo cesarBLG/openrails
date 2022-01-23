@@ -69,7 +69,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Brakes
             EOTType = eotEnabled;
             ID = IDRandom.Next(0, 99999);
             if (armed)
-                EOTState = EOTstate.CommTestOn;
+                EOTState = EOTstate.Armed;
         }
 
         public EOT(BinaryReader inf, Train train)

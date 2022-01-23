@@ -5806,8 +5806,6 @@ public List<CabView> CabViewList = new List<CabView>();
                 default:
                     if (CruiseControl != null)
                         data = CruiseControl.GetDataOf(cvc);
-                    else
-                        data = 0;
                     if (MultiPositionControllers != null && data == 0)
                     {
                         foreach (var mpc in MultiPositionControllers)
@@ -5817,9 +5815,7 @@ public List<CabView> CabViewList = new List<CabView>();
                                 break;
                             }
                     }
-                    else if (data == 0)
-                        data = 0;
-                    if (Train?.EOT != null)
+                    if (Train?.EOT != null && data == 0)
                         data = Train.EOT.GetDataOf(cvc);
                     break;
             }
