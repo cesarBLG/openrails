@@ -1603,7 +1603,7 @@ namespace Orts.Viewer3D.RollingStock
         bool IsMouseWithin();
         void HandleUserInput();
         string GetControlName();
-        string GetControlLabel();
+        string ControlLabel { get; }
     }
 
     /// <summary>
@@ -2319,10 +2319,7 @@ namespace Orts.Viewer3D.RollingStock
             return (Locomotive as MSTSLocomotive).TrainControlSystem.GetDisplayString(GetControlType().ToString());
         }
 
-        public string GetControlLabel()
-        {
-            return Control.Label;
-        }
+        public string ControlLabel => Control.Label;
 
         /// <summary>
         /// Handles cabview mouse events, and changes the corresponding locomotive control values.

@@ -856,10 +856,7 @@ namespace Orts.Viewer3D.RollingStock.Subsystems.ETCS
             }
             return "";
         }
-        public string GetControlLabel()
-        {
-            return GetControlName();
-        }
+        public string ControlLabel => GetControlName();
         public override void Draw(GraphicsDevice graphicsDevice)
         {
             DMI.Draw(CabShaderControlView.SpriteBatch, new Point(DrawPosition.X, DrawPosition.Y));
