@@ -5078,6 +5078,12 @@ public List<CabView> CabViewList = new List<CabView>();
                                 {
                                     data = (data / MaxDynamicBrakeForceN) * DynamicBrakeMaxCurrentA;
                                 }
+                                if (ThrottlePercent == 0 && data > 0)
+                                {
+                                    data = DynamicBrakePercent == -1 ? (data / MaxForceN) * MaxCurrentA
+                                        : DynamicBrakePercent == 0 ? (data / MaxDynamicBrakeForceN) * DynamicBrakeMaxCurrentA
+                                        : data;
+                                }
                                 break;
 
                             case CABViewControlUnits.NEWTONS:
