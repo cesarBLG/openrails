@@ -1,5 +1,5 @@
-﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.115
-January 22nd, 2022
+﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.116
+January 28th, 2022
 
 Please note that the installation and use of Open Rails software, even of its unofficial versions, is governed by the Open Rails End User License Agreement. 
 
@@ -11,10 +11,10 @@ INSTALLATION
 
 
 RELEASE NOTES
-This unofficial version has been derived from the latest official Testing release T1.4-148.
+This unofficial version has been derived from the latest official Testing release T1.4-148 and from the latest master branch status.
 
 
-This version includes some features not (yet) available in the Open Rails testing official version, that is:
+This version includes some features not (yet) available in the Open Rails testing official version and in the latest master branch status, that is:
 - addition of track sounds in the sound debug window (by dennisat)
 - F5 HUD scrolling (by mbm_or)
 - checkbox in General Options tab to enable or disable watchdog
@@ -36,7 +36,6 @@ This version includes some features not (yet) available in the Open Rails testin
 - bug fix for http://www.elvastower.com/forums/index.php?/topic/34633-unhandled-exception-overflow-in-win7/page__view__findpost__p__265463 , by mbm_OR
 - tentative support for RAIN textures for objects, terrain and transfers
 - dynamic terrain and scenery loading strategy (useful for slower computers)
-- enable customized tooltips for cabview controls, by adding a Label ( "string" ) line in the cabview control block in the .cvf file, by Jindrich
 - commands to selectively throw facing or trailing switches, see http://www.elvastower.com/forums/index.php?/topic/34991-opposite-switch-throwing-with-g-key/page__view__findpost__p__270291
 - locomotive and train elevator, see http://www.elvastower.com/forums/index.php?/topic/35082-locomotive-and-train-elevator/#entry271012
 - preliminary bug fix for http://www.elvastower.com/forums/index.php?/topic/35112-problem-with-tcs-scripts-and-timetable-mode/
@@ -51,8 +50,11 @@ This version includes some features not (yet) available in the Open Rails testin
 - Bug fix for https://bugs.launchpad.net/or/+bug/1950578 Dyn Brake set up state not disappearing in cab
 - update Russian locale .dlls, by Weter
 - workaround for http://www.elvastower.com/forums/index.php?/topic/32640-or-newyear-mg/page__view__findpost__p__278074 
-- NEW: accept also "ORTSLabel" in alternative to "Label" as cussomized tooltip for cabview controls
-- NEW: first phase of EOT management, see http://www.elvastower.com/forums/index.php?/topic/35912-eot/
+- accept also "ORTSLabel" in alternative to "Label" as cussomized tooltip for cabview controls
+- first phase of EOT management, see http://www.elvastower.com/forums/index.php?/topic/35912-eot/
+- NEW: bug fix for https://bugs.launchpad.net/or/+bug/1959336 , fix burst in DPU Load value when throttle at zero, by mbm_OR
+- NEW: fix burst in ORTS_SIGNED_TRACTION_BRAKING when throttle at 0
+- NEW: add Train Dpu Info to web server, by mbm_OR
 
 
 
