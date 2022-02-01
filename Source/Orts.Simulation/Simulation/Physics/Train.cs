@@ -289,6 +289,7 @@ namespace Orts.Simulation.Physics
         public int IncorporatingTrainNo = -1;                   // number of train incorporating the actual train
 
         public EOT EOT;
+        public EOTType EOTType;
 
         public Traffic_Service_Definition TrafficService;
         public int[,] MisalignedSwitch = new int[2, 2] { { -1, -1 }, { -1, -1 } };  // misaligned switch indication per direction:
@@ -4506,6 +4507,122 @@ namespace Orts.Simulation.Physics
             Length = length;
             travelled += distance;
         } // CalculatePositionOfCars
+
+        //================================================================================================//
+        /// <summary>
+        /// 
+        /// </summary>
+        /// 
+
+        public void CalculatePositionOfEOT()
+        {
+            var traveller = new Traveller(RearTDBTraveller, Traveller.TravellerDirection.Backward);
+            float distance = 0;
+            float elapsedTime = 0;
+            // The traveller location represents the back of the train.
+            var length = 0f;
+
+            var car = Cars[Cars.Count - 1];
+            traveller.Move(car.CouplerSlackM + car.GetCouplerZeroLengthM());
+            length += car.CouplerSlackM + car.GetCouplerZeroLengthM();
+            if (car.WheelAxlesLoaded)
+            {
+                car.ComputePosition(traveller, true, elapsedTime, distance, SpeedMpS);
+            }
+            else
+            {
+                var bogieSpacing = car.CarLengthM * 0.65f;  // we'll use this approximation since the wagfile doesn't contain info on bogie position
+
+                // traveller is positioned at the back of the car
+                // advance to the first bogie 
+                traveller.Move((car.CarLengthM - bogieSpacing) / 2.0f);
+                var tileX = traveller.TileX;
+                var tileZ = traveller.TileZ;
+                var x = traveller.X;
+                var y = traveller.Y;
+                var z = traveller.Z;
+                traveller.Move(bogieSpacing);
+
+                // normalize across tile boundaries
+                while (tileX > traveller.TileX)
+                {
+                    x += 2048;
+                    --tileX;
+                }
+                while (tileX < traveller.TileX)
+                {
+                    x -= 2048;
+                    ++tileX;
+                }
+                while (tileZ > traveller.TileZ)
+                {
+                    z += 2048;
+                    --tileZ;
+                }
+                while (tileZ < traveller.TileZ)
+                {
+                    z -= 2048;
+                    ++tileZ;
+                }
+
+
+                // note the railcar sits 0.275meters above the track database path  TODO - is this always consistent?
+                car.WorldPosition.XNAMatrix = Matrix.Identity;
+                if (car.Flipped)
+                {
+                    //  Rotate matrix 180' around Y axis.
+                    car.WorldPosition.XNAMatrix.M11 = -1;
+                    car.WorldPosition.XNAMatrix.M33 = -1;
+                }
+                car.WorldPosition.XNAMatrix *= Simulator.XNAMatrixFromMSTSCoordinates(traveller.X, traveller.Y + 0.275f, traveller.Z, x, y + 0.275f, z);
+                car.WorldPosition.TileX = traveller.TileX;
+                car.WorldPosition.TileZ = traveller.TileZ;
+
+                traveller.Move((car.CarLengthM - bogieSpacing) / 2.0f);  // Move to the front of the car 
+
+                car.UpdatedTraveler(traveller, elapsedTime, distance, SpeedMpS);
+                length += car.CarLengthM;
+            }
+            traveller = new Traveller(traveller, Traveller.TravellerDirection.Backward);
+            RearTDBTraveller = new Traveller(traveller);
+
+            Length += length;
+        } // CalculatePositionOfEOT
+
+        //================================================================================================//
+        /// <summary>
+        /// Recalculate rear traveller when removing EOT
+        /// </summary>
+        /// 
+
+        public void RecalculateRearTDBTraveller()
+        {
+            var traveller = new Traveller(RearTDBTraveller);
+            float distance = 0;
+            float elapsedTime = 0;
+            // The traveller location represents the back of the train.
+            var length = 0f;
+
+            var car = Cars[Cars.Count - 1];
+            traveller.Move(car.CouplerSlackM + car.GetCouplerZeroLengthM());
+            length += car.CouplerSlackM + car.GetCouplerZeroLengthM();
+            if (car.WheelAxlesLoaded)
+            {
+                car.ComputePosition(traveller, true, elapsedTime, distance, SpeedMpS);
+            }
+            else
+            {
+                // traveller is positioned at the back of the car
+                // advance to the front of the car 
+                traveller.Move(car.CarLengthM);
+
+                car.UpdatedTraveler(traveller, elapsedTime, distance, SpeedMpS);
+                length += car.CarLengthM;
+            }
+            RearTDBTraveller = new Traveller(traveller);
+
+            Length -= length;
+        }
 
         //================================================================================================//
         /// <summary>
@@ -21583,8 +21700,8 @@ namespace Orts.Simulation.Physics
             if (EOT != null) EOT = null;
             if (Simulator.PlayerLocomotive?.Train != null && Simulator.PlayerLocomotive.Train == this)
             {
-                if ((Simulator.PlayerLocomotive as MSTSLocomotive).EOTEnabled != MSTSLocomotive.EOTenabled.no)
-                    EOT = new EOT((Simulator.PlayerLocomotive as MSTSLocomotive).EOTEnabled, false, this);
+//                if ((Simulator.PlayerLocomotive as MSTSLocomotive).EOTEnabled != MSTSLocomotive.EOTenabled.no)
+//                    EOT = new EOT((Simulator.PlayerLocomotive as MSTSLocomotive).EOTEnabled, false, this);
             }
             else if (Cars[0] is MSTSLocomotive && (Cars[0] as MSTSLocomotive).EOTEnabled != MSTSLocomotive.EOTenabled.no)
                 EOT = new EOT((Cars[0] as MSTSLocomotive).EOTEnabled, true, this);

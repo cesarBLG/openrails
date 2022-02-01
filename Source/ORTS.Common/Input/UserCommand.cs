@@ -52,6 +52,7 @@
         [GetString("Display Next Station Window")] DisplayNextStationWindow,
         [GetString("Display Compass Window")] DisplayCompassWindow,
         [GetString("Display Train List Window")] DisplayTrainListWindow,
+        [GetString("Display EOT List Window")] DisplayEOTListWindow,
 
         [GetString("Debug Speed Up")] DebugSpeedUp,
         [GetString("Debug Speed Down")] DebugSpeedDown,

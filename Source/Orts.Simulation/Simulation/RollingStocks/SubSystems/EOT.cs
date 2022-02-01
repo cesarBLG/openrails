@@ -36,8 +36,44 @@ using System.IO;
 using System.Linq;
 using Event = Orts.Common.Event;
 
-namespace Orts.Simulation.RollingStocks.SubSystems.Brakes
+namespace Orts.Simulation.RollingStocks.SubSystems
 {
+    public struct EOTType
+    {
+        public string EOTDirectory;
+        public string EOTName;
+        public enum EOTLevel
+        {
+            NoComm,
+            OneWay,
+            TwoWay
+        }
+    }
+    public class SharedEOTData : List<EOTType>
+    {
+ 
+        public SharedEOTData (string eotPath)
+        {
+            var directories = Directory.GetDirectories(eotPath);
+            foreach (var directory in directories)
+            {
+                var files = Directory.GetFiles(directory, "*.wag");
+                foreach (var file in files)
+                {
+                    EOTType eotType = new EOTType();
+                    eotType.EOTDirectory = directory.Remove(0, eotPath.Length);
+                    eotType.EOTName = Path.GetFileNameWithoutExtension(file);
+                    Add(eotType);
+                }
+            }
+        }
+
+        public List<EOTType> ReadEOTData()
+        {
+            List<EOTType> eotTypes = new List<EOTType>();
+            return eotTypes;
+        }
+    }
     public class EOT
     {
         public enum EOTstate

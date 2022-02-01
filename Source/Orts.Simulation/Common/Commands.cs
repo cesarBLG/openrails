@@ -20,11 +20,13 @@
 using Orts.Simulation;
 using Orts.Simulation.Physics;
 using Orts.Simulation.RollingStocks;
+using Orts.Simulation.RollingStocks.SubSystems;
 using Orts.Simulation.RollingStocks.SubSystems.PowerSupplies;
 using ORTS.Common;
 using ORTS.Scripting.Api;
 using System;
 using System.Diagnostics;   // Used by Trace.Warnings
+using System.IO;
 
 namespace Orts.Common
 {
@@ -2309,6 +2311,60 @@ namespace Orts.Common
             if (Receiver?.Train?.EOT != null)
             {
                 Receiver.Train.EOT.EmergencyBrake(!Receiver.Train.EOT.EOTEmergencyBrakingOn);
+            }
+        }
+    }
+
+    [Serializable()]
+    public sealed class EOTMountCommand : BooleanCommand
+    {
+        public static MSTSLocomotive Receiver { get; set; }
+        public EOTType PickedEOTType;
+
+        public EOTMountCommand(CommandLog log, bool toState, EOTType pickedEOTType)
+            : base(log, toState)
+        {
+            PickedEOTType = pickedEOTType;
+            Redo();
+        }
+
+        public override void Redo()
+        {
+            if (Receiver?.Train != null)
+            {
+                if (ToState)
+                {
+                    Receiver.Train.EOT = new EOT(Receiver.EOTEnabled, false, Receiver.Train);
+                    Receiver.Train.EOTType.EOTDirectory = PickedEOTType.EOTDirectory;
+                    Receiver.Train.EOTType.EOTName = PickedEOTType.EOTName;
+                    var wagonFilePath = (Receiver.Train.Simulator.EOTPath + @"\" + PickedEOTType.EOTDirectory + @"\" + PickedEOTType.EOTName + @".wag").ToLower();
+                    try
+                    {
+                        TrainCar eot = RollingStock.Load(Receiver.Train.Simulator, wagonFilePath);
+                        eot.CarID = Receiver.Train.Number.ToString() + " - EOT";
+                        Receiver.Train.Cars.Add(eot);
+                        eot.Train = Receiver.Train;
+                    }
+                    catch (Exception error)
+                    {
+                        Trace.WriteLine(new FileLoadException(wagonFilePath, error));
+                        return;
+                    }
+                    Receiver.Train.CalculatePositionOfEOT();
+                    Receiver.Train.physicsUpdate(0);
+                }
+                else
+                {
+                    Receiver.Train.RecalculateRearTDBTraveller();
+                    var car = Receiver.Train.Cars[Receiver.Train.Cars.Count - 1];
+                    car.Train = null;
+                    car.IsPartOfActiveTrain = false;  // to stop sounds
+                    Receiver.Train.Cars.Remove(car);
+                    Receiver.Train.EOTType.EOTDirectory = "";
+                    Receiver.Train.EOTType.EOTName = "";
+                    Receiver.Train.EOT = null;
+                    Receiver.Train.physicsUpdate(0);
+                }
             }
         }
     }

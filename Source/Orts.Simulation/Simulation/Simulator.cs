@@ -25,6 +25,7 @@ using Orts.MultiPlayer;
 using Orts.Simulation.AIs;
 using Orts.Simulation.Physics;
 using Orts.Simulation.RollingStocks;
+using Orts.Simulation.RollingStocks.SubSystems;
 using Orts.Simulation.RollingStocks.SubSystems.Brakes;
 using Orts.Simulation.Signalling;
 using Orts.Simulation.Timetables;
@@ -80,6 +81,7 @@ namespace Orts.Simulation
 
         public string BasePath;     // ie c:\program files\microsoft games\train simulator
         public string RoutePath;    // ie c:\program files\microsoft games\train simulator\routes\usa1  - may be different on different pc's
+        public string EOTPath;      // ie c:\program files\microsoft games\train simulator\trains\ORTS_EOT
 
         // Primary Simulator Data 
         // These items represent the current state of the simulator 
@@ -141,6 +143,7 @@ namespace Orts.Simulation
         public List<MovingTable> MovingTables = new List<MovingTable>();
         public ExtCarSpawnerFile ExtCarSpawnerFile;
         public List<CarSpawnerList> CarSpawnerLists;
+        public SharedEOTData SharedEOTData;
 
         // timetable pools
         public Poolholder PoolHolder;
@@ -272,6 +275,7 @@ namespace Orts.Simulation
             RoutePathName = Path.GetFileName(RoutePath);
             BasePath = Path.GetDirectoryName(Path.GetDirectoryName(RoutePath));
             DayAmbientLight = (int)Settings.DayAmbientLight;
+            EOTPath = BasePath + @"\TRAINS\ORTS_EOT\";
 
 
             string ORfilepath = System.IO.Path.Combine(RoutePath, "OpenRails");
@@ -346,6 +350,13 @@ namespace Orts.Simulation
                 if (CarSpawnerLists == null) CarSpawnerLists = new List<CarSpawnerList>();
                 Trace.Write(" EXTCARSPAWN");
                 ExtCarSpawnerFile = new ExtCarSpawnerFile(RoutePath + @"\openrails\carspawn.dat", RoutePath + @"\shapes\", CarSpawnerLists);
+            }
+
+            // Generate a list of EOTs that may be used to attach at end of train
+            if (Directory.Exists(EOTPath))
+            {
+                Trace.Write(" EOT");
+                SharedEOTData = new SharedEOTData(EOTPath);
             }
 
             Confirmer = new Confirmer(this, 1.5);
@@ -1204,8 +1215,8 @@ namespace Orts.Simulation
             train.AITrainBrakePercent = 100; //<CSComment> This seems a tricky way for the brake modules to test if it is an AI train or not
             train.EqualReservoirPressurePSIorInHg = prevEQres; // The previous command modifies EQ reservoir pressure, causing issues with EP brake systems, so restore to prev value
 
-            if ((PlayerLocomotive as MSTSLocomotive).EOTEnabled != MSTSLocomotive.EOTenabled.no)
-                train.EOT = new EOT((PlayerLocomotive as MSTSLocomotive).EOTEnabled, false, train);
+//            if ((PlayerLocomotive as MSTSLocomotive).EOTEnabled != MSTSLocomotive.EOTenabled.no)
+//                train.EOT = new EOT((PlayerLocomotive as MSTSLocomotive).EOTEnabled, false, train);
 
             return (train);
         }
@@ -1281,8 +1292,8 @@ namespace Orts.Simulation
 
             if (conFileName.Contains("tilted")) train.IsTilting = true;
 
-            if ((PlayerLocomotive as MSTSLocomotive).EOTEnabled != MSTSLocomotive.EOTenabled.no)
-                train.EOT = new EOT((PlayerLocomotive as MSTSLocomotive).EOTEnabled, false, train);
+//            if ((PlayerLocomotive as MSTSLocomotive).EOTEnabled != MSTSLocomotive.EOTenabled.no)
+//                train.EOT = new EOT((PlayerLocomotive as MSTSLocomotive).EOTEnabled, false, train);
 
             return train;
         }

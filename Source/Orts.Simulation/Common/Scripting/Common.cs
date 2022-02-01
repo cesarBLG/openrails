@@ -18,7 +18,7 @@
 using Orts.Common;
 using Orts.Simulation;
 using Orts.Simulation.RollingStocks;
-using Orts.Simulation.RollingStocks.SubSystems.Brakes;
+using Orts.Simulation.RollingStocks.SubSystems;
 using System;
 
 namespace ORTS.Scripting.Api
