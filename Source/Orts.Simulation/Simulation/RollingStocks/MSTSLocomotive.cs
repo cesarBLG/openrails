@@ -1751,6 +1751,7 @@ public List<CabView> CabViewList = new List<CabView>();
                 TrainControlSystem.InitializeMoving();
                 TrainBrakeController.InitializeMoving();
                 BrakeSystem.LocoInitializeMoving();
+                EngineBrakeController?.SetPercent(0);
             }
         }
 
