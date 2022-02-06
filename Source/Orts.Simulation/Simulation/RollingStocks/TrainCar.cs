@@ -47,7 +47,6 @@ using ORTS.Common;
 using ORTS.Scripting.Api;
 using ORTS.Settings;
 using System;
-using Orts.Parsers.Msts;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -687,6 +686,7 @@ namespace Orts.Simulation.RollingStocks
             Tender,
             Passenger,
             Freight,
+            EOT,
         }
         public WagonTypes WagonType;
 

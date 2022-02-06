@@ -104,13 +104,6 @@ namespace Orts.Simulation.RollingStocks
             ContinuousSound
         }
 
-        public enum EOTenabled
-        {
-            no,
-            oneway,
-            twoway
-        }
-
         // simulation parameters
         public bool ManualHorn = false;
         public bool TCSHorn = false;
@@ -208,8 +201,6 @@ namespace Orts.Simulation.RollingStocks
         public float CurrentSteamHeatPressurePSI = 0.0f;   // Current pressure in steam heat system
 
         public string LocomotiveName; // Name of locomotive from ENG file
-
-        public EOTenabled EOTEnabled = EOTenabled.no;
 
         // Carriage Steam Heating Parameters
         public float MaxSteamHeatPressurePSI;    // Maximum Steam heating pressure
@@ -1100,7 +1091,6 @@ public List<CabView> CabViewList = new List<CabView>();
                 case "engine(ortsmaxtracksanderboxcapacity": MaxTrackSandBoxCapacityM3 = stf.ReadFloatBlock(STFReader.UNITS.Volume, null); break;
                 case "engine(ortsmaxtracksandersandconsumption": TrackSanderSandConsumptionM3pS = stf.ReadFloatBlock(STFReader.UNITS.Volume, null); break;
                 case "engine(ortsmaxtracksanderairconsumption": TrackSanderAirComsumptionM3pS = stf.ReadFloatBlock(STFReader.UNITS.Volume, null); break;
-                case "engine(ortseotenabled": Enum.TryParse(stf.ReadStringBlock("twoway").ToLower(), out EOTenabled EOTEnabled); break;
                 case "engine(ortscruisecontrol": SetUpCruiseControl(); break;
                 case "engine(ortsmultipositioncontroller": SetUpMPC(lowercasetoken, stf); break;
                 default:
@@ -1224,7 +1214,6 @@ public List<CabView> CabViewList = new List<CabView>();
             WaterScoopFillElevationM = locoCopy.WaterScoopFillElevationM;
             WaterScoopDepthM = locoCopy.WaterScoopDepthM;
             WaterScoopWidthM = locoCopy.WaterScoopWidthM;
-            EOTEnabled = locoCopy.EOTEnabled;
             MoveParamsToAxle();
             if (locoCopy.CruiseControl != null)
                 CruiseControl = locoCopy.CruiseControl.Clone(this);

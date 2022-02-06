@@ -18,6 +18,8 @@
 // This file is the responsibility of the 3D & Environment Team. 
 
 using System;
+using System.Collections.Generic;
+using System.IO;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Orts.Simulation;
@@ -33,15 +35,15 @@ namespace Orts.Viewer3D.Popups
     public class EOTListWindow : Window
     {
         public EOTListWindow(WindowManager owner)
-            : base(owner, Window.DecorationSize.X + owner.TextFontDefault.Height * 20, Window.DecorationSize.Y + (owner.Viewer.Simulator.SharedEOTData == null ?
-                  owner.TextFontDefault.Height * 2 : owner.TextFontDefault.Height * (owner.Viewer.Simulator.SharedEOTData.Count + 2)), Viewer.Catalog.GetString("EOT List"))
+            : base(owner, Window.DecorationSize.X + owner.TextFontDefault.Height * 20, Window.DecorationSize.Y + (owner.Viewer.Simulator.FullEOTPaths == null ?
+                  owner.TextFontDefault.Height * 2 : owner.TextFontDefault.Height * (owner.Viewer.Simulator.FullEOTPaths.Count + 2)), Viewer.Catalog.GetString("EOT List"))
         {
         }
 
         protected override ControlLayout Layout(ControlLayout layout)
         {
             var vbox = base.Layout(layout).AddLayoutVertical();
-            if (Owner.Viewer.Simulator.SharedEOTData != null)
+            if (Owner.Viewer.Simulator.FullEOTPaths != null)
             {
                 var colWidth = (vbox.RemainingWidth - vbox.TextHeight * 2) / 3;
                 {
@@ -52,16 +54,15 @@ namespace Orts.Viewer3D.Popups
                 }
                 vbox.AddHorizontalSeparator();
                 var scrollbox = vbox.AddLayoutScrollboxVertical(vbox.RemainingWidth);
- 
-                foreach (var thisEOTType in Owner.Viewer.Simulator.SharedEOTData)
+                var playerLocomotive = Owner.Viewer.Simulator.PlayerLocomotive;
+                foreach (var eotType in Owner.Viewer.Simulator.FullEOTPaths)
                 {
                     var line = scrollbox.AddLayoutHorizontalLineOfText();
                     EOTLabel filename, foldername, category;
-                    line.Add(filename = new EOTLabel(colWidth, line.RemainingHeight, Owner.Viewer, thisEOTType, thisEOTType.EOTName, LabelAlignment.Left));
-                    line.Add(foldername = new EOTLabel(colWidth - Owner.TextFontDefault.Height, line.RemainingHeight, Owner.Viewer, thisEOTType, thisEOTType.EOTDirectory, LabelAlignment.Left));
-                    line.Add(category = new EOTLabel(colWidth, line.RemainingHeight, Owner.Viewer, thisEOTType, "*", LabelAlignment.Right));
-                    if (Owner.Viewer.Simulator.PlayerLocomotive?.Train != null && thisEOTType.EOTName == Owner.Viewer.Simulator.PlayerLocomotive.Train.EOTType.EOTName
-                        && thisEOTType.EOTDirectory == Owner.Viewer.Simulator.PlayerLocomotive.Train.EOTType.EOTDirectory)
+                    line.Add(filename = new EOTLabel(colWidth, line.RemainingHeight, Owner.Viewer, eotType, Path.GetFileNameWithoutExtension(eotType), LabelAlignment.Left));
+                    line.Add(foldername = new EOTLabel(colWidth - Owner.TextFontDefault.Height, line.RemainingHeight, Owner.Viewer, eotType, (Path.GetDirectoryName(eotType)).Remove(0, Owner.Viewer.Simulator.EOTPath.Length), LabelAlignment.Left));
+                    line.Add(category = new EOTLabel(colWidth, line.RemainingHeight, Owner.Viewer, eotType, "*", LabelAlignment.Right));
+                    if (playerLocomotive?.Train != null && eotType.ToLower() == playerLocomotive.Train.EOT?.WagFilePath.ToLower()) 
                     {                       
                         filename.Color = Color.Red;
                         foldername.Color = Color.Red;
@@ -76,7 +77,7 @@ namespace Orts.Viewer3D.Popups
         {
             base.PrepareFrame(elapsedTime, updateFull);
 
-            if (updateFull && Owner.Viewer.Simulator.SharedEOTData != null)
+            if (updateFull && Owner.Viewer.Simulator.FullEOTPaths != null)
             {
                 Layout();
             }
@@ -86,9 +87,9 @@ namespace Orts.Viewer3D.Popups
     class EOTLabel : Label
     {
         readonly Viewer Viewer;
-        readonly EOTType PickedEOTTypeFromList;
+        readonly string PickedEOTTypeFromList;
 
-        public EOTLabel(int width, int height, Viewer viewer, EOTType eotType, String eotString, LabelAlignment alignment)
+        public EOTLabel(int width, int height, Viewer viewer, string eotType, String eotString, LabelAlignment alignment)
             : base(width, height, eotString, alignment)
         {
             Viewer = viewer;
@@ -98,17 +99,16 @@ namespace Orts.Viewer3D.Popups
 
         void EOTListLabel_Click(Control arg1, Point arg2)
         {
-            if (PickedEOTTypeFromList.EOTName != "" && Viewer.PlayerLocomotive.AbsSpeedMpS > Simulator.MaxStoppedMpS)
+            if (PickedEOTTypeFromList != "")
             {
-                Viewer.Simulator.Confirmer.Information(Viewer.Catalog.GetString("Can't attach EOT if player train not stopped"));
-                return;
-            }
-            if (PickedEOTTypeFromList.EOTName != "")
-            {
-                if (!(PickedEOTTypeFromList.EOTName == Viewer.Simulator.PlayerLocomotive.Train.EOTType.EOTName
-                        && PickedEOTTypeFromList.EOTDirectory == Viewer.Simulator.PlayerLocomotive.Train.EOTType.EOTDirectory))
+                if (Viewer.PlayerLocomotive.AbsSpeedMpS > Simulator.MaxStoppedMpS)
                 {
-                    if (PickedEOTTypeFromList.EOTName != "" && Viewer.PlayerLocomotive.Train?.EOT != null)
+                    Viewer.Simulator.Confirmer.Information(Viewer.Catalog.GetString("Can't attach EOT if player train not stopped"));
+                    return;
+                }
+                if (PickedEOTTypeFromList.ToLower() != Viewer.PlayerLocomotive.Train.Cars[Viewer.PlayerLocomotive.Train.Cars.Count - 1].WagFilePath.ToLower())
+                {
+                    if (Viewer.PlayerLocomotive.Train?.EOT != null)
                     {
                         Viewer.Simulator.Confirmer.Information(Viewer.Catalog.GetString("Player train already has a mounted EOT"));
                         return;
@@ -116,8 +116,7 @@ namespace Orts.Viewer3D.Popups
                     //Ask to mount EOT
                     new EOTMountCommand(Viewer.Log, true, PickedEOTTypeFromList);
                 }
-                else if (PickedEOTTypeFromList.EOTName == Viewer.Simulator.PlayerLocomotive.Train.EOTType.EOTName
-                        && PickedEOTTypeFromList.EOTDirectory == Viewer.Simulator.PlayerLocomotive.Train.EOTType.EOTDirectory)
+                else if (PickedEOTTypeFromList.ToLower() == Viewer.PlayerLocomotive.Train.Cars[Viewer.PlayerLocomotive.Train.Cars.Count - 1].WagFilePath.ToLower())
                 {
                     new EOTMountCommand(Viewer.Log, false, PickedEOTTypeFromList);
                 }

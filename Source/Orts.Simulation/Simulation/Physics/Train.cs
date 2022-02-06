@@ -289,7 +289,6 @@ namespace Orts.Simulation.Physics
         public int IncorporatingTrainNo = -1;                   // number of train incorporating the actual train
 
         public EOT EOT;
-        public EOTType EOTType;
 
         public Traffic_Service_Definition TrafficService;
         public int[,] MisalignedSwitch = new int[2, 2] { { -1, -1 }, { -1, -1 } };  // misaligned switch indication per direction:
@@ -928,9 +927,9 @@ namespace Orts.Simulation.Physics
             InitialSpeed = inf.ReadSingle();
             IsPathless = inf.ReadBoolean();
 
-            var hasEOT = inf.ReadInt32();
+ /*           var hasEOT = inf.ReadInt32();
             if (hasEOT == 1)
-                EOT = new EOT(inf, this);
+                EOT = new EOT(inf, this);*/
 
             if (TrainType != TRAINTYPE.REMOTE)
             {
@@ -1210,13 +1209,13 @@ namespace Orts.Simulation.Physics
             // Save initial speed
             outf.Write(InitialSpeed);
             outf.Write(IsPathless);
-            if (EOT != null)
+ /*           if (EOT != null)
             {
                 outf.Write(1);
                 EOT.Save(outf);
             }
             else
-                outf.Write(-1);
+                outf.Write(-1);*/
         }
 
         private void SaveCars(BinaryWriter outf)
@@ -1954,7 +1953,6 @@ namespace Orts.Simulation.Physics
                 return;
             }
             // Update train physics, position and movement
-            if (EOT != null) EOT.Update();
             PropagateBrakePressure(elapsedClockSeconds);
 
             bool whlslp = false;
@@ -21697,14 +21695,25 @@ namespace Orts.Simulation.Physics
 
         public void ReinitializeEOT()
         {
-            if (EOT != null) EOT = null;
+            if (EOT != null)
+            {
+                EOT.EOTState = EOT.EOTstate.Disarmed;
+                EOT = null;
+            }
             if (Simulator.PlayerLocomotive?.Train != null && Simulator.PlayerLocomotive.Train == this)
             {
-//                if ((Simulator.PlayerLocomotive as MSTSLocomotive).EOTEnabled != MSTSLocomotive.EOTenabled.no)
-//                    EOT = new EOT((Simulator.PlayerLocomotive as MSTSLocomotive).EOTEnabled, false, this);
+                if (Cars.First() == Simulator.PlayerLocomotive && Cars.Last() is EOT)
+                    EOT = (EOT)Cars.Last();
+                else if (Cars.Last() == Simulator.PlayerLocomotive && Cars.First() is EOT)
+                    EOT = (EOT)Cars.First();
             }
-            else if (Cars[0] is MSTSLocomotive && (Cars[0] as MSTSLocomotive).EOTEnabled != MSTSLocomotive.EOTenabled.no)
-                EOT = new EOT((Cars[0] as MSTSLocomotive).EOTEnabled, true, this);
+            else
+            {
+                if (Cars.First() is MSTSLocomotive && Cars.Last() is EOT)
+                    EOT = (EOT)Cars.Last();
+                else if (Cars.Last() is MSTSLocomotive && Cars.First() is EOT)
+                    EOT = (EOT)Cars.First();
+            }
         }
 
     }// class Train

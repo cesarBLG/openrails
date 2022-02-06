@@ -143,7 +143,6 @@ namespace Orts.Simulation
         public List<MovingTable> MovingTables = new List<MovingTable>();
         public ExtCarSpawnerFile ExtCarSpawnerFile;
         public List<CarSpawnerList> CarSpawnerLists;
-        public SharedEOTData SharedEOTData;
 
         // timetable pools
         public Poolholder PoolHolder;
@@ -191,7 +190,7 @@ namespace Orts.Simulation
             }
         }
 
-
+        public FullEOTPaths FullEOTPaths;
         // Replay functionality!
         public CommandLog Log { get; set; }
         public List<ICommand> ReplayCommandList { get; set; }
@@ -356,7 +355,7 @@ namespace Orts.Simulation
             if (Directory.Exists(EOTPath))
             {
                 Trace.Write(" EOT");
-                SharedEOTData = new SharedEOTData(EOTPath);
+                FullEOTPaths = new FullEOTPaths(EOTPath);
             }
 
             Confirmer = new Confirmer(this, 1.5);
@@ -1139,6 +1138,11 @@ namespace Orts.Simulation
                 string wagonFilePath = wagonFolder + @"\" + wagon.Name + ".wag"; ;
                 if (wagon.IsEngine)
                     wagonFilePath = Path.ChangeExtension(wagonFilePath, ".eng");
+                else if (wagon.IsEOT)
+                {
+                    wagonFolder = BasePath + @"\trains\orts_eot\" + wagon.Folder;
+                    wagonFilePath = wagonFolder + @"\" + wagon.Name + ".eot";
+                }
 
                 if (!File.Exists(wagonFilePath))
                 {
@@ -1158,6 +1162,7 @@ namespace Orts.Simulation
                     else car.CarID = "0 - " + car.UiD; //player's train is always named train 0.
                     train.Cars.Add(car);
                     car.Train = train;
+                    if (car is EOT) train.EOT = car as EOT;
                     train.Length += car.CarLengthM;
 
                     var mstsDieselLocomotive = car as MSTSDieselLocomotive;
@@ -1339,6 +1344,11 @@ namespace Orts.Simulation
                         string wagonFilePath = wagonFolder + @"\" + wagon.Name + ".wag"; ;
                         if (wagon.IsEngine)
                             wagonFilePath = Path.ChangeExtension(wagonFilePath, ".eng");
+                        else if (wagon.IsEOT)
+                        {
+                            wagonFolder = BasePath + @"\trains\orts_eot\" + wagon.Folder;
+                            wagonFilePath = wagonFolder + @"\" + wagon.Name + ".eot";
+                        }
 
                         if (!File.Exists(wagonFilePath))
                         {
@@ -1354,6 +1364,8 @@ namespace Orts.Simulation
                             car.CarID = activityObject.ID + " - " + car.UiD;
                             train.Cars.Add(car);
                             car.Train = train;
+                            if (car is EOT)
+                                train.EOT = car as EOT;
                         }
                         catch (Exception error)
                         {

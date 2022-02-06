@@ -38,43 +38,29 @@ using Event = Orts.Common.Event;
 
 namespace Orts.Simulation.RollingStocks.SubSystems
 {
-    public struct EOTType
+    public enum EOTLevel
     {
-        public string EOTDirectory;
-        public string EOTName;
-        public enum EOTLevel
-        {
-            NoComm,
-            OneWay,
-            TwoWay
-        }
+        NoComm,
+        OneWay,
+        TwoWay
     }
-    public class SharedEOTData : List<EOTType>
+
+    public class FullEOTPaths : List<string>
     {
- 
-        public SharedEOTData (string eotPath)
+         public FullEOTPaths (string eotPath)
         {
             var directories = Directory.GetDirectories(eotPath);
             foreach (var directory in directories)
             {
-                var files = Directory.GetFiles(directory, "*.wag");
+                var files = Directory.GetFiles(directory, "*.eot");
                 foreach (var file in files)
                 {
-                    EOTType eotType = new EOTType();
-                    eotType.EOTDirectory = directory.Remove(0, eotPath.Length);
-                    eotType.EOTName = Path.GetFileNameWithoutExtension(file);
-                    Add(eotType);
+                    Add(file);
                 }
             }
         }
-
-        public List<EOTType> ReadEOTData()
-        {
-            List<EOTType> eotTypes = new List<EOTType>();
-            return eotTypes;
-        }
     }
-    public class EOT
+    public class EOT : MSTSWagon
     {
         public enum EOTstate
         {
@@ -93,12 +79,19 @@ namespace Orts.Simulation.RollingStocks.SubSystems
         public int ID;
         public EOTstate EOTState;
         public bool EOTEmergencyBrakingOn = false;
-        public Train Train;
-        public MSTSLocomotive.EOTenabled EOTType;
+        public EOTLevel EOTLevel;
 
         protected Timer DelayTimer;
 
-        public EOT(MSTSLocomotive.EOTenabled eotEnabled, bool armed, Train train)
+        public EOT(Simulator simulator, string wagPath)
+            : base(simulator, wagPath)
+        {
+            EOTState = EOTstate.Disarmed;
+            ID = IDRandom.Next(0, 99999);
+            DelayTimer = new Timer(this);
+        }
+
+/*        public EOT(MSTSLocomotive.EOTenabled eotEnabled, bool armed, Train train)
         {
             Train = train;
             EOTState = EOTstate.Disarmed;
@@ -107,21 +100,43 @@ namespace Orts.Simulation.RollingStocks.SubSystems
             if (armed)
                 EOTState = EOTstate.Armed;
             DelayTimer = new Timer(this);
-        }
+        }*/
 
-        public EOT(BinaryReader inf, Train train)
+ /*       public EOT(BinaryReader inf, Train train)
         {
             Train = train;
             ID = inf.ReadInt32();
             EOTState = (EOTstate)(inf.ReadInt32());
             DelayTimer = new Timer(this);
-        }
+        }*/
 
-        public void Initialize()
+        public override void Initialize()
         {
+            base.Initialize();
         }
 
-        public void Update()
+        public override void InitializeMoving()
+        {
+            base.InitializeMoving();
+            InitializeLevel();
+        }
+
+        public void InitializeLevel()
+        {
+            switch (EOTLevel)
+            {
+                case EOTLevel.OneWay:
+                    EOTState = EOTstate.Armed;
+                    break;
+                case EOTLevel.TwoWay:
+                    EOTState = EOTstate.ArmedTwoWay;
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        public override void Update(float elapsedClockSeconds)
         {
             UpdateState();
             if (Train.Simulator.PlayerLocomotive.Train == Train && EOTState == EOTstate.ArmedTwoWay &&
@@ -130,7 +145,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                 Train.Cars.Last().BrakeSystem.AngleCockBOpen = true;
             else
                 Train.Cars.Last().BrakeSystem.AngleCockBOpen = false;
-
+            base.Update(elapsedClockSeconds);
         }
 
         private void UpdateState()
@@ -147,7 +162,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                     }
                     break;
                 case EOTstate.Armed:
-                    if (EOTType == MSTSLocomotive.EOTenabled.twoway)
+                    if (EOTLevel == EOTLevel.TwoWay)
                     {
                         if (DelayTimer == null)
                             DelayTimer = new Timer(this);
@@ -170,10 +185,49 @@ namespace Orts.Simulation.RollingStocks.SubSystems
             }
         }
 
-        public void Save(BinaryWriter outf)
+        public override void Parse(string lowercasetoken, STFReader stf)
+        {
+            switch (lowercasetoken)
+            {
+                case "ortseot(level":
+                    stf.MustMatch("(");
+                    var eotLevel = stf.ReadString();
+                    try
+                    {
+                        EOTLevel = (EOTLevel)Enum.Parse(typeof(EOTLevel), eotLevel.First().ToString().ToUpper() + eotLevel.Substring(1));
+                    }
+                    catch
+                    {
+                        STFException.TraceWarning(stf, "Skipped unknown EOT Level " + eotLevel);
+                    }
+                    break;
+                default:
+                    base.Parse(lowercasetoken, stf);
+                    break;
+            }
+        }
+
+        public override void Save(BinaryWriter outf)
         {
             outf.Write(ID);
             outf.Write((int)EOTState);
+            base.Save(outf);
+        }
+
+        public override void Restore(BinaryReader inf)
+        {
+            ID = inf.ReadInt32();
+            EOTState = (EOTstate)(inf.ReadInt32());
+            DelayTimer = new Timer(this);
+            base.Restore(inf);
+            if (Train != null) Train.EOT = this;
+        }
+
+        public override void Copy(MSTSWagon copy)
+        {
+            base.Copy(copy);
+            EOT eotcopy = (EOT)copy;
+            EOTLevel = eotcopy.EOTLevel;
         }
 
         public float GetDataOf(CabViewControl cvc)
@@ -197,7 +251,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
         public void CommTest()
         {
             if (EOTState == EOTstate.Disarmed &&
-                (EOTType == MSTSLocomotive.EOTenabled.oneway || EOTType == MSTSLocomotive.EOTenabled.twoway))
+                (EOTLevel == EOTLevel.OneWay || EOTLevel == EOTLevel.TwoWay))
             {
                 if (DelayTimer == null)
                     DelayTimer = new Timer(this);

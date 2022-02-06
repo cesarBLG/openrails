@@ -31,6 +31,7 @@ using Orts.Parsers.OR;
 using Orts.Simulation.AIs;
 using Orts.Simulation.Physics;
 using Orts.Simulation.RollingStocks;
+using Orts.Simulation.RollingStocks.SubSystems;
 using Orts.Simulation.Signalling;
 using Orts.Simulation.Timetables;
 using ORTS.Common;
@@ -2379,6 +2380,8 @@ namespace Orts.Simulation.Timetables
                         car.OrgConsist = String.Copy(consistDetails.consistFile).ToLower();
                         car.SignalEvent(Event.Pantograph1Up);
                         TTTrain.Length += car.CarLengthM;
+                        if (car is EOT)
+                            TTTrain.EOT = car as EOT;
                     }
 
                     // derive speed
@@ -2462,6 +2465,11 @@ namespace Orts.Simulation.Timetables
 
                     if (wagon.IsEngine)
                         wagonFilePath = Path.ChangeExtension(wagonFilePath, ".eng");
+                    else if (wagon.IsEOT)
+                    {
+                        wagonFolder =  simulator.BasePath + @"\trains\orts_eot\" + wagon.Folder;
+                        wagonFilePath = wagonFolder + @"\" + wagon.Name + ".eot";
+                    }
 
                     if (!File.Exists(wagonFilePath))
                     {

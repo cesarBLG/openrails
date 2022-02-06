@@ -2319,9 +2319,9 @@ namespace Orts.Common
     public sealed class EOTMountCommand : BooleanCommand
     {
         public static MSTSLocomotive Receiver { get; set; }
-        public EOTType PickedEOTType;
+        public string PickedEOTType;
 
-        public EOTMountCommand(CommandLog log, bool toState, EOTType pickedEOTType)
+        public EOTMountCommand(CommandLog log, bool toState, string pickedEOTType)
             : base(log, toState)
         {
             PickedEOTType = pickedEOTType;
@@ -2334,16 +2334,14 @@ namespace Orts.Common
             {
                 if (ToState)
                 {
-                    Receiver.Train.EOT = new EOT(Receiver.EOTEnabled, false, Receiver.Train);
-                    Receiver.Train.EOTType.EOTDirectory = PickedEOTType.EOTDirectory;
-                    Receiver.Train.EOTType.EOTName = PickedEOTType.EOTName;
-                    var wagonFilePath = (Receiver.Train.Simulator.EOTPath + @"\" + PickedEOTType.EOTDirectory + @"\" + PickedEOTType.EOTName + @".wag").ToLower();
+                    var wagonFilePath = PickedEOTType.ToLower();
                     try
                     {
-                        TrainCar eot = RollingStock.Load(Receiver.Train.Simulator, wagonFilePath);
+                        EOT eot = (EOT)RollingStock.Load(Receiver.Train.Simulator, wagonFilePath);
                         eot.CarID = Receiver.Train.Number.ToString() + " - EOT";
                         Receiver.Train.Cars.Add(eot);
                         eot.Train = Receiver.Train;
+                        eot.Train.EOT = eot;
                     }
                     catch (Exception error)
                     {
@@ -2360,8 +2358,6 @@ namespace Orts.Common
                     car.Train = null;
                     car.IsPartOfActiveTrain = false;  // to stop sounds
                     Receiver.Train.Cars.Remove(car);
-                    Receiver.Train.EOTType.EOTDirectory = "";
-                    Receiver.Train.EOTType.EOTName = "";
                     Receiver.Train.EOT = null;
                     Receiver.Train.physicsUpdate(0);
                 }

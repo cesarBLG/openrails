@@ -58,7 +58,6 @@ namespace Orts.Simulation.RollingStocks
             base(simulator, wagFile)
         {
             PowerSupply = new ScriptedElectricPowerSupply(this);
-            EOTEnabled = EOTenabled.oneway;
         }
 
         /// <summary>
