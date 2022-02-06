@@ -806,6 +806,9 @@ namespace Orts.Formats.Msts
                 new STFReader.TokenProcessor("position", ()=>{ ParsePosition(stf); }),
                 new STFReader.TokenProcessor("graphic", ()=>{ ParseFireACEFile(stf, basepath); }),
                 new STFReader.TokenProcessor("fuelcoal", ()=>{ ParseGraphic(stf, basepath); }),
+                new STFReader.TokenProcessor("ortsdisplay", ()=>{ParseDisplay(stf); }),
+                new STFReader.TokenProcessor("ortsscreenpage", () => {ParseScreen(stf); }),
+                new STFReader.TokenProcessor("ortscabviewpoint", ()=>{ParseCabViewpoint(stf); }),
             });
 
             Direction = 1;
