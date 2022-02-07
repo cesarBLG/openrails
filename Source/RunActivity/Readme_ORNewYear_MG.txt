@@ -1,5 +1,5 @@
-﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.116
-January 28th, 2022
+﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.117
+February 7th, 2022
 
 Please note that the installation and use of Open Rails software, even of its unofficial versions, is governed by the Open Rails End User License Agreement. 
 
@@ -11,7 +11,7 @@ INSTALLATION
 
 
 RELEASE NOTES
-This unofficial version has been derived from the latest official Testing release T1.4-148 and from the latest master branch status.
+This unofficial version has been derived from the latest official Testing release T1.4-166 and from the latest master branch status.
 
 
 This version includes some features not (yet) available in the Open Rails testing official version and in the latest master branch status, that is:
@@ -50,12 +50,13 @@ This version includes some features not (yet) available in the Open Rails testin
 - Bug fix for https://bugs.launchpad.net/or/+bug/1950578 Dyn Brake set up state not disappearing in cab
 - update Russian locale .dlls, by Weter
 - workaround for http://www.elvastower.com/forums/index.php?/topic/32640-or-newyear-mg/page__view__findpost__p__278074 
-- accept also "ORTSLabel" in alternative to "Label" as cussomized tooltip for cabview controls
-- first phase of EOT management, see http://www.elvastower.com/forums/index.php?/topic/35912-eot/
-- NEW: bug fix for https://bugs.launchpad.net/or/+bug/1959336 , fix burst in DPU Load value when throttle at zero, by mbm_OR
-- NEW: fix burst in ORTS_SIGNED_TRACTION_BRAKING when throttle at 0
-- NEW: add Train Dpu Info to web server, by mbm_OR
-
+- bug fix for https://bugs.launchpad.net/or/+bug/1959336 , fix burst in DPU Load value when throttle at zero, by mbm_OR
+- fix burst in ORTS_SIGNED_TRACTION_BRAKING when throttle at 0
+- NEW: improve Train Dpu Info to web server, by mbm_OR
+- NEW: second phase of EOT management, see http://www.elvastower.com/forums/index.php?/topic/35912-eot/ 
+- NEW: set engine brake to 0% when train starts run at speed > 0
+- NEW: enable also Firebox cab control to be laid in any cabviewpoint
+- NEW: bug fix for https://bugs.launchpad.net/or/+bug/1959617 Positive bars can't have two colours
 
 
 The Monogame related code intentionally coincides only partly with the code of the OR official testing version.
