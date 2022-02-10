@@ -37,6 +37,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
         public float SpeedRegulatorMaxForceSteps = 0;
         public bool MaxForceSetSingleStep = false;
         public bool MaxForceKeepSelectedStepWhenManualModeSet = false;
+        public bool KeepSelectedSpeedWhenManualModeSet = false;
         public bool ForceRegulatorAutoWhenNonZeroSpeedSelected = false;
         public bool ForceRegulatorAutoWhenNonZeroForceSelected = false;
         public bool ForceRegulatorAutoWhenNonZeroSpeedSelectedAndThrottleAtZero = false;
@@ -176,6 +177,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                 case "engine(ortscruisecontrol(maxforcesteps": SpeedRegulatorMaxForceSteps = stf.ReadIntBlock(0); break;
                 case "engine(ortscruisecontrol(maxforcesetsinglestep": MaxForceSetSingleStep = stf.ReadBoolBlock(false); break;
                 case "engine(ortscruisecontrol(maxforcekeepselectedstepwhenmanualmodeset": MaxForceKeepSelectedStepWhenManualModeSet = stf.ReadBoolBlock(false); break;
+                case "engine(ortscruisecontrol(keepselectedspeedwhenmanualmodeset": KeepSelectedSpeedWhenManualModeSet = stf.ReadBoolBlock(false); break;
                 case "engine(ortscruisecontrol(forceregulatorautowhennonzerospeedselected": ForceRegulatorAutoWhenNonZeroSpeedSelected = stf.ReadBoolBlock(false); break;
                 case "engine(ortscruisecontrol(forceregulatorautowhennonzeroforceselected": ForceRegulatorAutoWhenNonZeroForceSelected = stf.ReadBoolBlock(false); break;
                 case "engine(ortscruisecontrol(forceregulatorautowhennonzerospeedselectedandthrottleatzero": ForceRegulatorAutoWhenNonZeroSpeedSelectedAndThrottleAtZero = stf.ReadBoolBlock(false); break;
@@ -288,6 +290,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
             SpeedRegulatorMaxForceSteps = other.SpeedRegulatorMaxForceSteps;
             MaxForceSetSingleStep = other.MaxForceSetSingleStep;
             MaxForceKeepSelectedStepWhenManualModeSet = other.MaxForceKeepSelectedStepWhenManualModeSet;
+            KeepSelectedSpeedWhenManualModeSet = other.KeepSelectedSpeedWhenManualModeSet;
             ForceRegulatorAutoWhenNonZeroSpeedSelected = other.ForceRegulatorAutoWhenNonZeroSpeedSelected;
             ForceRegulatorAutoWhenNonZeroForceSelected = other.ForceRegulatorAutoWhenNonZeroForceSelected;
             ForceRegulatorAutoWhenNonZeroSpeedSelectedAndThrottleAtZero = other.ForceRegulatorAutoWhenNonZeroSpeedSelectedAndThrottleAtZero;
@@ -538,7 +541,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                     case SpeedRegulatorMode.Auto:
                         {
                             if (SpeedRegulatorOptions.Contains("regulatorauto")) test = true;
-                            if (!DisableManualSwitchToAutoWhenSetSpeedNotAtTop) SelectedSpeedMpS = Locomotive.AbsSpeedMpS;
+                            if (!DisableManualSwitchToAutoWhenSetSpeedNotAtTop && !KeepSelectedSpeedWhenManualModeSet) SelectedSpeedMpS = Locomotive.AbsSpeedMpS;
                             break;
                         }
                     case SpeedRegulatorMode.Testing: if (SpeedRegulatorOptions.Contains("regulatortest")) test = true; break;
