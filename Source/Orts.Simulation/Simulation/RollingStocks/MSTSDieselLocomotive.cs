@@ -1064,7 +1064,8 @@ namespace Orts.Simulation.RollingStocks
             {
                 var indexIni = trainBrakeStatus.IndexOf(tokenIni) + tokenIni.Length + 1;
                 var indexEnd = trainBrakeStatus.IndexOf(tokenEnd) - indexIni;
-                brakeInfoValue = trainBrakeStatus.Substring(indexIni, indexEnd).TrimEnd();
+                if (indexEnd > 0)// BP found before EOT
+                    brakeInfoValue = trainBrakeStatus.Substring(indexIni, indexEnd).TrimEnd();
             }
             return brakeInfoValue;
         }
