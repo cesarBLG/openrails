@@ -2337,10 +2337,8 @@ namespace Orts.Common
                     var wagonFilePath = PickedEOTType.ToLower();
                     try
                     {
-                        EOT eot = (EOT)RollingStock.Load(Receiver.Train.Simulator, wagonFilePath);
+                        EOT eot = (EOT)RollingStock.Load(Receiver.Train.Simulator, Receiver.Train, wagonFilePath);
                         eot.CarID = Receiver.Train.Number.ToString() + " - EOT";
-                        Receiver.Train.Cars.Add(eot);
-                        eot.Train = Receiver.Train;
                         eot.Train.EOT = eot;
                     }
                     catch (Exception error)

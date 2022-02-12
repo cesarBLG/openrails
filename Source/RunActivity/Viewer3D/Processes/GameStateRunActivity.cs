@@ -1281,7 +1281,7 @@ namespace Orts.Viewer3D.Processes
                 Material.Dispose();
             }
 
-        public override void Draw(GraphicsDevice graphicsDevice)
+            public override void Draw(GraphicsDevice graphicsDevice)
             {
                 graphicsDevice.SetVertexBuffer(VertexBuffer);
                 graphicsDevice.DrawPrimitives(PrimitiveType.TriangleStrip, 0, 2);

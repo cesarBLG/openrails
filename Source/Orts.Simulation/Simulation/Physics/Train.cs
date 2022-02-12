@@ -50,7 +50,6 @@
 // #define DEBUG_COUPLER_FORCES
 
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Orts.Formats.Msts;
 using Orts.MultiPlayer;
 using Orts.Simulation.AIs;
@@ -58,7 +57,7 @@ using Orts.Simulation.RollingStocks;
 using Orts.Simulation.RollingStocks.SubSystems;
 using Orts.Simulation.RollingStocks.SubSystems.Brakes;
 using Orts.Simulation.RollingStocks.SubSystems.Brakes.MSTS;
-using Orts.Parsers.Msts;
+using Orts.Simulation.RollingStocks.SubSystems.PowerSupplies;
 using Orts.Simulation.Signalling;
 using Orts.Simulation.Timetables;
 using ORTS.Common;
@@ -71,7 +70,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Event = Orts.Common.Event;
-using Orts.Simulation.RollingStocks.SubSystems.PowerSupplies;
 
 namespace Orts.Simulation.Physics
 {
@@ -80,6 +78,7 @@ namespace Orts.Simulation.Physics
         public List<TrainCar> Cars = new List<TrainCar>();           // listed front to back
         public int Number;
         public string Name;
+        public string TcsParametersFileName;
         public static int TotalNumber = 1; // start at 1 (0 is reserved for player train)
         public TrainCar FirstCar
         {
@@ -665,11 +664,9 @@ namespace Orts.Simulation.Physics
 
         }
 
-        //================================================================================================//
         /// <summary>
         /// Restore
-        /// <\summary>
-
+        /// </summary>
         public Train(Simulator simulator, BinaryReader inf)
         {
             Init(simulator);
@@ -958,7 +955,11 @@ namespace Orts.Simulation.Physics
             if (count > 0)
             {
                 for (int i = 0; i < count; ++i)
-                    Cars.Add(RollingStock.Restore(simulator, inf, this));
+                {
+                    TrainCar car = RollingStock.Load(simulator, this, inf.ReadString(), false);
+                    car.Restore(inf);
+                    car.Initialize();
+                }
             }
             SetDPUnitIDs(true);
         }
@@ -1019,12 +1020,9 @@ namespace Orts.Simulation.Physics
             }
         }
 
-
-        //================================================================================================//
         /// <summary>
         /// save game state
-        /// <\summary>
-
+        /// </summary>
         public virtual void Save(BinaryWriter outf)
         {
             SaveCars(outf);
@@ -1221,8 +1219,11 @@ namespace Orts.Simulation.Physics
         private void SaveCars(BinaryWriter outf)
         {
             outf.Write(Cars.Count);
-            foreach (TrainCar car in Cars)
-                RollingStock.Save(outf, car);
+            foreach (MSTSWagon wagon in Cars.OfType<MSTSWagon>())
+            {
+                outf.Write(wagon.WagFilePath);
+                wagon.Save(outf);
+            }
         }
 
         static void SaveTrafficSDefinition(BinaryWriter outf, Traffic_Service_Definition thisTSD)
@@ -4269,9 +4270,8 @@ namespace Orts.Simulation.Physics
 
         public void PropagateBrakePressure(float elapsedClockSeconds)
         {
-            if (LeadLocomotiveIndex >= 0)
+            if (LeadLocomotive is MSTSLocomotive lead)
             {
-                MSTSLocomotive lead = (MSTSLocomotive)Cars[LeadLocomotiveIndex];
                 if (lead.TrainBrakeController != null)
                     lead.TrainBrakeController.UpdatePressure(ref EqualReservoirPressurePSIorInHg, elapsedClockSeconds, ref BrakeLine4);
                 if (lead.EngineBrakeController != null)

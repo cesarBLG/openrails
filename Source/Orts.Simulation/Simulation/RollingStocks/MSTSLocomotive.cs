@@ -1751,7 +1751,7 @@ public List<CabView> CabViewList = new List<CabView>();
                 TrainControlSystem.InitializeMoving();
                 TrainBrakeController.InitializeMoving();
                 BrakeSystem.LocoInitializeMoving();
-                EngineBrakeController?.SetPercent(0);
+                EngineBrakeController?.InitializeMoving();
             }
         }
 
@@ -5060,11 +5060,11 @@ public List<CabView> CabViewList = new List<CabView>();
                                     MaxCurrentA = (float)cvc.MaxValue;
                                 if (DynamicBrakeMaxCurrentA == 0)
                                     DynamicBrakeMaxCurrentA = (float)cvc.MinValue;
-                                if (ThrottlePercent > 0)
+                                if (ThrottlePercent >= 0 && DynamicBrakePercent == -1)
                                 {
                                     data = (data / MaxForceN) * MaxCurrentA;
                                 }
-                                if (DynamicBrakePercent > 0)
+                                if (ThrottlePercent == 0 && DynamicBrakePercent >= 0)
                                 {
                                     data = (data / MaxDynamicBrakeForceN) * DynamicBrakeMaxCurrentA;
                                 }
