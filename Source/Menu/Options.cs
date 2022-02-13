@@ -159,7 +159,6 @@ namespace ORTS
             checkReduceMemory.Checked = Settings.ReduceMemory;
 
             // Audio tab
-            checkMSTSBINSound.Checked = Settings.MSTSBINSound;
             numericSoundVolumePercent.Value = Settings.SoundVolumePercent;
             numericSoundDetailLevel.Value = Settings.SoundDetailLevel;
             numericExternalSoundPassThruPercent.Value = Settings.ExternalSoundPassThruPercent;
@@ -468,7 +467,6 @@ private async void OptionsForm_Shown(object sender, EventArgs e)
             Settings.ReduceMemory = checkReduceMemory.Checked;
 
             // Audio tab
-            Settings.MSTSBINSound = checkMSTSBINSound.Checked;
             Settings.SoundVolumePercent = (int)numericSoundVolumePercent.Value;
             Settings.SoundDetailLevel = (int)numericSoundDetailLevel.Value;
             Settings.ExternalSoundPassThruPercent = (int)numericExternalSoundPassThruPercent.Value;
