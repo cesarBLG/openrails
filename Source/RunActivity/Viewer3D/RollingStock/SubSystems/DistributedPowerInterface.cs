@@ -842,16 +842,17 @@ namespace Orts.Viewer3D.RollingStock.SubSystems
                 {
                     numIndices = 6 * (1 + iRow * (1 + (NumColumns - 1) * MaxDigits) + ((iCol - 1) * MaxDigits));
                     numVertices = 4 * (1 + iRow * (1 + (NumColumns - 1) * MaxDigits) + ((iCol - 1) * MaxDigits));
-                    param = DPITable.TableText[iRow, iCol].Text.Substring(2);
+                    param = "";
+                    if (DPITable.TableText[iRow, iCol].Text.Length >= 2) param = DPITable.TableText[iRow, iCol].Text.Substring(2);
                     color = DPITable.TableText[iRow, iCol].Color;
                     for (int iChar = 0; iChar < MaxDigits; iChar++)
                     {
-                        if (iChar == 0)
+                        if (iChar == 0 && param.Length != 0)
                         {
                             tX = GetTextureCoordX(DPITable.TableSymbol[iRow, iCol].Text, 0);
                             tY = GetTextureCoordY(DPITable.TableSymbol[iRow, iCol].Text, 0, color);
                         }
-                        else if (iChar < param.Length + 1)
+                        else if (iChar < param.Length + 1 && param.Length != 0)
                         {
                             tX = GetTextureCoordX(param, iChar - 1);
                             tY = GetTextureCoordY(param, iChar - 1, color);
