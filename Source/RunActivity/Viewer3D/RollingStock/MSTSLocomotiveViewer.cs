@@ -3425,10 +3425,6 @@ namespace Orts.Viewer3D.RollingStock
                 string matrixName = ""; string typeName = ""; AnimatedPartMultiState tmpPart = null;
                 for (int iMatrix = 0; iMatrix < TrainCarShape.SharedShape.MatrixNames.Count; ++iMatrix)
                 {
-                    if (iMatrix == 146)
-                    {
-                        var pippo = 1;
-                    }
                     matrixName = TrainCarShape.SharedShape.MatrixNames[iMatrix].ToUpper();
                     //Name convention
                     //TYPE:Order:Parameter-PartN
@@ -3976,7 +3972,6 @@ namespace Orts.Viewer3D.RollingStock
             shapePrimitive.Mark();
         }
     } // class ThreeDimCabDigit
-
 
     public class ThreeDimCabGaugeNative
     {

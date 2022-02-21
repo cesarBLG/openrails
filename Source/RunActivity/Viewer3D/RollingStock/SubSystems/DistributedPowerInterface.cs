@@ -643,30 +643,23 @@ namespace Orts.Viewer3D.RollingStock.SubSystems
             Matrix rot;
             for (int iRow = 0; iRow < DPITable.NumberOfRowsFull; iRow++)
             {
-                //                tX = 0;
-                //                tY = (headerIndex + 8) * 0.0625f;
-                // blank instead
+                // fill with blanks at startup
                 tX = 0.875f;
                 tY = 0.125f;
-                rot = Matrix.CreateRotationY(-rotation);
                 //the left-bottom vertex
                 Vector3 v = new Vector3(offset.X, offset.Y, 0.01f);
-                v = Vector3.Transform(v, rot);
                 v += start; Vertex v1 = new Vertex(v.X, v.Y, v.Z, 0, 0, -1, tX, tY);
 
                 //the right-bottom vertex
-                v.X = offset.X + Size * 7 * 0.5f; v.Y = offset.Y; v.Z = 0.01f;
-                v = Vector3.Transform(v, rot);
+                v.X = offset.X + Size * 7 * 0.5f; v.Y = offset.Y;
                 v += start; Vertex v2 = new Vertex(v.X, v.Y, v.Z, 0, 0, -1, tX + 0.125f, tY);
 
                 //the right-top vertex
-                v.X = offset.X + Size * 7 * 0.5f; v.Y = offset.Y + Size; v.Z = 0.01f;
-                v = Vector3.Transform(v, rot);
+                v.X = offset.X + Size * 7 * 0.5f; v.Y = offset.Y + Size;
                 v += start; Vertex v3 = new Vertex(v.X, v.Y, v.Z, 0, 0, -1, tX + 0.125f, tY - 0.0625f);
 
                 //the left-top vertex
-                v.X = offset.X; v.Y = offset.Y + Size; v.Z = 0.01f;
-                v = Vector3.Transform(v, rot);
+                v.X = offset.X; v.Y = offset.Y + Size;
                 v += start; Vertex v4 = new Vertex(v.X, v.Y, v.Z, 0, 0, -1, tX, tY - 0.0625f);
 
                 //create first triangle
@@ -696,22 +689,18 @@ namespace Orts.Viewer3D.RollingStock.SubSystems
                         var offX = offset.X + Size * (1 + HeaderMaxDigits + (MaxDigits) * (iCol - 1)) * 0.5f;
                         //the left-bottom vertex
                         Vector3 va = new Vector3(offX , offset.Y, 0.01f);
-                        va = Vector3.Transform(va, rot);
                         va += start; Vertex v5 = new Vertex(va.X, va.Y, va.Z, 0, 0, -1, tX, tY);
 
                         //the right-bottom vertex
-                        va.X = offX + Size * 0.5f; va.Y = offset.Y; va.Z = 0.01f;
-                        va = Vector3.Transform(va, rot);
+                        va.X = offX + Size * 0.5f; va.Y = offset.Y;
                         va += start; Vertex v6 = new Vertex(va.X, va.Y, va.Z, 0, 0, -1, tX + 0.125f, tY);
 
                         //the right-top vertex
-                        va.X = offX + Size * 0.5f; va.Y = offset.Y + Size; va.Z = 0.01f;
-                        va = Vector3.Transform(va, rot);
+                        va.X = offX + Size * 0.5f; va.Y = offset.Y + Size;
                         va += start; Vertex v7 = new Vertex(va.X, va.Y, va.Z, 0, 0, -1, tX + 0.125f, tY - 0.0625f);
 
                         //the left-top vertex
-                        va.X = offX; va.Y = offset.Y + Size; va.Z = 0.01f;
-                        va = Vector3.Transform(va, rot);
+                        va.X = offX; va.Y = offset.Y + Size;
                         va += start; Vertex v8 = new Vertex(va.X, va.Y, va.Z, 0, 0, -1, tX, tY - 0.0625f);
 
                         //create first triangle
@@ -792,8 +781,6 @@ namespace Orts.Viewer3D.RollingStock.SubSystems
             bool Alert = false;
             //            string speed = CVFR.Get3DDigits(out Alert);
             DPITable.PrepareFrame(DPIStatus);
-            string speed = "12345";
-            Debug.Assert(speed.Length <= MaxDigits);
 
  //           NumVertices = NumIndices = 0;
 
@@ -844,6 +831,7 @@ namespace Orts.Viewer3D.RollingStock.SubSystems
                     numVertices = 4 * (1 + iRow * (1 + (NumColumns - 1) * MaxDigits) + ((iCol - 1) * MaxDigits));
                     param = "";
                     if (DPITable.TableText[iRow, iCol].Text.Length >= 2) param = DPITable.TableText[iRow, iCol].Text.Substring(2);
+                    Debug.Assert(param.Length - 1 <= MaxDigits);
                     color = DPITable.TableText[iRow, iCol].Color;
                     for (int iChar = 0; iChar < MaxDigits; iChar++)
                     {
