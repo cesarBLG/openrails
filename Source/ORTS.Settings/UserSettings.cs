@@ -241,7 +241,7 @@ namespace ORTS.Settings
         public int AdhesionMovingAverageFilterSize { get; set; }
         [Default(false)]
         public bool BreakCouplers { get; set; }
-        [Default(false)]
+        [Default(true)]
         public bool CurveResistanceDependent { get; set; }
         [Default(false)]
         public bool CurveSpeedDependent { get; set; }

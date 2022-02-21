@@ -188,7 +188,6 @@ namespace ORTS
             numericAdhesionMovingAverageFilterSize.Enabled = checkUseAdvancedAdhesion.Checked; 
             numericAdhesionMovingAverageFilterSize.Value = Settings.AdhesionMovingAverageFilterSize;
             checkBreakCouplers.Checked = Settings.BreakCouplers;
-            checkCurveResistanceDependent.Checked = Settings.CurveResistanceDependent;
             checkCurveSpeedDependent.Checked = Settings.CurveSpeedDependent;
             checkTunnelResistanceDependent.Checked = Settings.TunnelResistanceDependent;
             checkWindResistanceDependent.Checked = Settings.WindResistanceDependent;
@@ -348,6 +347,7 @@ namespace ORTS
             checkSaveCommands.Checked = Settings.SaveCommands;
             checkReduceMemory.Checked = Settings.ReduceMemory;
             checkFastFullScreenAltTab.Checked = Settings.FastFullScreenAltTab;
+            checkCurveResistanceDependent.Checked = Settings.CurveResistanceDependent;
         }
 
 /*
@@ -492,7 +492,6 @@ private async void OptionsForm_Shown(object sender, EventArgs e)
             Settings.UseAdvancedAdhesion = checkUseAdvancedAdhesion.Checked;
             Settings.AdhesionMovingAverageFilterSize = (int)numericAdhesionMovingAverageFilterSize.Value;
             Settings.BreakCouplers = checkBreakCouplers.Checked;
-            Settings.CurveResistanceDependent = checkCurveResistanceDependent.Checked;
             Settings.CurveSpeedDependent = checkCurveSpeedDependent.Checked;
             Settings.TunnelResistanceDependent = checkTunnelResistanceDependent.Checked;
             Settings.WindResistanceDependent = checkWindResistanceDependent.Checked;
@@ -567,7 +566,7 @@ private async void OptionsForm_Shown(object sender, EventArgs e)
             Settings.SaveCommands = checkSaveCommands.Checked;
             Settings.ReduceMemory = checkReduceMemory.Checked;
             Settings.FastFullScreenAltTab = checkFastFullScreenAltTab.Checked;
-
+            Settings.CurveResistanceDependent = checkCurveResistanceDependent.Checked;
 
             Settings.Save();
         }
