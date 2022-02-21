@@ -192,8 +192,6 @@ namespace ORTS.Settings
         public bool ReduceMemory { get; set; }
 
         // Audio settings:
-        [Default(true)]
-        public bool MSTSBINSound { get; set; }
         [Default(100)]
         public int SoundVolumePercent { get; set; }
         [Default(5)]
@@ -216,8 +214,6 @@ namespace ORTS.Settings
         public bool Wire { get; set; }
         [Default(false)]
         public bool VerticalSync { get; set; }
-        [Default(0)]
-        public int Cab2DStretch { get; set; }
         [Default(2000)]
         public int ViewingDistance { get; set; }
         [Default(true)]

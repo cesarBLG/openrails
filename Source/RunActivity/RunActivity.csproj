@@ -904,7 +904,7 @@ DEL "Program\*.nlp"
 XCOPY "Program\Runactivity.exe"
 XCOPY "Program\Runactivity.pdb"
 REN Runactivity.exe Runactivity32.exe
-Corflags.exe  Program\Runactivity32.exe -32bitpref+
+
 
 
 REN Runactivity.pdb Runactivity32.pdb
