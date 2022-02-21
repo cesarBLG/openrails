@@ -901,6 +901,15 @@ XCOPY "Source\RunActivity\Viewer3D\WebServices\Web" "Program\Content\Web" /S /Y
 DEL "Program\RunActivityLAA.*"
 DEL "Program\RunActivity32.*"
 DEL "Program\*.nlp"
+XCOPY "Program\Runactivity.exe"
+XCOPY "Program\Runactivity.pdb"
+REN Runactivity.exe Runactivity32.exe
+Corflags.exe  Program\Runactivity32.exe -32bitpref+
+
+
+REN Runactivity.pdb Runactivity32.pdb
+XCOPY "Runactivity32.*" "Program"
+DEL "Runactivity32.*"
 </PostBuildEvent>
   </PropertyGroup>
 </Project>
