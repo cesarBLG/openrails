@@ -153,10 +153,6 @@ namespace ORTS
             checkDisableTCSScripts.Checked = Settings.DisableTCSScripts;
             checkEnableWebServer.Checked = Settings.WebServer;
             numericWebServerPort.Value = Settings.WebServerPort;
-            checkEnableWatchdog.Checked = Settings.EnableWatchdog;
-            checkRunAt32bit.Checked = Settings.RunAt32bit;
-            checkSaveCommands.Checked = Settings.SaveCommands;
-            checkReduceMemory.Checked = Settings.ReduceMemory;
 
             // Audio tab
             numericSoundVolumePercent.Value = Settings.SoundVolumePercent;
@@ -166,7 +162,6 @@ namespace ORTS
             // Video tab
             checkDynamicShadows.Checked = Settings.DynamicShadows;
             checkShadowAllShapes.Checked = Settings.ShadowAllShapes;
-            checkFastFullScreenAltTab.Checked = Settings.FastFullScreenAltTab;
             checkWindowGlass.Checked = Settings.WindowGlass;
             checkModelInstancing.Checked = Settings.ModelInstancing;
             checkWire.Checked = Settings.Wire;
@@ -346,6 +341,14 @@ namespace ORTS
             checkCorrectQuestionableBrakingParams.Checked = Settings.CorrectQuestionableBrakingParams;
             numericActRandomizationLevel.Value = Settings.ActRandomizationLevel;
             numericActWeatherRandomizationLevel.Value = Settings.ActWeatherRandomizationLevel;
+
+            // ORNYMG Only tab
+
+            checkEnableWatchdog.Checked = Settings.EnableWatchdog;
+            checkRunAt32bit.Checked = Settings.RunAt32bit;
+            checkSaveCommands.Checked = Settings.SaveCommands;
+            checkReduceMemory.Checked = Settings.ReduceMemory;
+            checkFastFullScreenAltTab.Checked = Settings.FastFullScreenAltTab;
         }
 
 /*
@@ -461,10 +464,6 @@ private async void OptionsForm_Shown(object sender, EventArgs e)
             Settings.Units = comboOtherUnits.SelectedValue.ToString();
             Settings.DisableTCSScripts = checkDisableTCSScripts.Checked;
             Settings.WebServer = checkEnableWebServer.Checked;
-            Settings.EnableWatchdog = checkEnableWatchdog.Checked;
-            Settings.RunAt32bit = checkRunAt32bit.Checked;
-            Settings.SaveCommands = checkSaveCommands.Checked;
-            Settings.ReduceMemory = checkReduceMemory.Checked;
 
             // Audio tab
             Settings.SoundVolumePercent = (int)numericSoundVolumePercent.Value;
@@ -474,7 +473,6 @@ private async void OptionsForm_Shown(object sender, EventArgs e)
             // Video tab
             Settings.DynamicShadows = checkDynamicShadows.Checked;
             Settings.ShadowAllShapes = checkShadowAllShapes.Checked;
-            Settings.FastFullScreenAltTab = checkFastFullScreenAltTab.Checked;
             Settings.WindowGlass = checkWindowGlass.Checked;
             Settings.ModelInstancing = checkModelInstancing.Checked;
             Settings.Wire = checkWire.Checked;
@@ -563,6 +561,15 @@ private async void OptionsForm_Shown(object sender, EventArgs e)
             Settings.CorrectQuestionableBrakingParams = checkCorrectQuestionableBrakingParams.Checked;
             Settings.ActRandomizationLevel = (int)numericActRandomizationLevel.Value;
             Settings.ActWeatherRandomizationLevel = (int)numericActWeatherRandomizationLevel.Value;
+
+            // ORNYMG Only tab
+
+            Settings.EnableWatchdog = checkEnableWatchdog.Checked;
+            Settings.RunAt32bit = checkRunAt32bit.Checked;
+            Settings.SaveCommands = checkSaveCommands.Checked;
+            Settings.ReduceMemory = checkReduceMemory.Checked;
+            Settings.FastFullScreenAltTab = checkFastFullScreenAltTab.Checked;
+
 
             Settings.Save();
         }

@@ -186,9 +186,9 @@ namespace ORTS.Settings
         public bool EnableWatchdog { get; set; }
         [Default(true)]
         public bool RunAt32bit { get; set; }
-        [Default(true)]
-        public bool SaveCommands { get; set; }
         [Default(false)]
+        public bool SaveCommands { get; set; }
+        [Default(true)]
         public bool ReduceMemory { get; set; }
 
         // Audio settings:
@@ -206,7 +206,7 @@ namespace ORTS.Settings
         public bool DynamicShadows { get; set; }
         [Default(false)]
         public bool ShadowAllShapes { get; set; }
-        [Default(false)]
+        [Default(true)]
         public bool FastFullScreenAltTab { get; set; }
         [Default(false)]
         public bool WindowGlass { get; set; }
