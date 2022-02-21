@@ -850,7 +850,7 @@ namespace Orts.Viewer3D.RollingStock.SubSystems
                         if (iChar == 0 && param.Length != 0)
                         {
                             tX = GetTextureCoordX(DPITable.TableSymbol[iRow, iCol].Text, 0);
-                            tY = GetTextureCoordY(DPITable.TableSymbol[iRow, iCol].Text, 0, color);
+                            tY = GetTextureCoordY(DPITable.TableSymbol[iRow, iCol].Text, 0, Color.White);
                         }
                         else if (iChar < param.Length + 1 && param.Length != 0)
                         {
