@@ -81,7 +81,6 @@
             this.AdhesionLevelValue = new System.Windows.Forms.Label();
             this.AdhesionLevelLabel = new System.Windows.Forms.Label();
             this.checkAdhesionPropToWeather = new System.Windows.Forms.CheckBox();
-            this.checkCircularSpeedGauge = new System.Windows.Forms.CheckBox();
             this.checkSignalLightGlow = new System.Windows.Forms.CheckBox();
             this.checkUseMSTSEnv = new System.Windows.Forms.CheckBox();
             this.labelPerformanceTunerTarget = new System.Windows.Forms.Label();
@@ -214,6 +213,7 @@
             this.checkAlerter = new System.Windows.Forms.CheckBox();
             this.tabOptions = new System.Windows.Forms.TabControl();
             this.tabPageORNYMG = new System.Windows.Forms.TabPage();
+            this.checkLODViewingExtention = new System.Windows.Forms.CheckBox();
             this.checkTunnelResistanceDependent = new System.Windows.Forms.CheckBox();
             this.checkWindResistanceDependent = new System.Windows.Forms.CheckBox();
             this.checkCurveResistanceDependent = new System.Windows.Forms.CheckBox();
@@ -222,7 +222,6 @@
             this.checkRunAt32bit = new System.Windows.Forms.CheckBox();
             this.checkEnableWatchdog = new System.Windows.Forms.CheckBox();
             this.checkFastFullScreenAltTab = new System.Windows.Forms.CheckBox();
-            this.checkLODViewingExtention = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.bindingSourceContent)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbLAA)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUseSuperElevation)).BeginInit();
@@ -705,7 +704,6 @@
             this.tabPageExperimental.Controls.Add(this.trackAdhesionFactorChange);
             this.tabPageExperimental.Controls.Add(this.trackAdhesionFactor);
             this.tabPageExperimental.Controls.Add(this.checkAdhesionPropToWeather);
-            this.tabPageExperimental.Controls.Add(this.checkCircularSpeedGauge);
             this.tabPageExperimental.Controls.Add(this.checkSignalLightGlow);
             this.tabPageExperimental.Controls.Add(this.checkUseMSTSEnv);
             this.tabPageExperimental.Controls.Add(this.labelPerformanceTunerTarget);
@@ -993,16 +991,6 @@
             this.checkAdhesionPropToWeather.Text = "Adhesion proportional to rain/snow/fog";
             this.checkAdhesionPropToWeather.UseVisualStyleBackColor = true;
             this.checkAdhesionPropToWeather.CheckedChanged += new System.EventHandler(this.AdhesionPropToWeatherCheckBox_CheckedChanged);
-            // 
-            // checkCircularSpeedGauge
-            // 
-            this.checkCircularSpeedGauge.AutoSize = true;
-            this.checkCircularSpeedGauge.Location = new System.Drawing.Point(6, 212);
-            this.checkCircularSpeedGauge.Name = "checkCircularSpeedGauge";
-            this.checkCircularSpeedGauge.Size = new System.Drawing.Size(156, 17);
-            this.checkCircularSpeedGauge.TabIndex = 21;
-            this.checkCircularSpeedGauge.Text = "ETCS circular speed gauge";
-            this.checkCircularSpeedGauge.UseVisualStyleBackColor = true;
             // 
             // checkSignalLightGlow
             // 
@@ -2674,6 +2662,16 @@
             this.tabPageORNYMG.Text = "ORNYMG Only";
             this.tabPageORNYMG.UseVisualStyleBackColor = true;
             // 
+            // checkLODViewingExtention
+            // 
+            this.checkLODViewingExtention.AutoSize = true;
+            this.checkLODViewingExtention.Location = new System.Drawing.Point(15, 261);
+            this.checkLODViewingExtention.Name = "checkLODViewingExtention";
+            this.checkLODViewingExtention.Size = new System.Drawing.Size(268, 17);
+            this.checkLODViewingExtention.TabIndex = 27;
+            this.checkLODViewingExtention.Text = "Extend object maximum viewing distance to horizon";
+            this.checkLODViewingExtention.UseVisualStyleBackColor = true;
+            // 
             // checkTunnelResistanceDependent
             // 
             this.checkTunnelResistanceDependent.AutoSize = true;
@@ -2757,16 +2755,6 @@
             this.checkFastFullScreenAltTab.TabIndex = 2;
             this.checkFastFullScreenAltTab.Text = "Fast full-screen alt-tab";
             this.checkFastFullScreenAltTab.UseVisualStyleBackColor = true;
-            // 
-            // checkLODViewingExtention
-            // 
-            this.checkLODViewingExtention.AutoSize = true;
-            this.checkLODViewingExtention.Location = new System.Drawing.Point(15, 261);
-            this.checkLODViewingExtention.Name = "checkLODViewingExtention";
-            this.checkLODViewingExtention.Size = new System.Drawing.Size(268, 17);
-            this.checkLODViewingExtention.TabIndex = 27;
-            this.checkLODViewingExtention.Text = "Extend object maximum viewing distance to horizon";
-            this.checkLODViewingExtention.UseVisualStyleBackColor = true;
             // 
             // OptionsForm
             // 
@@ -2895,7 +2883,6 @@
         private System.Windows.Forms.TrackBar trackAdhesionFactorChange;
         private System.Windows.Forms.TrackBar trackAdhesionFactor;
         private System.Windows.Forms.CheckBox checkAdhesionPropToWeather;
-        private System.Windows.Forms.CheckBox checkCircularSpeedGauge;
         private System.Windows.Forms.CheckBox checkSignalLightGlow;
         private System.Windows.Forms.CheckBox checkUseMSTSEnv;
         private System.Windows.Forms.Label labelPerformanceTunerTarget;

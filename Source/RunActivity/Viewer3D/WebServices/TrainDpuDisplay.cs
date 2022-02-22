@@ -35,12 +35,8 @@ namespace Orts.Viewer3D.WebServices
         public struct ListLabel
         {
             public string FirstCol;
-            //public int FirstColWidth;
             public List<string> LastCol;
-            //public List<int> LastColWidth;
             public List<string> SymbolCol;
-            //public bool ChangeColWidth;
-            //public string KeyPressed;
         }
 
         private static bool normalVerticalMode = true;// vertical window size

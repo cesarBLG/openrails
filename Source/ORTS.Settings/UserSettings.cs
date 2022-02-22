@@ -123,6 +123,7 @@ namespace ORTS.Settings
 
         public enum DirectXFeature
         {
+            Level /* Default value which gets replaced with what is supported */,
             Level9_1,
             Level9_3,
             Level10_0,
@@ -317,8 +318,6 @@ namespace ORTS.Settings
         public bool DoubleWire { get; set; }
         [Default(false)]
         public bool AuxActionEnabled { get; set; }
-        [Default(false)]
-        public bool CircularSpeedGauge { get; set; }
         [Default(true)]
         public bool LODViewingExtention { get; set; }
         [Default(false)]
@@ -365,6 +364,14 @@ namespace ORTS.Settings
         public string LoggingPath { get; set; }
         [Default("")]
         public string ScreenshotPath { get; set; }
+        [Default("")]
+        public string DirectXFeatureLevel
+        {
+            get => DirectXFeatureEnum.ToString().Replace("Level", "");
+            set => DirectXFeatureEnum = (DirectXFeature)Enum.Parse(typeof(DirectXFeature), "Level" + value);
+        }
+        DirectXFeature DirectXFeatureEnum;
+        public bool IsDirectXFeatureLevelIncluded(DirectXFeature level) => level <= DirectXFeatureEnum;
         [Default(true)]
         public bool ShadowMapBlur { get; set; }
         [Default(4)]
