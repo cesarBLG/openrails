@@ -1,5 +1,5 @@
-﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.118
-February 12th, 2022
+﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.119
+February 22nd, 2022
 
 Please note that the installation and use of Open Rails software, even of its unofficial versions, is governed by the Open Rails End User License Agreement. 
 
@@ -11,7 +11,7 @@ INSTALLATION
 
 
 RELEASE NOTES
-This unofficial version has been derived from the latest official Testing release T1.4-209.
+This unofficial version has been derived from the latest official Testing release T1.4-237 and from the official master branch up to date.
 
 
 This version includes some features not (yet) available in the Open Rails testing official version, that is:
@@ -48,11 +48,12 @@ This version includes some features not (yet) available in the Open Rails testin
 - Bug fix for https://bugs.launchpad.net/or/+bug/1950578 Dyn Brake set up state not disappearing in cab
 - workaround for http://www.elvastower.com/forums/index.php?/topic/32640-or-newyear-mg/page__view__findpost__p__278074 
 - EOT management, see http://www.elvastower.com/forums/index.php?/topic/35912-eot/ 
-- enable also Firebox cab control to be laid in any cabviewpoint
-- NEW: CruiseControl: added KeepSelectedSpeedWhenManualModeSet, see http://www.elvastower.com/forums/index.php?/topic/33841-cruise-control/page__view__findpost__p__281915
-- NEW: Fix bug of wagon smoke not appearing when Reduce Memory Usage option set, see http://www.elvastower.com/forums/index.php?/topic/35975-recent-mg-versions-smoking-caboose-has-stopped-smoking/
-- NEW: Bug fix for http://www.elvastower.com/forums/index.php?/topic/35981-walking-people-dont-walk-well/
-- NEW: Fix for https://bugs.launchpad.net/or/+bug/1960519. Crash, diesel locomotive with vacuum brakes, by mbm_OR
+- Fix bug of wagon smoke not appearing when Reduce Memory Usage option set, see http://www.elvastower.com/forums/index.php?/topic/35975-recent-mg-versions-smoking-caboose-has-stopped-smoking/
+- NEW: "ORNYMG only" option tab, including all option checkboxes available only in ORNYMG
+- NEW: Distributed power display in 3D cabs, see http://www.elvastower.com/forums/index.php?/topic/26249-remote-control-dpu-units/page__view__findpost__p__282473
+- NEW: Fix HUD DPI labels misalignment, by mbm_OR
+- NEW: Bug fix for http://www.elvastower.com/forums/index.php?/topic/36021-crash-on-switching-to-autopilot/#entry282465
+
 
 
 The Monogame related code intentionally coincides only partly with the code of the OR official testing version.
