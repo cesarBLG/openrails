@@ -2970,7 +2970,6 @@ namespace Orts.Simulation.RollingStocks
                         {
                             PrevCarLead = false;
                         }
-
                     }
 
                     // If tender is coupled to a trailing locomotive then reduce resistance
@@ -2978,11 +2977,8 @@ namespace Orts.Simulation.RollingStocks
                     {
                         LateralWindResistanceForceN *= TrailLocoResistanceFactor;
                     }
-
                 }
-
-                    WindForceN = LateralWindResistanceForceN + WindDragResistanceForceN;
-
+                WindForceN = LateralWindResistanceForceN + WindDragResistanceForceN;
             }
             else
             {

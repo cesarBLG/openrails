@@ -245,9 +245,9 @@ namespace ORTS.Settings
         public bool CurveResistanceDependent { get; set; }
         [Default(false)]
         public bool CurveSpeedDependent { get; set; }
-        [Default(false)]
+        [Default(true)]
         public bool TunnelResistanceDependent { get; set; }
-        [Default(false)]
+        [Default(true)]
         public bool WindResistanceDependent { get; set; }
         [Default(false)]
         public bool OverrideNonElectrifiedRoutes { get; set; }
