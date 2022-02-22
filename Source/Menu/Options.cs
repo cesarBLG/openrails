@@ -322,7 +322,6 @@ namespace ORTS
             checkConditionalLoadOfNightTextures.Checked = Settings.ConditionalLoadOfDayOrNightTextures;
             checkSignalLightGlow.Checked = Settings.SignalLightGlow;
             checkCircularSpeedGauge.Checked = Settings.CircularSpeedGauge;
-            checkLODViewingExtention.Checked = Settings.LODViewingExtention;
             checkPreferDDSTexture.Checked = Settings.PreferDDSTexture;
             checkUseLocationPassingPaths.Checked = Settings.UseLocationPassingPaths;
             checkUseMSTSEnv.Checked = Settings.UseMSTSEnv;
@@ -348,6 +347,7 @@ namespace ORTS
             checkCurveResistanceDependent.Checked = Settings.CurveResistanceDependent;
             checkTunnelResistanceDependent.Checked = Settings.TunnelResistanceDependent;
             checkWindResistanceDependent.Checked = Settings.WindResistanceDependent;
+            checkLODViewingExtention.Checked = Settings.LODViewingExtention;
         }
 
 /*
@@ -542,7 +542,6 @@ private async void OptionsForm_Shown(object sender, EventArgs e)
             Settings.ConditionalLoadOfDayOrNightTextures = checkConditionalLoadOfNightTextures.Checked;
             Settings.SignalLightGlow = checkSignalLightGlow.Checked;
             Settings.CircularSpeedGauge = checkCircularSpeedGauge.Checked;
-            Settings.LODViewingExtention = checkLODViewingExtention.Checked;
             Settings.PreferDDSTexture = checkPreferDDSTexture.Checked;
             Settings.UseLocationPassingPaths = checkUseLocationPassingPaths.Checked;
             Settings.UseMSTSEnv = checkUseMSTSEnv.Checked;
@@ -567,6 +566,7 @@ private async void OptionsForm_Shown(object sender, EventArgs e)
             Settings.CurveResistanceDependent = checkCurveResistanceDependent.Checked;
             Settings.TunnelResistanceDependent = checkTunnelResistanceDependent.Checked;
             Settings.WindResistanceDependent = checkWindResistanceDependent.Checked;
+            Settings.LODViewingExtention = checkLODViewingExtention.Checked;
 
             Settings.Save();
         }

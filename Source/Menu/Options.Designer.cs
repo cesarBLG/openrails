@@ -29,8 +29,8 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             this.buttonOK = new System.Windows.Forms.Button();
             this.buttonCancel = new System.Windows.Forms.Button();
             this.bindingSourceContent = new System.Windows.Forms.BindingSource(this.components);
@@ -86,7 +86,6 @@
             this.checkUseMSTSEnv = new System.Windows.Forms.CheckBox();
             this.labelPerformanceTunerTarget = new System.Windows.Forms.Label();
             this.checkPerformanceTuner = new System.Windows.Forms.CheckBox();
-            this.checkLODViewingExtention = new System.Windows.Forms.CheckBox();
             this.label8 = new System.Windows.Forms.Label();
             this.numericSuperElevationGauge = new System.Windows.Forms.NumericUpDown();
             this.label7 = new System.Windows.Forms.Label();
@@ -215,14 +214,15 @@
             this.checkAlerter = new System.Windows.Forms.CheckBox();
             this.tabOptions = new System.Windows.Forms.TabControl();
             this.tabPageORNYMG = new System.Windows.Forms.TabPage();
+            this.checkTunnelResistanceDependent = new System.Windows.Forms.CheckBox();
+            this.checkWindResistanceDependent = new System.Windows.Forms.CheckBox();
+            this.checkCurveResistanceDependent = new System.Windows.Forms.CheckBox();
             this.checkReduceMemory = new System.Windows.Forms.CheckBox();
             this.checkSaveCommands = new System.Windows.Forms.CheckBox();
             this.checkRunAt32bit = new System.Windows.Forms.CheckBox();
             this.checkEnableWatchdog = new System.Windows.Forms.CheckBox();
             this.checkFastFullScreenAltTab = new System.Windows.Forms.CheckBox();
-            this.checkCurveResistanceDependent = new System.Windows.Forms.CheckBox();
-            this.checkTunnelResistanceDependent = new System.Windows.Forms.CheckBox();
-            this.checkWindResistanceDependent = new System.Windows.Forms.CheckBox();
+            this.checkLODViewingExtention = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.bindingSourceContent)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbLAA)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUseSuperElevation)).BeginInit();
@@ -711,7 +711,6 @@
             this.tabPageExperimental.Controls.Add(this.labelPerformanceTunerTarget);
             this.tabPageExperimental.Controls.Add(this.numericPerformanceTunerTarget);
             this.tabPageExperimental.Controls.Add(this.checkPerformanceTuner);
-            this.tabPageExperimental.Controls.Add(this.checkLODViewingExtention);
             this.tabPageExperimental.Controls.Add(this.label8);
             this.tabPageExperimental.Controls.Add(this.numericSuperElevationGauge);
             this.tabPageExperimental.Controls.Add(this.label7);
@@ -1046,16 +1045,6 @@
             this.checkPerformanceTuner.UseVisualStyleBackColor = true;
             this.checkPerformanceTuner.Click += new System.EventHandler(this.checkPerformanceTuner_Click);
             // 
-            // checkLODViewingExtention
-            // 
-            this.checkLODViewingExtention.AutoSize = true;
-            this.checkLODViewingExtention.Location = new System.Drawing.Point(304, 166);
-            this.checkLODViewingExtention.Name = "checkLODViewingExtention";
-            this.checkLODViewingExtention.Size = new System.Drawing.Size(268, 17);
-            this.checkLODViewingExtention.TabIndex = 22;
-            this.checkLODViewingExtention.Text = "Extend object maximum viewing distance to horizon";
-            this.checkLODViewingExtention.UseVisualStyleBackColor = true;
-            // 
             // label8
             // 
             this.label8.AutoSize = true;
@@ -1305,27 +1294,27 @@
             this.dataGridViewContent.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.dataGridViewContent.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None;
             this.dataGridViewContent.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
-            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle5.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle5.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle5.ForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle5.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle5.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle5.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dataGridViewContent.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle5;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dataGridViewContent.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             this.dataGridViewContent.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
             this.dataGridViewContent.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.nameDataGridViewTextBoxColumn,
             this.pathDataGridViewTextBoxColumn});
             this.dataGridViewContent.DataSource = this.bindingSourceContent;
-            dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle6.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle6.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle6.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle6.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle6.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.dataGridViewContent.DefaultCellStyle = dataGridViewCellStyle6;
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.dataGridViewContent.DefaultCellStyle = dataGridViewCellStyle2;
             this.dataGridViewContent.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dataGridViewContent.Location = new System.Drawing.Point(0, 0);
             this.dataGridViewContent.MultiSelect = false;
@@ -2668,6 +2657,7 @@
             // 
             // tabPageORNYMG
             // 
+            this.tabPageORNYMG.Controls.Add(this.checkLODViewingExtention);
             this.tabPageORNYMG.Controls.Add(this.checkTunnelResistanceDependent);
             this.tabPageORNYMG.Controls.Add(this.checkWindResistanceDependent);
             this.tabPageORNYMG.Controls.Add(this.checkCurveResistanceDependent);
@@ -2683,6 +2673,36 @@
             this.tabPageORNYMG.TabIndex = 11;
             this.tabPageORNYMG.Text = "ORNYMG Only";
             this.tabPageORNYMG.UseVisualStyleBackColor = true;
+            // 
+            // checkTunnelResistanceDependent
+            // 
+            this.checkTunnelResistanceDependent.AutoSize = true;
+            this.checkTunnelResistanceDependent.Location = new System.Drawing.Point(15, 189);
+            this.checkTunnelResistanceDependent.Name = "checkTunnelResistanceDependent";
+            this.checkTunnelResistanceDependent.Size = new System.Drawing.Size(164, 17);
+            this.checkTunnelResistanceDependent.TabIndex = 26;
+            this.checkTunnelResistanceDependent.Text = "Tunnel dependent resistance";
+            this.checkTunnelResistanceDependent.UseVisualStyleBackColor = true;
+            // 
+            // checkWindResistanceDependent
+            // 
+            this.checkWindResistanceDependent.AutoSize = true;
+            this.checkWindResistanceDependent.Location = new System.Drawing.Point(15, 212);
+            this.checkWindResistanceDependent.Name = "checkWindResistanceDependent";
+            this.checkWindResistanceDependent.Size = new System.Drawing.Size(156, 17);
+            this.checkWindResistanceDependent.TabIndex = 25;
+            this.checkWindResistanceDependent.Text = "Wind dependent resistance";
+            this.checkWindResistanceDependent.UseVisualStyleBackColor = true;
+            // 
+            // checkCurveResistanceDependent
+            // 
+            this.checkCurveResistanceDependent.AutoSize = true;
+            this.checkCurveResistanceDependent.Location = new System.Drawing.Point(15, 166);
+            this.checkCurveResistanceDependent.Name = "checkCurveResistanceDependent";
+            this.checkCurveResistanceDependent.Size = new System.Drawing.Size(159, 17);
+            this.checkCurveResistanceDependent.TabIndex = 24;
+            this.checkCurveResistanceDependent.Text = "Curve dependent resistance";
+            this.checkCurveResistanceDependent.UseVisualStyleBackColor = true;
             // 
             // checkReduceMemory
             // 
@@ -2738,35 +2758,15 @@
             this.checkFastFullScreenAltTab.Text = "Fast full-screen alt-tab";
             this.checkFastFullScreenAltTab.UseVisualStyleBackColor = true;
             // 
-            // checkCurveResistanceDependent
+            // checkLODViewingExtention
             // 
-            this.checkCurveResistanceDependent.AutoSize = true;
-            this.checkCurveResistanceDependent.Location = new System.Drawing.Point(15, 166);
-            this.checkCurveResistanceDependent.Name = "checkCurveResistanceDependent";
-            this.checkCurveResistanceDependent.Size = new System.Drawing.Size(159, 17);
-            this.checkCurveResistanceDependent.TabIndex = 24;
-            this.checkCurveResistanceDependent.Text = "Curve dependent resistance";
-            this.checkCurveResistanceDependent.UseVisualStyleBackColor = true;
-            // 
-            // checkTunnelResistanceDependent
-            // 
-            this.checkTunnelResistanceDependent.AutoSize = true;
-            this.checkTunnelResistanceDependent.Location = new System.Drawing.Point(15, 189);
-            this.checkTunnelResistanceDependent.Name = "checkTunnelResistanceDependent";
-            this.checkTunnelResistanceDependent.Size = new System.Drawing.Size(164, 17);
-            this.checkTunnelResistanceDependent.TabIndex = 26;
-            this.checkTunnelResistanceDependent.Text = "Tunnel dependent resistance";
-            this.checkTunnelResistanceDependent.UseVisualStyleBackColor = true;
-            // 
-            // checkWindResistanceDependent
-            // 
-            this.checkWindResistanceDependent.AutoSize = true;
-            this.checkWindResistanceDependent.Location = new System.Drawing.Point(15, 212);
-            this.checkWindResistanceDependent.Name = "checkWindResistanceDependent";
-            this.checkWindResistanceDependent.Size = new System.Drawing.Size(156, 17);
-            this.checkWindResistanceDependent.TabIndex = 25;
-            this.checkWindResistanceDependent.Text = "Wind dependent resistance";
-            this.checkWindResistanceDependent.UseVisualStyleBackColor = true;
+            this.checkLODViewingExtention.AutoSize = true;
+            this.checkLODViewingExtention.Location = new System.Drawing.Point(15, 261);
+            this.checkLODViewingExtention.Name = "checkLODViewingExtention";
+            this.checkLODViewingExtention.Size = new System.Drawing.Size(268, 17);
+            this.checkLODViewingExtention.TabIndex = 27;
+            this.checkLODViewingExtention.Text = "Extend object maximum viewing distance to horizon";
+            this.checkLODViewingExtention.UseVisualStyleBackColor = true;
             // 
             // OptionsForm
             // 
@@ -2901,7 +2901,6 @@
         private System.Windows.Forms.Label labelPerformanceTunerTarget;
         private System.Windows.Forms.NumericUpDown numericPerformanceTunerTarget;
         private System.Windows.Forms.CheckBox checkPerformanceTuner;
-        private System.Windows.Forms.CheckBox checkLODViewingExtention;
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.NumericUpDown numericSuperElevationGauge;
         private System.Windows.Forms.Label label7;
@@ -3054,5 +3053,6 @@
         private System.Windows.Forms.CheckBox checkCurveResistanceDependent;
         private System.Windows.Forms.CheckBox checkTunnelResistanceDependent;
         private System.Windows.Forms.CheckBox checkWindResistanceDependent;
+        private System.Windows.Forms.CheckBox checkLODViewingExtention;
     }
 }

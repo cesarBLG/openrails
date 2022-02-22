@@ -319,7 +319,7 @@ namespace ORTS.Settings
         public bool AuxActionEnabled { get; set; }
         [Default(false)]
         public bool CircularSpeedGauge { get; set; }
-        [Default(false)]
+        [Default(true)]
         public bool LODViewingExtention { get; set; }
         [Default(false)]
         public bool PreferDDSTexture { get; set; }
