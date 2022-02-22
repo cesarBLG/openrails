@@ -833,6 +833,7 @@ namespace Orts.Viewer3D.RollingStock.SubSystems
                     if (DPITable.TableText[iRow, iCol].Text.Length >= 2) param = DPITable.TableText[iRow, iCol].Text.Substring(2);
                     Debug.Assert(param.Length - 1 <= MaxDigits);
                     color = DPITable.TableText[iRow, iCol].Color;
+                    var leadingSpaces = 0;
                     for (int iChar = 0; iChar < MaxDigits; iChar++)
                     {
                         if (iChar == 0 && param.Length != 0)
@@ -840,10 +841,24 @@ namespace Orts.Viewer3D.RollingStock.SubSystems
                             tX = GetTextureCoordX(DPITable.TableSymbol[iRow, iCol].Text, 0);
                             tY = GetTextureCoordY(DPITable.TableSymbol[iRow, iCol].Text, 0, Color.White);
                         }
-                        else if (iChar < param.Length + 1 && param.Length != 0)
+                        else if (iChar == 1 && param.Length < 5)
                         {
-                            tX = GetTextureCoordX(param, iChar - 1);
-                            tY = GetTextureCoordY(param, iChar - 1, color);
+                            // Add a leading space
+                            tX = 0.875f;
+                            tY = 0.125f;
+                            leadingSpaces++ ;
+                        }
+                        else if (iChar == 2 && param.Length < 3)
+                        {
+                            // Add a further leading space
+                            tX = 0.875f;
+                            tY = 0.125f;
+                            leadingSpaces++ ;
+                        }
+                        else if (iChar < param.Length + 1 + leadingSpaces && param.Length != 0)
+                        {
+                            tX = GetTextureCoordX(param, iChar - 1 - leadingSpaces);
+                            tY = GetTextureCoordY(param, iChar - 1 - leadingSpaces, color);
                         }
                         else // space
                         {
