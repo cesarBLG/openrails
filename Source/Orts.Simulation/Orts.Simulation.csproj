@@ -31,6 +31,8 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
     <OutputPath>..\..\Program\</OutputPath>
     <DefineConstants>TRACE;ACTIVITY_EDITOR</DefineConstants>
     <DocumentationFile>..\..\Program\Orts.Simulation.xml</DocumentationFile>
