@@ -340,6 +340,7 @@ namespace ORTS
             checkSaveCommands.Checked = Settings.SaveCommands;
             checkReduceMemory.Checked = Settings.ReduceMemory;
             checkFastFullScreenAltTab.Checked = Settings.FastFullScreenAltTab;
+            numericCab2DStretch.Value = Settings.Cab2DStretch;
             checkCurveResistanceDependent.Checked = Settings.CurveResistanceDependent;
             checkTunnelResistanceDependent.Checked = Settings.TunnelResistanceDependent;
             checkWindResistanceDependent.Checked = Settings.WindResistanceDependent;
@@ -555,6 +556,7 @@ private async void OptionsForm_Shown(object sender, EventArgs e)
             Settings.SaveCommands = checkSaveCommands.Checked;
             Settings.ReduceMemory = checkReduceMemory.Checked;
             Settings.FastFullScreenAltTab = checkFastFullScreenAltTab.Checked;
+            Settings.Cab2DStretch = (int)numericCab2DStretch.Value;
             Settings.CurveResistanceDependent = checkCurveResistanceDependent.Checked;
             Settings.TunnelResistanceDependent = checkTunnelResistanceDependent.Checked;
             Settings.WindResistanceDependent = checkWindResistanceDependent.Checked;

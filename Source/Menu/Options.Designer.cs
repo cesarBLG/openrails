@@ -218,6 +218,8 @@
             this.checkRunAt32bit = new System.Windows.Forms.CheckBox();
             this.checkEnableWatchdog = new System.Windows.Forms.CheckBox();
             this.checkFastFullScreenAltTab = new System.Windows.Forms.CheckBox();
+            this.numericCab2DStretch = new System.Windows.Forms.NumericUpDown();
+            this.labelCab2DStretch = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.bindingSourceContent)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbLAA)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUseSuperElevation)).BeginInit();
@@ -276,6 +278,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.numericBrakePipeChargingRate)).BeginInit();
             this.tabOptions.SuspendLayout();
             this.tabPageORNYMG.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericCab2DStretch)).BeginInit();
             this.SuspendLayout();
             // 
             // buttonOK
@@ -2592,6 +2595,8 @@
             // 
             // tabPageORNYMG
             // 
+            this.tabPageORNYMG.Controls.Add(this.numericCab2DStretch);
+            this.tabPageORNYMG.Controls.Add(this.labelCab2DStretch);
             this.tabPageORNYMG.Controls.Add(this.checkLODViewingExtention);
             this.tabPageORNYMG.Controls.Add(this.checkTunnelResistanceDependent);
             this.tabPageORNYMG.Controls.Add(this.checkWindResistanceDependent);
@@ -2703,6 +2708,30 @@
             this.checkFastFullScreenAltTab.Text = "Fast full-screen alt-tab";
             this.checkFastFullScreenAltTab.UseVisualStyleBackColor = true;
             // 
+            // numericCab2DStretch
+            // 
+            this.numericCab2DStretch.Increment = new decimal(new int[] {
+            25,
+            0,
+            0,
+            0});
+            this.numericCab2DStretch.Location = new System.Drawing.Point(15, 235);
+            this.numericCab2DStretch.Name = "numericCab2DStretch";
+            this.numericCab2DStretch.Size = new System.Drawing.Size(54, 20);
+            this.numericCab2DStretch.TabIndex = 28;
+            this.toolTip1.SetToolTip(this.numericCab2DStretch, "0 to clip cab view, 100 to stretch it. For cab views that match the display, use " +
+        "100.");
+            // 
+            // labelCab2DStretch
+            // 
+            this.labelCab2DStretch.AutoSize = true;
+            this.labelCab2DStretch.Location = new System.Drawing.Point(75, 237);
+            this.labelCab2DStretch.Margin = new System.Windows.Forms.Padding(3);
+            this.labelCab2DStretch.Name = "labelCab2DStretch";
+            this.labelCab2DStretch.Size = new System.Drawing.Size(88, 13);
+            this.labelCab2DStretch.TabIndex = 29;
+            this.labelCab2DStretch.Text = "% cab 2D stretch";
+            // 
             // OptionsForm
             // 
             this.AcceptButton = this.buttonOK;
@@ -2790,6 +2819,7 @@
             this.tabOptions.ResumeLayout(false);
             this.tabPageORNYMG.ResumeLayout(false);
             this.tabPageORNYMG.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericCab2DStretch)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -2983,5 +3013,7 @@
         private System.Windows.Forms.CheckBox checkTunnelResistanceDependent;
         private System.Windows.Forms.CheckBox checkWindResistanceDependent;
         private System.Windows.Forms.CheckBox checkLODViewingExtention;
+        private System.Windows.Forms.NumericUpDown numericCab2DStretch;
+        private System.Windows.Forms.Label labelCab2DStretch;
     }
 }
