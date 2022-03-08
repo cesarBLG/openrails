@@ -34,6 +34,7 @@ therefore will not see the alerter warning, selecting the related option
 
 
 .. _options-control-confirmations:
+
 Control confirmations
 ---------------------
 
@@ -55,23 +56,6 @@ or "Replay ended" but you cannot suppress these system messages.
 Control confirmations can also be toggled on and off at runtime using the 
 key combination Ctrl-Alt-F10. 
 
-
-.. _options-map-window:
-
-Map window
------------------
-
-It is suggested to always select this option. When this option is selected,
-pressing ``<Ctrl+9>`` at runtime creates an additional window like the
-following. This window coexists with the main Open Rails window, and
-``<Alt+Tab>`` switches between it and the Open Rails window. See the related
-option :ref:`Fast fullscreen Alt+Tab <options-fullscreen>`.
-
-Through this window you can monitor train movements and also influence
-them, by setting signals and switches. A complete description of the
-dispatcher tab can be found :ref:`here <driving-dispatcher>`.
-
-.. image:: images/options-dispatcher.png
 
 Graduated release air brakes
 ----------------------------
@@ -438,8 +422,6 @@ described in detail :ref:`here <physics-wind-resistance>`
 Run electric locos on non-electrified routes
 --------------------------------------------
 
-This option allows the running of electric locomotives on non-electrified routes.
-
 Steam locomotive hot start
 --------------------------
 
@@ -663,17 +645,6 @@ Show shape warnings
 When this option is selected, when OR is loading the shape (.s) files it
 will report errors in syntax and structure (even if these don't cause
 runtime errors) in the :ref:`Log file <driving-logfile>` ``OpenRailsLog.txt`` on the desktop.
-
-Load day/night textures only when needed
-----------------------------------------
-
-As a default OR loads night textures together with the day textures both at
-daytime and nighttime. When this option is selected, to reduce loading time and reduce
-memory used, night textures are not loaded in the daytime and are only
-loaded at sunset (if the game continues through sunset time); analogously day
-textures are not loaded in the nighttime if the related night textures are
-available, and are only loaded at sunrise (if the game continues through sunrise
-time).
 
 Signal light glow
 -----------------

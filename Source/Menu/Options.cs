@@ -143,7 +143,6 @@ namespace ORTS
             checkAlerterExternal.Checked = Settings.Alerter && !Settings.AlerterDisableExternal;
             checkOverspeedMonitor.Checked = Settings.SpeedControl;
             checkControlConfirmations.Checked = !Settings.SuppressConfirmations;
-            checkViewMapWindow.Checked = Settings.ViewDispatcher;
             checkRetainers.Checked = Settings.RetainersOnAllCars;
             checkGraduatedRelease.Checked = Settings.GraduatedRelease;
             numericBrakePipeChargingRate.Value = Settings.BrakePipeChargingRate;
@@ -189,7 +188,6 @@ namespace ORTS
             numericAdhesionMovingAverageFilterSize.Value = Settings.AdhesionMovingAverageFilterSize;
             checkBreakCouplers.Checked = Settings.BreakCouplers;
             checkCurveSpeedDependent.Checked = Settings.CurveSpeedDependent;
-            checkOverrideNonElectrifiedRoutes.Checked = Settings.OverrideNonElectrifiedRoutes;
             checkHotStart.Checked = Settings.HotStart;
             checkForcedRedAtStationStops.Checked = !Settings.NoForcedRedAtStationStops;
             checkDoorsAITrains.Checked = Settings.OpenDoorsInAITrains;
@@ -319,7 +317,6 @@ namespace ORTS
             numericPerformanceTunerTarget.Value = Settings.PerformanceTunerTarget;
             trackLODBias.Value = Settings.LODBias;
             trackLODBias_ValueChanged(null, null);
-            checkConditionalLoadOfNightTextures.Checked = Settings.ConditionalLoadOfDayOrNightTextures;
             checkSignalLightGlow.Checked = Settings.SignalLightGlow;
             checkPreferDDSTexture.Checked = Settings.PreferDDSTexture;
             checkUseLocationPassingPaths.Checked = Settings.UseLocationPassingPaths;
@@ -453,7 +450,6 @@ private async void OptionsForm_Shown(object sender, EventArgs e)
             Settings.AlerterDisableExternal = !checkAlerterExternal.Checked;
             Settings.SpeedControl = checkOverspeedMonitor.Checked;
             Settings.SuppressConfirmations = !checkControlConfirmations.Checked;
-            Settings.ViewDispatcher = checkViewMapWindow.Checked;
             Settings.RetainersOnAllCars = checkRetainers.Checked;
             Settings.GraduatedRelease = checkGraduatedRelease.Checked;
             Settings.BrakePipeChargingRate = (int)numericBrakePipeChargingRate.Value;
@@ -492,7 +488,6 @@ private async void OptionsForm_Shown(object sender, EventArgs e)
             Settings.AdhesionMovingAverageFilterSize = (int)numericAdhesionMovingAverageFilterSize.Value;
             Settings.BreakCouplers = checkBreakCouplers.Checked;
             Settings.CurveSpeedDependent = checkCurveSpeedDependent.Checked;
-            Settings.OverrideNonElectrifiedRoutes = checkOverrideNonElectrifiedRoutes.Checked;
             Settings.HotStart = checkHotStart.Checked;
             Settings.NoForcedRedAtStationStops = !checkForcedRedAtStationStops.Checked;
             Settings.OpenDoorsInAITrains = checkDoorsAITrains.Checked;
@@ -538,7 +533,6 @@ private async void OptionsForm_Shown(object sender, EventArgs e)
             Settings.PerformanceTuner = checkPerformanceTuner.Checked;
             Settings.PerformanceTunerTarget = (int)numericPerformanceTunerTarget.Value;
             Settings.LODBias = trackLODBias.Value;
-            Settings.ConditionalLoadOfDayOrNightTextures = checkConditionalLoadOfNightTextures.Checked;
             Settings.SignalLightGlow = checkSignalLightGlow.Checked;
             Settings.PreferDDSTexture = checkPreferDDSTexture.Checked;
             Settings.UseLocationPassingPaths = checkUseLocationPassingPaths.Checked;
@@ -860,7 +854,6 @@ private async void OptionsForm_Shown(object sender, EventArgs e)
             {
                 (pbAlerter, new[] { checkAlerter }),
                 (pbControlConfirmations, new[] { checkControlConfirmations }),
-                (pbMapWindow, new[] { checkViewMapWindow }),
                 (pbRetainers, new[] { checkRetainers }),
                 (pbGraduatedRelease, new[] { checkGraduatedRelease }),
                 (pbBrakePipeChargingRate, new[] { lBrakePipeChargingRate }),
@@ -897,15 +890,6 @@ private async void OptionsForm_Shown(object sender, EventArgs e)
                 {
                     pbControlConfirmations,
                     baseUrl + "/options.html#control-confirmations"
-                },
-                {
-                    pbMapWindow,
-                    // This URL is temporary, waiting for https://open-rails.readthedocs.io to be updated to match the Manual in PDF format.
-                    baseUrl + "/options.html#dispatcher-window"
-                },
-                {
-                    pbLAA,
-                    baseUrl + "/options.html#large-address-aware-binaries"
                 },
                 {
                     pbRetainers,

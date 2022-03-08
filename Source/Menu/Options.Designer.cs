@@ -77,7 +77,6 @@
             this.AdhesionFactorValueLabel = new System.Windows.Forms.Label();
             this.labelLODBias = new System.Windows.Forms.Label();
             this.checkShapeWarnings = new System.Windows.Forms.CheckBox();
-            this.checkConditionalLoadOfNightTextures = new System.Windows.Forms.CheckBox();
             this.AdhesionLevelValue = new System.Windows.Forms.Label();
             this.AdhesionLevelLabel = new System.Windows.Forms.Label();
             this.checkAdhesionPropToWeather = new System.Windows.Forms.CheckBox();
@@ -146,7 +145,6 @@
             this.checkHotStart = new System.Windows.Forms.CheckBox();
             this.checkSimpleControlsPhysics = new System.Windows.Forms.CheckBox();
             this.checkCurveSpeedDependent = new System.Windows.Forms.CheckBox();
-            this.checkOverrideNonElectrifiedRoutes = new System.Windows.Forms.CheckBox();
             this.labelAdhesionMovingAverageFilterSize = new System.Windows.Forms.Label();
             this.numericAdhesionMovingAverageFilterSize = new System.Windows.Forms.NumericUpDown();
             this.checkBreakCouplers = new System.Windows.Forms.CheckBox();
@@ -191,7 +189,6 @@
             this.pbRetainers = new System.Windows.Forms.PictureBox();
             this.pbAlerter = new System.Windows.Forms.PictureBox();
             this.pbControlConfirmations = new System.Windows.Forms.PictureBox();
-            this.pbMapWindow = new System.Windows.Forms.PictureBox();
             this.labelPortNumber = new System.Windows.Forms.Label();
             this.numericWebServerPort = new System.Windows.Forms.NumericUpDown();
             this.checkEnableWebServer = new System.Windows.Forms.CheckBox();
@@ -203,7 +200,6 @@
             this.comboPressureUnit = new System.Windows.Forms.ComboBox();
             this.labelLanguage = new System.Windows.Forms.Label();
             this.comboLanguage = new System.Windows.Forms.ComboBox();
-            this.checkViewMapWindow = new System.Windows.Forms.CheckBox();
             this.checkControlConfirmations = new System.Windows.Forms.CheckBox();
             this.checkAlerterExternal = new System.Windows.Forms.CheckBox();
             this.numericBrakePipeChargingRate = new System.Windows.Forms.NumericUpDown();
@@ -276,7 +272,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.pbRetainers)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbAlerter)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbControlConfirmations)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pbMapWindow)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericWebServerPort)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericBrakePipeChargingRate)).BeginInit();
             this.tabOptions.SuspendLayout();
@@ -698,7 +693,6 @@
             this.tabPageExperimental.Controls.Add(this.labelLODBias);
             this.tabPageExperimental.Controls.Add(this.checkShapeWarnings);
             this.tabPageExperimental.Controls.Add(this.trackLODBias);
-            this.tabPageExperimental.Controls.Add(this.checkConditionalLoadOfNightTextures);
             this.tabPageExperimental.Controls.Add(this.AdhesionLevelValue);
             this.tabPageExperimental.Controls.Add(this.AdhesionLevelLabel);
             this.tabPageExperimental.Controls.Add(this.trackAdhesionFactorChange);
@@ -953,16 +947,6 @@
             this.checkShapeWarnings.TabIndex = 36;
             this.checkShapeWarnings.Text = "Show shape warnings";
             this.checkShapeWarnings.UseVisualStyleBackColor = true;
-            // 
-            // checkConditionalLoadOfNightTextures
-            // 
-            this.checkConditionalLoadOfNightTextures.AutoSize = true;
-            this.checkConditionalLoadOfNightTextures.Location = new System.Drawing.Point(304, 28);
-            this.checkConditionalLoadOfNightTextures.Name = "checkConditionalLoadOfNightTextures";
-            this.checkConditionalLoadOfNightTextures.Size = new System.Drawing.Size(228, 17);
-            this.checkConditionalLoadOfNightTextures.TabIndex = 17;
-            this.checkConditionalLoadOfNightTextures.Text = "Load day/night textures only when needed";
-            this.checkConditionalLoadOfNightTextures.UseVisualStyleBackColor = true;
             // 
             // AdhesionLevelValue
             // 
@@ -1682,7 +1666,6 @@
             this.tabPageSimulation.Controls.Add(this.checkHotStart);
             this.tabPageSimulation.Controls.Add(this.checkSimpleControlsPhysics);
             this.tabPageSimulation.Controls.Add(this.checkCurveSpeedDependent);
-            this.tabPageSimulation.Controls.Add(this.checkOverrideNonElectrifiedRoutes);
             this.tabPageSimulation.Controls.Add(this.labelAdhesionMovingAverageFilterSize);
             this.tabPageSimulation.Controls.Add(this.numericAdhesionMovingAverageFilterSize);
             this.tabPageSimulation.Controls.Add(this.checkBreakCouplers);
@@ -1780,16 +1763,6 @@
             this.checkCurveSpeedDependent.TabIndex = 5;
             this.checkCurveSpeedDependent.Text = "Curve dependent speed limit";
             this.checkCurveSpeedDependent.UseVisualStyleBackColor = true;
-            // 
-            // checkOverrideNonElectrifiedRoutes
-            // 
-            this.checkOverrideNonElectrifiedRoutes.AutoSize = true;
-            this.checkOverrideNonElectrifiedRoutes.Location = new System.Drawing.Point(6, 169);
-            this.checkOverrideNonElectrifiedRoutes.Name = "checkOverrideNonElectrifiedRoutes";
-            this.checkOverrideNonElectrifiedRoutes.Size = new System.Drawing.Size(219, 17);
-            this.checkOverrideNonElectrifiedRoutes.TabIndex = 7;
-            this.checkOverrideNonElectrifiedRoutes.Text = "Override non-electrified route line-voltage";
-            this.checkOverrideNonElectrifiedRoutes.UseVisualStyleBackColor = true;
             // 
             // labelAdhesionMovingAverageFilterSize
             // 
@@ -2212,7 +2185,6 @@
             this.tabPageGeneral.Controls.Add(this.pbRetainers);
             this.tabPageGeneral.Controls.Add(this.pbAlerter);
             this.tabPageGeneral.Controls.Add(this.pbControlConfirmations);
-            this.tabPageGeneral.Controls.Add(this.pbMapWindow);
             this.tabPageGeneral.Controls.Add(this.labelPortNumber);
             this.tabPageGeneral.Controls.Add(this.numericWebServerPort);
             this.tabPageGeneral.Controls.Add(this.checkEnableWebServer);
@@ -2224,7 +2196,6 @@
             this.tabPageGeneral.Controls.Add(this.comboPressureUnit);
             this.tabPageGeneral.Controls.Add(this.labelLanguage);
             this.tabPageGeneral.Controls.Add(this.comboLanguage);
-            this.tabPageGeneral.Controls.Add(this.checkViewMapWindow);
             this.tabPageGeneral.Controls.Add(this.checkControlConfirmations);
             this.tabPageGeneral.Controls.Add(this.checkAlerterExternal);
             this.tabPageGeneral.Controls.Add(this.numericBrakePipeChargingRate);
@@ -2372,18 +2343,6 @@
             this.pbControlConfirmations.MouseEnter += new System.EventHandler(this.HelpIcon_MouseEnter);
             this.pbControlConfirmations.MouseLeave += new System.EventHandler(this.HelpIcon_MouseLeave);
             // 
-            // pbMapWindow
-            // 
-            this.pbMapWindow.Image = global::ORTS.Properties.Resources.info_18;
-            this.pbMapWindow.Location = new System.Drawing.Point(6, 76);
-            this.pbMapWindow.Name = "pbMapWindow";
-            this.pbMapWindow.Size = new System.Drawing.Size(18, 18);
-            this.pbMapWindow.TabIndex = 18;
-            this.pbMapWindow.TabStop = false;
-            this.pbMapWindow.Click += new System.EventHandler(this.HelpIcon_Click);
-            this.pbMapWindow.MouseEnter += new System.EventHandler(this.HelpIcon_MouseEnter);
-            this.pbMapWindow.MouseLeave += new System.EventHandler(this.HelpIcon_MouseLeave);
-            // 
             // labelPortNumber
             // 
             this.labelPortNumber.AutoSize = true;
@@ -2513,18 +2472,6 @@
             this.comboLanguage.Name = "comboLanguage";
             this.comboLanguage.Size = new System.Drawing.Size(121, 21);
             this.comboLanguage.TabIndex = 9;
-            // 
-            // checkViewMapWindow
-            // 
-            this.checkViewMapWindow.AutoSize = true;
-            this.checkViewMapWindow.Location = new System.Drawing.Point(32, 75);
-            this.checkViewMapWindow.Name = "checkViewMapWindow";
-            this.checkViewMapWindow.Size = new System.Drawing.Size(254, 17);
-            this.checkViewMapWindow.TabIndex = 2;
-            this.checkViewMapWindow.Text = "Map window                                                        ";
-            this.checkViewMapWindow.UseVisualStyleBackColor = true;
-            this.checkViewMapWindow.MouseEnter += new System.EventHandler(this.HelpIcon_MouseEnter);
-            this.checkViewMapWindow.MouseLeave += new System.EventHandler(this.HelpIcon_MouseLeave);
             // 
             // checkControlConfirmations
             // 
@@ -2838,7 +2785,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.pbRetainers)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbAlerter)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbControlConfirmations)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pbMapWindow)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericWebServerPort)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericBrakePipeChargingRate)).EndInit();
             this.tabOptions.ResumeLayout(false);
@@ -2877,7 +2823,6 @@
         private System.Windows.Forms.Label labelLODBias;
         private System.Windows.Forms.CheckBox checkShapeWarnings;
         private System.Windows.Forms.TrackBar trackLODBias;
-        private System.Windows.Forms.CheckBox checkConditionalLoadOfNightTextures;
         private System.Windows.Forms.Label AdhesionLevelValue;
         private System.Windows.Forms.Label AdhesionLevelLabel;
         private System.Windows.Forms.TrackBar trackAdhesionFactorChange;
@@ -2960,7 +2905,6 @@
         private System.Windows.Forms.CheckBox checkHotStart;
         private System.Windows.Forms.CheckBox checkSimpleControlsPhysics;
         private System.Windows.Forms.CheckBox checkCurveSpeedDependent;
-        private System.Windows.Forms.CheckBox checkOverrideNonElectrifiedRoutes;
         private System.Windows.Forms.Label labelAdhesionMovingAverageFilterSize;
         private System.Windows.Forms.NumericUpDown numericAdhesionMovingAverageFilterSize;
         private System.Windows.Forms.CheckBox checkBreakCouplers;
@@ -3010,7 +2954,6 @@
         private System.Windows.Forms.PictureBox pbRetainers;
         private System.Windows.Forms.PictureBox pbAlerter;
         private System.Windows.Forms.PictureBox pbControlConfirmations;
-        private System.Windows.Forms.PictureBox pbMapWindow;
         private System.Windows.Forms.Label labelPortNumber;
         private System.Windows.Forms.NumericUpDown numericWebServerPort;
         private System.Windows.Forms.CheckBox checkEnableWebServer;
@@ -3022,7 +2965,6 @@
         private System.Windows.Forms.ComboBox comboPressureUnit;
         private System.Windows.Forms.Label labelLanguage;
         private System.Windows.Forms.ComboBox comboLanguage;
-        private System.Windows.Forms.CheckBox checkViewMapWindow;
         private System.Windows.Forms.CheckBox checkControlConfirmations;
         private System.Windows.Forms.CheckBox checkAlerterExternal;
         private System.Windows.Forms.NumericUpDown numericBrakePipeChargingRate;
