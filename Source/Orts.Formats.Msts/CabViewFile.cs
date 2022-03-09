@@ -392,7 +392,9 @@ namespace Orts.Formats.Msts
         METRES,
         MILES,
         FEET,
-        YARDS
+        YARDS,
+
+        PERCENT
     }
 
     public enum DiscreteStates

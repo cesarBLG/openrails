@@ -5117,6 +5117,17 @@ public List<CabView> CabViewList = new List<CabView>();
                             case CABViewControlUnits.KILO_LBS:
                                 data = N.ToLbf(data) * 0.001f;
                                 break;
+
+                            case CABViewControlUnits.PERCENT:
+                                if (Math.Abs(SpeedMpS) != 0.0f)
+                                {
+                                    if (Math.Abs(TractiveForceN) - Math.Abs(BrakeForceN + DynamicBrakeForceN) >= 0)
+                                        data = data / MaxForceN * 100;
+                                    else
+                                        data = data / (MaxBrakeForceN + MaxDynamicBrakeForceN) * 100;
+                                }
+                                break;
+
                         }
                         break;
                     }
