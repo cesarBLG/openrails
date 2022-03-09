@@ -1,5 +1,5 @@
 ﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.120
-March 8th, 2022
+March 9th, 2022
 
 Please note that the installation and use of Open Rails software, even of its unofficial versions, is governed by the Open Rails End User License Agreement. 
 
@@ -54,6 +54,7 @@ This version includes some features not (yet) available in the Open Rails testin
 - Bug fix for http://www.elvastower.com/forums/index.php?/topic/36021-crash-on-switching-to-autopilot/#entry282465
 - NEW: kept Locomotive() TCS script hook
 - NEW: reinstated 2Dcab stretch option
+- NEW: add PERCENT UoM to ORTS_SIGNED_TRACTION_TOTAL_BRAKING
 
 
 
