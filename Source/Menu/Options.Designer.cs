@@ -208,6 +208,8 @@
             this.checkAlerter = new System.Windows.Forms.CheckBox();
             this.tabOptions = new System.Windows.Forms.TabControl();
             this.tabPageORNYMG = new System.Windows.Forms.TabPage();
+            this.pbEnableWebServer = new System.Windows.Forms.PictureBox();
+            this.checkEnableWebServer = new System.Windows.Forms.CheckBox();
             this.labelCab2DStretch = new System.Windows.Forms.Label();
             this.checkLODViewingExtention = new System.Windows.Forms.CheckBox();
             this.checkTunnelResistanceDependent = new System.Windows.Forms.CheckBox();
@@ -218,8 +220,6 @@
             this.checkRunAt32bit = new System.Windows.Forms.CheckBox();
             this.checkEnableWatchdog = new System.Windows.Forms.CheckBox();
             this.checkFastFullScreenAltTab = new System.Windows.Forms.CheckBox();
-            this.pbEnableWebServer = new System.Windows.Forms.PictureBox();
-            this.checkEnableWebServer = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.bindingSourceContent)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbLAA)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUseSuperElevation)).BeginInit();
@@ -2349,15 +2349,15 @@
             // labelPortNumber
             // 
             this.labelPortNumber.AutoSize = true;
-            this.labelPortNumber.Location = new System.Drawing.Point(89, 333);
+            this.labelPortNumber.Location = new System.Drawing.Point(117, 324);
             this.labelPortNumber.Name = "labelPortNumber";
-            this.labelPortNumber.Size = new System.Drawing.Size(237, 13);
+            this.labelPortNumber.Size = new System.Drawing.Size(197, 13);
             this.labelPortNumber.TabIndex = 17;
-            this.labelPortNumber.Text = "WebServer port number                                       ";
+            this.labelPortNumber.Text = "Web server port                                      ";
             // 
             // numericWebServerPort
             // 
-            this.numericWebServerPort.Location = new System.Drawing.Point(6, 331);
+            this.numericWebServerPort.Location = new System.Drawing.Point(34, 322);
             this.numericWebServerPort.Maximum = new decimal(new int[] {
             65534,
             0,
@@ -2604,6 +2604,25 @@
             this.tabPageORNYMG.Text = "ORNYMG Only";
             this.tabPageORNYMG.UseVisualStyleBackColor = true;
             // 
+            // pbEnableWebServer
+            // 
+            this.pbEnableWebServer.Image = global::ORTS.Properties.Resources.info_18;
+            this.pbEnableWebServer.Location = new System.Drawing.Point(15, 284);
+            this.pbEnableWebServer.Name = "pbEnableWebServer";
+            this.pbEnableWebServer.Size = new System.Drawing.Size(18, 18);
+            this.pbEnableWebServer.TabIndex = 31;
+            this.pbEnableWebServer.TabStop = false;
+            // 
+            // checkEnableWebServer
+            // 
+            this.checkEnableWebServer.AutoSize = true;
+            this.checkEnableWebServer.Location = new System.Drawing.Point(41, 283);
+            this.checkEnableWebServer.Name = "checkEnableWebServer";
+            this.checkEnableWebServer.Size = new System.Drawing.Size(255, 17);
+            this.checkEnableWebServer.TabIndex = 30;
+            this.checkEnableWebServer.Text = "Enable webserver                                                ";
+            this.checkEnableWebServer.UseVisualStyleBackColor = true;
+            // 
             // labelCab2DStretch
             // 
             this.labelCab2DStretch.AutoSize = true;
@@ -2707,25 +2726,6 @@
             this.checkFastFullScreenAltTab.TabIndex = 2;
             this.checkFastFullScreenAltTab.Text = "Fast full-screen alt-tab";
             this.checkFastFullScreenAltTab.UseVisualStyleBackColor = true;
-            // 
-            // pbEnableWebServer
-            // 
-            this.pbEnableWebServer.Image = global::ORTS.Properties.Resources.info_18;
-            this.pbEnableWebServer.Location = new System.Drawing.Point(15, 284);
-            this.pbEnableWebServer.Name = "pbEnableWebServer";
-            this.pbEnableWebServer.Size = new System.Drawing.Size(18, 18);
-            this.pbEnableWebServer.TabIndex = 31;
-            this.pbEnableWebServer.TabStop = false;
-            // 
-            // checkEnableWebServer
-            // 
-            this.checkEnableWebServer.AutoSize = true;
-            this.checkEnableWebServer.Location = new System.Drawing.Point(41, 283);
-            this.checkEnableWebServer.Name = "checkEnableWebServer";
-            this.checkEnableWebServer.Size = new System.Drawing.Size(255, 17);
-            this.checkEnableWebServer.TabIndex = 30;
-            this.checkEnableWebServer.Text = "Enable webserver                                                ";
-            this.checkEnableWebServer.UseVisualStyleBackColor = true;
             // 
             // OptionsForm
             // 

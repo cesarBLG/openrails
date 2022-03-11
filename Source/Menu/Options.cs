@@ -150,7 +150,6 @@ namespace ORTS
             comboPressureUnit.Text = Settings.PressureUnit;
             comboOtherUnits.Text = settings.Units;
             checkDisableTCSScripts.Checked = Settings.DisableTCSScripts;
-            checkEnableWebServer.Checked = Settings.WebServer;
             numericWebServerPort.Value = Settings.WebServerPort;
 
             // Audio tab
@@ -345,6 +344,7 @@ namespace ORTS
             checkTunnelResistanceDependent.Checked = Settings.TunnelResistanceDependent;
             checkWindResistanceDependent.Checked = Settings.WindResistanceDependent;
             checkLODViewingExtention.Checked = Settings.LODViewingExtention;
+            checkEnableWebServer.Checked = Settings.WebServer;
         }
 
 /*
@@ -458,7 +458,6 @@ private async void OptionsForm_Shown(object sender, EventArgs e)
             Settings.PressureUnit = comboPressureUnit.SelectedValue.ToString();
             Settings.Units = comboOtherUnits.SelectedValue.ToString();
             Settings.DisableTCSScripts = checkDisableTCSScripts.Checked;
-            Settings.WebServer = checkEnableWebServer.Checked;
 
             // Audio tab
             Settings.SoundVolumePercent = (int)numericSoundVolumePercent.Value;
@@ -561,6 +560,7 @@ private async void OptionsForm_Shown(object sender, EventArgs e)
             Settings.TunnelResistanceDependent = checkTunnelResistanceDependent.Checked;
             Settings.WindResistanceDependent = checkWindResistanceDependent.Checked;
             Settings.LODViewingExtention = checkLODViewingExtention.Checked;
+            Settings.WebServer = checkEnableWebServer.Checked;
 
             Settings.Save();
         }
