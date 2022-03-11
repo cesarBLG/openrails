@@ -598,7 +598,7 @@ namespace Orts.Viewer3D.RollingStock.SubSystems
         string AceFile;
         public ThreeDimCabDPI(Viewer viewer, int iMatrix, string size, string aceFile, PoseableShape trainCarShape, CabViewControlRenderer c)
         //           : base(viewer, iMatrix, size, aceFile, trainCarShape, c)
-        { 
+        {
             Size = int.Parse(size) * 0.001f;//input size is in mm
             if (aceFile != "")
             {
@@ -618,7 +618,7 @@ namespace Orts.Viewer3D.RollingStock.SubSystems
             // this leads to 1944 vertices
             var maxVertex = 2048;
 
-                               //Material = viewer.MaterialManager.Load("Scenery", Helpers.GetRouteTextureFile(viewer.Simulator, Helpers.TextureFlags.None, texture), (int)(SceneryMaterialOptions.None | SceneryMaterialOptions.AlphaBlendingBlend), 0);
+            //Material = viewer.MaterialManager.Load("Scenery", Helpers.GetRouteTextureFile(viewer.Simulator, Helpers.TextureFlags.None, texture), (int)(SceneryMaterialOptions.None | SceneryMaterialOptions.AlphaBlendingBlend), 0);
             Material = FindMaterial(false);//determine normal material
                                            // Create and populate a new ShapePrimitive
             NumVertices = NumIndices = 0;
@@ -688,7 +688,7 @@ namespace Orts.Viewer3D.RollingStock.SubSystems
                         tY = GetTextureCoordY(param, iChar, color);
                         var offX = offset.X + Size * (1 + HeaderMaxDigits + (MaxDigits) * (iCol - 1)) * 0.5f;
                         //the left-bottom vertex
-                        Vector3 va = new Vector3(offX , offset.Y, 0.01f);
+                        Vector3 va = new Vector3(offX, offset.Y, 0.01f);
                         va += start; Vertex v5 = new Vertex(va.X, va.Y, va.Z, 0, 0, -1, tX, tY);
 
                         //the right-bottom vertex
@@ -737,7 +737,7 @@ namespace Orts.Viewer3D.RollingStock.SubSystems
             CABViewControlTypes controltype = CVFR.GetControlType();
             Material material = null;
 
-           if (AceFile != "")
+            if (AceFile != "")
             {
                 imageName = AceFile;
             }
@@ -752,7 +752,7 @@ namespace Orts.Viewer3D.RollingStock.SubSystems
             {
                 if (!File.Exists(globalText + imageName))
                 {
-                    Trace.TraceInformation("Ignored missing " + imageName + " using default. You can copy the " + imageName + " from OR\'s AddOns folder to " + globalText +
+                    Trace.TraceInformation("Ignored missing " + imageName + " using default. You can copy and unpack the " + imageName + " from OR\'s Documentation\\SampleFiles\\Manual folder to " + globalText +
                         ", or place it under " + TrainCarShape.SharedShape.ReferencePath);
                 }
                 material = Viewer.MaterialManager.Load("Scenery", Helpers.GetTextureFile(Viewer.Simulator, Helpers.TextureFlags.None, globalText, imageName), (int)(options), 0);
@@ -761,7 +761,7 @@ namespace Orts.Viewer3D.RollingStock.SubSystems
             {
                 if (!File.Exists(TrainCarShape.SharedShape.ReferencePath + @"\" + imageName))
                 {
-                    Trace.TraceInformation("Ignored missing " + imageName + " using default. You can copy the " + imageName + " from OR\'s AddOns folder to " + globalText +
+                    Trace.TraceInformation("Ignored missing " + imageName + " using default. You can copy and unpack the " + imageName + " from OR\'s Documentation\\SampleFiles\\Manual folder to " + globalText +
                         ", or place it under " + TrainCarShape.SharedShape.ReferencePath);
                     material = Viewer.MaterialManager.Load("Scenery", Helpers.GetTextureFile(Viewer.Simulator, Helpers.TextureFlags.None, globalText, imageName), (int)(options), 0);
                 }
@@ -782,7 +782,7 @@ namespace Orts.Viewer3D.RollingStock.SubSystems
             //            string speed = CVFR.Get3DDigits(out Alert);
             DPITable.PrepareFrame(DPIStatus);
 
- //           NumVertices = NumIndices = 0;
+            //           NumVertices = NumIndices = 0;
 
             if (Alert)//alert use alert meterial
             {
@@ -883,7 +883,7 @@ namespace Orts.Viewer3D.RollingStock.SubSystems
                 }
             }
             //update the shape primitive
-           UpdateShapePrimitive(UsedMaterial);
+            UpdateShapePrimitive(UsedMaterial);
 
         }
 
@@ -932,22 +932,22 @@ namespace Orts.Viewer3D.RollingStock.SubSystems
                     x = iChar * 0.125f;
                     break;
                 default:
-                var c = param[iChar];
-                switch (c)
-                {
-                    case 'N':
-                    case 'B': x = 0.25f; break;
-                    case ':': x = 0.375f; break;
-                    case '.': x = 0.5f; break;
-                    case '—':
-                    case '-': x = 0.625f; break;
-                    case ' ': x = 0.875f; break;
-                    case '\u2590': x = 0.75f; break;
-                    default:
-                        x = (c - '0') % 8 * 0.125f;
-                        break;
-                }
-                break;
+                    var c = param[iChar];
+                    switch (c)
+                    {
+                        case 'N':
+                        case 'B': x = 0.25f; break;
+                        case ':': x = 0.375f; break;
+                        case '.': x = 0.5f; break;
+                        case '—':
+                        case '-': x = 0.625f; break;
+                        case ' ': x = 0.875f; break;
+                        case '\u2590': x = 0.75f; break;
+                        default:
+                            x = (c - '0') % 8 * 0.125f;
+                            break;
+                    }
+                    break;
             }
             if (x < 0) x = 0;
             if (x > 1) x = 1;
