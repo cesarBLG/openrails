@@ -316,7 +316,7 @@ namespace Orts.Simulation.RollingStocks
         };
 
         protected float OdometerResetPositionM = 0;
-        protected bool OdometerCountingUp = true;
+        public bool OdometerCountingUp = true;
         protected bool OdometerCountingForwards = true;
         public bool OdometerResetButtonPressed = false;
 

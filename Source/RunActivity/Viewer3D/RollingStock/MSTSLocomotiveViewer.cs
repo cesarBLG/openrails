@@ -2174,6 +2174,8 @@ namespace Orts.Viewer3D.RollingStock
                 case CABViewControlTypes.ORTS_EOT_COMM_TEST:
                 case CABViewControlTypes.ORTS_EOT_DISARM:
                 case CABViewControlTypes.ORTS_EOT_ARM_TWO_WAY:
+                case CABViewControlTypes.ORTS_ODOMETER_UP:
+                case CABViewControlTypes.ORTS_ODOMETER_DOWN:
                     index = ButtonState ? 1 : 0;
                     break;
                 case CABViewControlTypes.ORTS_STATIC_DISPLAY:
@@ -2529,6 +2531,18 @@ namespace Orts.Viewer3D.RollingStock
                     new ElectricTrainSupplyCommand(Viewer.Log, ChangedValue(Locomotive.LocomotivePowerSupply.ElectricTrainSupplySwitch.CommandSwitch ? 1 : 0) > 0);
                     break;
                 case CABViewControlTypes.ORTS_ODOMETER_DIRECTION: if (ChangedValue(1) == 0) new ToggleOdometerDirectionCommand(Viewer.Log); break;
+                case CABViewControlTypes.ORTS_ODOMETER_UP:
+                    bool buttonState = ChangedValue(ButtonState ? 1 : 0) > 0;
+                    if (buttonState && !Locomotive.OdometerCountingUp)
+                        new ToggleOdometerDirectionCommand(Viewer.Log);
+                    ButtonState = buttonState;
+                    break;
+                case CABViewControlTypes.ORTS_ODOMETER_DOWN:
+                    buttonState = ChangedValue(ButtonState ? 1 : 0) > 0;
+                    if (buttonState && Locomotive.OdometerCountingUp)
+                        new ToggleOdometerDirectionCommand(Viewer.Log);
+                    ButtonState = buttonState;
+                    break;
                 case CABViewControlTypes.ORTS_ODOMETER_RESET:
                     new ResetOdometerCommand(Viewer.Log, ChangedValue(Locomotive.OdometerResetButtonPressed ? 1 : 0) > 0); break;
                 case CABViewControlTypes.ORTS_GENERIC_ITEM1:
@@ -2536,7 +2550,7 @@ namespace Orts.Viewer3D.RollingStock
                 case CABViewControlTypes.ORTS_GENERIC_ITEM2:
                     if ((Locomotive.GenericItem2 ? 1 : 0) != ChangedValue(Locomotive.GenericItem2 ? 1 : 0)) new ToggleGenericItem2Command(Viewer.Log); break;
                 case CABViewControlTypes.ORTS_SCREEN_SELECT:
-                    bool buttonState = ChangedValue(ButtonState ? 1 : 0) > 0;
+                    buttonState = ChangedValue(ButtonState ? 1 : 0) > 0;
                     if (((CVCDiscrete)Control).NewScreens != null)
                         foreach (var newScreen in ((CVCDiscrete)Control).NewScreens)
                         {

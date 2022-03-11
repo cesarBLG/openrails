@@ -317,6 +317,8 @@ namespace Orts.Formats.Msts
         ORTS_ODOMETER,
         ORTS_ODOMETER_RESET,
         ORTS_ODOMETER_DIRECTION,
+        ORTS_ODOMETER_UP,
+        ORTS_ODOMETER_DOWN,
         ORTS_DISTRIBUTED_POWER,
         ORTS_DP_MOVE_TO_FRONT,
         ORTS_DP_MOVE_TO_BACK,
