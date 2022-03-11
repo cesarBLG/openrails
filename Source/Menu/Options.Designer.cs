@@ -58,6 +58,7 @@
             this.trackAntiAliasing = new System.Windows.Forms.TrackBar();
             this.numericSoundVolumePercent = new System.Windows.Forms.NumericUpDown();
             this.numericExternalSoundPassThruPercent = new System.Windows.Forms.NumericUpDown();
+            this.numericCab2DStretch = new System.Windows.Forms.NumericUpDown();
             this.tabPageExperimental = new System.Windows.Forms.TabPage();
             this.label27 = new System.Windows.Forms.Label();
             this.label26 = new System.Windows.Forms.Label();
@@ -179,7 +180,6 @@
             this.numericSoundDetailLevel = new System.Windows.Forms.NumericUpDown();
             this.tabPageGeneral = new System.Windows.Forms.TabPage();
             this.pbOverspeedMonitor = new System.Windows.Forms.PictureBox();
-            this.pbEnableWebServer = new System.Windows.Forms.PictureBox();
             this.pbDisableTcsScripts = new System.Windows.Forms.PictureBox();
             this.pbOtherUnits = new System.Windows.Forms.PictureBox();
             this.pbPressureUnit = new System.Windows.Forms.PictureBox();
@@ -191,7 +191,6 @@
             this.pbControlConfirmations = new System.Windows.Forms.PictureBox();
             this.labelPortNumber = new System.Windows.Forms.Label();
             this.numericWebServerPort = new System.Windows.Forms.NumericUpDown();
-            this.checkEnableWebServer = new System.Windows.Forms.CheckBox();
             this.checkOverspeedMonitor = new System.Windows.Forms.CheckBox();
             this.checkDisableTCSScripts = new System.Windows.Forms.CheckBox();
             this.labelOtherUnits = new System.Windows.Forms.Label();
@@ -209,6 +208,7 @@
             this.checkAlerter = new System.Windows.Forms.CheckBox();
             this.tabOptions = new System.Windows.Forms.TabControl();
             this.tabPageORNYMG = new System.Windows.Forms.TabPage();
+            this.labelCab2DStretch = new System.Windows.Forms.Label();
             this.checkLODViewingExtention = new System.Windows.Forms.CheckBox();
             this.checkTunnelResistanceDependent = new System.Windows.Forms.CheckBox();
             this.checkWindResistanceDependent = new System.Windows.Forms.CheckBox();
@@ -218,8 +218,8 @@
             this.checkRunAt32bit = new System.Windows.Forms.CheckBox();
             this.checkEnableWatchdog = new System.Windows.Forms.CheckBox();
             this.checkFastFullScreenAltTab = new System.Windows.Forms.CheckBox();
-            this.numericCab2DStretch = new System.Windows.Forms.NumericUpDown();
-            this.labelCab2DStretch = new System.Windows.Forms.Label();
+            this.pbEnableWebServer = new System.Windows.Forms.PictureBox();
+            this.checkEnableWebServer = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.bindingSourceContent)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbLAA)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUseSuperElevation)).BeginInit();
@@ -235,6 +235,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.trackAntiAliasing)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericSoundVolumePercent)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericExternalSoundPassThruPercent)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericCab2DStretch)).BeginInit();
             this.tabPageExperimental.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.precipitationBoxLength)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.precipitationBoxWidth)).BeginInit();
@@ -264,7 +265,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.numericSoundDetailLevel)).BeginInit();
             this.tabPageGeneral.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pbOverspeedMonitor)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pbEnableWebServer)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbDisableTcsScripts)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbOtherUnits)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbPressureUnit)).BeginInit();
@@ -278,7 +278,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.numericBrakePipeChargingRate)).BeginInit();
             this.tabOptions.SuspendLayout();
             this.tabPageORNYMG.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numericCab2DStretch)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbEnableWebServer)).BeginInit();
             this.SuspendLayout();
             // 
             // buttonOK
@@ -672,6 +672,20 @@
             0,
             0,
             0});
+            // 
+            // numericCab2DStretch
+            // 
+            this.numericCab2DStretch.Increment = new decimal(new int[] {
+            25,
+            0,
+            0,
+            0});
+            this.numericCab2DStretch.Location = new System.Drawing.Point(15, 235);
+            this.numericCab2DStretch.Name = "numericCab2DStretch";
+            this.numericCab2DStretch.Size = new System.Drawing.Size(54, 20);
+            this.numericCab2DStretch.TabIndex = 28;
+            this.toolTip1.SetToolTip(this.numericCab2DStretch, "0 to clip cab view, 100 to stretch it. For cab views that match the display, use " +
+        "100.");
             // 
             // tabPageExperimental
             // 
@@ -2178,7 +2192,6 @@
             // tabPageGeneral
             // 
             this.tabPageGeneral.Controls.Add(this.pbOverspeedMonitor);
-            this.tabPageGeneral.Controls.Add(this.pbEnableWebServer);
             this.tabPageGeneral.Controls.Add(this.pbDisableTcsScripts);
             this.tabPageGeneral.Controls.Add(this.pbOtherUnits);
             this.tabPageGeneral.Controls.Add(this.pbPressureUnit);
@@ -2190,7 +2203,6 @@
             this.tabPageGeneral.Controls.Add(this.pbControlConfirmations);
             this.tabPageGeneral.Controls.Add(this.labelPortNumber);
             this.tabPageGeneral.Controls.Add(this.numericWebServerPort);
-            this.tabPageGeneral.Controls.Add(this.checkEnableWebServer);
             this.tabPageGeneral.Controls.Add(this.checkOverspeedMonitor);
             this.tabPageGeneral.Controls.Add(this.checkDisableTCSScripts);
             this.tabPageGeneral.Controls.Add(this.labelOtherUnits);
@@ -2225,18 +2237,6 @@
             this.pbOverspeedMonitor.Click += new System.EventHandler(this.HelpIcon_Click);
             this.pbOverspeedMonitor.MouseEnter += new System.EventHandler(this.HelpIcon_MouseEnter);
             this.pbOverspeedMonitor.MouseLeave += new System.EventHandler(this.HelpIcon_MouseLeave);
-            // 
-            // pbEnableWebServer
-            // 
-            this.pbEnableWebServer.Image = global::ORTS.Properties.Resources.info_18;
-            this.pbEnableWebServer.Location = new System.Drawing.Point(6, 309);
-            this.pbEnableWebServer.Name = "pbEnableWebServer";
-            this.pbEnableWebServer.Size = new System.Drawing.Size(18, 18);
-            this.pbEnableWebServer.TabIndex = 29;
-            this.pbEnableWebServer.TabStop = false;
-            this.pbEnableWebServer.Click += new System.EventHandler(this.HelpIcon_Click);
-            this.pbEnableWebServer.MouseEnter += new System.EventHandler(this.HelpIcon_MouseEnter);
-            this.pbEnableWebServer.MouseLeave += new System.EventHandler(this.HelpIcon_MouseLeave);
             // 
             // pbDisableTcsScripts
             // 
@@ -2349,15 +2349,15 @@
             // labelPortNumber
             // 
             this.labelPortNumber.AutoSize = true;
-            this.labelPortNumber.Location = new System.Drawing.Point(105, 333);
+            this.labelPortNumber.Location = new System.Drawing.Point(89, 333);
             this.labelPortNumber.Name = "labelPortNumber";
-            this.labelPortNumber.Size = new System.Drawing.Size(181, 13);
+            this.labelPortNumber.Size = new System.Drawing.Size(237, 13);
             this.labelPortNumber.TabIndex = 17;
-            this.labelPortNumber.Text = "Port number                                       ";
+            this.labelPortNumber.Text = "WebServer port number                                       ";
             // 
             // numericWebServerPort
             // 
-            this.numericWebServerPort.Location = new System.Drawing.Point(31, 331);
+            this.numericWebServerPort.Location = new System.Drawing.Point(6, 331);
             this.numericWebServerPort.Maximum = new decimal(new int[] {
             65534,
             0,
@@ -2376,18 +2376,6 @@
             0,
             0,
             0});
-            // 
-            // checkEnableWebServer
-            // 
-            this.checkEnableWebServer.AutoSize = true;
-            this.checkEnableWebServer.Location = new System.Drawing.Point(32, 308);
-            this.checkEnableWebServer.Name = "checkEnableWebServer";
-            this.checkEnableWebServer.Size = new System.Drawing.Size(255, 17);
-            this.checkEnableWebServer.TabIndex = 15;
-            this.checkEnableWebServer.Text = "Enable webserver                                                ";
-            this.checkEnableWebServer.UseVisualStyleBackColor = true;
-            this.checkEnableWebServer.MouseEnter += new System.EventHandler(this.HelpIcon_MouseEnter);
-            this.checkEnableWebServer.MouseLeave += new System.EventHandler(this.HelpIcon_MouseLeave);
             // 
             // checkOverspeedMonitor
             // 
@@ -2595,6 +2583,8 @@
             // 
             // tabPageORNYMG
             // 
+            this.tabPageORNYMG.Controls.Add(this.pbEnableWebServer);
+            this.tabPageORNYMG.Controls.Add(this.checkEnableWebServer);
             this.tabPageORNYMG.Controls.Add(this.numericCab2DStretch);
             this.tabPageORNYMG.Controls.Add(this.labelCab2DStretch);
             this.tabPageORNYMG.Controls.Add(this.checkLODViewingExtention);
@@ -2613,6 +2603,16 @@
             this.tabPageORNYMG.TabIndex = 11;
             this.tabPageORNYMG.Text = "ORNYMG Only";
             this.tabPageORNYMG.UseVisualStyleBackColor = true;
+            // 
+            // labelCab2DStretch
+            // 
+            this.labelCab2DStretch.AutoSize = true;
+            this.labelCab2DStretch.Location = new System.Drawing.Point(75, 237);
+            this.labelCab2DStretch.Margin = new System.Windows.Forms.Padding(3);
+            this.labelCab2DStretch.Name = "labelCab2DStretch";
+            this.labelCab2DStretch.Size = new System.Drawing.Size(88, 13);
+            this.labelCab2DStretch.TabIndex = 29;
+            this.labelCab2DStretch.Text = "% cab 2D stretch";
             // 
             // checkLODViewingExtention
             // 
@@ -2708,29 +2708,24 @@
             this.checkFastFullScreenAltTab.Text = "Fast full-screen alt-tab";
             this.checkFastFullScreenAltTab.UseVisualStyleBackColor = true;
             // 
-            // numericCab2DStretch
+            // pbEnableWebServer
             // 
-            this.numericCab2DStretch.Increment = new decimal(new int[] {
-            25,
-            0,
-            0,
-            0});
-            this.numericCab2DStretch.Location = new System.Drawing.Point(15, 235);
-            this.numericCab2DStretch.Name = "numericCab2DStretch";
-            this.numericCab2DStretch.Size = new System.Drawing.Size(54, 20);
-            this.numericCab2DStretch.TabIndex = 28;
-            this.toolTip1.SetToolTip(this.numericCab2DStretch, "0 to clip cab view, 100 to stretch it. For cab views that match the display, use " +
-        "100.");
+            this.pbEnableWebServer.Image = global::ORTS.Properties.Resources.info_18;
+            this.pbEnableWebServer.Location = new System.Drawing.Point(15, 284);
+            this.pbEnableWebServer.Name = "pbEnableWebServer";
+            this.pbEnableWebServer.Size = new System.Drawing.Size(18, 18);
+            this.pbEnableWebServer.TabIndex = 31;
+            this.pbEnableWebServer.TabStop = false;
             // 
-            // labelCab2DStretch
+            // checkEnableWebServer
             // 
-            this.labelCab2DStretch.AutoSize = true;
-            this.labelCab2DStretch.Location = new System.Drawing.Point(75, 237);
-            this.labelCab2DStretch.Margin = new System.Windows.Forms.Padding(3);
-            this.labelCab2DStretch.Name = "labelCab2DStretch";
-            this.labelCab2DStretch.Size = new System.Drawing.Size(88, 13);
-            this.labelCab2DStretch.TabIndex = 29;
-            this.labelCab2DStretch.Text = "% cab 2D stretch";
+            this.checkEnableWebServer.AutoSize = true;
+            this.checkEnableWebServer.Location = new System.Drawing.Point(41, 283);
+            this.checkEnableWebServer.Name = "checkEnableWebServer";
+            this.checkEnableWebServer.Size = new System.Drawing.Size(255, 17);
+            this.checkEnableWebServer.TabIndex = 30;
+            this.checkEnableWebServer.Text = "Enable webserver                                                ";
+            this.checkEnableWebServer.UseVisualStyleBackColor = true;
             // 
             // OptionsForm
             // 
@@ -2763,6 +2758,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.trackAntiAliasing)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericSoundVolumePercent)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericExternalSoundPassThruPercent)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericCab2DStretch)).EndInit();
             this.tabPageExperimental.ResumeLayout(false);
             this.tabPageExperimental.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.precipitationBoxLength)).EndInit();
@@ -2804,7 +2800,6 @@
             this.tabPageGeneral.ResumeLayout(false);
             this.tabPageGeneral.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pbOverspeedMonitor)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pbEnableWebServer)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbDisableTcsScripts)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbOtherUnits)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbPressureUnit)).EndInit();
@@ -2819,7 +2814,7 @@
             this.tabOptions.ResumeLayout(false);
             this.tabPageORNYMG.ResumeLayout(false);
             this.tabPageORNYMG.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numericCab2DStretch)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbEnableWebServer)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -2974,7 +2969,6 @@
         private System.Windows.Forms.NumericUpDown numericSoundDetailLevel;
         private System.Windows.Forms.TabPage tabPageGeneral;
         private System.Windows.Forms.PictureBox pbOverspeedMonitor;
-        private System.Windows.Forms.PictureBox pbEnableWebServer;
         private System.Windows.Forms.PictureBox pbDisableTcsScripts;
         private System.Windows.Forms.PictureBox pbOtherUnits;
         private System.Windows.Forms.PictureBox pbPressureUnit;
@@ -2986,7 +2980,6 @@
         private System.Windows.Forms.PictureBox pbControlConfirmations;
         private System.Windows.Forms.Label labelPortNumber;
         private System.Windows.Forms.NumericUpDown numericWebServerPort;
-        private System.Windows.Forms.CheckBox checkEnableWebServer;
         private System.Windows.Forms.CheckBox checkOverspeedMonitor;
         private System.Windows.Forms.CheckBox checkDisableTCSScripts;
         private System.Windows.Forms.Label labelOtherUnits;
@@ -3015,5 +3008,7 @@
         private System.Windows.Forms.CheckBox checkLODViewingExtention;
         private System.Windows.Forms.NumericUpDown numericCab2DStretch;
         private System.Windows.Forms.Label labelCab2DStretch;
+        private System.Windows.Forms.PictureBox pbEnableWebServer;
+        private System.Windows.Forms.CheckBox checkEnableWebServer;
     }
 }
