@@ -1,5 +1,5 @@
-﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.120
-March 9th, 2022
+﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.121
+March 22nd, 2022
 
 Please note that the installation and use of Open Rails software, even of its unofficial versions, is governed by the Open Rails End User License Agreement. 
 
@@ -11,7 +11,7 @@ INSTALLATION
 
 
 RELEASE NOTES
-This unofficial version has been derived from the latest official Testing release T1.4-277 and from the official master branch up to date.
+This unofficial version has been derived from the latest official Testing release T1.4-413 and from the official master branch up to date.
 
 
 This version includes some features not (yet) available in the Open Rails testing official version, that is:
@@ -45,16 +45,16 @@ This version includes some features not (yet) available in the Open Rails testin
 - bug fix that didn't check for null label text, see http://www.elvastower.com/forums/index.php?/topic/32640-or-newyear-mg/page__view__findpost__p__273496
 - Various fixes related to reversals and couplings, see e.g. http://www.elvastower.com/forums/index.php?/topic/29383-assistance-with-ai-shunting/page__view__findpost__p__277369
 - Insert cabview controls in side views of 2D cabs, see http://www.elvastower.com/forums/index.php?/topic/35640-inserting-cabview-controls-in-side-views-of-2d-cabs/ 
-- Bug fix for https://bugs.launchpad.net/or/+bug/1950578 Dyn Brake set up state not disappearing in cab
 - workaround for http://www.elvastower.com/forums/index.php?/topic/32640-or-newyear-mg/page__view__findpost__p__278074 
-- EOT management, see http://www.elvastower.com/forums/index.php?/topic/35912-eot/ 
+- EOT management, see http://www.elvastower.com/forums/index.php?/topic/35912-eot/ (present in Unstable release)
 - Fix bug of wagon smoke not appearing when Reduce Memory Usage option set, see http://www.elvastower.com/forums/index.php?/topic/35975-recent-mg-versions-smoking-caboose-has-stopped-smoking/
 - "ORNYMG only" option tab, including all option checkboxes available only in ORNYMG
-- Distributed power display in 3D cabs, see http://www.elvastower.com/forums/index.php?/topic/26249-remote-control-dpu-units/page__view__findpost__p__282473
-- Bug fix for http://www.elvastower.com/forums/index.php?/topic/36021-crash-on-switching-to-autopilot/#entry282465
-- NEW: kept Locomotive() TCS script hook
-- NEW: reinstated 2Dcab stretch option
-- NEW: add PERCENT UoM to ORTS_SIGNED_TRACTION_TOTAL_BRAKING
+- kept Locomotive() TCS script hook
+- kept various options in ORNYMG only tab
+- add PERCENT UoM to ORTS_SIGNED_TRACTION_TOTAL_BRAKING
+- NEW: add cabview controls ODOMETER_UP and ODOMETER_DOWN
+- NEW: add bug fix for https://bugs.launchpad.net/or/+bug/1964793 Steam Loco Tractive Effort shows incorrectly in the HUD, by steamer_ctn (already present in Unstable release)
+
 
 
 
