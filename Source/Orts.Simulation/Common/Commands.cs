@@ -2228,10 +2228,7 @@ namespace Orts.Common
 
         public override void Redo()
         {
-            if (Receiver?.Train?.EOT != null)
-            {
-                Receiver.Train.EOT.CommTest();
-            }
+            Receiver?.Train?.EOT?.CommTest();
         }
     }
 
@@ -2248,10 +2245,7 @@ namespace Orts.Common
 
         public override void Redo()
         {
-            if (Receiver?.Train?.EOT != null)
-            {
-                Receiver.Train.EOT.Disarm();
-            }
+            Receiver?.Train?.EOT?.Disarm();
         }
     }
 
@@ -2268,10 +2262,7 @@ namespace Orts.Common
 
         public override void Redo()
         {
-            if (Receiver?.Train?.EOT != null)
-            {
-                Receiver.Train.EOT.ArmTwoWay();
-            }
+            Receiver?.Train?.EOT?.ArmTwoWay();
         }
     }
 
@@ -2288,10 +2279,7 @@ namespace Orts.Common
 
         public override void Redo()
         {
-            if (Receiver?.Train?.EOT != null)
-            {
-                Receiver.Train.EOT.EmergencyBrake(ToState);
-            }
+            Receiver?.Train?.EOT?.EmergencyBrake(ToState);
         }
     }
 
@@ -2308,10 +2296,7 @@ namespace Orts.Common
 
         public override void Redo()
         {
-            if (Receiver?.Train?.EOT != null)
-            {
-                Receiver.Train.EOT.EmergencyBrake(!Receiver.Train.EOT.EOTEmergencyBrakingOn);
-            }
+            Receiver.Train.EOT?.EmergencyBrake(!Receiver.Train.EOT.EOTEmergencyBrakingOn);
         }
     }
 

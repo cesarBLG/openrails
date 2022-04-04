@@ -253,6 +253,8 @@ namespace Orts.Simulation
         public event System.EventHandler<QueryCarViewerLoadedEventArgs> QueryCarViewerLoaded;
         public event System.EventHandler RequestTTDetachWindow;
 
+        public float TimetableLoadedFraction = 0.0f;    // Set by AI.PrerunAI(), Get by GameStateRunActivity.Update()
+
         public Simulator(UserSettings settings, string activityPath, bool useOpenRailsDirectory)
         {
             Catalog = new GettextResourceManager("Orts.Simulation");
@@ -349,6 +351,13 @@ namespace Orts.Simulation
                 if (CarSpawnerLists == null) CarSpawnerLists = new List<CarSpawnerList>();
                 Trace.Write(" EXTCARSPAWN");
                 ExtCarSpawnerFile = new ExtCarSpawnerFile(RoutePath + @"\openrails\carspawn.dat", RoutePath + @"\shapes\", CarSpawnerLists);
+            }
+
+            // Generate a list of EOTs that may be used to attach at end of train
+            if (Directory.Exists(EOTPath))
+            {
+                Trace.Write(" EOT");
+                FullEOTPaths = new FullEOTPaths(EOTPath);
             }
 
             // Generate a list of EOTs that may be used to attach at end of train
@@ -1163,6 +1172,7 @@ namespace Orts.Simulation
                         car.CarID = MPManager.GetUserName() + " - " + car.UiD; //player's train is always named train 0.
                     else
                         car.CarID = "0 - " + car.UiD; //player's train is always named train 0.
+                    if (car is EOT) train.EOT = car as EOT;
 
                     if (car is EOT) train.EOT = car as EOT;
                     train.Length += car.CarLengthM;

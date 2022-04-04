@@ -62,7 +62,7 @@ namespace Orts.Simulation.RollingStocks
                 if (wagFilePath.ToLower().Contains("orts_eot"))
                     car = new EOT(simulator, wagFilePath);
                 else
-                // its an ordinary MSTS wagon
+                    // its an ordinary MSTS wagon
                     car = new MSTSWagon(simulator, wagFilePath);
             }
             else

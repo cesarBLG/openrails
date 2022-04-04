@@ -19,6 +19,9 @@
 
 using Microsoft.Xna.Framework.Graphics;
 using Orts.Simulation.Physics;
+using Orts.Simulation.RollingStocks;
+using Orts.Simulation.RollingStocks.SubSystems;
+using Orts.Simulation.RollingStocks.SubSystems.Brakes;
 using ORTS.Common;
 using System;
 using System.Collections.Generic;

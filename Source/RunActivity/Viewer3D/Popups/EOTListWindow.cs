@@ -45,12 +45,11 @@ namespace Orts.Viewer3D.Popups
             var vbox = base.Layout(layout).AddLayoutVertical();
             if (Owner.Viewer.Simulator.FullEOTPaths != null)
             {
-                var colWidth = (vbox.RemainingWidth - vbox.TextHeight * 2) / 3;
+                var colWidth = (vbox.RemainingWidth - vbox.TextHeight * 2) / 2;
                 {
                     var line = vbox.AddLayoutHorizontalLineOfText();
                     line.Add(new Label(colWidth, line.RemainingHeight, Viewer.Catalog.GetString("Filename")));
                     line.Add(new Label(colWidth, line.RemainingHeight, Viewer.Catalog.GetString("Folder Name"), LabelAlignment.Left));
-                    line.Add(new Label(colWidth, line.RemainingHeight, Viewer.Catalog.GetString("Category"), LabelAlignment.Right));
                 }
                 vbox.AddHorizontalSeparator();
                 var scrollbox = vbox.AddLayoutScrollboxVertical(vbox.RemainingWidth);
@@ -58,15 +57,13 @@ namespace Orts.Viewer3D.Popups
                 foreach (var eotType in Owner.Viewer.Simulator.FullEOTPaths)
                 {
                     var line = scrollbox.AddLayoutHorizontalLineOfText();
-                    EOTLabel filename, foldername, category;
+                    EOTLabel filename, foldername;
                     line.Add(filename = new EOTLabel(colWidth, line.RemainingHeight, Owner.Viewer, eotType, Path.GetFileNameWithoutExtension(eotType), LabelAlignment.Left));
                     line.Add(foldername = new EOTLabel(colWidth - Owner.TextFontDefault.Height, line.RemainingHeight, Owner.Viewer, eotType, (Path.GetDirectoryName(eotType)).Remove(0, Owner.Viewer.Simulator.EOTPath.Length), LabelAlignment.Left));
-                    line.Add(category = new EOTLabel(colWidth, line.RemainingHeight, Owner.Viewer, eotType, "*", LabelAlignment.Right));
                     if (playerLocomotive?.Train != null && eotType.ToLower() == playerLocomotive.Train.EOT?.WagFilePath.ToLower()) 
                     {                       
                         filename.Color = Color.Red;
                         foldername.Color = Color.Red;
-                        category.Color = Color.Red;
                     }
                 }
              }

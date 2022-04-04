@@ -1562,7 +1562,6 @@ namespace Orts.MultiPlayer
                 train.CheckFreight();
                 train.SetDPUnitIDs();
                 train.ReinitializeEOT();
-                return;
             }
             // New train
             else
