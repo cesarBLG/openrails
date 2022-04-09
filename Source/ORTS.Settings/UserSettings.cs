@@ -166,8 +166,6 @@ namespace ORTS.Settings
         [Default(true)]
         public bool SpeedControl { get; set; }
         [Default(false)]
-        public bool ViewDispatcher { get; set; }
-        [Default(false)]
         public bool GraduatedRelease { get; set; }
         [Default(false)]
         public bool RetainersOnAllCars { get; set; }
@@ -201,7 +199,7 @@ namespace ORTS.Settings
         public int ExternalSoundPassThruPercent { get; set; } // higher = louder sound
 
         // Video settings:
-        [Default(false)]
+        [Default(true)]
         public bool DynamicShadows { get; set; }
         [Default(false)]
         public bool ShadowAllShapes { get; set; }
@@ -209,11 +207,11 @@ namespace ORTS.Settings
         public bool FastFullScreenAltTab { get; set; }
         [Default(false)]
         public bool WindowGlass { get; set; }
-        [Default(false)]
+        [Default(true)]
         public bool ModelInstancing { get; set; }
         [Default(true)]
         public bool Wire { get; set; }
-        [Default(false)]
+        [Default(true)]
         public bool VerticalSync { get; set; }
         [Default(0)]
         public int Cab2DStretch { get; set; }

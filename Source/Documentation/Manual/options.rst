@@ -200,11 +200,11 @@ Video Options
 Dynamic shadows
 ---------------
 
-Check this option to cast shadows from movable objects such as trains.
+This option causes movable objects such as trains to cast shadows.
+Unchecking the option will increase the frame rate.
 
-The default setting is unchecked.
+The default setting is checked.
 
-Note: This may reduce the frame rate.
 
 Shadow for all shapes
 ---------------------
@@ -231,14 +231,14 @@ If this option is not selected, OR is minimized.
 Each successive press of Alt+Tab will toggle between the map window
 and the OR window.
 
-Note: To display the Map Window, the :ref:`Map window option <options-map-window>` 
-must also be selected and the Map Window started with Ctrl+9.
+Note: To display the Map Window, the Map Window must be started with Ctrl+9.
 
 Glass on in-game windows
 ------------------------
 
 When this option is checked, the in-game windows are displayed in a
 semitransparent mode.
+
 
 Model instancing
 ----------------
@@ -250,10 +250,12 @@ hardware, but this may reduce the frame rate.
 
 The default setting is checked.
 
+
 Overhead wire
 -------------
 
 This option will enable or disable display of the overhead wire.
+
 
 .. _options-double-overhead-wires:
 
@@ -263,6 +265,7 @@ Double overhead wires
 MSTS uses a single wire for electrified routes; you may check this box so
 that OR will show the two overhead wires that are more common.
 
+
 .. _options-vsync:
 
 Vertical sync
@@ -270,48 +273,17 @@ Vertical sync
 
 Vertical Sync (VSync) attempts to lock Open Rails’ output frame rate 
 to your monitor's refresh rate for the smoothest image and to resist 
-image "tearing”.
+image "tearing".
+
 VSync may help keep the frame rate more stable on complex routes, 
 reducing sudden frame rate drops and apparent control lag in some cases.
 If Open Rails' frame rate drops below your monitor's frame rate, you 
-may see stuttering or image "tearing". To prevent this, either turn off 
+may see stuttering or image "tearing". To prevent this, either uncheck 
 the VSync option or reduce the values for video options such as view 
 distance, anti-aliasing, or world object density.
 
-.. _options-cab-stretch:
+The default setting is checked.
 
-% Cab 2D stretch
-----------------
-
-OR manages not only cab interiors using 2D images in a MSTS-compatible
-way, but also supports 3D models. Most 2D cab images follow MSTS practice,
-being 1024 x 768 pixels to suit monitors with a 4:3 aspect ratio.
-
-So, the problem arises -- how to display these 4:3 cabs on a 16:9 or 16:10
-monitor?
-
-One possibility is to stretch these images horizontally to match other
-aspect ratios, as shown in the image below.
-
-.. image:: images/options-2dstretch_1.png
-
-To respect the proportions however, by default OR does no stretching and
-shows the full width of the cab interior, thus losing a portion from the
-top and bottom of the image. You can use the Up and Down Arrow keys to pan
-and reveal these missing portions.
-
-Therefore the setting for % Cab 2D Stretch has a default value of 0
-providing no stretching and a maximum value of 100 which stretches the
-picture so as to cover the complete display. Intermediate values provide a
-blend of panning and stretching.
-
-.. image:: images/options-2dstretch_2.png
-
-OR can also pillarbox or letterbox the cab by filling the missing space with 
-black bars. You can activate this mode in-game by pressing Ctrl+1. It overrides 
-any stretching.
-
-.. image:: images/options-2dstretch_3.png
 
 .. _options-cab-stretch:
 
@@ -347,6 +319,8 @@ black bars. You can activate this mode in-game by pressing Ctrl+1. It overrides
 any stretching.
 
 .. image:: images/options-2dstretch_3.png
+
+
 
 Viewing distance
 ----------------
