@@ -665,17 +665,6 @@ namespace Orts.Formats.Msts
                     setting.GraduatedRelease = false;
                     Trace.Write("\nGraduated Brake Release          =   False");
                 }
-                               
-                if (ORTSOptionsViewDispatcherWindow == 1)
-                {
-                    setting.ViewDispatcher = true;
-                    Trace.Write("\nView Dispatch Window             =   True");
-                }
-                else if (ORTSOptionsViewDispatcherWindow == 0)
-                {
-                    setting.ViewDispatcher = false;
-                    Trace.Write("\nView Dispatch Window             =   False");
-                }
 
                 if (ORTSOptionsSoundSpeedControl == 1)
                 {
