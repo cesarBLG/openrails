@@ -1,5 +1,5 @@
-﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.121
-March 22nd, 2022
+﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.122
+April 9th, 2022
 
 Please note that the installation and use of Open Rails software, even of its unofficial versions, is governed by the Open Rails End User License Agreement. 
 
@@ -11,7 +11,7 @@ INSTALLATION
 
 
 RELEASE NOTES
-This unofficial version has been derived from the latest official Testing release T1.4-413 and from the official master branch up to date.
+This unofficial version has been derived from the latest official Testing release T1.4-450.
 
 
 This version includes some features not (yet) available in the Open Rails testing official version, that is:
@@ -46,16 +46,15 @@ This version includes some features not (yet) available in the Open Rails testin
 - Various fixes related to reversals and couplings, see e.g. http://www.elvastower.com/forums/index.php?/topic/29383-assistance-with-ai-shunting/page__view__findpost__p__277369
 - Insert cabview controls in side views of 2D cabs, see http://www.elvastower.com/forums/index.php?/topic/35640-inserting-cabview-controls-in-side-views-of-2d-cabs/ 
 - workaround for http://www.elvastower.com/forums/index.php?/topic/32640-or-newyear-mg/page__view__findpost__p__278074 
-- EOT management, see http://www.elvastower.com/forums/index.php?/topic/35912-eot/ (present in Unstable release)
 - Fix bug of wagon smoke not appearing when Reduce Memory Usage option set, see http://www.elvastower.com/forums/index.php?/topic/35975-recent-mg-versions-smoking-caboose-has-stopped-smoking/
 - "ORNYMG only" option tab, including all option checkboxes available only in ORNYMG
 - kept Locomotive() TCS script hook
 - kept various options in ORNYMG only tab
 - add PERCENT UoM to ORTS_SIGNED_TRACTION_TOTAL_BRAKING
-- NEW: add cabview controls ODOMETER_UP and ODOMETER_DOWN
-- NEW: add bug fix for https://bugs.launchpad.net/or/+bug/1964793 Steam Loco Tractive Effort shows incorrectly in the HUD, by steamer_ctn (already present in Unstable release)
-
-
+- add cabview controls ODOMETER_UP and ODOMETER_DOWN
+- NEW: fix for http://www.elvastower.com/forums/index.php?/topic/36129-player-trainlead-locomotive-must-be-player-locomotive-crash/ (present in Unstable release)
+- NEW: Fix issue with auxiliary water tender water level, by steamer_ctn (present in Unstable release)
+- NEW: Sky color fix, by DR-Aeronautics (present in Unstable release)
 
 
 The Monogame related code intentionally coincides only partly with the code of the OR official testing version.
@@ -68,6 +67,7 @@ This unofficial version couldn't have been created without following contributio
 - perpetualKid
 - Jindrich
 - Dennis A T (dennisat)
+- DR-Aeronautics
 - Mauricio (mbm_OR)
 - cjakeman
 - BillC
