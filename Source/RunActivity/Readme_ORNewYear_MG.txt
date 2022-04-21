@@ -1,5 +1,5 @@
-﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.122
-April 9th, 2022
+﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.123
+April 21st, 2022
 
 Please note that the installation and use of Open Rails software, even of its unofficial versions, is governed by the Open Rails End User License Agreement. 
 
@@ -11,7 +11,7 @@ INSTALLATION
 
 
 RELEASE NOTES
-This unofficial version has been derived from the latest official Testing release T1.4-450.
+This unofficial version has been derived from the latest official Testing release T1.4-473 and from the master release at the up-to-date state.
 
 
 This version includes some features not (yet) available in the Open Rails testing official version, that is:
@@ -52,9 +52,7 @@ This version includes some features not (yet) available in the Open Rails testin
 - kept various options in ORNYMG only tab
 - add PERCENT UoM to ORTS_SIGNED_TRACTION_TOTAL_BRAKING
 - add cabview controls ODOMETER_UP and ODOMETER_DOWN
-- NEW: fix for http://www.elvastower.com/forums/index.php?/topic/36129-player-trainlead-locomotive-must-be-player-locomotive-crash/ (present in Unstable release)
-- NEW: Fix issue with auxiliary water tender water level, by steamer_ctn (present in Unstable release)
-- NEW: Sky color fix, by DR-Aeronautics (present in Unstable release)
+- NEW: tentative fix for ORNYMG bug preventing scripts to run
 
 
 The Monogame related code intentionally coincides only partly with the code of the OR official testing version.
