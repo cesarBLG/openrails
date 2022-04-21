@@ -139,7 +139,7 @@
     <Compile Include="Viewer3D\Popups\ComposeMessage.cs" />
     <Compile Include="Viewer3D\Popups\EOTListWindow.cs" />
     <Compile Include="Viewer3D\Popups\HUDScrollWindow.cs" />
-    <Compile Include="Viewer3D\Popups\EOTListWindow.cs" />	
+    <Compile Include="Viewer3D\Popups\EOTListWindow.cs" />
     <Compile Include="Viewer3D\Popups\LabelPrimitive.cs" />
     <Compile Include="Viewer3D\Popups\MultiPlayerWindow.cs" />
     <Compile Include="Viewer3D\Popups\NoticeWindow.cs" />
@@ -904,11 +904,10 @@ DEL "Program\RunActivity32.*"
 DEL "Program\*.nlp"
 XCOPY "Program\Runactivity.exe"
 XCOPY "Program\Runactivity.pdb"
+XCOPY "Program\Runactivity.exe.config"
 REN Runactivity.exe Runactivity32.exe
-
-
-
 REN Runactivity.pdb Runactivity32.pdb
+REN Runactivity.exe.config Runactivity32.exe.config
 XCOPY "Runactivity32.*" "Program"
 DEL "Runactivity32.*"
 </PostBuildEvent>
