@@ -954,9 +954,16 @@ namespace Orts.Simulation.RollingStocks
             {//, Simulator.Catalog.GetString("Gear")
                 status.AppendFormat("{0}", DieselEngines[0].GearBox.CurrentGearIndex < 0 ? Simulator.Catalog.GetString("N") : (DieselEngines[0].GearBox.CurrentGearIndex + 1).ToString());
             }
-            status.AppendFormat("\t{0}\t{1}\t\n",
 
-            FormatStrings.FormatFuelVolume(DieselLevelL, IsMetric, IsUK), DieselEngines.GetStatus());
+            status.AppendFormat("\t{0}\t{1}\t\n",
+            FormatStrings.FormatFuelVolume(DieselLevelL, IsMetric, IsUK), DieselEngines.GetStatus(0));
+            if (DieselEngines.DEList.Count > 1)
+            {
+                for (int deIndex = 1; deIndex <= DieselEngines.DEList.Count; deIndex++)
+                {
+                    status.AppendFormat("\t\t\t\t\t\t\t\t\t\t\t{0}\t\n", DieselEngines.GetStatus(deIndex));
+                }
+            }
 
 
             if (IsSteamHeatFitted && Train.PassengerCarsNumber > 0 && this.IsLeadLocomotive() && Train.CarSteamHeatOn)

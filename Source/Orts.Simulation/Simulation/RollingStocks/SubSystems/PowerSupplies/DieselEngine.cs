@@ -409,59 +409,50 @@ namespace Orts.Simulation.RollingStocks.SubSystems.PowerSupplies
             return labels.ToString();
         }
 
-        public string GetStatus()
+        public string GetStatus(int deIndex)
         {
             var result = new StringBuilder();
 
             //result.AppendFormat(Simulator.Catalog.GetString("Status"));
-            foreach (var eng in DEList)
+            if (deIndex < DEList.Count)
+            {
+                var eng = DEList[deIndex];
                 result.AppendFormat("\t{0}", Simulator.Catalog.GetParticularString("Engine", GetStringAttribute.GetPrettyName(eng.State)));
 
-            if (Locomotive.DieselTransmissionType == MSTSDieselLocomotive.DieselTransmissionTypes.Mechanic)
-            {
-                result.AppendFormat("\t{0}\t{1}", Simulator.Catalog.GetParticularString("HUD", "Power"), Simulator.Catalog.GetString(" "));  // Leave maximum power out
-                foreach (var eng in DEList)
+                if (Locomotive.DieselTransmissionType == MSTSDieselLocomotive.DieselTransmissionTypes.Mechanic)
                 {
+                    //               result.AppendFormat("\t{0}\t{1}", Simulator.Catalog.GetParticularString("HUD", "Power"), Simulator.Catalog.GetString(" "));  // Leave maximum power out
                     result.AppendFormat("\t{0}", FormatStrings.FormatPower(eng.CurrentDieselOutputPowerW, Locomotive.IsMetric, false, false));
                 }
-            }
-            else
-            {
-                result.AppendFormat("\t{0}\t{1}", Simulator.Catalog.GetParticularString("HUD", "Power"), FormatStrings.FormatPower(MaxOutputPowerW, Locomotive.IsMetric, false, false));
-                foreach (var eng in DEList)
+                else
+                {
+ //                   result.AppendFormat("\t{0}\t{1}", Simulator.Catalog.GetParticularString("HUD", "Power"), FormatStrings.FormatPower(MaxOutputPowerW, Locomotive.IsMetric, false, false));
                     result.AppendFormat("\t{0}", FormatStrings.FormatPower(eng.CurrentDieselOutputPowerW, Locomotive.IsMetric, false, false));
-            }
+                }
 
-            //result.AppendFormat("\t{0}", Simulator.Catalog.GetString("Load"));
-            foreach (var eng in DEList)
+                //result.AppendFormat("\t{0}", Simulator.Catalog.GetString("Load"));
                 result.AppendFormat("\t{0:F1}%", eng.LoadPercent);
 
-            if (Locomotive.DieselTransmissionType == MSTSDieselLocomotive.DieselTransmissionTypes.Mechanic)
-            {
-                foreach (var eng in DEList)
+                if (Locomotive.DieselTransmissionType == MSTSDieselLocomotive.DieselTransmissionTypes.Mechanic)
                 {
                     var governorEnabled = eng.GovernorEnabled ? "???" : "";
                     result.AppendFormat("\t{0:F0} {2}{1}", eng.RealRPM, governorEnabled, FormatStrings.rpm);
                 }
-            }
-            else
-            {
-                foreach (var eng in DEList)
+                else
+                {
                     result.AppendFormat("\t{0:F0} {1}", eng.RealRPM, FormatStrings.rpm);
-            }
+                }
 
-            //result.AppendFormat("\t{0}", Simulator.Catalog.GetString("Flow"));
-            foreach (var eng in DEList)
+                //result.AppendFormat("\t{0}", Simulator.Catalog.GetString("Flow"));
                 result.AppendFormat("\t{0}/{1}", FormatStrings.FormatFuelVolume(pS.TopH(eng.DieselFlowLps), Locomotive.IsMetric, Locomotive.IsUK), FormatStrings.h);
 
-            //result.Append("\t");
-            foreach (var eng in DEList)
+                //result.Append("\t");
                 result.AppendFormat("\t{0}", FormatStrings.FormatTemperature(eng.DieselTemperatureDeg, Locomotive.IsMetric, false));
 
-            //result.AppendFormat("\t{0}", Simulator.Catalog.GetString("Oil"));
-            foreach (var eng in DEList)
+                //result.AppendFormat("\t{0}", Simulator.Catalog.GetString("Oil"));
                 result.AppendFormat("\t{0}", FormatStrings.FormatPressure(eng.DieselOilPressurePSI, PressureUnit.PSI, Locomotive.MainPressureUnit, true));
 
+            }
             return result.ToString();
         }
 
