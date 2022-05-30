@@ -1027,7 +1027,6 @@ namespace Orts.Viewer3D
         protected FuelPickupItem FuelPickupItem;
         protected SoundSource Sound;
         protected float FrameRate;
-        protected Viewer Viewer;
         protected WorldPosition Position;
 
         protected int AnimationFrames;
@@ -1037,7 +1036,6 @@ namespace Orts.Viewer3D
             : base(viewer, path, position, shapeFlags)
         {
             FuelPickupItemObj = fuelpickupitemObj;
-            Viewer = viewer;
             Position = position;
             Initialize();
         }
@@ -1192,7 +1190,6 @@ namespace Orts.Viewer3D
         protected controller controllerGrabber01;
         protected controller controllerGrabber02;
         protected float slowDownThreshold = 0.03f;
-        protected SoundSource Sound;
         // To detect transitions that trigger sounds
         protected bool OldMoveX;
         protected bool OldMoveY;
