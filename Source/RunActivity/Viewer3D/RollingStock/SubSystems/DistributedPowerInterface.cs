@@ -368,7 +368,6 @@ namespace Orts.Viewer3D.RollingStock.SubSystems
         WindowTextFont TableSymbolFont;
         readonly int FontHeightTableText = 16;
         readonly int FontHeightTableSymbol = 19;
-        readonly int RowHeight = 34;
         readonly int ColLength = 88;
         public bool FullTable = true;
         public CABViewControlUnits LoadUnits;
@@ -969,7 +968,6 @@ namespace Orts.Viewer3D.RollingStock.SubSystems
                     if (color == Color.Yellow) y += 0.125f;
                     return y;
             }
-            return 1.0f;
         }
 
         public void PrepareFrame(RenderFrame frame, ElapsedTime elapsedTime)

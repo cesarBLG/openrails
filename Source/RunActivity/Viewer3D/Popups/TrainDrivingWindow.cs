@@ -18,31 +18,26 @@
 // This file is the responsibility of the 3D & Environment Team.
 
 using Microsoft.Xna.Framework.Graphics;
-using Orts.Simulation.Physics;
-using Orts.Simulation.RollingStocks;
-using Orts.Simulation.RollingStocks.SubSystems;
-using Orts.Simulation.RollingStocks.SubSystems.Brakes;
-using ORTS.Common;
+
+
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using Microsoft.Xna.Framework;
+using ORTS.Common;
+using ORTS.Common.Input;
+using Orts.Simulation.Physics;
 using Orts.Simulation.RollingStocks.SubSystems;
 using Orts.Simulation.RollingStocks.SubSystems.Brakes;
 using Orts.Simulation.RollingStocks;
-using System.Text;
-using ORTS.Common.Input;
-using Microsoft.Xna.Framework;
-using System.IO;
 
 namespace Orts.Viewer3D.Popups
 {
     public class TrainDrivingWindow : Window
     {
-        bool DynBrakeSetup = false;
         bool ResizeWindow = false;
         bool UpdateDataEnded = false;
-        double StartTime;
-        int FirstColIndex = 0;//first string that does not fit
         int FirstColLenght = 0;
         int FirstColOverFlow = 0;
         int LastColLenght = 0;
@@ -76,9 +71,7 @@ namespace Orts.Viewer3D.Popups
         int WindowWidthMin = 0;
         int WindowWidthMax = 0;
 
-        char expandWindow;
         const int TextSize = 15;
-        string gradientIndicator;
         string keyPressed;// display a symbol when a control key is pressed.
         public int keyPresLenght;
         public int OffSetX = 0;

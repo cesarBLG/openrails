@@ -139,7 +139,6 @@
     <Compile Include="Viewer3D\Popups\ComposeMessage.cs" />
     <Compile Include="Viewer3D\Popups\EOTListWindow.cs" />
     <Compile Include="Viewer3D\Popups\HUDScrollWindow.cs" />
-    <Compile Include="Viewer3D\Popups\EOTListWindow.cs" />
     <Compile Include="Viewer3D\Popups\LabelPrimitive.cs" />
     <Compile Include="Viewer3D\Popups\MultiPlayerWindow.cs" />
     <Compile Include="Viewer3D\Popups\NoticeWindow.cs" />
