@@ -1704,8 +1704,19 @@ namespace Orts.Parsers.Msts
         // ORTS specific
         ORTSListName, // ORTS specific for multi-carspawnerlists
         ORTSSoundFileName, // ORTS specific for individual level crossing sounds
-        ORTSPantographToggle3,
+        ORTSPantographToggle3, 
         ORTSPantographToggle4,
+        ORTSCraneSound,  // ORTS Specific for container stations
+        ORTSMaxStackedContainers,
+        ORTSStackLocations,
+        ORTSStackLocationsLength,
+        ORTSPickingSurfaceYOffset,
+        ORTSPickingSurfaceRelativeTopStartPosition,
+        ORTSMaxGrabberSpan,
+        StackLocation,
+        MaxStackedContainers,
+        Length,
+        Flipped,
 
         // TSRE specific
         Ruler
