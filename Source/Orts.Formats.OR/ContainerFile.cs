@@ -28,7 +28,7 @@ namespace Orts.Formats.OR
 {
     /// <summary>
     ///
-    /// class ORWeatherFile
+    /// class ContainerFile
     /// </summary>
 
     public class ContainerFile
@@ -83,18 +83,6 @@ namespace Orts.Formats.OR
                 default: return false;
             }
             return true;
-        }
-
-        // restore
-        public ContainerParameters(BinaryReader inf)
-        {
- //           Overcast = inf.ReadSingle();
-        }
-
-        // save
-        public void Save(BinaryWriter outf)
-        {
-//            outf.Write(Overcast);
         }
     }
 }

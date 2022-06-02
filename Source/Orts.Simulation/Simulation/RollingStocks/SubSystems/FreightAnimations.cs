@@ -317,7 +317,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                 }
                 else
                 {
-                    container.LoadFromContainerFile(loadFilePath);
+                    container.LoadFromContainerFile(loadFilePath, wagon.Simulator.BasePath +@"\trains\trainset\");
                     ContainerManager.LoadedContainers.Add(loadFilePath, container);
                 }
                 Vector3 offset = new Vector3(0, 0, 0);

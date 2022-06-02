@@ -1712,7 +1712,7 @@ namespace Orts.Parsers.Msts
         ORTSStackLocationsLength,
         ORTSPickingSurfaceYOffset,
         ORTSPickingSurfaceRelativeTopStartPosition,
-        ORTSMaxGrabberSpan,
+        ORTSGrabberArmsParts,
         StackLocation,
         MaxStackedContainers,
         Length,

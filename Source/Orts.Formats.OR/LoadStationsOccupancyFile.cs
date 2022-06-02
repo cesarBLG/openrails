@@ -28,7 +28,7 @@ namespace Orts.Formats.OR
 {
     /// <summary>
     ///
-    /// class ORWeatherFile
+    /// class LoadStationsOccupancyFile
     /// </summary>
 
     public class LoadStationsOccupancyFile
