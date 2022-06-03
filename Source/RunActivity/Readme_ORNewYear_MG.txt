@@ -1,5 +1,5 @@
-﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.124
-May 14th, 2022
+﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.125
+June 3rd, 2022
 
 Please note that the installation and use of Open Rails software, even of its unofficial versions, is governed by the Open Rails End User License Agreement. 
 
@@ -11,7 +11,7 @@ INSTALLATION
 
 
 RELEASE NOTES
-This unofficial version has been derived from the latest official Testing release T1.4-502 and from the master release at the up-to-date state.
+This unofficial version has been derived from the latest official Testing release T1.4-531.
 
 
 This version includes some features not (yet) available in the Open Rails testing official version, that is:
@@ -54,8 +54,7 @@ This version includes some features not (yet) available in the Open Rails testin
 - add cabview controls ODOMETER_UP and ODOMETER_DOWN
 - tentative fix for ORNYMG bug preventing scripts to run
 - Improvements in sky color and in other environment areas, by DR-Aeronautics
-- NEW: cleanup of Diesel Locomotive Info HUD when loco with more than one engine
-- NEW: fix warnings on SkyShader.fx and improve starlight, by DR-Aeronautics
+- NEW: Container management, see http://www.elvastower.com/forums/index.php?/topic/36162-container-management/ , with the support of Laci1959, QJ-6811, Aldarion, David Rowe and twpol
 
 
 The Monogame related code intentionally coincides only partly with the code of the OR official testing version.
