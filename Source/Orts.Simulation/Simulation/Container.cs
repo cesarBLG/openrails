@@ -1091,6 +1091,7 @@ namespace Orts.Simulation
             for (int i = 0; i < checkLength; i++)
             {
                 if (!StackLocations[i].Usable) continue;
+                if (StackLocations[i].Length + 0.02 < container.LengthM) continue;
                 if (StackLocations[i].Containers?.Count >= StackLocations[i].MaxStackedContainers) continue;
                 if (StackLocations[i].Containers?.Count > 0 && StackLocations[i].Containers[0]?.LengthM != container.LengthM) continue;
                 return true;
