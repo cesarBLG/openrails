@@ -132,13 +132,16 @@ namespace Orts.Simulation
         public SuperElevation SuperElevation;
         public int SuperElevationMinLen = 50;
         public float SuperElevationGauge = 1.435f;//1.435 guage
+        public LoadStationsOccupancyFile LoadStationsOccupancyFile;
 
         // Used in save and restore form
         public string PathName = "<unknown>";
         public float InitialTileX;
         public float InitialTileZ;
+        public bool Initialize = true;
         public HazzardManager HazzardManager;
         public FuelManager FuelManager;
+        public ContainerManager ContainerManager;
         public bool InControl = true;//For multiplayer, a player may not control his/her own train (as helper)
         public TurntableFile TurntableFile;
         public List<MovingTable> MovingTables = new List<MovingTable>();
@@ -371,6 +374,7 @@ namespace Orts.Simulation
             Confirmer = new Confirmer(this, 1.5);
             HazzardManager = new HazzardManager(this);
             FuelManager = new FuelManager(this);
+            ContainerManager = new ContainerManager(this);
             ScriptManager = new ScriptManager();
             Log = new CommandLog(this);
         }
@@ -441,6 +445,12 @@ namespace Orts.Simulation
 
         public void Start(CancellationToken cancellation)
         {
+            ContainerManager = new ContainerManager(this);
+            if (Activity?.Tr_Activity?.Tr_Activity_Header?.LoadStationsOccupancyFile != null)
+            {
+                var occupancyFilePath = RoutePath + @"\Activities\Openrails\" + Activity.Tr_Activity.Tr_Activity_Header.LoadStationsOccupancyFile + ".lso";
+                LoadStationsOccupancyFile = new LoadStationsOccupancyFile(occupancyFilePath);
+            }
             Signals = new Signals(this, SIGCFG, cancellation);
             TurntableFile = new TurntableFile(RoutePath + @"\openrails\turntables.dat", RoutePath + @"\shapes\", MovingTables, this);
             LevelCrossings = new LevelCrossings(this);
@@ -482,6 +492,7 @@ namespace Orts.Simulation
             TurntableFile = new TurntableFile(RoutePath + @"\openrails\turntables.dat", RoutePath + @"\shapes\", MovingTables, this);
             LevelCrossings = new LevelCrossings(this);
             FuelManager = new FuelManager(this);
+            ContainerManager = new ContainerManager(this);
             Trains = new TrainList(this);
             PoolHolder = new Poolholder(this, arguments, cancellation);
             PathName = String.Copy(arguments[1]);
@@ -519,6 +530,7 @@ namespace Orts.Simulation
 
         public void Restore(BinaryReader inf, string pathName, float initialTileX, float initialTileZ, CancellationToken cancellation)
         {
+            Initialize = false;
             ClockTime = inf.ReadDouble();
             Season = (SeasonType)inf.ReadInt32();
             WeatherType = (WeatherType)inf.ReadInt32();
@@ -528,9 +540,8 @@ namespace Orts.Simulation
             InitialTileX = initialTileX;
             InitialTileZ = initialTileZ;
             PoolHolder = new Poolholder(inf, this);
-
+            ContainerManager = new ContainerManager(this);
             Signals = new Signals(this, SIGCFG, inf, cancellation);
-
             RestoreTrains(inf);
             LevelCrossings = new LevelCrossings(this);
             AI = new AI(this, inf);
@@ -549,6 +560,7 @@ namespace Orts.Simulation
             ActivityRun = Orts.Simulation.Activity.Restore(inf, this, ActivityRun);
             Signals.RestoreTrains(Trains);  // restore links to trains
             Signals.Update(true);           // update all signals once to set proper stat
+            ContainerManager.Restore(inf);
             MPManager.Instance().RememberOriginalSwitchState(); // this prepares a string that must then be passed to clients
         }
 
@@ -571,6 +583,7 @@ namespace Orts.Simulation
                 foreach (var movingtable in MovingTables) movingtable.Save(outf);
 
             Orts.Simulation.Activity.Save(outf, ActivityRun);
+            ContainerManager.Save(outf);
         }
 
         Train InitializeTrains(CancellationToken cancellation)
@@ -879,6 +892,8 @@ namespace Orts.Simulation
             }
 
             if (HazzardManager != null) HazzardManager.Update(elapsedClockSeconds);
+
+            if (ContainerManager != null) ContainerManager.Update();
         }
 
         internal void SetWeather(WeatherType weather, SeasonType season)
@@ -1279,6 +1294,8 @@ namespace Orts.Simulation
                     else
                         car.CarID = "0 - " + car.UiD; //player's train is always named train 0.
                     if (car is EOT) train.EOT = car as EOT;
+                    car.FreightAnimations?.Load(car as MSTSWagon, wagon.LoadDataList);
+
                     train.Length += car.CarLengthM;
 
                     var mstsDieselLocomotive = car as MSTSDieselLocomotive;
@@ -1480,6 +1497,7 @@ namespace Orts.Simulation
                             car.CarID = activityObject.ID + " - " + car.UiD;
                             if (car is EOT)
                                 train.EOT = car as EOT;
+                            car.FreightAnimations?.Load(car as MSTSWagon, wagon.LoadDataList);
                         }
                         catch (Exception error)
                         {
