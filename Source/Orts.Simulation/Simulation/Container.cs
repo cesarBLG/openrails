@@ -220,6 +220,7 @@ namespace Orts.Simulation
                     break;
                 case ContainerType.C45ft:
                     LengthM = 13.7f;
+                    HeightM = 2.9f;
                     break;
                 case ContainerType.C48ft:
                     LengthM = 14.6f;
@@ -661,93 +662,94 @@ namespace Orts.Simulation
                     {
                         if (Math.Abs(LinkedFreightAnimation.Wagon.SpeedMpS) < 0.01f)
                         {
-                            MoveY = false;
-                            TargetX = PickingSurfaceRelativeTopStartPosition.X;
                             WorldPosition animWorldPosition = new WorldPosition(LinkedFreightAnimation.Wagon.WorldPosition);
-            //                var translation = Matrix.CreateTranslation(LinkedFreightAnimation.Offset);
-            //                animWorldPosition.XNAMatrix = translation * animWorldPosition.XNAMatrix;
                             var relativeAnimationPosition = Matrix.Multiply(animWorldPosition.XNAMatrix, InitialInvAnimationXNAMatrix);
-                            // compute where within the free space to lay down the container
-                            var freightAnims = LinkedFreightAnimation.FreightAnimations;
-                            var offsetZ = LinkedFreightAnimation.Offset.Z;
-                            if (Math.Abs(LinkedFreightAnimation.LoadingAreaLength - HandledContainer.LengthM) > 0.01)
+                            if (!messageWritten)
                             {
-                                var loadedFreightAnim = new FreightAnimationDiscrete(LinkedFreightAnimation, LinkedFreightAnimation.FreightAnimations);
-                                var loadedIntakePoint = loadedFreightAnim.LinkedIntakePoint;
-                                if (!(HandledContainer.ContainerType == ContainerType.C20ft && LinkedFreightAnimation.LoadPosition == LoadPosition.Center &&
-                                    LinkedFreightAnimation.LoadingAreaLength + 0.01f >= 12.19))
+                                MoveY = false;
+                                TargetX = PickingSurfaceRelativeTopStartPosition.X;
+                                // compute where within the free space to lay down the container
+                                var freightAnims = LinkedFreightAnimation.FreightAnimations;
+                                var offsetZ = LinkedFreightAnimation.Offset.Z;
+                                if (Math.Abs(LinkedFreightAnimation.LoadingAreaLength - HandledContainer.LengthM) > 0.01)
                                 {
-                                    if (LinkedFreightAnimation.LoadingAreaLength == freightAnims.LoadingAreaLength && !freightAnims.DoubleStacker)
+                                    var loadedFreightAnim = new FreightAnimationDiscrete(LinkedFreightAnimation, LinkedFreightAnimation.FreightAnimations);
+                                    var loadedIntakePoint = loadedFreightAnim.LinkedIntakePoint;
+                                    if (!(HandledContainer.ContainerType == ContainerType.C20ft && LinkedFreightAnimation.LoadPosition == LoadPosition.Center &&
+                                        LinkedFreightAnimation.LoadingAreaLength + 0.01f >= 12.19))
                                     {
-                                        loadedFreightAnim.LoadPosition = LoadPosition.Rear;
-                                        loadedFreightAnim.Offset.Z = freightAnims.Offset.Z + (freightAnims.LoadingAreaLength - HandledContainer.LengthM) / 2;
-                                    }
-                                    else if (loadedFreightAnim.LoadPosition != LoadPosition.Center && loadedFreightAnim.LoadPosition != LoadPosition.Above)
-                                    {
-                                        switch (loadedFreightAnim.LoadPosition)
+                                        if (LinkedFreightAnimation.LoadingAreaLength == freightAnims.LoadingAreaLength && !freightAnims.DoubleStacker)
                                         {
-                                            case LoadPosition.Front:
-                                                loadedFreightAnim.Offset.Z = freightAnims.Offset.Z -(freightAnims.LoadingAreaLength - HandledContainer.LengthM) / 2;
-                                                break;
-                                            case LoadPosition.Rear:
-                                                loadedFreightAnim.Offset.Z = freightAnims.Offset.Z + (freightAnims.LoadingAreaLength - HandledContainer.LengthM) / 2;
-                                                break;
-                                            case LoadPosition.CenterFront:
-                                                loadedFreightAnim.Offset.Z = freightAnims.Offset.Z - HandledContainer.LengthM / 2;
-                                                break;
-                                            case LoadPosition.CenterRear:
-                                                loadedFreightAnim.Offset.Z = freightAnims.Offset.Z + HandledContainer.LengthM / 2;
-                                                break;
-                                            default:
-                                                break;
+                                            loadedFreightAnim.LoadPosition = LoadPosition.Rear;
+                                            loadedFreightAnim.Offset.Z = freightAnims.Offset.Z + (freightAnims.LoadingAreaLength - HandledContainer.LengthM) / 2;
                                         }
-                                    }         
-                                }
-                                else
-                                // don't lay down a short container in the middle of the wagon
-                                {
-                                    if (LinkedFreightAnimation.LoadingAreaLength == freightAnims.LoadingAreaLength && !freightAnims.DoubleStacker)
-                                    {
-                                        loadedFreightAnim.LoadPosition = LoadPosition.Rear;
-                                        loadedFreightAnim.Offset.Z = freightAnims.Offset.Z + (freightAnims.LoadingAreaLength - HandledContainer.LengthM) / 2;
+                                        else if (loadedFreightAnim.LoadPosition != LoadPosition.Center && loadedFreightAnim.LoadPosition != LoadPosition.Above)
+                                        {
+                                            switch (loadedFreightAnim.LoadPosition)
+                                            {
+                                                case LoadPosition.Front:
+                                                    loadedFreightAnim.Offset.Z = freightAnims.Offset.Z - (freightAnims.LoadingAreaLength - HandledContainer.LengthM) / 2;
+                                                    break;
+                                                case LoadPosition.Rear:
+                                                    loadedFreightAnim.Offset.Z = freightAnims.Offset.Z + (freightAnims.LoadingAreaLength - HandledContainer.LengthM) / 2;
+                                                    break;
+                                                case LoadPosition.CenterFront:
+                                                    loadedFreightAnim.Offset.Z = freightAnims.Offset.Z - HandledContainer.LengthM / 2;
+                                                    break;
+                                                case LoadPosition.CenterRear:
+                                                    loadedFreightAnim.Offset.Z = freightAnims.Offset.Z + HandledContainer.LengthM / 2;
+                                                    break;
+                                                default:
+                                                    break;
+                                            }
+                                        }
                                     }
                                     else
+                                    // don't lay down a short container in the middle of the wagon
                                     {
-                                        loadedFreightAnim.LoadPosition = LoadPosition.CenterFront;
-                                        loadedFreightAnim.Offset.Z = freightAnims.Offset.Z - HandledContainer.LengthM / 2;
+                                        if (LinkedFreightAnimation.LoadingAreaLength == freightAnims.LoadingAreaLength && !freightAnims.DoubleStacker)
+                                        {
+                                            loadedFreightAnim.LoadPosition = LoadPosition.Rear;
+                                            loadedFreightAnim.Offset.Z = freightAnims.Offset.Z + (freightAnims.LoadingAreaLength - HandledContainer.LengthM) / 2;
+                                        }
+                                        else
+                                        {
+                                            loadedFreightAnim.LoadPosition = LoadPosition.CenterFront;
+                                            loadedFreightAnim.Offset.Z = freightAnims.Offset.Z - HandledContainer.LengthM / 2;
+                                        }
                                     }
+                                    loadedFreightAnim.LoadingAreaLength = HandledContainer.LengthM;
+                                    loadedIntakePoint.OffsetM = -loadedFreightAnim.Offset.Z;
+                                    freightAnims.Animations.Add(loadedFreightAnim);
+                                    loadedFreightAnim.Container = HandledContainer;
+                                    freightAnims.UpdateEmptyFreightAnims(HandledContainer.LengthM);
+                                    // Too early to have container on wagon
+                                    loadedFreightAnim.Container = null;
+                                    LinkedFreightAnimation = loadedFreightAnim;
                                 }
-                                loadedFreightAnim.LoadingAreaLength = HandledContainer.LengthM;
-                                loadedIntakePoint.OffsetM = -loadedFreightAnim.Offset.Z;
-                                freightAnims.Animations.Add(loadedFreightAnim);
-                                loadedFreightAnim.Container = HandledContainer;
-                                freightAnims.UpdateEmptyFreightAnims(HandledContainer.LengthM);
-                                // Too early to have container on wagon
-                                loadedFreightAnim.Container = null;
-                                LinkedFreightAnimation = loadedFreightAnim;
-                            }
-                            else
-                            {
-                                freightAnims.EmptyAnimations.Remove(LinkedFreightAnimation);
-                                freightAnims.Animations.Add(LinkedFreightAnimation);
-                                (freightAnims.Animations.Last() as FreightAnimationDiscrete).Container = HandledContainer;
-                                freightAnims.EmptyAbove();
-                                (freightAnims.Animations.Last() as FreightAnimationDiscrete).Container = null;
+                                else
+                                {
+                                    freightAnims.EmptyAnimations.Remove(LinkedFreightAnimation);
+                                    freightAnims.Animations.Add(LinkedFreightAnimation);
+                                    (freightAnims.Animations.Last() as FreightAnimationDiscrete).Container = HandledContainer;
+                                    freightAnims.EmptyAbove();
+                                    (freightAnims.Animations.Last() as FreightAnimationDiscrete).Container = null;
 
 
+                                }
                             }
                             TargetZ = PickingSurfaceRelativeTopStartPosition.Z - relativeAnimationPosition.Translation.Z - LinkedFreightAnimation.Offset.Z * 
                                 (WagonFlipped ? -1 : 1);
- /*                           if (TargetZ < PickingSurfaceRelativeTopStartPosition.Z)
+                            if (Math.Abs(TargetZ) > MinZSpan)
                             {
                                 if (!messageWritten)
                                 {
                                     Simulator.Confirmer.Message(ConfirmLevel.Information, Simulator.Catalog.GetStringFmt("Wagon out of range: move wagon towards crane by {0} metres",
-                                        PickingSurfaceRelativeTopStartPosition.Z - TargetZ));
+                                        Math.Abs(TargetZ) - MinZSpan));
                                     messageWritten = true;
                                 }
                             }
-                            else*/
+                            else
                             {
                                 MoveX = MoveZ = true;
                                 Status = ContainerStationStatus.LoadHorizontallyMoveToLayOnWagon;
