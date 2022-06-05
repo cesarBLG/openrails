@@ -17,8 +17,11 @@
 
 using System;
 using System.Diagnostics;
+using System.Linq;
 
-namespace Orts.ExternalDevices
+using RailDriver;
+
+namespace ORTS.Common.Input
 {
     public enum RailDriverDisplaySign : byte
     {
@@ -55,7 +58,7 @@ namespace Orts.ExternalDevices
         Char_u = 0x1c,
     }
 
-    public abstract class RailDriverBase
+    public class RailDriverDevice
     {
         public static readonly byte[] LedDigits = { (byte)RailDriverDisplaySign.Digit_0, (byte)RailDriverDisplaySign.Digit_1, (byte)RailDriverDisplaySign.Digit_2,
             (byte)RailDriverDisplaySign.Digit_3, (byte)RailDriverDisplaySign.Digit_4, (byte)RailDriverDisplaySign.Digit_5, (byte)RailDriverDisplaySign.Digit_6,
@@ -66,46 +69,59 @@ namespace Orts.ExternalDevices
             (byte)RailDriverDisplaySign.Digit_6 | (byte)RailDriverDisplaySign.Decimal, (byte)RailDriverDisplaySign.Digit_7 | (byte)RailDriverDisplaySign.Decimal,
             (byte)RailDriverDisplaySign.Digit_8 | (byte)RailDriverDisplaySign.Decimal, (byte)RailDriverDisplaySign.Digit_9 | (byte)RailDriverDisplaySign.Decimal};
 
-        public byte[] NewWriteBuffer => new byte[WriteBufferSize];
+        private readonly PIEDevice device;
 
-        private static RailDriverBase instance;
+        private static RailDriverDevice instance;
         private static byte[] writeBuffer;
 
-        public static RailDriverBase GetInstance32()
+        public int WriteBufferSize => device?.WriteLength ?? 0;
+
+        public int ReadBufferSize => device?.ReadLength ?? 0;
+
+        public int WriteData(byte[] writeBuffer)
         {
-            if (null == instance)
-            {
-                instance = new RailDriver32();
-                writeBuffer = instance.NewWriteBuffer;
-            }
-            return instance;
+            return device?.WriteData(writeBuffer) ?? -1;
         }
 
-        public static RailDriverBase GetInstance64()
+        public byte[] GetReadBuffer()
         {
-            if (null == instance)
-            {
-                instance = new RailDriver64();
-                writeBuffer = instance.NewWriteBuffer;
-            }
-            return instance;
+            return new byte[ReadBufferSize];
         }
 
-        public abstract int WriteBufferSize { get; }
+        public int ReadCurrentData(ref byte[] data)
+        {
+            return device?.ReadLast(ref data) ?? -1;
+        }
 
-        public abstract int ReadBufferSize { get; }
+        public void Shutdown()
+        {
+            device?.CloseInterface();
+        }
 
-        public abstract int WriteData(byte[] writeBuffer);
-        public byte[] NewReadBuffer => new byte[ReadBufferSize];
+        public bool Enabled => device != null;
 
-        public abstract int ReadCurrentData(ref byte[] data);
+        public static RailDriverDevice Instance
+        {
+            get
+            {
+                if (null == instance)
+                {
+                    instance = new RailDriverDevice();
+                }
+                return instance;
+            }
+        }
 
-        public abstract int BlockingReadCurrentData(ref byte[] data, int timeout);
-
-        public abstract void Shutdown();
-
-        public abstract bool Enabled { get; }
-
+        private RailDriverDevice()
+        {
+            device = PIEDevice.EnumeratePIE().Where(dev => dev.HidUsagePage == 0xc && dev.Pid == 210).FirstOrDefault();
+            if (null != device)
+            {
+                device.SetupInterface();
+                device.SuppressDuplicateReports = true;
+                writeBuffer = new byte[WriteBufferSize];
+            }
+        }
 
         /// <summary>
         /// Set the RailDriver LEDs to the specified values
@@ -115,12 +131,15 @@ namespace Orts.ExternalDevices
         /// <param name="led3"></param>
         public void SetLeds(byte led1, byte led2, byte led3)
         {
-            writeBuffer.Initialize();
-            writeBuffer[1] = 134;
-            writeBuffer[2] = led3;
-            writeBuffer[3] = led2;
-            writeBuffer[4] = led1;
-            instance?.WriteData(writeBuffer);
+            if (device != null)
+            {
+                writeBuffer.Initialize();
+                writeBuffer[1] = 134;
+                writeBuffer[2] = led3;
+                writeBuffer[3] = led2;
+                writeBuffer[4] = led1;
+                device.WriteData(writeBuffer);
+            }
         }
 
         /// <summary>
@@ -131,13 +150,15 @@ namespace Orts.ExternalDevices
         /// <param name="led3"></param>
         public void SetLeds(RailDriverDisplaySign led1, RailDriverDisplaySign led2, RailDriverDisplaySign led3)
         {
-//            if (writeBuffer.Length == 0) return;
-            writeBuffer.Initialize();
-            writeBuffer[1] = 134;
-            writeBuffer[2] = (byte)led3;
-            writeBuffer[3] = (byte)led2;
-            writeBuffer[4] = (byte)led1;
-            instance?.WriteData(writeBuffer);
+            if (device != null)
+            {
+                writeBuffer.Initialize();
+                writeBuffer[1] = 134;
+                writeBuffer[2] = (byte)led3;
+                writeBuffer[3] = (byte)led2;
+                writeBuffer[4] = (byte)led1;
+                device.WriteData(writeBuffer);
+            }
         }
 
         /// <summary>
@@ -158,12 +179,11 @@ namespace Orts.ExternalDevices
         /// <summary>
         /// Displays the given numeric value on RailDriver LED display
         /// </summary>
-        public void SetLedsNumeric(float value)
+        public void SetLedsNumeric(double value)
         {
             if (value < 0 || value > 999.9)
                 throw new ArgumentOutOfRangeException(nameof(value), value, "Display Value needs to be between 0.0 and 999.9");
-            value *= 10;    //simplify display setting for fractional part
-            int s = (int)(value >= 0 ? value + .5 : -value + .5);
+            int s = (int)(value * 10);    //simplify display setting for fractional part
             if (s < 100)
                 SetLeds(0, LedDecimalDigits[s / 10], LedDigits[s % 10]);
             else if (s < 1000)
@@ -183,119 +203,13 @@ namespace Orts.ExternalDevices
         /// <param name="on"></param>
         public void EnableSpeaker(bool state)
         {
-            writeBuffer.Initialize();
-            writeBuffer[1] = 133;
-            writeBuffer[7] = (byte)(state ? 1 : 0);
-            instance.WriteData(writeBuffer);
-        }
-
-
-    }
-
-    internal class RailDriver32 : RailDriverBase
-    {
-        private readonly PIEHid32Net.PIEDevice device;                   // Our RailDriver
-
-        public RailDriver32()
-        {
-            try
+            if (device != null)
             {
-                foreach (PIEHid32Net.PIEDevice currentDevice in PIEHid32Net.PIEDevice.EnumeratePIE())
-                {
-                    if (currentDevice.HidUsagePage == 0xc && currentDevice.Pid == 210)
-                    {
-                        device = currentDevice;
-                        device.SetupInterface();
-                        device.suppressDuplicateReports = true;
-                        break;
-                    }
-                }
+                writeBuffer.Initialize();
+                writeBuffer[1] = 133;
+                writeBuffer[7] = (byte)(state ? 1 : 0);
+                device.WriteData(writeBuffer);
             }
-            catch (Exception error)
-            {
-                device = null;
-                Trace.WriteLine(error);
-            }
-        }
-
-        public override int WriteBufferSize => device?.WriteLength ?? 0;
-
-        public override int ReadBufferSize => device?.ReadLength ?? 0;
-
-        public override bool Enabled => device != null;
-
-        public override int BlockingReadCurrentData(ref byte[] data, int timeout)
-        {
-            return device?.BlockingReadData(ref data, timeout) ?? -1;
-        }
-
-        public override int ReadCurrentData(ref byte[] data)
-        {
-            return device?.ReadLast(ref data) ?? -1;
-        }
-
-        public override void Shutdown()
-        {
-            device?.CloseInterface();
-        }
-
-        public override int WriteData(byte[] writeBuffer)
-        {
-            return device?.WriteData(writeBuffer) ?? -1;
         }
     }
-
-    internal class RailDriver64 : RailDriverBase
-    {
-        private readonly PIEHid64Net.PIEDevice device;                   // Our RailDriver
-
-        public RailDriver64()
-        {
-            try
-            {
-                foreach (PIEHid64Net.PIEDevice currentDevice in PIEHid64Net.PIEDevice.EnumeratePIE())
-                {
-                    if (currentDevice.HidUsagePage == 0xc && currentDevice.Pid == 210)
-                    {
-                        device = currentDevice;
-                        device.SetupInterface();
-                        device.suppressDuplicateReports = true;
-                        break;
-                    }
-                }
-            }
-            catch (Exception error)
-            {
-                device = null;
-                Trace.WriteLine(error);
-            }
-        }
-
-        public override int WriteBufferSize => (int)(device?.WriteLength ?? 0);
-
-        public override int ReadBufferSize => (int)(device?.ReadLength ?? 0);
-
-        public override bool Enabled => device != null;
-
-        public override int BlockingReadCurrentData(ref byte[] data, int timeout)
-        {
-            return device?.BlockingReadData(ref data, timeout) ?? -1;
-        }
-
-        public override int ReadCurrentData(ref byte[] data)
-        {
-            return device?.ReadLast(ref data) ?? -1;
-        }
-
-        public override void Shutdown()
-        {
-            device?.CloseInterface();
-        }
-
-        public override int WriteData(byte[] writeBuffer)
-        {
-            return device?.WriteData(writeBuffer) ?? -1;
-        }
-    }
-
 }

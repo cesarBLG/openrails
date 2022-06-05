@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using ORTS.Common;
 using ORTS.Common.Input;
-using Orts.ExternalDevices;
 using Orts.Menu;
 using ORTS.Settings;
 
@@ -16,7 +15,7 @@ namespace ORTS
 {
     public partial class OptionsForm : Form
     {
-        private RailDriverBase instance;
+        private RailDriverDevice instance;
         private Form railDriverLegend;
         private RailDriverCalibrationSetting currentCalibrationStep = RailDriverCalibrationSetting.CutOffDelta;
 
@@ -163,10 +162,7 @@ namespace ORTS
 
         private void InitializeRailDriverSettings()
         {
-            if (Environment.Is64BitProcess)
-                instance = RailDriverBase.GetInstance64();
-            else
-                instance = RailDriverBase.GetInstance32();
+                instance = RailDriverDevice.Instance;
             //#if !DEBUG
             if (!instance.Enabled)
                 {
@@ -192,7 +188,7 @@ namespace ORTS
 
         private void RunCalibration()
         {
-            byte[] readData = instance.NewReadBuffer;
+            byte[] readData = instance.GetReadBuffer();
             instance.SetLeds(RailDriverDisplaySign.Char_C, RailDriverDisplaySign.Char_A, RailDriverDisplaySign.Char_L);
             RailDriverCalibrationSetting nextStep = RailDriverCalibrationSetting.ReverserNeutral;
             DialogResult result = DialogResult.OK;

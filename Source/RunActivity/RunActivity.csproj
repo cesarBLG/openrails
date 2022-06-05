@@ -821,10 +821,6 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Orts.ExternalDevices\Orts.ExternalDevices.csproj">
-      <Project>{0da86c52-ffb5-4cd6-a2c0-08f1610e6399}</Project>
-      <Name>Orts.ExternalDevices</Name>
-    </ProjectReference>
     <ProjectReference Include="..\ORTS.Common\ORTS.Common.csproj">
       <Project>{da94d876-7d35-46c3-aece-aface72c686c}</Project>
       <Name>ORTS.Common</Name>

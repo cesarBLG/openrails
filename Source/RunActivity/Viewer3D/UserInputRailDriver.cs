@@ -20,7 +20,6 @@ using System.Diagnostics;
 using Orts.Viewer3D.Processes;
 using ORTS.Common;
 using ORTS.Common.Input;
-using Orts.ExternalDevices;
 using ORTS.Settings;
 
 namespace Orts.Viewer3D
@@ -37,7 +36,7 @@ namespace Orts.Viewer3D
         private const byte EmergencyStopCommandUp = 36;
         private const byte EmergencyStopCommandDown = 37;
 
-        private readonly RailDriverBase railDriverInstance;
+        private readonly RailDriverDevice railDriverInstance;
         private static RailDriverSettings settings;
 
         public float DirectionPercent;      // -100 (reverse) to 100 (forward)
@@ -62,10 +61,7 @@ namespace Orts.Viewer3D
         {
             try
             {
-                if (Environment.Is64BitProcess)
-                    railDriverInstance = RailDriverBase.GetInstance64();
-                else
-                    railDriverInstance = RailDriverBase.GetInstance32();
+                railDriverInstance = RailDriverDevice.Instance;
                 if (railDriverInstance.Enabled)
                 {
                     settings = game.Settings.RailDriver;
@@ -125,8 +121,8 @@ namespace Orts.Viewer3D
                     bailoffDisengaged = UpdateCutOff(bailoffDisengaged, cutOff);
                     bailoffEngaged = UpdateCutOff(bailoffEngaged, cutOff);
 
-                    readBuffer = railDriverInstance.NewReadBuffer;
-                    readBufferHistory = railDriverInstance.NewReadBuffer;
+                    readBuffer = railDriverInstance.GetReadBuffer();
+                    readBufferHistory = railDriverInstance.GetReadBuffer();
 
                     railDriverInstance.SetLeds(RailDriverDisplaySign.Hyphen, RailDriverDisplaySign.Hyphen, RailDriverDisplaySign.Hyphen);
                 }
