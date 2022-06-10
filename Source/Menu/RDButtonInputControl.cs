@@ -18,7 +18,8 @@
 using System;
 using System.Drawing;
 using System.Windows.Forms;
-using Orts.ExternalDevices;
+
+using ORTS.Common.Input;
 
 namespace Orts.Menu
 {
@@ -34,19 +35,19 @@ namespace Orts.Menu
         public byte UserButton { get; private set; }
         public byte DefaultButton { get; private set; }
 
-        private static RailDriverBase railDriver;
+        private static RailDriverDevice railDriver;
         private static byte[] readBuffer;
         private static byte[] buttonData = new byte[8];
 
         private static bool edit;
 
-        public RDButtonInputControl(byte userButton, byte defaultButton, RailDriverBase railDriver)
+        public RDButtonInputControl(byte userButton, byte defaultButton, RailDriverDevice railDriver)
         {
             InitializeComponent();
             if (RDButtonInputControl.railDriver == null)
                 RDButtonInputControl.railDriver = railDriver;
             if (null == readBuffer)
-                readBuffer = railDriver.NewReadBuffer;
+                readBuffer = railDriver.GetReadBuffer();
             UserButton = userButton;
             DefaultButton = defaultButton;
 

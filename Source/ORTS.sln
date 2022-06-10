@@ -53,9 +53,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataValidator", "Contrib\Da
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ContentChecker", "ContentChecker\ContentChecker.csproj", "{316A8CAC-8BD4-4A64-A384-4A3C28C5D3D8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orts.ExternalDevices", "Orts.ExternalDevices\Orts.ExternalDevices.csproj", "{0DA86C52-FFB5-4CD6-A2C0-08F1610E6399}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Launcher64", "Launcher64\Launcher64.csproj", "{B558F620-3BF7-4371-B7A1-9EE8D828DE21}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimulatorTester", "Contrib\SimulatorTester\SimulatorTester.csproj", "{792B01A1-5C43-4FFA-A4C0-BBDC95A4A178}"
 EndProject
 Global
@@ -164,10 +163,6 @@ Global
 		{316A8CAC-8BD4-4A64-A384-4A3C28C5D3D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{316A8CAC-8BD4-4A64-A384-4A3C28C5D3D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{316A8CAC-8BD4-4A64-A384-4A3C28C5D3D8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0DA86C52-FFB5-4CD6-A2C0-08F1610E6399}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0DA86C52-FFB5-4CD6-A2C0-08F1610E6399}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0DA86C52-FFB5-4CD6-A2C0-08F1610E6399}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0DA86C52-FFB5-4CD6-A2C0-08F1610E6399}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B558F620-3BF7-4371-B7A1-9EE8D828DE21}.Debug|Any CPU.ActiveCfg = Debug|x64
 		{B558F620-3BF7-4371-B7A1-9EE8D828DE21}.Debug|Any CPU.Build.0 = Debug|x64
 		{B558F620-3BF7-4371-B7A1-9EE8D828DE21}.Release|Any CPU.ActiveCfg = Release|x64
