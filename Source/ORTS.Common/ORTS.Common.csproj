@@ -53,8 +53,8 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\3rdPartyLibs\Monogame\MonoGame.Framework.dll</HintPath>
     </Reference>
-    <Reference Include="RailDriver, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\RailDriver.1.1.4\lib\netstandard2.0\RailDriver.dll</HintPath>
+    <Reference Include="RailDriver, Version=0.7.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\RailDriver.0.7.10\lib\netstandard2.0\RailDriver.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -75,7 +75,7 @@
     <Compile Include="Filter.cs" />
     <Compile Include="FxCopAttributes.cs" />
     <Compile Include="GetStringAttribute.cs" />
-    <Compile Include="Input\RailDriverBase.cs" />
+    <Compile Include="Input\RailDriverDevice.cs" />
     <Compile Include="Integrator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SettingsBase.cs" />
