@@ -1387,13 +1387,19 @@ namespace Orts.Viewer3D.RollingStock
                 foreach (var pd in pdl)
                     pd.Mark();
             TrainCarShape.Mark();
-            if (FreightShape != null)
-                FreightShape.Mark();
-            if (InteriorShape != null)
-                InteriorShape.Mark();
+            FreightShape?.Mark();
+            InteriorShape?.Mark();
             if (FreightAnimations?.Animations != null)
                 foreach (var freightAnimation in FreightAnimations.Animations)
                     freightAnimation.FreightShape?.Mark();
+            FrontCouplerShape?.Mark();
+            FrontCouplerOpenShape?.Mark();
+            RearCouplerShape?.Mark();
+            RearCouplerOpenShape?.Mark();
+            FrontAirHoseShape?.Mark();
+            FrontAirHoseDisconnectedShape?.Mark();
+            RearAirHoseShape?.Mark();
+            RearAirHoseDisconnectedShape?.Mark();
         }
     }
 }
