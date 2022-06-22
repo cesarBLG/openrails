@@ -1,5 +1,5 @@
-﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.126.1
-June 17th, 2022
+﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.126.2
+June 22ndh, 2022
 
 Please note that the installation and use of Open Rails software, even of its unofficial versions, is governed by the Open Rails End User License Agreement. 
 
@@ -11,7 +11,7 @@ INSTALLATION
 
 
 RELEASE NOTES
-This unofficial version has been derived from the latest official Testing release T1.4-531 and from the latest official master branch.
+This unofficial version has been derived from the latest official Testing release T1.4-533.
 
 
 This version includes some features not (yet) available in the Open Rails testing official version, that is:
@@ -53,7 +53,8 @@ This version includes some features not (yet) available in the Open Rails testin
 - Container management, see http://www.elvastower.com/forums/index.php?/topic/36162-container-management/ , with the support of Laci1959, QJ-6811, Aldarion, David Rowe, twpol and CJakeman
 - NEW: used new raildriver .dllm by perpetualKid (feature already available in official OR versions)
 - NEW: multiple preset viewpoints for 3D cabs, see http://www.elvastower.com/forums/index.php?/topic/36339-multiple-preset-viewpoints-for-3d-cabs/
-- NEW: fix bug https://bugs.launchpad.net/or/+bug/1979005 Drive wheels not rotating at correct speed .
+- NEW: fix bug https://bugs.launchpad.net/or/+bug/1979005 Drive wheels not rotating at correct speed 
+- NEW: Containers: extensions changed from .loa to .load-or and from .lsp to .load-stations-loads-or , as requested by the OR reviewer (already present in the official Unstable release).
 
 
 The Monogame related code intentionally coincides only partly with the code of the OR official testing version.
