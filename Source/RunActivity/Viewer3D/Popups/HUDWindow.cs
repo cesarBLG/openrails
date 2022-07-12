@@ -1,4 +1,4 @@
-﻿// COPYRIGHT 2011, 2012, 2013 by the Open Rails project.
+// COPYRIGHT 2011, 2012, 2013 by the Open Rails project.
 //
 // This file is part of Open Rails.
 //
@@ -139,14 +139,15 @@ namespace Orts.Viewer3D.Popups
 
             ProcessVirtualAddressLimit = GetVirtualAddressLimit();
 
+            var processId = Process.GetCurrentProcess().Id;
             try
             {
                 var counterDotNetClrMemory = new PerformanceCounterCategory(".NET CLR Memory");
-                foreach (var process in counterDotNetClrMemory.GetInstanceNames())
+                foreach (InstanceData instance in counterDotNetClrMemory.ReadCategory()["Process ID"].Values)
                 {
-                    var processId = new PerformanceCounter(".NET CLR Memory", "Process ID", process);
-                    if (processId.NextValue() == Process.GetCurrentProcess().Id)
+                    if (instance.RawValue == processId)
                     {
+                        var process = instance.InstanceName;
                         CLRMemoryAllocatedBytesPerSecCounter = new PerformanceCounter(".NET CLR Memory", "Allocated Bytes/sec", process);
                         Trace.TraceInformation($"Found Microsoft .NET Framework performance counter {process}");
                         break;
@@ -162,11 +163,11 @@ namespace Orts.Viewer3D.Popups
             try
             {
                 var counterProcess = new PerformanceCounterCategory("Process");
-                foreach (var process in counterProcess.GetInstanceNames())
+                foreach (InstanceData instance in counterProcess.ReadCategory()["ID Process"].Values)
                 {
-                    var processId = new PerformanceCounter("Process", "ID Process", process);
-                    if (processId.NextValue() == Process.GetCurrentProcess().Id)
+                    if (instance.RawValue == processId)
                     {
+                        var process = instance.InstanceName;
                         CPUMemoryPrivateCounter = new PerformanceCounter("Process", "Private Bytes", process);
                         CPUMemoryWorkingSetCounter = new PerformanceCounter("Process", "Working Set", process);
                         CPUMemoryWorkingSetPrivateCounter = new PerformanceCounter("Process", "Working Set - Private", process);
