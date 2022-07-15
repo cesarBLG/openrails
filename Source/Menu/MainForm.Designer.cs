@@ -466,7 +466,7 @@ namespace ORTS
             this.checkDebriefActivityEval.Name = "checkDebriefActivityEval";
             this.checkDebriefActivityEval.Size = new System.Drawing.Size(149, 17);
             this.checkDebriefActivityEval.TabIndex = 20;
-            this.checkDebriefActivityEval.Text = "Debrief evaluation:";
+            this.checkDebriefActivityEval.Text = "Activity evaluation:";
             this.checkDebriefActivityEval.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.checkDebriefActivityEval.UseVisualStyleBackColor = true;
             // 
@@ -896,7 +896,7 @@ namespace ORTS
             // testingToolStripMenuItem
             // 
             this.testingToolStripMenuItem.Name = "testingToolStripMenuItem";
-            this.testingToolStripMenuItem.Size = new System.Drawing.Size(109, 22);
+            this.testingToolStripMenuItem.Size = new System.Drawing.Size(111, 22);
             this.testingToolStripMenuItem.Text = "Testing";
             this.testingToolStripMenuItem.Click += new System.EventHandler(this.testingToolStripMenuItem_Click);
             // 
@@ -906,7 +906,7 @@ namespace ORTS
             this.contextMenuStripTools.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.testingToolStripMenuItem});
             this.contextMenuStripTools.Name = "contextMenuStrip1";
-            this.contextMenuStripTools.Size = new System.Drawing.Size(110, 26);
+            this.contextMenuStripTools.Size = new System.Drawing.Size(112, 26);
             // 
             // linkLabelChangeLog
             // 
