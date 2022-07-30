@@ -169,6 +169,7 @@ namespace ORTS
             labelDistantMountainsViewingDistance.Enabled = checkDistantMountains.Checked;
             numericDistantMountainsViewingDistance.Enabled = checkDistantMountains.Checked;
             numericDistantMountainsViewingDistance.Value = Settings.DistantMountainsViewingDistance / 1000;
+            checkLODViewingExtention.Checked = Settings.LODViewingExtention;
             numericViewingFOV.Value = Settings.ViewingFOV;
             numericWorldObjectDensity.Value = Settings.WorldObjectDensity;
             comboWindowSize.Text = Settings.WindowSize;
@@ -343,7 +344,6 @@ namespace ORTS
             checkCurveResistanceDependent.Checked = Settings.CurveResistanceDependent;
             checkTunnelResistanceDependent.Checked = Settings.TunnelResistanceDependent;
             checkWindResistanceDependent.Checked = Settings.WindResistanceDependent;
-            checkLODViewingExtention.Checked = Settings.LODViewingExtention;
             checkEnableWebServer.Checked = Settings.WebServer;
         }
 
@@ -475,6 +475,7 @@ private async void OptionsForm_Shown(object sender, EventArgs e)
             Settings.ViewingDistance = (int)numericViewingDistance.Value;
             Settings.DistantMountains = checkDistantMountains.Checked;
             Settings.DistantMountainsViewingDistance = (int)numericDistantMountainsViewingDistance.Value * 1000;
+            Settings.LODViewingExtention = checkLODViewingExtention.Checked;
             Settings.ViewingFOV = (int)numericViewingFOV.Value;
             Settings.WorldObjectDensity = (int)numericWorldObjectDensity.Value;
             Settings.WindowSize = GetValidWindowSize(comboWindowSize.Text);
@@ -560,7 +561,6 @@ private async void OptionsForm_Shown(object sender, EventArgs e)
             Settings.CurveResistanceDependent = checkCurveResistanceDependent.Checked;
             Settings.TunnelResistanceDependent = checkTunnelResistanceDependent.Checked;
             Settings.WindResistanceDependent = checkWindResistanceDependent.Checked;
-            Settings.LODViewingExtention = checkLODViewingExtention.Checked;
             Settings.WebServer = checkEnableWebServer.Checked;
 
             Settings.Save();
