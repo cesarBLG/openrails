@@ -196,7 +196,7 @@ namespace Orts.Viewer3D
                 ObjectRadius = shapes.Max(s => (Location.Location - s.Location.Location).Length()) + dlHighest.ViewSphereRadius;
 
                 // Object viewing distance is easy because it's based on the outside of the object radius.
-                if (viewer.Settings.LODViewingExtention)
+                if (viewer.Settings.LODViewingExtension)
                     ObjectViewingDistance = float.MaxValue;
                 else
                     ObjectViewingDistance = dlLowest.ViewingDistance;
@@ -2513,7 +2513,7 @@ namespace Orts.Viewer3D
                   : displayDetail;
 
               // If set, extend the lowest LOD to the maximum viewing distance.
-              if (Viewer.Settings.LODViewingExtention && displayDetailLevel == lodControl.DistanceLevels.Length - 1)
+              if (Viewer.Settings.LODViewingExtension && displayDetailLevel == lodControl.DistanceLevels.Length - 1)
                   distanceDetail.ViewingDistance = float.MaxValue;
 
               for (var i = 0; i < displayDetail.SubObjects.Length; i++)

@@ -169,7 +169,7 @@ namespace ORTS
             labelDistantMountainsViewingDistance.Enabled = checkDistantMountains.Checked;
             numericDistantMountainsViewingDistance.Enabled = checkDistantMountains.Checked;
             numericDistantMountainsViewingDistance.Value = Settings.DistantMountainsViewingDistance / 1000;
-            checkLODViewingExtention.Checked = Settings.LODViewingExtention;
+            checkLODViewingExtension.Checked = Settings.LODViewingExtension;
             numericViewingFOV.Value = Settings.ViewingFOV;
             numericWorldObjectDensity.Value = Settings.WorldObjectDensity;
             comboWindowSize.Text = Settings.WindowSize;
@@ -475,7 +475,7 @@ private async void OptionsForm_Shown(object sender, EventArgs e)
             Settings.ViewingDistance = (int)numericViewingDistance.Value;
             Settings.DistantMountains = checkDistantMountains.Checked;
             Settings.DistantMountainsViewingDistance = (int)numericDistantMountainsViewingDistance.Value * 1000;
-            Settings.LODViewingExtention = checkLODViewingExtention.Checked;
+            Settings.LODViewingExtension = checkLODViewingExtension.Checked;
             Settings.ViewingFOV = (int)numericViewingFOV.Value;
             Settings.WorldObjectDensity = (int)numericWorldObjectDensity.Value;
             Settings.WindowSize = GetValidWindowSize(comboWindowSize.Text);

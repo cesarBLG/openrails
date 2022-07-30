@@ -221,7 +221,7 @@
             this.checkRunAt32bit = new System.Windows.Forms.CheckBox();
             this.checkEnableWatchdog = new System.Windows.Forms.CheckBox();
             this.checkFastFullScreenAltTab = new System.Windows.Forms.CheckBox();
-            this.checkLODViewingExtention = new System.Windows.Forms.CheckBox();
+            this.checkLODViewingExtension = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.bindingSourceContent)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbLAA)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUseSuperElevation)).BeginInit();
@@ -1858,7 +1858,7 @@
             // 
             // tabPageVideo
             // 
-            this.tabPageVideo.Controls.Add(this.checkLODViewingExtention);
+            this.tabPageVideo.Controls.Add(this.checkLODViewingExtension);
             this.tabPageVideo.Controls.Add(this.labelAntiAliasingValue);
             this.tabPageVideo.Controls.Add(this.labelAntiAliasing);
             this.tabPageVideo.Controls.Add(this.trackAntiAliasing);
@@ -2745,15 +2745,15 @@
             this.checkFastFullScreenAltTab.Text = "Fast full-screen alt-tab";
             this.checkFastFullScreenAltTab.UseVisualStyleBackColor = true;
             // 
-            // checkLODViewingExtention
+            // checkLODViewingExtension
             // 
-            this.checkLODViewingExtention.AutoSize = true;
-            this.checkLODViewingExtention.Location = new System.Drawing.Point(6, 250);
-            this.checkLODViewingExtention.Name = "checkLODViewingExtention";
-            this.checkLODViewingExtention.Size = new System.Drawing.Size(268, 17);
-            this.checkLODViewingExtention.TabIndex = 28;
-            this.checkLODViewingExtention.Text = "Extend object maximum viewing distance to horizon";
-            this.checkLODViewingExtention.UseVisualStyleBackColor = true;
+            this.checkLODViewingExtension.AutoSize = true;
+            this.checkLODViewingExtension.Location = new System.Drawing.Point(6, 250);
+            this.checkLODViewingExtension.Name = "checkLODViewingExtension";
+            this.checkLODViewingExtension.Size = new System.Drawing.Size(268, 17);
+            this.checkLODViewingExtension.TabIndex = 28;
+            this.checkLODViewingExtension.Text = "Extend object maximum viewing distance to horizon";
+            this.checkLODViewingExtension.UseVisualStyleBackColor = true;
             // 
             // OptionsForm
             // 
@@ -3040,6 +3040,6 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.CheckBox checkDieselEnginesStarted;
         private System.Windows.Forms.CheckBox checkBoilerPreheated;
-        private System.Windows.Forms.CheckBox checkLODViewingExtention;
+        private System.Windows.Forms.CheckBox checkLODViewingExtension;
     }
 }

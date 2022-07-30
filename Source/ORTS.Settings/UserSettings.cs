@@ -223,6 +223,8 @@ namespace ORTS.Settings
         public bool DistantMountains { get; set; }
         [Default(40000)]
         public int DistantMountainsViewingDistance { get; set; }
+        [Default(true)]
+        public bool LODViewingExtension { get; set; }
         [Default(45)] // MSTS uses 60 FOV horizontally, on 4:3 displays this is 45 FOV vertically (what OR uses).
         public int ViewingFOV { get; set; }
         [Default(49)]
@@ -318,8 +320,6 @@ namespace ORTS.Settings
         public bool DoubleWire { get; set; }
         [Default(false)]
         public bool AuxActionEnabled { get; set; }
-        [Default(true)]
-        public bool LODViewingExtention { get; set; }
         [Default(false)]
         public bool PreferDDSTexture { get; set; }
         [Default(false)]
