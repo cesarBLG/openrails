@@ -1,5 +1,5 @@
-﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.127
-July 15th, 2022
+﻿Open Rails, NewYear version README - Rev.128
+August 6th, 2022
 
 Please note that the installation and use of Open Rails software, even of its unofficial versions, is governed by the Open Rails End User License Agreement. 
 
@@ -11,7 +11,7 @@ INSTALLATION
 
 
 RELEASE NOTES
-This unofficial version has been derived from the latest official Testing release T1.4-598.
+This unofficial version has been derived from the latest official Testing release T1.4-604, plus the fetures and fixes added later in the testing version up to date.
 
 
 This version includes some features not (yet) available in the Open Rails testing official version, that is:
@@ -51,7 +51,8 @@ This version includes some features not (yet) available in the Open Rails testin
 - add cabview controls ODOMETER_UP and ODOMETER_DOWN
 - Improvements in sky color and in other environment areas, by DR-Aeronautics
 - multiple preset viewpoints for 3D cabs, see http://www.elvastower.com/forums/index.php?/topic/36339-multiple-preset-viewpoints-for-3d-cabs/
-- NEW: kept checkbox for Activity Evaluation
+- NEW: Bug fix for https://bugs.launchpad.net/or/+bug/1983511 When an AI train disappears at end of run, containers remain visible
+- NEW: added code to manage containers on wagons in multiplayer mode.
 
 
 The Monogame related code intentionally coincides only partly with the code of the OR official testing version.
