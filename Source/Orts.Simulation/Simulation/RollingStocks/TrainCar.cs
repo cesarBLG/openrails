@@ -467,21 +467,29 @@ namespace Orts.Simulation.RollingStocks
             {
                 if (RemoteControlGroup == 0 && Train != null)
                 {
-//                    if (Train.LeadLocomotive != null && (!((MSTSLocomotive)Train.LeadLocomotive).TrainControlSystem.TractionAuthorization && Train.MUThrottlePercent > 0 ||
-//                        ((MSTSLocomotive)Train.LeadLocomotive).CruiseControl?.SpeedRegMode != CruiseControl.SpeedRegulatorMode.Manual))
-                    if (Train.LeadLocomotive != null && !((MSTSLocomotive)Train.LeadLocomotive).TrainControlSystem.TractionAuthorization && Train.MUThrottlePercent > 0 )
-                        {
-                        return 0;
-                    }
-                    else
+                    if (Train.LeadLocomotive is MSTSLocomotive locomotive)
                     {
-                        return Train.MUThrottlePercent;
+                        if (!locomotive.TrainControlSystem.TractionAuthorization
+                            || Train.MUThrottlePercent <= 0)
+                        {
+                            return 0;
+                        }
+                        else if (Train.MUThrottlePercent > locomotive.TrainControlSystem.MaxThrottlePercent)
+                        {
+                            return Math.Max(locomotive.TrainControlSystem.MaxThrottlePercent, 0);
+                        }
                     }
+
+                    return Train.MUThrottlePercent;
                 }
                 else if (RemoteControlGroup == 1 && Train != null)
+                {
                     return Train.DPThrottlePercent;
+                }
                 else
+                {
                     return LocalThrottlePercent;
+                }
             }
             set
             {
@@ -516,21 +524,26 @@ namespace Orts.Simulation.RollingStocks
         {
             get
             {
-                if (RemoteControlGroup >= 0 && Train != null)
+                if (RemoteControlGroup == 0 && Train != null)
                 {
-                    if (Train.LeadLocomotive != null && ((MSTSLocomotive) Train.LeadLocomotive).TrainControlSystem.FullDynamicBrakingOrder)
+                    if (Train.LeadLocomotive is MSTSLocomotive locomotive)
                     {
-                        return 100;
+                        if (locomotive.TrainControlSystem.FullDynamicBrakingOrder)
+                        {
+                            return 100;
+                        }
                     }
-                    else if (RemoteControlGroup == 1 && Train != null)
-                        return Train.DPDynamicBrakePercent;
-                    else
-                    {
-                        return Train.MUDynamicBrakePercent;
-                    }
-}
+
+                    return Train.MUDynamicBrakePercent;
+                }
+                else if (RemoteControlGroup == 1 && Train != null)
+                {
+                    return Train.DPDynamicBrakePercent;
+                }
                 else
+                {
                     return LocalDynamicBrakePercent;
+                }
             }
             set
             {
