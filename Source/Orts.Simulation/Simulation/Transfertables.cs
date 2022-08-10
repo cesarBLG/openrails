@@ -171,6 +171,17 @@ namespace Orts.Simulation
         public override void ComputeTarget(bool isForward)
         {
             if (!Continuous) return;
+            if (MultiPlayer.MPManager.IsMultiPlayer())
+            {
+                SubMessageCode = submessagecode.GoToTarget;
+                MultiPlayer.MPManager.Notify(new MultiPlayer.MSGMovingTbl(Simulator.ActiveMovingTableIndex, Orts.MultiPlayer.MPManager.GetUserName(), SubMessageCode, isForward, OffsetPos).ToString());
+            }
+            GeneralComputeTarget(isForward);
+        }
+
+        public void GeneralComputeTarget(bool isForward)
+        {
+            if (!Continuous) return;
             Continuous = false;
             GoToTarget = false;
             Forward = isForward;
@@ -248,6 +259,28 @@ namespace Orts.Simulation
         /// 
         public override void StartContinuous(bool isForward)
         {
+            if (TrainsOnMovingTable.Count == 1 && TrainsOnMovingTable[0].FrontOnBoard && TrainsOnMovingTable[0].BackOnBoard)
+            {
+                // Preparing for rotation
+                var train = TrainsOnMovingTable[0].Train;
+                if (Math.Abs(train.SpeedMpS) > 0.1 || (train.LeadLocomotiveIndex != -1 && (train.LeadLocomotive.ThrottlePercent >= 1 || train.TrainType != Train.TRAINTYPE.REMOTE && !(train.LeadLocomotive.Direction == Direction.N
+                 || Math.Abs(train.MUReverserPercent) <= 1))) || (train.ControlMode != Train.TRAIN_CONTROL.MANUAL && train.ControlMode != Train.TRAIN_CONTROL.TURNTABLE &&
+                 train.ControlMode != Train.TRAIN_CONTROL.EXPLORER && train.ControlMode != Train.TRAIN_CONTROL.UNDEFINED))
+                {
+                    if (SendNotifications) Simulator.Confirmer.Warning(Simulator.Catalog.GetStringFmt("Rotation can't start: check throttle, speed, direction and control mode"));
+                    return;
+                }
+            }
+            if (MultiPlayer.MPManager.IsMultiPlayer())
+            {
+                SubMessageCode = submessagecode.StartingContinuous;
+                MultiPlayer.MPManager.Notify(new MultiPlayer.MSGMovingTbl(Simulator.ActiveMovingTableIndex, Orts.MultiPlayer.MPManager.GetUserName(), SubMessageCode, isForward, OffsetPos).ToString());
+            }
+            GeneralStartContinuous(isForward);
+        }
+
+        public void GeneralStartContinuous(bool isForward)
+        {
             if (TrainsOnMovingTable.Count > 1 || (TrainsOnMovingTable.Count == 1 && TrainsOnMovingTable[0].FrontOnBoard ^ TrainsOnMovingTable[0].BackOnBoard))
             {
                 Forward = false;
@@ -260,13 +293,6 @@ namespace Orts.Simulation
             {
                 // Preparing for transfer
                 var train = TrainsOnMovingTable[0].Train;
-                if (Math.Abs(train.SpeedMpS) > 0.1 || (train.LeadLocomotiveIndex != -1 && (train.LeadLocomotive.ThrottlePercent >= 1 || !(train.LeadLocomotive.Direction == Direction.N 
-                 || Math.Abs(train.MUReverserPercent) <= 1))) || (train.ControlMode != Train.TRAIN_CONTROL.MANUAL && train.ControlMode != Train.TRAIN_CONTROL.TURNTABLE &&
-                 train.ControlMode != Train.TRAIN_CONTROL.EXPLORER && train.ControlMode != Train.TRAIN_CONTROL.UNDEFINED))
-                {
-                    Simulator.Confirmer.Warning(Simulator.Catalog.GetStringFmt("Transfer can't start: check throttle, speed, direction and control mode"));
-                    return;
-                }
                 if (train.ControlMode == Train.TRAIN_CONTROL.MANUAL || train.ControlMode == Train.TRAIN_CONTROL.EXPLORER || train.ControlMode == Train.TRAIN_CONTROL.UNDEFINED)
                 {
                     SaveConnected = Connected ^ !MyTrackNodesOrientation[ConnectedTrackEnd];

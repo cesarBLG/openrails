@@ -81,6 +81,11 @@ namespace Orts.Simulation
         protected int[] MyTrVectorSectionsIndex;
         public bool[] MyTrackNodesOrientation { get; protected set; } // true if forward, false if backward
         public int TrackShapeIndex;
+        public enum submessagecode
+        {
+            GoToTarget,
+            StartingContinuous,
+        }
         // Dynamic data
         public WorldPosition WorldPosition = new WorldPosition();
         public List<string> Animations = new List<string>();
@@ -103,6 +108,8 @@ namespace Orts.Simulation
         public Vector3 FinalFrontTravellerXNALocation;
         public Vector3 FinalRearTravellerXNALocation;
         public Simulator Simulator;
+        public submessagecode SubMessageCode;
+        public bool AlignToRemote;
 
         public MovingTable(STFReader stf, Simulator simulator)
         {
@@ -366,11 +373,11 @@ namespace Orts.Simulation
             string animation;
             WorldPosition.XNAMatrix.M44 = 100000000; //WorlPosition not yet defined, will be loaded when loading related tile
             stf.MustMatch("(");
-              stf.ParseBlock(new[] {
+            stf.ParseBlock(new[] {
                 new STFReader.TokenProcessor("wfile", ()=>{
                     WFile = stf.ReadStringBlock(null);
                     WorldPosition.TileX = int.Parse(WFile.Substring(1, 7));
-                    WorldPosition.TileZ = int.Parse(WFile.Substring(8, 7));                
+                    WorldPosition.TileZ = int.Parse(WFile.Substring(8, 7));
                 }),
                 new STFReader.TokenProcessor("uid", ()=>{ UID = stf.ReadIntBlock(-1); }),
                 new STFReader.TokenProcessor("animation", ()=>{ animation = stf.ReadStringBlock(null);
@@ -467,11 +474,22 @@ namespace Orts.Simulation
             }
         }
 
-         /// <summary>
+        /// <summary>
         /// Computes the nearest turntable exit in the actual direction
         /// Returns the Y angle to be compared.
         /// </summary>
         public override void ComputeTarget(bool isClockwise)
+        {
+            if (!Continuous) return;
+            if (MultiPlayer.MPManager.IsMultiPlayer())
+            {
+                SubMessageCode = submessagecode.GoToTarget;
+                MultiPlayer.MPManager.Notify(new MultiPlayer.MSGMovingTbl(Simulator.ActiveMovingTableIndex, Orts.MultiPlayer.MPManager.GetUserName(), SubMessageCode, isClockwise, YAngle).ToString());
+            }
+            GeneralComputeTarget(isClockwise);
+        }
+
+        public void GeneralComputeTarget(bool isClockwise)
         {
             if (!Continuous) return;
             Continuous = false;
@@ -585,11 +603,33 @@ namespace Orts.Simulation
         }
 
         /// <summary>
-        /// Starts continuous movement
+        /// Starts continuous movement by player action
         /// 
         /// </summary>
         /// 
         public override void StartContinuous(bool isClockwise)
+        {
+            if (TrainsOnMovingTable.Count == 1 && TrainsOnMovingTable[0].FrontOnBoard && TrainsOnMovingTable[0].BackOnBoard)
+            {
+                // Preparing for rotation
+                var train = TrainsOnMovingTable[0].Train;
+                if (Math.Abs(train.SpeedMpS) > 0.1 || (train.LeadLocomotiveIndex != -1 && (train.LeadLocomotive.ThrottlePercent >= 1 || train.TrainType != Train.TRAINTYPE.REMOTE && !(train.LeadLocomotive.Direction == Direction.N
+                 || Math.Abs(train.MUReverserPercent) <= 1))) || (train.ControlMode != Train.TRAIN_CONTROL.MANUAL && train.ControlMode != Train.TRAIN_CONTROL.TURNTABLE &&
+                 train.ControlMode != Train.TRAIN_CONTROL.EXPLORER && train.ControlMode != Train.TRAIN_CONTROL.UNDEFINED))
+                {
+                    if (SendNotifications) Simulator.Confirmer.Warning(Simulator.Catalog.GetStringFmt("Rotation can't start: check throttle, speed, direction and control mode"));
+                    return;
+                }
+            }
+            if (MultiPlayer.MPManager.IsMultiPlayer())
+            {
+                SubMessageCode = submessagecode.StartingContinuous;
+                MultiPlayer.MPManager.Notify(new MultiPlayer.MSGMovingTbl(Simulator.ActiveMovingTableIndex, Orts.MultiPlayer.MPManager.GetUserName(), SubMessageCode, isClockwise, YAngle).ToString());
+            }
+            GeneralStartContinuous(isClockwise);
+        }
+
+        public void GeneralStartContinuous(bool isClockwise)
         {
             if (TrainsOnMovingTable.Count > 1 || (TrainsOnMovingTable.Count == 1 && TrainsOnMovingTable[0].FrontOnBoard ^ TrainsOnMovingTable[0].BackOnBoard))
             {
@@ -603,13 +643,6 @@ namespace Orts.Simulation
             {
                 // Preparing for rotation
                 var train = TrainsOnMovingTable[0].Train;
-                if (Math.Abs(train.SpeedMpS) > 0.1 || (train.LeadLocomotiveIndex != -1 && (train.LeadLocomotive.ThrottlePercent >= 1 || !(train.LeadLocomotive.Direction == Direction.N 
-                 || Math.Abs(train.MUReverserPercent) <= 1))) || (train.ControlMode != Train.TRAIN_CONTROL.MANUAL && train.ControlMode != Train.TRAIN_CONTROL.TURNTABLE &&
-                 train.ControlMode != Train.TRAIN_CONTROL.EXPLORER && train.ControlMode != Train.TRAIN_CONTROL.UNDEFINED))
-                {
-                    if (SendNotifications) Simulator.Confirmer.Warning(Simulator.Catalog.GetStringFmt("Rotation can't start: check throttle, speed, direction and control mode"));
-                    return;
-                }
                 if (train.ControlMode == Train.TRAIN_CONTROL.MANUAL || train.ControlMode == Train.TRAIN_CONTROL.EXPLORER || train.ControlMode == Train.TRAIN_CONTROL.UNDEFINED)
                 {
                     ComputeTrainPosition(train);
@@ -622,6 +655,8 @@ namespace Orts.Simulation
             Counterclockwise = !isClockwise;
             Continuous = true;
         }
+
+
 
         // Computing position of cars relative to center of platform
         public void ComputeTrainPosition(Train train)
