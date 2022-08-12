@@ -437,7 +437,7 @@ namespace Orts.Viewer3D
             CabXOffsetPixels = inf.ReadInt32();
             NightTexturesNotLoaded = inf.ReadBoolean();
             DayTexturesNotLoaded = inf.ReadBoolean();
-            LoadMemoryThreshold = (ulong)HUDWindow.GetVirtualAddressLimit() - 512 * 1024 * 1024;
+            LoadMemoryThreshold = Game.HostProcess.CPUMemoryVirtualLimit - 512 * 1024 * 1024;
             tryLoadingNightTextures = true;
             tryLoadingDayTextures = true;
 
@@ -539,7 +539,7 @@ namespace Orts.Viewer3D
             World.LoadPrep();
             World.GetCameraTile();
             MaterialManager.LoadPrep();
-            LoadMemoryThreshold = (ulong)HUDWindow.GetVirtualAddressLimit() - 512 * 1024 * 1024;
+            LoadMemoryThreshold = Game.HostProcess.CPUMemoryVirtualLimit - 512 * 1024 * 1024;
             Load();
 
             // MUST be after loading is done! (Or we try and load shapes on the main thread.)
