@@ -110,6 +110,7 @@ namespace Orts.Simulation
         public Simulator Simulator;
         public submessagecode SubMessageCode;
         public bool AlignToRemote;
+        public bool RemotelyControlled;
 
         public MovingTable(STFReader stf, Simulator simulator)
         {
@@ -350,6 +351,7 @@ namespace Orts.Simulation
         // Fixed data
         public List<float> Angles = new List<float>();
         public float StartingY = 0; // starting yaw angle
+        public float ThresholdForTarget; // Threshold to check if we can now go to the target
         // Dynamic data
         public bool Clockwise; // clockwise motion on
         public bool Counterclockwise; // counterclockwise motion on
@@ -486,6 +488,7 @@ namespace Orts.Simulation
                 SubMessageCode = submessagecode.GoToTarget;
                 MultiPlayer.MPManager.Notify(new MultiPlayer.MSGMovingTbl(Simulator.ActiveMovingTableIndex, Orts.MultiPlayer.MPManager.GetUserName(), SubMessageCode, isClockwise, YAngle).ToString());
             }
+            RemotelyControlled = false;
             GeneralComputeTarget(isClockwise);
         }
 
@@ -496,6 +499,7 @@ namespace Orts.Simulation
             GoToTarget = false;
             Clockwise = isClockwise;
             Counterclockwise = !isClockwise;
+            ThresholdForTarget = RemotelyControlled ? 0.2f : 0.1f;
             if (Clockwise)
             {
                 var forwardAngleDiff = 3.5f;
@@ -528,7 +532,7 @@ namespace Orts.Simulation
                             }
                         }
                     }
-                    if (forwardAngleDiff < 0.1 || rearAngleDiff < 0.1)
+                    if (forwardAngleDiff < ThresholdForTarget || rearAngleDiff < ThresholdForTarget)
                     {
                         if (forwardAngleDiff < rearAngleDiff && Math.Abs(forwardAngleDiff - rearAngleDiff) > 0.01)
                         {
@@ -579,7 +583,7 @@ namespace Orts.Simulation
                             }
                         }
                     }
-                    if (forwardAngleDiff > -0.1 || rearAngleDiff > -0.1)
+                    if (forwardAngleDiff > -ThresholdForTarget || rearAngleDiff > -ThresholdForTarget)
                     {
                         if (forwardAngleDiff > rearAngleDiff && Math.Abs(forwardAngleDiff - rearAngleDiff) > 0.01)
                         {
@@ -599,6 +603,7 @@ namespace Orts.Simulation
                 }
 
             }
+            RemotelyControlled = false;
             return;
         }
 

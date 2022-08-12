@@ -27,6 +27,7 @@ using Orts.Simulation.RollingStocks.SubSystems;
 using Orts.Simulation.Signalling;
 using ORTS.Common;
 using ORTS.Scripting.Api;
+using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -4018,6 +4019,13 @@ namespace Orts.MultiPlayer
                     switch (subMessageCode)
                     {
                         case MovingTable.submessagecode.GoToTarget:
+                            turntable.RemotelyControlled = true;
+                            if (Math.Abs(MathHelper.WrapAngle(turntable.YAngle - yangle)) > 0.2f)
+                            {
+                                turntable.YAngle = yangle;
+                                turntable.TargetY = yangle;
+                                turntable.AlignToRemote = true;
+                            }
                             turntable.GeneralComputeTarget(clockwise);
                             break;
                         case MovingTable.submessagecode.StartingContinuous:
@@ -4035,6 +4043,13 @@ namespace Orts.MultiPlayer
                     switch (subMessageCode)
                     {
                         case MovingTable.submessagecode.GoToTarget:
+                            transfertable.RemotelyControlled = true;
+                            if(Math.Abs(transfertable.OffsetPos - yangle) > 2.8f)
+                            {
+                                transfertable.OffsetPos = yangle;
+                                transfertable.TargetOffset = yangle;
+                                transfertable.AlignToRemote = true;
+                            }
                             transfertable.GeneralComputeTarget(clockwise);
                             break;
                         case MovingTable.submessagecode.StartingContinuous:

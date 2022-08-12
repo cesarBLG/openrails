@@ -44,6 +44,7 @@ namespace Orts.Simulation
         public List<float> Offsets = new List<float>();
         public bool VerticalTransfer = false;
         public float CenterOffsetComponent = 0;
+        public float OffsetDiff = 1.4f;
         // Dynamic data
         public bool Forward; // forward motion on
         public bool Reverse; // reverse motion on
@@ -176,6 +177,7 @@ namespace Orts.Simulation
                 SubMessageCode = submessagecode.GoToTarget;
                 MultiPlayer.MPManager.Notify(new MultiPlayer.MSGMovingTbl(Simulator.ActiveMovingTableIndex, Orts.MultiPlayer.MPManager.GetUserName(), SubMessageCode, isForward, OffsetPos).ToString());
             }
+            RemotelyControlled = false;
             GeneralComputeTarget(isForward);
         }
 
@@ -186,9 +188,9 @@ namespace Orts.Simulation
             GoToTarget = false;
             Forward = isForward;
             Reverse = !isForward;
+            OffsetDiff = RemotelyControlled ? 2.8f : 1.4f;
             if (Forward)
             {
-                var offsetDiff = 1.4f;
                 Connected = false;
                 if (Offsets.Count <= 0)
                 {
@@ -202,7 +204,7 @@ namespace Orts.Simulation
                         if (MyTrackNodesIndex[iOffset] != -1 && MyTrVectorSectionsIndex[iOffset] != -1)
                         {
                             var thisOffsetDiff = Offsets[iOffset] - OffsetPos;
-                            if (thisOffsetDiff < offsetDiff && thisOffsetDiff >= 0)
+                            if (thisOffsetDiff < OffsetDiff && thisOffsetDiff >= 0)
                             {
                                 ConnectedTarget = iOffset;
                                 break;
@@ -219,7 +221,6 @@ namespace Orts.Simulation
             }
             else if (Reverse)
             {
-                var offsetDiff = -1.4f;
                 Connected = false;
                 if (Offsets.Count <= 0)
                 {
@@ -233,7 +234,7 @@ namespace Orts.Simulation
                         if (MyTrackNodesIndex[iOffset] != -1 && MyTrVectorSectionsIndex[iOffset] != -1)
                         {
                             var thisOffsetDiff = Offsets[iOffset] - OffsetPos;
-                            if (thisOffsetDiff > offsetDiff && thisOffsetDiff <= 0)
+                            if (thisOffsetDiff > -OffsetDiff && thisOffsetDiff <= 0)
                             {
                                 ConnectedTarget = iOffset;
                                 break;
@@ -249,6 +250,7 @@ namespace Orts.Simulation
                 }
 
             }
+            RemotelyControlled = false;
             return;
         }
 
