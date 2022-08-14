@@ -789,15 +789,6 @@ lat/lon rectangle corresponding to the arid zone of North America (lat from
 The randomization is not performed either if the activity contains weather
 change events.
 
-.. _options-dds-textures:
-
-Load DDS textures in preference to ACE
---------------------------------------
-
-Open Rails is capable of loading both ACE and DDS textures. If only one of
-the two is present, it is loaded. If both are present, the ACE texture is
-loaded unless this option has been selected.
-
 
 MSTS Environments
 -----------------
@@ -808,13 +799,6 @@ night sky and for clouds.
 With this option selected, ORTS applies the MSTS environment files. This
 includes support of Kosmos environments, even if the final effect may be
 different from the current MSTS one.
-
-Adhesion factor correction
---------------------------
-
-The adhesion is multiplied by this percentage factor. Therefore lower
-values of the slider reduce adhesion and cause more frequent wheel slips
-and therefore a more difficult, but more challenging driving experience.
 
 Level of detail bias
 --------------------
@@ -841,9 +825,16 @@ Note: If your content does not use multiple LODs, then this option will have no 
 Adhesion proportional to rain/snow/fog
 --------------------------------------
 
-When this option is selected, adhesion becomes dependent on the intensity
+Adhesion is dependent on the intensity
 of rain and snow and the density of fog. Intensities and density can be
 modified at runtime by the player.
+
+Adhesion factor correction
+--------------------------
+
+The adhesion is multiplied by this percentage factor. Therefore lower
+values of the slider reduce adhesion and cause more frequent wheel slips
+and therefore a more difficult, but more challenging driving experience.
 
 Adhesion factor random change
 -----------------------------
