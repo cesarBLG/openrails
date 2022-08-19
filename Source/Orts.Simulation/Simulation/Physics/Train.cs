@@ -21723,7 +21723,7 @@ namespace Orts.Simulation.Physics
                 else if (Cars.Last() == Simulator.PlayerLocomotive && Cars.First() is EOT)
                     EOT = (EOT)Cars.First();
             }
-            else
+            else if (Cars.Count > 0)
             {
                 if (Cars.First() is MSTSLocomotive && Cars.Last() is EOT)
                     EOT = (EOT)Cars.Last();
