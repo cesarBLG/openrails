@@ -13,6 +13,17 @@
     <FileAlignment>512</FileAlignment>
     <ApplicationIcon>..\..\ORTS.ico</ApplicationIcon>
     <TargetFrameworkProfile />
+    <UseWindowsForms>true</UseWindowsForms>
+    <UseWPF>true</UseWPF>
+    <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
+    <IsPublishable>False</IsPublishable>
+    <AssemblyTitle>Open Rails Track Viewer (Contributed)</AssemblyTitle>
+    <Description>Open Rails Transport Simulator</Description>
+    <Company>Open Rails</Company>
+    <Product>Open Rails</Product>
+    <Copyright>Copyright © 2009 - 2022</Copyright>
+    <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
+    <DefineConstants>TRACE;WINDOWS</DefineConstants>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationManifest>..\..\Launcher\app.manifest</ApplicationManifest>

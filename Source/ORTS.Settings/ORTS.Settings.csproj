@@ -27,6 +27,16 @@
     <LangVersion>7.3</LangVersion>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
+    <IsPublishable>False</IsPublishable>
+    <AssemblyTitle>Open Rails Settings Library</AssemblyTitle>
+    <Description>Open Rails Transport Simulator</Description>
+    <Company>Open Rails</Company>
+    <Product>Open Rails</Product>
+    <Copyright>Copyright © 2009 - 2022</Copyright>
+    <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
     <DebugType>pdbonly</DebugType>

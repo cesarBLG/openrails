@@ -12,6 +12,13 @@
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <TargetFrameworkProfile />
+    <IsPublishable>False</IsPublishable>
+    <AssemblyTitle>Open Rails Data Validator (Contributed)</AssemblyTitle>
+    <Description>Open Rails Transport Simulator</Description>
+    <Company>Open Rails</Company>
+    <Product>Open Rails</Product>
+    <Copyright>Copyright © 2009 - 2022</Copyright>
+    <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>

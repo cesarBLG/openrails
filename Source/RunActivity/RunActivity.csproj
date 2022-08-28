@@ -25,6 +25,16 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <Prefer32Bit>false</Prefer32Bit>
     <LangVersion>7.3</LangVersion>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
+    <IsPublishable>False</IsPublishable>
+    <AssemblyTitle>Open Rails Activity Runner</AssemblyTitle>
+    <Description>Open Rails Transport Simulator</Description>
+    <Company>Open Rails</Company>
+    <Product>Open Rails</Product>
+    <Copyright>Copyright © 2009 - 2022</Copyright>
+    <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
+    <DefineConstants>TRACE;WINDOWS;NEW_ACTION;WITH_NEW_SAVE;ACTIVITY_EDITOR</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
     <DebugType>pdbonly</DebugType>
