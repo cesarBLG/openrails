@@ -1294,7 +1294,7 @@ namespace Orts.Simulation
                     else
                         car.CarID = "0 - " + car.UiD; //player's train is always named train 0.
                     if (car is EOT) train.EOT = car as EOT;
-                    car.FreightAnimations?.Load(car as MSTSWagon, wagon.LoadDataList);
+                    car.FreightAnimations?.Load(wagon.LoadDataList);
 
                     train.Length += car.CarLengthM;
 
@@ -1497,7 +1497,7 @@ namespace Orts.Simulation
                             car.CarID = activityObject.ID + " - " + car.UiD;
                             if (car is EOT)
                                 train.EOT = car as EOT;
-                            car.FreightAnimations?.Load(car as MSTSWagon, wagon.LoadDataList);
+                            car.FreightAnimations?.Load(wagon.LoadDataList);
                         }
                         catch (Exception error)
                         {
