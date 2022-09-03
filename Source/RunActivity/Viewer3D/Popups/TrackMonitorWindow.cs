@@ -17,14 +17,14 @@
 
 // This file is the responsibility of the 3D & Environment Team. 
 
+using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Orts.Simulation.Physics;
 using Orts.Simulation.RollingStocks;
 using ORTS.Common;
 using ORTS.Settings;
-using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace Orts.Viewer3D.Popups
@@ -2310,6 +2310,10 @@ namespace Orts.Viewer3D.Popups
 
                     case Train.TrainObjectItem.TRAINOBJECTTYPE.SIGNAL:
                         lastLabelPosition = drawSignalForward(spriteBatch, offset, startObjectArea, endObjectArea, zeroPoint, maxDistance, distanceFactor, firstLabelPosition, forward, lastLabelPosition, thisItem, ref signalShown, ref borderSignalShown, ref firstLabelShown);
+                        break;
+
+                    case Train.TrainObjectItem.TRAINOBJECTTYPE.SPEED_SIGNAL:
+                        lastLabelPosition = drawSpeedpost(spriteBatch, offset, startObjectArea, endObjectArea, zeroPoint, maxDistance, distanceFactor, firstLabelPosition, forward, lastLabelPosition, thisItem, ref firstLabelShown);
                         break;
 
                     case Train.TrainObjectItem.TRAINOBJECTTYPE.SPEEDPOST:
