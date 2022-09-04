@@ -1,5 +1,5 @@
-﻿Open Rails, NewYear version README - Rev.129
-August 14th, 2022
+﻿Open Rails, NewYear version README - Rev.130
+September 4th, 2022
 
 Please note that the installation and use of Open Rails software, even of its unofficial versions, is governed by the Open Rails End User License Agreement. 
 
@@ -50,10 +50,8 @@ This version includes some features not (yet) available in the Open Rails testin
 - add cabview controls ODOMETER_UP and ODOMETER_DOWN
 - Improvements in sky color and in other environment areas, by DR-Aeronautics
 - multiple preset viewpoints for 3D cabs, see http://www.elvastower.com/forums/index.php?/topic/36339-multiple-preset-viewpoints-for-3d-cabs/
-- Bug fix for https://bugs.launchpad.net/or/+bug/1983511 When an AI train disappears at end of run, containers remain visible (present in Unstable release)
-- added code to manage containers on wagons in multiplayer mode
-- N£W: sync turntable and transfertable operation when in multiplayer mode, see http://www.elvastower.com/forums/index.php?/topic/28591-operational-turntable/page__view__findpost__p__287727
-- NEW: Provide travelled distance to TCS scripts taking into account the running direction, by cesarBLG (present in Unstable release).
+- sync turntable and transfertable operation when in multiplayer mode, see http://www.elvastower.com/forums/index.php?/topic/28591-operational-turntable/page__view__findpost__p__287727 (already present in Unstable release, foreseen in Testing release by September 10th)
+- fix crash when reinitializing EOTs on a carless train
 
 
 The Monogame related code intentionally coincides only partly with the code of the OR official testing version.
