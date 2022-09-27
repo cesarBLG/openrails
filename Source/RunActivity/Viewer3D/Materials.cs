@@ -215,7 +215,8 @@ namespace Orts.Viewer3D
             {
                 var texture = Textures[path];
                 Textures.Remove(path);
-                if (Viewer.Settings.ReduceMemory)
+                if (Viewer.Settings.ReduceMemory &&
+                    texture != SharedMaterialManager.DefaultSnowTexture && texture != SharedMaterialManager.DefaultDMSnowTexture)
                 {
                     texture.Dispose();
                     texture = null;
