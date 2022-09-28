@@ -178,6 +178,8 @@ namespace ORTS
             trackAntiAliasing.Value = Settings.AntiAliasing;
             trackAntiAliasing_ValueChanged(null, null);
             checkDoubleWire.Checked = Settings.DoubleWire;
+            trackLODBias.Value = Settings.LODBias;
+            trackLODBias_ValueChanged(null, null);
 
             // Simulation tab
 
@@ -264,7 +266,7 @@ namespace ORTS
                 catch { }
             }
 
-            // Updater tab
+            // System tab
             var updateChannelNames = new Dictionary<string, string> {
                 { "stable", catalog.GetString("Stable (recommended)") },
                 { "testing", catalog.GetString("Testing") },
@@ -277,34 +279,33 @@ namespace ORTS
                 { "unstable", catalog.GetString("Daily updates which may contain serious defects. For developers only.") },
                 { "", catalog.GetString("No updates.") },
             };
-            var spacing = labelUpdateChannel.Margin.Size;
-            var indent = 20;
-            var top = labelUpdateChannel.Bottom + spacing.Height;
+            var spacing = labelUpdateMode.Margin.Size;
+            var indent = 180;
+            var top = labelUpdateMode.Bottom + spacing.Height;
             foreach (var channel in UpdateManager.GetChannels())
             {
                 var radio = new RadioButton()
                 {
                     Text = updateChannelNames[channel.ToLowerInvariant()],
-                    Margin = labelUpdateChannel.Margin,
-                    Left = spacing.Width,
+                    Margin = labelUpdateMode.Margin,
+                    Left = spacing.Width + 32, // to leave room for HelpIcon
                     Top = top,
                     Checked = updateManager.ChannelName.Equals(channel, StringComparison.InvariantCultureIgnoreCase),
                     AutoSize = true,
                     Tag = channel,
                 };
-                tabPageUpdater.Controls.Add(radio);
-                top += radio.Height + spacing.Height;
+                tabPageSystem.Controls.Add(radio);
                 var label = new Label()
                 {
                     Text = updateChannelDescriptions[channel.ToLowerInvariant()],
-                    Margin = labelUpdateChannel.Margin,
+                    Margin = labelUpdateMode.Margin,
                     Left = spacing.Width + indent,
-                    Top = top,
-                    Width = tabPageUpdater.ClientSize.Width - indent - spacing.Width * 2,
+                    Top = top + 2, // Offset to align with radio button text
+                    Width = tabPageSystem.ClientSize.Width - indent - spacing.Width * 2,
                     AutoSize = true,
                 };
-                tabPageUpdater.Controls.Add(label);
-                top += label.Height + spacing.Height;
+                tabPageSystem.Controls.Add(label);
+                top += label.Height + spacing.Height - 3; // -3 to close them up a bit
             }
 
             // Experimental tab
@@ -315,8 +316,6 @@ namespace ORTS
             labelPerformanceTunerTarget.Enabled = checkPerformanceTuner.Checked;
             numericPerformanceTunerTarget.Enabled = checkPerformanceTuner.Checked;
             numericPerformanceTunerTarget.Value = Settings.PerformanceTunerTarget;
-            trackLODBias.Value = Settings.LODBias;
-            trackLODBias_ValueChanged(null, null);
             checkSignalLightGlow.Checked = Settings.SignalLightGlow;
             checkUseLocationPassingPaths.Checked = Settings.UseLocationPassingPaths;
             checkUseMSTSEnv.Checked = Settings.UseMSTSEnv;
@@ -477,6 +476,7 @@ private async void OptionsForm_Shown(object sender, EventArgs e)
             Settings.ViewingFOV = (int)numericViewingFOV.Value;
             Settings.WorldObjectDensity = (int)numericWorldObjectDensity.Value;
             Settings.WindowSize = GetValidWindowSize(comboWindowSize.Text);
+            Settings.LODBias = trackLODBias.Value;
 
             Settings.DayAmbientLight = (int)trackDayAmbientLight.Value;
             Settings.DoubleWire = checkDoubleWire.Checked;
@@ -522,7 +522,7 @@ private async void OptionsForm_Shown(object sender, EventArgs e)
                 Settings.Folders.Folders.Add(folder.Name, folder.Path);
 
             // Updater tab
-            foreach (Control control in tabPageUpdater.Controls)
+            foreach (Control control in tabPageSystem.Controls)
                 if ((control is RadioButton) && (control as RadioButton).Checked)
                     UpdateManager.SetChannel((string)control.Tag);
 
@@ -532,7 +532,6 @@ private async void OptionsForm_Shown(object sender, EventArgs e)
             Settings.SuperElevationGauge = (int)numericSuperElevationGauge.Value;
             Settings.PerformanceTuner = checkPerformanceTuner.Checked;
             Settings.PerformanceTunerTarget = (int)numericPerformanceTunerTarget.Value;
-            Settings.LODBias = trackLODBias.Value;
             Settings.SignalLightGlow = checkSignalLightGlow.Checked;
             Settings.UseLocationPassingPaths = checkUseLocationPassingPaths.Checked;
             Settings.UseMSTSEnv = checkUseMSTSEnv.Checked;
@@ -682,15 +681,15 @@ private async void OptionsForm_Shown(object sender, EventArgs e)
         private void trackLODBias_ValueChanged(object sender, EventArgs e)
         {
             if (trackLODBias.Value == -100)
-                labelLODBias.Text = catalog.GetStringFmt("No detail (-{0}%)", -trackLODBias.Value);
+                labelDefaultDetail.Text = catalog.GetStringFmt("No detail (-{0}%)", -trackLODBias.Value);
             else if (trackLODBias.Value < 0)
-                labelLODBias.Text = catalog.GetStringFmt("Less detail (-{0}%)", -trackLODBias.Value);
+                labelDefaultDetail.Text = catalog.GetStringFmt("Less detail (-{0}%)", -trackLODBias.Value);
             else if (trackLODBias.Value == 0)
-                labelLODBias.Text = catalog.GetStringFmt("Default detail (+{0}%)", trackLODBias.Value);
+                labelDefaultDetail.Text = catalog.GetStringFmt("Default detail (+{0}%)", trackLODBias.Value);
             else if (trackLODBias.Value < 100)
-                labelLODBias.Text = catalog.GetStringFmt("More detail (+{0}%)", trackLODBias.Value);
+                labelDefaultDetail.Text = catalog.GetStringFmt("More detail (+{0}%)", trackLODBias.Value);
             else
-                labelLODBias.Text = catalog.GetStringFmt("All detail (+{0}%)", trackLODBias.Value);
+                labelDefaultDetail.Text = catalog.GetStringFmt("All detail (+{0}%)", trackLODBias.Value);
         }
 
         private void dataGridViewContent_SelectionChanged(object sender, EventArgs e)
@@ -812,7 +811,7 @@ private async void OptionsForm_Shown(object sender, EventArgs e)
             labelPerformanceTunerTarget.Enabled = checkPerformanceTuner.Checked;
         }
 
-        #region Help for General Options
+        #region Help for Options
         // The icons all share the same code which assumes they are named according to a simple scheme as follows:
         //   1. To add a new Help Icon, copy an existing one and paste it onto the tab.
         //   2. Give it the same name as the associated control but change the prefix to "pb" for Picture Box.
@@ -884,6 +883,31 @@ private async void OptionsForm_Shown(object sender, EventArgs e)
                 (pbSoundVolumePercent, new Control[] { labelSoundVolume, numericSoundVolumePercent }),
                 (pbSoundDetailLevel, new Control[]  { labelSoundDetailLevel, numericSoundDetailLevel }),
                 (pbExternalSoundPassThruPercent, new Control[]  { labelExternalSound, numericExternalSoundPassThruPercent }),
+
+                // Video tab
+                (pbViewingDistance, new Control[] { labelViewingDistance, numericViewingDistance }),
+                (pbDistantMountains, new Control[] { checkDistantMountains, numericDistantMountainsViewingDistance, labelDistantMountainsViewingDistance }),
+                (pbLODViewingExtension, new[] { checkLODViewingExtension }),
+                (pbDynamicShadows, new[] { checkDynamicShadows }),
+                (pbShadowAllShapes, new[] { checkShadowAllShapes }),
+                (pbWire, new[] { checkWire }),
+                (pbDoubleWire, new[] { checkDoubleWire }),
+                (pbSignalLightGlow, new[] { checkSignalLightGlow }),
+                (pbDayAmbientLight, new Control[] { labelAmbientDaylightBrightness, trackDayAmbientLight }),
+                (pbModelInstancing, new[] { checkModelInstancing }),
+                (pbVerticalSync, new[] { checkVerticalSync }),
+                (pbAntiAliasing, new Control[] { labelAntiAliasingValue, trackAntiAliasing }),
+                (pbWorldObjectDensity, new Control[] { labelWorldObjectDensity, numericWorldObjectDensity }),
+                (pbLODBias, new Control[] { labelLODBias, trackLODBias }),
+                (pbViewingFOV, new Control[] { labelViewingVerticalFOV, numericViewingFOV }),
+
+                // System
+                (pbLanguage, new Control[] { labelLanguage, comboLanguage }),
+                (pbUpdateMode, new Control[] { labelUpdateMode }),
+                (pbWindowGlass, new[] { checkWindowGlass }),
+                (pbControlConfirmations, new[] { checkControlConfirmations }),
+                (pbWebServerPort, new Control[] { labelWebServerPort }),
+                (pbPerformanceTuner, new Control[] { checkPerformanceTuner, labelPerformanceTunerTarget }),
             };
             foreach ((PictureBox pb, Control[] controls) in helpIconControls)
             {
@@ -909,10 +933,6 @@ private async void OptionsForm_Shown(object sender, EventArgs e)
                     baseUrl + "/options.html#alerter-in-cab"
                 },
                 {
-                    pbControlConfirmations,
-                    baseUrl + "/options.html#control-confirmations"
-                },
-                {
                     pbRetainers,
                     baseUrl + "/options.html#retainer-valve-on-all-cars"
                 },
@@ -923,10 +943,6 @@ private async void OptionsForm_Shown(object sender, EventArgs e)
                 {
                     pbBrakePipeChargingRate,
                     baseUrl + "/options.html#brake-pipe-charging-rate"
-                },
-                {
-                    pbLanguage,
-                    baseUrl + "/options.html#language"
                 },
                 {
                     pbPressureUnit,
@@ -963,6 +979,93 @@ private async void OptionsForm_Shown(object sender, EventArgs e)
                     baseUrl + "/options.html#audio-options"
                 },
 
+                // Video tab
+                {
+                    pbViewingDistance,
+                    baseUrl + "/options.html#viewing-distance"
+                },
+                {
+                    pbDistantMountains,
+                    baseUrl + "/options.html#distant-mountains"
+                },
+                {
+                    pbLODViewingExtension,
+                    baseUrl + "/options.html#extend-object-maximum-viewing-distance-to-horizon"
+                },
+                {
+                    pbDynamicShadows,
+                    baseUrl + "/options.html#dynamic-shadows"
+                },
+                {
+                    pbShadowAllShapes,
+                    baseUrl + "/options.html#shadow-for-all-shapes"
+                },
+                {
+                    pbWire,
+                    baseUrl + "/options.html#overhead-wire"
+                },
+                {
+                    pbDoubleWire,
+                    baseUrl + "/options.html#double-overhead-wires"
+                },
+                {
+                    pbSignalLightGlow,
+                    baseUrl + "/options.html#signal-light-glow"
+                },
+                {
+                    pbDayAmbientLight,
+                    baseUrl + "/options.html#ambient-daylight-brightness"
+                },
+                {
+                    pbModelInstancing,
+                    baseUrl + "/options.html#model-instancing"
+                },
+                {
+                    pbVerticalSync,
+                    baseUrl + "/options.html#vertical-sync"
+                },
+                {
+                    pbAntiAliasing,
+                    baseUrl + "/options.html#anti-aliasing"
+                },
+                {
+                    pbWorldObjectDensity,
+                    baseUrl + "/options.html#world-object-density"
+                },
+                {
+                    pbLODBias,
+                    baseUrl + "/options.html#level-of-detail-bias"
+                },
+                {
+                    pbViewingFOV,
+                    baseUrl + "/options.html#viewing-vertical-fov"
+                },
+
+                // System tab
+                {
+                    pbLanguage,
+                    baseUrl + "/options.html#language"
+                },
+                {
+                    pbUpdateMode,
+                    baseUrl + "/options.html#updater-options"
+                },
+                {
+                    pbWindowGlass,
+                    baseUrl + "/options.html#window-glass"
+                },
+                {
+                    pbControlConfirmations,
+                    baseUrl + "/options.html#control-confirmations"
+                },
+                {
+                    pbWebServerPort,
+                    baseUrl + "/options.html#web-server-port"
+                },
+                {
+                    pbPerformanceTuner,
+                    baseUrl + "/options.html#performance-tuner"
+                },
             };
             if (urls.TryGetValue(sender, out var url))
             {
@@ -994,6 +1097,16 @@ private async void OptionsForm_Shown(object sender, EventArgs e)
         #endregion
 
         private void OptionsForm_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label3_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void comboWindowSize_SelectedIndexChanged(object sender, EventArgs e)
         {
 
         }
