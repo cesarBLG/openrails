@@ -54,26 +54,6 @@ namespace Orts.Viewer3D.RollingStock.SubSystems
             UserInputCommands.Add(UserCommand.ControlCruiseControlModeIncrease, new Action[] { () => CruiseControl.SpeedSelectorModeStopIncrease(), () => CruiseControl.SpeedSelectorModeStartIncrease() });
             UserInputCommands.Add(UserCommand.ControlCruiseControlModeDecrease, new Action[] { Noop, () => CruiseControl.SpeedSelectorModeDecrease() });
             UserInputCommands.Add(UserCommand.ControlTrainTypePaxCargo, new Action[] { Noop, () => Locomotive.ChangeTrainTypePaxCargo() });
-            UserInputCommands.Add(UserCommand.ControlSelectSpeed10, new Action[] { Noop, () => CruiseControl.SetSpeed(10) });
-            UserInputCommands.Add(UserCommand.ControlSelectSpeed20, new Action[] { Noop, () => CruiseControl.SetSpeed(20) });
-            UserInputCommands.Add(UserCommand.ControlSelectSpeed30, new Action[] { Noop, () => CruiseControl.SetSpeed(30) });
-            UserInputCommands.Add(UserCommand.ControlSelectSpeed40, new Action[] { Noop, () => CruiseControl.SetSpeed(40) });
-            UserInputCommands.Add(UserCommand.ControlSelectSpeed50, new Action[] { Noop, () => CruiseControl.SetSpeed(50) });
-            UserInputCommands.Add(UserCommand.ControlSelectSpeed60, new Action[] { Noop, () => CruiseControl.SetSpeed(60) });
-            UserInputCommands.Add(UserCommand.ControlSelectSpeed70, new Action[] { Noop, () => CruiseControl.SetSpeed(70) });
-            UserInputCommands.Add(UserCommand.ControlSelectSpeed80, new Action[] { Noop, () => CruiseControl.SetSpeed(80) });
-            UserInputCommands.Add(UserCommand.ControlSelectSpeed90, new Action[] { Noop, () => CruiseControl.SetSpeed(90) });
-            UserInputCommands.Add(UserCommand.ControlSelectSpeed100, new Action[] { Noop, () => CruiseControl.SetSpeed(100) });
-            UserInputCommands.Add(UserCommand.ControlSelectSpeed110, new Action[] { Noop, () => CruiseControl.SetSpeed(110) });
-            UserInputCommands.Add(UserCommand.ControlSelectSpeed120, new Action[] { Noop, () => CruiseControl.SetSpeed(120) });
-            UserInputCommands.Add(UserCommand.ControlSelectSpeed130, new Action[] { Noop, () => CruiseControl.SetSpeed(130) });
-            UserInputCommands.Add(UserCommand.ControlSelectSpeed140, new Action[] { Noop, () => CruiseControl.SetSpeed(140) });
-            UserInputCommands.Add(UserCommand.ControlSelectSpeed150, new Action[] { Noop, () => CruiseControl.SetSpeed(150) });
-            UserInputCommands.Add(UserCommand.ControlSelectSpeed160, new Action[] { Noop, () => CruiseControl.SetSpeed(160) });
-            UserInputCommands.Add(UserCommand.ControlSelectSpeed170, new Action[] { Noop, () => CruiseControl.SetSpeed(170) });
-            UserInputCommands.Add(UserCommand.ControlSelectSpeed180, new Action[] { Noop, () => CruiseControl.SetSpeed(180) });
-            UserInputCommands.Add(UserCommand.ControlSelectSpeed190, new Action[] { Noop, () => CruiseControl.SetSpeed(190) });
-            UserInputCommands.Add(UserCommand.ControlSelectSpeed200, new Action[] { Noop, () => CruiseControl.SetSpeed(200) });
             UserInputCommands.Add(UserCommand.ControlSpeedRegulatorSelectedSpeedToZero, new Action[] { Noop, () => CruiseControl.SetSpeed(0) });
         }
     }
