@@ -1,4 +1,4 @@
-// COPYRIGHT 2010, 2011, 2012, 2013, 2014 by the Open Rails project.
+﻿// COPYRIGHT 2010, 2011, 2012, 2013, 2014 by the Open Rails project.
 // 
 // This file is part of Open Rails.
 // 
@@ -441,17 +441,6 @@ namespace Orts.Viewer3D
                 // Now calculate division to query.
                 var x = ((int)location.Location.X + 1024) / BlockSize;
                 var z = ((int)location.Location.Z + 1024) / BlockSize;
-
-                // Trace the case where x or z are out of bounds
-                if (x < 0 || x > 255 || z < 0 || z > 255)
-                {
-                    Trace.TraceWarning("Precipitation indexes are out of bounds:  x = {0}, z = {1}, Location.X = {2}, Location.Z = {3}, BlockSize = {4}, HeightDimensionX = {5}, HeightDimensionZ = {6}",
-                        x, z, location.Location.X, location.Location.Z, BlockSize, tile.Height.GetLength(0), tile.Height.GetLength(1));
-                    if (x > 255) x = 255;
-                    else if (z > 255) z = 255;
-                    else if (x < 0) x = 0;
-                    else z = 0;
-                }
 
                 // Trace the case where x or z are out of bounds and fix
                 var xSize = tile.Height.GetLength(0);
