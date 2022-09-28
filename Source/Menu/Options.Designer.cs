@@ -35,13 +35,33 @@
             this.buttonCancel = new System.Windows.Forms.Button();
             this.bindingSourceContent = new System.Windows.Forms.BindingSource(this.components);
             this.pbLAA = new System.Windows.Forms.PictureBox();
+            this.pbViewingFOV = new System.Windows.Forms.PictureBox();
+            this.labelDefaultDetail = new System.Windows.Forms.Label();
+            this.pbUpdateMode = new System.Windows.Forms.PictureBox();
+            this.pbWindowGlass = new System.Windows.Forms.PictureBox();
+            this.pbWebServerPort = new System.Windows.Forms.PictureBox();
+            this.pbPerformanceTuner = new System.Windows.Forms.PictureBox();
+            this.pbLODBias = new System.Windows.Forms.PictureBox();
+            this.pbWorldObjectDensity = new System.Windows.Forms.PictureBox();
+            this.pbAntiAliasing = new System.Windows.Forms.PictureBox();
+            this.pbVerticalSync = new System.Windows.Forms.PictureBox();
+            this.pbModelInstancing = new System.Windows.Forms.PictureBox();
+            this.pbDayAmbientLight = new System.Windows.Forms.PictureBox();
+            this.pbSignalLightGlow = new System.Windows.Forms.PictureBox();
+            this.pbDoubleWire = new System.Windows.Forms.PictureBox();
+            this.pbWire = new System.Windows.Forms.PictureBox();
+            this.pbShadowAllShapes = new System.Windows.Forms.PictureBox();
+            this.pbDynamicShadows = new System.Windows.Forms.PictureBox();
+            this.pbLODViewingExtension = new System.Windows.Forms.PictureBox();
+            this.pbDistantMountains = new System.Windows.Forms.PictureBox();
+            this.pbViewingDistance = new System.Windows.Forms.PictureBox();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.numericUseSuperElevation = new System.Windows.Forms.NumericUpDown();
+            this.trackLODBias = new System.Windows.Forms.TrackBar();
             this.numericSuperElevationMinLen = new System.Windows.Forms.NumericUpDown();
             this.numericPerformanceTunerTarget = new System.Windows.Forms.NumericUpDown();
             this.trackAdhesionFactor = new System.Windows.Forms.TrackBar();
             this.trackAdhesionFactorChange = new System.Windows.Forms.TrackBar();
-            this.trackLODBias = new System.Windows.Forms.TrackBar();
             this.numericActRandomizationLevel = new System.Windows.Forms.NumericUpDown();
             this.numericActWeatherRandomizationLevel = new System.Windows.Forms.NumericUpDown();
             this.checkFullRangeThrottle = new System.Windows.Forms.CheckBox();
@@ -60,6 +80,10 @@
             this.numericExternalSoundPassThruPercent = new System.Windows.Forms.NumericUpDown();
             this.numericCab2DStretch = new System.Windows.Forms.NumericUpDown();
             this.checkLODViewingExtension = new System.Windows.Forms.CheckBox();
+            this.labelWindowSize = new System.Windows.Forms.Label();
+            this.labelWebServerPort = new System.Windows.Forms.Label();
+            this.labelWorldObjectDensity = new System.Windows.Forms.Label();
+            this.labelViewingVerticalFOV = new System.Windows.Forms.Label();
             this.tabPageExperimental = new System.Windows.Forms.TabPage();
             this.label27 = new System.Windows.Forms.Label();
             this.label26 = new System.Windows.Forms.Label();
@@ -68,25 +92,33 @@
             this.checkCorrectQuestionableBrakingParams = new System.Windows.Forms.CheckBox();
             this.label16 = new System.Windows.Forms.Label();
             this.label9 = new System.Windows.Forms.Label();
-            this.label21 = new System.Windows.Forms.Label();
             this.AdhesionFactorChangeValueLabel = new System.Windows.Forms.Label();
             this.AdhesionFactorValueLabel = new System.Windows.Forms.Label();
-            this.labelLODBias = new System.Windows.Forms.Label();
             this.checkShapeWarnings = new System.Windows.Forms.CheckBox();
             this.AdhesionLevelValue = new System.Windows.Forms.Label();
             this.AdhesionLevelLabel = new System.Windows.Forms.Label();
-            this.checkSignalLightGlow = new System.Windows.Forms.CheckBox();
             this.checkUseMSTSEnv = new System.Windows.Forms.CheckBox();
-            this.labelPerformanceTunerTarget = new System.Windows.Forms.Label();
-            this.checkPerformanceTuner = new System.Windows.Forms.CheckBox();
             this.label8 = new System.Windows.Forms.Label();
             this.numericSuperElevationGauge = new System.Windows.Forms.NumericUpDown();
             this.label7 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.ElevationText = new System.Windows.Forms.Label();
-            this.tabPageUpdater = new System.Windows.Forms.TabPage();
-            this.labelUpdateChannel = new System.Windows.Forms.Label();
+            this.labelLODBias = new System.Windows.Forms.Label();
+            this.labelPerformanceTunerTarget = new System.Windows.Forms.Label();
+            this.checkPerformanceTuner = new System.Windows.Forms.CheckBox();
+            this.tabPageSystem = new System.Windows.Forms.TabPage();
+            this.labelPortNumber = new System.Windows.Forms.Label();
+            this.numericWebServerPort = new System.Windows.Forms.NumericUpDown();
+            this.pbControlConfirmations = new System.Windows.Forms.PictureBox();
+            this.checkControlConfirmations = new System.Windows.Forms.CheckBox();
+            this.pbLanguage = new System.Windows.Forms.PictureBox();
+            this.labelLanguage = new System.Windows.Forms.Label();
+            this.comboLanguage = new System.Windows.Forms.ComboBox();
+            this.comboWindowSize = new System.Windows.Forms.ComboBox();
+            this.label3 = new System.Windows.Forms.Label();
+            this.checkWindowGlass = new System.Windows.Forms.CheckBox();
+            this.labelUpdateMode = new System.Windows.Forms.Label();
             this.tabPageContent = new System.Windows.Forms.TabPage();
             this.labelContent = new System.Windows.Forms.Label();
             this.buttonContentDelete = new System.Windows.Forms.Button();
@@ -146,28 +178,26 @@
             this.checkBreakCouplers = new System.Windows.Forms.CheckBox();
             this.checkUseAdvancedAdhesion = new System.Windows.Forms.CheckBox();
             this.tabPageVideo = new System.Windows.Forms.TabPage();
+            this.checkSignalLightGlow = new System.Windows.Forms.CheckBox();
             this.labelAntiAliasingValue = new System.Windows.Forms.Label();
             this.labelAntiAliasing = new System.Windows.Forms.Label();
             this.checkShadowAllShapes = new System.Windows.Forms.CheckBox();
             this.checkDoubleWire = new System.Windows.Forms.CheckBox();
-            this.label15 = new System.Windows.Forms.Label();
             this.labelDayAmbientLight = new System.Windows.Forms.Label();
             this.checkModelInstancing = new System.Windows.Forms.CheckBox();
             this.checkVerticalSync = new System.Windows.Forms.CheckBox();
             this.labelDistantMountainsViewingDistance = new System.Windows.Forms.Label();
             this.checkDistantMountains = new System.Windows.Forms.CheckBox();
-            this.label14 = new System.Windows.Forms.Label();
+            this.labelViewingDistance = new System.Windows.Forms.Label();
             this.numericViewingDistance = new System.Windows.Forms.NumericUpDown();
             this.labelFOVHelp = new System.Windows.Forms.Label();
             this.numericViewingFOV = new System.Windows.Forms.NumericUpDown();
             this.label10 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.numericWorldObjectDensity = new System.Windows.Forms.NumericUpDown();
-            this.comboWindowSize = new System.Windows.Forms.ComboBox();
-            this.checkWindowGlass = new System.Windows.Forms.CheckBox();
-            this.label3 = new System.Windows.Forms.Label();
             this.checkDynamicShadows = new System.Windows.Forms.CheckBox();
             this.checkWire = new System.Windows.Forms.CheckBox();
+            this.labelAmbientDaylightBrightness = new System.Windows.Forms.Label();
             this.tabPageAudio = new System.Windows.Forms.TabPage();
             this.pbExternalSoundPassThruPercent = new System.Windows.Forms.PictureBox();
             this.pbSoundDetailLevel = new System.Windows.Forms.PictureBox();
@@ -181,23 +211,16 @@
             this.pbEnableTcsScripts = new System.Windows.Forms.PictureBox();
             this.pbOtherUnits = new System.Windows.Forms.PictureBox();
             this.pbPressureUnit = new System.Windows.Forms.PictureBox();
-            this.pbLanguage = new System.Windows.Forms.PictureBox();
             this.pbBrakePipeChargingRate = new System.Windows.Forms.PictureBox();
             this.pbGraduatedRelease = new System.Windows.Forms.PictureBox();
             this.pbRetainers = new System.Windows.Forms.PictureBox();
             this.pbAlerter = new System.Windows.Forms.PictureBox();
-            this.pbControlConfirmations = new System.Windows.Forms.PictureBox();
-            this.labelPortNumber = new System.Windows.Forms.Label();
-            this.numericWebServerPort = new System.Windows.Forms.NumericUpDown();
             this.checkOverspeedMonitor = new System.Windows.Forms.CheckBox();
             this.checkEnableTCSScripts = new System.Windows.Forms.CheckBox();
             this.labelOtherUnits = new System.Windows.Forms.Label();
             this.labelPressureUnit = new System.Windows.Forms.Label();
             this.comboOtherUnits = new System.Windows.Forms.ComboBox();
             this.comboPressureUnit = new System.Windows.Forms.ComboBox();
-            this.labelLanguage = new System.Windows.Forms.Label();
-            this.comboLanguage = new System.Windows.Forms.ComboBox();
-            this.checkControlConfirmations = new System.Windows.Forms.CheckBox();
             this.checkAlerterExternal = new System.Windows.Forms.CheckBox();
             this.numericBrakePipeChargingRate = new System.Windows.Forms.NumericUpDown();
             this.checkRetainers = new System.Windows.Forms.CheckBox();
@@ -206,6 +229,12 @@
             this.checkAlerter = new System.Windows.Forms.CheckBox();
             this.tabOptions = new System.Windows.Forms.TabControl();
             this.tabPageORNYMG = new System.Windows.Forms.TabPage();
+            this.label25 = new System.Windows.Forms.Label();
+            this.precipitationBoxLength = new System.Windows.Forms.NumericUpDown();
+            this.label24 = new System.Windows.Forms.Label();
+            this.precipitationBoxWidth = new System.Windows.Forms.NumericUpDown();
+            this.label23 = new System.Windows.Forms.Label();
+            this.precipitationBoxHeight = new System.Windows.Forms.NumericUpDown();
             this.pbEnableWebServer = new System.Windows.Forms.PictureBox();
             this.checkEnableWebServer = new System.Windows.Forms.CheckBox();
             this.labelCab2DStretch = new System.Windows.Forms.Label();
@@ -217,20 +246,33 @@
             this.checkRunAt32bit = new System.Windows.Forms.CheckBox();
             this.checkEnableWatchdog = new System.Windows.Forms.CheckBox();
             this.checkFastFullScreenAltTab = new System.Windows.Forms.CheckBox();
-            this.label25 = new System.Windows.Forms.Label();
-            this.precipitationBoxLength = new System.Windows.Forms.NumericUpDown();
-            this.label24 = new System.Windows.Forms.Label();
-            this.precipitationBoxWidth = new System.Windows.Forms.NumericUpDown();
-            this.label23 = new System.Windows.Forms.Label();
-            this.precipitationBoxHeight = new System.Windows.Forms.NumericUpDown();
             ((System.ComponentModel.ISupportInitialize)(this.bindingSourceContent)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbLAA)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbViewingFOV)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbUpdateMode)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbWindowGlass)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbWebServerPort)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbPerformanceTuner)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbLODBias)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbWorldObjectDensity)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbAntiAliasing)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbVerticalSync)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbModelInstancing)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbDayAmbientLight)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbSignalLightGlow)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbDoubleWire)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbWire)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbShadowAllShapes)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbDynamicShadows)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbLODViewingExtension)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbDistantMountains)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbViewingDistance)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUseSuperElevation)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.trackLODBias)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericSuperElevationMinLen)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericPerformanceTunerTarget)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackAdhesionFactor)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackAdhesionFactorChange)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.trackLODBias)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericActRandomizationLevel)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericActWeatherRandomizationLevel)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericDistantMountainsViewingDistance)).BeginInit();
@@ -241,7 +283,10 @@
             ((System.ComponentModel.ISupportInitialize)(this.numericCab2DStretch)).BeginInit();
             this.tabPageExperimental.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericSuperElevationGauge)).BeginInit();
-            this.tabPageUpdater.SuspendLayout();
+            this.tabPageSystem.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericWebServerPort)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbControlConfirmations)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbLanguage)).BeginInit();
             this.tabPageContent.SuspendLayout();
             this.groupBoxContent.SuspendLayout();
             this.panelContent.SuspendLayout();
@@ -271,20 +316,17 @@
             ((System.ComponentModel.ISupportInitialize)(this.pbEnableTcsScripts)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbOtherUnits)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbPressureUnit)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pbLanguage)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbBrakePipeChargingRate)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbGraduatedRelease)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbRetainers)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbAlerter)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pbControlConfirmations)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericWebServerPort)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericBrakePipeChargingRate)).BeginInit();
             this.tabOptions.SuspendLayout();
             this.tabPageORNYMG.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pbEnableWebServer)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.precipitationBoxLength)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.precipitationBoxWidth)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.precipitationBoxHeight)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbEnableWebServer)).BeginInit();
             this.SuspendLayout();
             // 
             // buttonOK
@@ -321,6 +363,244 @@
             this.pbLAA.TabIndex = 0;
             this.pbLAA.TabStop = false;
             // 
+            // pbViewingFOV
+            // 
+            this.pbViewingFOV.Image = global::ORTS.Properties.Resources.info_18;
+            this.pbViewingFOV.Location = new System.Drawing.Point(312, 233);
+            this.pbViewingFOV.Name = "pbViewingFOV";
+            this.pbViewingFOV.Size = new System.Drawing.Size(18, 18);
+            this.pbViewingFOV.TabIndex = 45;
+            this.pbViewingFOV.TabStop = false;
+            this.pbViewingFOV.Click += new System.EventHandler(this.HelpIcon_Click);
+            this.pbViewingFOV.MouseEnter += new System.EventHandler(this.HelpIcon_MouseEnter);
+            this.pbViewingFOV.MouseLeave += new System.EventHandler(this.HelpIcon_MouseLeave);
+            // 
+            // labelDefaultDetail
+            // 
+            this.labelDefaultDetail.Location = new System.Drawing.Point(455, 169);
+            this.labelDefaultDetail.Margin = new System.Windows.Forms.Padding(3);
+            this.labelDefaultDetail.Name = "labelDefaultDetail";
+            this.labelDefaultDetail.Size = new System.Drawing.Size(141, 16);
+            this.labelDefaultDetail.TabIndex = 44;
+            this.labelDefaultDetail.Text = "Default detail (+0%)";
+            this.labelDefaultDetail.TextAlign = System.Drawing.ContentAlignment.TopRight;
+            // 
+            // pbUpdateMode
+            // 
+            this.pbUpdateMode.Image = global::ORTS.Properties.Resources.info_18;
+            this.pbUpdateMode.Location = new System.Drawing.Point(11, 52);
+            this.pbUpdateMode.Name = "pbUpdateMode";
+            this.pbUpdateMode.Size = new System.Drawing.Size(18, 18);
+            this.pbUpdateMode.TabIndex = 30;
+            this.pbUpdateMode.TabStop = false;
+            this.pbUpdateMode.Click += new System.EventHandler(this.HelpIcon_Click);
+            this.pbUpdateMode.MouseEnter += new System.EventHandler(this.HelpIcon_MouseEnter);
+            this.pbUpdateMode.MouseLeave += new System.EventHandler(this.HelpIcon_MouseLeave);
+            // 
+            // pbWindowGlass
+            // 
+            this.pbWindowGlass.Image = global::ORTS.Properties.Resources.info_18;
+            this.pbWindowGlass.Location = new System.Drawing.Point(11, 234);
+            this.pbWindowGlass.Name = "pbWindowGlass";
+            this.pbWindowGlass.Size = new System.Drawing.Size(18, 18);
+            this.pbWindowGlass.TabIndex = 36;
+            this.pbWindowGlass.TabStop = false;
+            this.pbWindowGlass.Click += new System.EventHandler(this.HelpIcon_Click);
+            this.pbWindowGlass.MouseEnter += new System.EventHandler(this.HelpIcon_MouseEnter);
+            this.pbWindowGlass.MouseLeave += new System.EventHandler(this.HelpIcon_MouseLeave);
+            // 
+            // pbWebServerPort
+            // 
+            this.pbWebServerPort.Image = global::ORTS.Properties.Resources.info_18;
+            this.pbWebServerPort.Location = new System.Drawing.Point(11, 298);
+            this.pbWebServerPort.Name = "pbWebServerPort";
+            this.pbWebServerPort.Size = new System.Drawing.Size(18, 18);
+            this.pbWebServerPort.TabIndex = 41;
+            this.pbWebServerPort.TabStop = false;
+            this.pbWebServerPort.Click += new System.EventHandler(this.HelpIcon_Click);
+            this.pbWebServerPort.MouseEnter += new System.EventHandler(this.HelpIcon_MouseEnter);
+            this.pbWebServerPort.MouseLeave += new System.EventHandler(this.HelpIcon_MouseLeave);
+            // 
+            // pbPerformanceTuner
+            // 
+            this.pbPerformanceTuner.Image = global::ORTS.Properties.Resources.info_18;
+            this.pbPerformanceTuner.Location = new System.Drawing.Point(11, 330);
+            this.pbPerformanceTuner.Name = "pbPerformanceTuner";
+            this.pbPerformanceTuner.Size = new System.Drawing.Size(18, 18);
+            this.pbPerformanceTuner.TabIndex = 45;
+            this.pbPerformanceTuner.TabStop = false;
+            this.pbPerformanceTuner.Click += new System.EventHandler(this.HelpIcon_Click);
+            this.pbPerformanceTuner.MouseEnter += new System.EventHandler(this.HelpIcon_MouseEnter);
+            this.pbPerformanceTuner.MouseLeave += new System.EventHandler(this.HelpIcon_MouseLeave);
+            // 
+            // pbLODBias
+            // 
+            this.pbLODBias.Image = global::ORTS.Properties.Resources.info_18;
+            this.pbLODBias.Location = new System.Drawing.Point(312, 169);
+            this.pbLODBias.Name = "pbLODBias";
+            this.pbLODBias.Size = new System.Drawing.Size(18, 18);
+            this.pbLODBias.TabIndex = 43;
+            this.pbLODBias.TabStop = false;
+            this.pbLODBias.Click += new System.EventHandler(this.HelpIcon_Click);
+            this.pbLODBias.MouseEnter += new System.EventHandler(this.HelpIcon_MouseEnter);
+            this.pbLODBias.MouseLeave += new System.EventHandler(this.HelpIcon_MouseLeave);
+            // 
+            // pbWorldObjectDensity
+            // 
+            this.pbWorldObjectDensity.Image = global::ORTS.Properties.Resources.info_18;
+            this.pbWorldObjectDensity.Location = new System.Drawing.Point(312, 137);
+            this.pbWorldObjectDensity.Name = "pbWorldObjectDensity";
+            this.pbWorldObjectDensity.Size = new System.Drawing.Size(18, 18);
+            this.pbWorldObjectDensity.TabIndex = 42;
+            this.pbWorldObjectDensity.TabStop = false;
+            this.pbWorldObjectDensity.Click += new System.EventHandler(this.HelpIcon_Click);
+            this.pbWorldObjectDensity.MouseEnter += new System.EventHandler(this.HelpIcon_MouseEnter);
+            this.pbWorldObjectDensity.MouseLeave += new System.EventHandler(this.HelpIcon_MouseLeave);
+            // 
+            // pbAntiAliasing
+            // 
+            this.pbAntiAliasing.Image = global::ORTS.Properties.Resources.info_18;
+            this.pbAntiAliasing.Location = new System.Drawing.Point(312, 73);
+            this.pbAntiAliasing.Name = "pbAntiAliasing";
+            this.pbAntiAliasing.Size = new System.Drawing.Size(18, 18);
+            this.pbAntiAliasing.TabIndex = 41;
+            this.pbAntiAliasing.TabStop = false;
+            this.pbAntiAliasing.Click += new System.EventHandler(this.HelpIcon_Click);
+            this.pbAntiAliasing.MouseEnter += new System.EventHandler(this.HelpIcon_MouseEnter);
+            this.pbAntiAliasing.MouseLeave += new System.EventHandler(this.HelpIcon_MouseLeave);
+            // 
+            // pbVerticalSync
+            // 
+            this.pbVerticalSync.Image = global::ORTS.Properties.Resources.info_18;
+            this.pbVerticalSync.Location = new System.Drawing.Point(312, 41);
+            this.pbVerticalSync.Name = "pbVerticalSync";
+            this.pbVerticalSync.Size = new System.Drawing.Size(18, 18);
+            this.pbVerticalSync.TabIndex = 40;
+            this.pbVerticalSync.TabStop = false;
+            this.pbVerticalSync.Click += new System.EventHandler(this.HelpIcon_Click);
+            this.pbVerticalSync.MouseEnter += new System.EventHandler(this.HelpIcon_MouseEnter);
+            this.pbVerticalSync.MouseLeave += new System.EventHandler(this.HelpIcon_MouseLeave);
+            // 
+            // pbModelInstancing
+            // 
+            this.pbModelInstancing.Image = global::ORTS.Properties.Resources.info_18;
+            this.pbModelInstancing.Location = new System.Drawing.Point(312, 9);
+            this.pbModelInstancing.Name = "pbModelInstancing";
+            this.pbModelInstancing.Size = new System.Drawing.Size(18, 18);
+            this.pbModelInstancing.TabIndex = 39;
+            this.pbModelInstancing.TabStop = false;
+            this.pbModelInstancing.Click += new System.EventHandler(this.HelpIcon_Click);
+            this.pbModelInstancing.MouseEnter += new System.EventHandler(this.HelpIcon_MouseEnter);
+            this.pbModelInstancing.MouseLeave += new System.EventHandler(this.HelpIcon_MouseLeave);
+            // 
+            // pbDayAmbientLight
+            // 
+            this.pbDayAmbientLight.Image = global::ORTS.Properties.Resources.info_18;
+            this.pbDayAmbientLight.Location = new System.Drawing.Point(11, 297);
+            this.pbDayAmbientLight.Name = "pbDayAmbientLight";
+            this.pbDayAmbientLight.Size = new System.Drawing.Size(18, 18);
+            this.pbDayAmbientLight.TabIndex = 38;
+            this.pbDayAmbientLight.TabStop = false;
+            this.pbDayAmbientLight.Click += new System.EventHandler(this.HelpIcon_Click);
+            this.pbDayAmbientLight.MouseEnter += new System.EventHandler(this.HelpIcon_MouseEnter);
+            this.pbDayAmbientLight.MouseLeave += new System.EventHandler(this.HelpIcon_MouseLeave);
+            // 
+            // pbSignalLightGlow
+            // 
+            this.pbSignalLightGlow.Image = global::ORTS.Properties.Resources.info_18;
+            this.pbSignalLightGlow.Location = new System.Drawing.Point(11, 265);
+            this.pbSignalLightGlow.Name = "pbSignalLightGlow";
+            this.pbSignalLightGlow.Size = new System.Drawing.Size(18, 18);
+            this.pbSignalLightGlow.TabIndex = 37;
+            this.pbSignalLightGlow.TabStop = false;
+            this.pbSignalLightGlow.Click += new System.EventHandler(this.HelpIcon_Click);
+            this.pbSignalLightGlow.MouseEnter += new System.EventHandler(this.HelpIcon_MouseEnter);
+            this.pbSignalLightGlow.MouseLeave += new System.EventHandler(this.HelpIcon_MouseLeave);
+            // 
+            // pbDoubleWire
+            // 
+            this.pbDoubleWire.Image = global::ORTS.Properties.Resources.info_18;
+            this.pbDoubleWire.Location = new System.Drawing.Point(11, 233);
+            this.pbDoubleWire.Name = "pbDoubleWire";
+            this.pbDoubleWire.Size = new System.Drawing.Size(18, 18);
+            this.pbDoubleWire.TabIndex = 36;
+            this.pbDoubleWire.TabStop = false;
+            this.pbDoubleWire.Click += new System.EventHandler(this.HelpIcon_Click);
+            this.pbDoubleWire.MouseEnter += new System.EventHandler(this.HelpIcon_MouseEnter);
+            this.pbDoubleWire.MouseLeave += new System.EventHandler(this.HelpIcon_MouseLeave);
+            // 
+            // pbWire
+            // 
+            this.pbWire.Image = global::ORTS.Properties.Resources.info_18;
+            this.pbWire.Location = new System.Drawing.Point(11, 201);
+            this.pbWire.Name = "pbWire";
+            this.pbWire.Size = new System.Drawing.Size(18, 18);
+            this.pbWire.TabIndex = 35;
+            this.pbWire.TabStop = false;
+            this.pbWire.Click += new System.EventHandler(this.HelpIcon_Click);
+            this.pbWire.MouseEnter += new System.EventHandler(this.HelpIcon_MouseEnter);
+            this.pbWire.MouseLeave += new System.EventHandler(this.HelpIcon_MouseLeave);
+            // 
+            // pbShadowAllShapes
+            // 
+            this.pbShadowAllShapes.Image = global::ORTS.Properties.Resources.info_18;
+            this.pbShadowAllShapes.Location = new System.Drawing.Point(11, 169);
+            this.pbShadowAllShapes.Name = "pbShadowAllShapes";
+            this.pbShadowAllShapes.Size = new System.Drawing.Size(18, 18);
+            this.pbShadowAllShapes.TabIndex = 34;
+            this.pbShadowAllShapes.TabStop = false;
+            this.pbShadowAllShapes.Click += new System.EventHandler(this.HelpIcon_Click);
+            this.pbShadowAllShapes.MouseEnter += new System.EventHandler(this.HelpIcon_MouseEnter);
+            this.pbShadowAllShapes.MouseLeave += new System.EventHandler(this.HelpIcon_MouseLeave);
+            // 
+            // pbDynamicShadows
+            // 
+            this.pbDynamicShadows.Image = global::ORTS.Properties.Resources.info_18;
+            this.pbDynamicShadows.Location = new System.Drawing.Point(11, 137);
+            this.pbDynamicShadows.Name = "pbDynamicShadows";
+            this.pbDynamicShadows.Size = new System.Drawing.Size(18, 18);
+            this.pbDynamicShadows.TabIndex = 33;
+            this.pbDynamicShadows.TabStop = false;
+            this.pbDynamicShadows.Click += new System.EventHandler(this.HelpIcon_Click);
+            this.pbDynamicShadows.MouseEnter += new System.EventHandler(this.HelpIcon_MouseEnter);
+            this.pbDynamicShadows.MouseLeave += new System.EventHandler(this.HelpIcon_MouseLeave);
+            // 
+            // pbLODViewingExtension
+            // 
+            this.pbLODViewingExtension.Image = global::ORTS.Properties.Resources.info_18;
+            this.pbLODViewingExtension.Location = new System.Drawing.Point(11, 105);
+            this.pbLODViewingExtension.Name = "pbLODViewingExtension";
+            this.pbLODViewingExtension.Size = new System.Drawing.Size(18, 18);
+            this.pbLODViewingExtension.TabIndex = 32;
+            this.pbLODViewingExtension.TabStop = false;
+            this.pbLODViewingExtension.Click += new System.EventHandler(this.HelpIcon_Click);
+            this.pbLODViewingExtension.MouseEnter += new System.EventHandler(this.HelpIcon_MouseEnter);
+            this.pbLODViewingExtension.MouseLeave += new System.EventHandler(this.HelpIcon_MouseLeave);
+            // 
+            // pbDistantMountains
+            // 
+            this.pbDistantMountains.Image = global::ORTS.Properties.Resources.info_18;
+            this.pbDistantMountains.Location = new System.Drawing.Point(11, 41);
+            this.pbDistantMountains.Name = "pbDistantMountains";
+            this.pbDistantMountains.Size = new System.Drawing.Size(18, 18);
+            this.pbDistantMountains.TabIndex = 31;
+            this.pbDistantMountains.TabStop = false;
+            this.pbDistantMountains.Click += new System.EventHandler(this.HelpIcon_Click);
+            this.pbDistantMountains.MouseEnter += new System.EventHandler(this.HelpIcon_MouseEnter);
+            this.pbDistantMountains.MouseLeave += new System.EventHandler(this.HelpIcon_MouseLeave);
+            // 
+            // pbViewingDistance
+            // 
+            this.pbViewingDistance.Image = global::ORTS.Properties.Resources.info_18;
+            this.pbViewingDistance.Location = new System.Drawing.Point(11, 9);
+            this.pbViewingDistance.Name = "pbViewingDistance";
+            this.pbViewingDistance.Size = new System.Drawing.Size(18, 18);
+            this.pbViewingDistance.TabIndex = 30;
+            this.pbViewingDistance.TabStop = false;
+            this.pbViewingDistance.Click += new System.EventHandler(this.HelpIcon_Click);
+            this.pbViewingDistance.MouseEnter += new System.EventHandler(this.HelpIcon_MouseEnter);
+            this.pbViewingDistance.MouseLeave += new System.EventHandler(this.HelpIcon_MouseLeave);
+            // 
             // numericUseSuperElevation
             // 
             this.numericUseSuperElevation.Location = new System.Drawing.Point(26, 42);
@@ -334,6 +614,23 @@
             this.numericUseSuperElevation.Size = new System.Drawing.Size(54, 20);
             this.numericUseSuperElevation.TabIndex = 2;
             this.toolTip1.SetToolTip(this.numericUseSuperElevation, "0: no elevation, 1: 9cm max; 10: 18cm max");
+            // 
+            // trackLODBias
+            // 
+            this.trackLODBias.AutoSize = false;
+            this.trackLODBias.BackColor = System.Drawing.SystemColors.Window;
+            this.trackLODBias.LargeChange = 10;
+            this.trackLODBias.Location = new System.Drawing.Point(336, 192);
+            this.trackLODBias.Maximum = 100;
+            this.trackLODBias.Minimum = -100;
+            this.trackLODBias.Name = "trackLODBias";
+            this.trackLODBias.Size = new System.Drawing.Size(263, 26);
+            this.trackLODBias.TabIndex = 27;
+            this.trackLODBias.TickFrequency = 10;
+            this.toolTip1.SetToolTip(this.trackLODBias, "Default is 0%");
+//            this.trackLODBias.MouseEnter += new System.EventHandler(this.HelpIcon_MouseEnter);
+//            this.trackLODBias.MouseLeave += new System.EventHandler(this.HelpIcon_MouseLeave);
+            this.trackLODBias.ValueChanged += new System.EventHandler(this.trackLODBias_ValueChanged);
             // 
             // numericSuperElevationMinLen
             // 
@@ -371,7 +668,7 @@
             0,
             0,
             0});
-            this.numericPerformanceTunerTarget.Location = new System.Drawing.Point(26, 142);
+            this.numericPerformanceTunerTarget.Location = new System.Drawing.Point(55, 352);
             this.numericPerformanceTunerTarget.Margin = new System.Windows.Forms.Padding(23, 3, 3, 3);
             this.numericPerformanceTunerTarget.Maximum = new decimal(new int[] {
             300,
@@ -423,21 +720,6 @@
             this.toolTip1.SetToolTip(this.trackAdhesionFactorChange, "Default is 10%");
             this.trackAdhesionFactorChange.Value = 10;
             this.trackAdhesionFactorChange.ValueChanged += new System.EventHandler(this.trackAdhesionFactor_ValueChanged);
-            // 
-            // trackLODBias
-            // 
-            this.trackLODBias.AutoSize = false;
-            this.trackLODBias.BackColor = System.Drawing.SystemColors.Window;
-            this.trackLODBias.LargeChange = 10;
-            this.trackLODBias.Location = new System.Drawing.Point(6, 277);
-            this.trackLODBias.Maximum = 100;
-            this.trackLODBias.Minimum = -100;
-            this.trackLODBias.Name = "trackLODBias";
-            this.trackLODBias.Size = new System.Drawing.Size(292, 26);
-            this.trackLODBias.TabIndex = 16;
-            this.trackLODBias.TickFrequency = 10;
-            this.toolTip1.SetToolTip(this.trackLODBias, "Default is 0%");
-            this.trackLODBias.ValueChanged += new System.EventHandler(this.trackLODBias_ValueChanged);
             // 
             // numericActRandomizationLevel
             // 
@@ -582,7 +864,7 @@
             0,
             0,
             0});
-            this.numericDistantMountainsViewingDistance.Location = new System.Drawing.Point(26, 214);
+            this.numericDistantMountainsViewingDistance.Location = new System.Drawing.Point(69, 65);
             this.numericDistantMountainsViewingDistance.Margin = new System.Windows.Forms.Padding(23, 3, 3, 3);
             this.numericDistantMountainsViewingDistance.Maximum = new decimal(new int[] {
             1000,
@@ -609,12 +891,12 @@
             this.trackDayAmbientLight.AutoSize = false;
             this.trackDayAmbientLight.BackColor = System.Drawing.SystemColors.Window;
             this.trackDayAmbientLight.LargeChange = 4;
-            this.trackDayAmbientLight.Location = new System.Drawing.Point(6, 371);
+            this.trackDayAmbientLight.Location = new System.Drawing.Point(11, 321);
             this.trackDayAmbientLight.Margin = new System.Windows.Forms.Padding(6, 3, 6, 3);
             this.trackDayAmbientLight.Maximum = 30;
             this.trackDayAmbientLight.Minimum = 15;
             this.trackDayAmbientLight.Name = "trackDayAmbientLight";
-            this.trackDayAmbientLight.Size = new System.Drawing.Size(292, 26);
+            this.trackDayAmbientLight.Size = new System.Drawing.Size(270, 26);
             this.trackDayAmbientLight.SmallChange = 2;
             this.trackDayAmbientLight.TabIndex = 21;
             this.toolTip1.SetToolTip(this.trackDayAmbientLight, "Default is 100%");
@@ -627,12 +909,12 @@
             this.trackAntiAliasing.AutoSize = false;
             this.trackAntiAliasing.BackColor = System.Drawing.SystemColors.Window;
             this.trackAntiAliasing.LargeChange = 2;
-            this.trackAntiAliasing.Location = new System.Drawing.Point(304, 371);
+            this.trackAntiAliasing.Location = new System.Drawing.Point(323, 104);
             this.trackAntiAliasing.Margin = new System.Windows.Forms.Padding(6, 3, 6, 3);
             this.trackAntiAliasing.Maximum = 6;
             this.trackAntiAliasing.Minimum = 1;
             this.trackAntiAliasing.Name = "trackAntiAliasing";
-            this.trackAntiAliasing.Size = new System.Drawing.Size(292, 26);
+            this.trackAntiAliasing.Size = new System.Drawing.Size(270, 26);
             this.trackAntiAliasing.TabIndex = 24;
             this.toolTip1.SetToolTip(this.trackAntiAliasing, "Default is 2x MSAA");
             this.trackAntiAliasing.Value = 2;
@@ -700,12 +982,40 @@
             // checkLODViewingExtension
             // 
             this.checkLODViewingExtension.AutoSize = true;
-            this.checkLODViewingExtension.Location = new System.Drawing.Point(6, 250);
+            this.checkLODViewingExtension.Location = new System.Drawing.Point(41, 106);
             this.checkLODViewingExtension.Name = "checkLODViewingExtension";
             this.checkLODViewingExtension.Size = new System.Drawing.Size(268, 17);
             this.checkLODViewingExtension.TabIndex = 28;
             this.checkLODViewingExtension.Text = "Extend object maximum viewing distance to horizon";
             this.checkLODViewingExtension.UseVisualStyleBackColor = true;
+            // 
+            // labelWindowSize
+            // 
+            this.labelWindowSize.Location = new System.Drawing.Point(0, 0);
+            this.labelWindowSize.Name = "labelWindowSize";
+            this.labelWindowSize.Size = new System.Drawing.Size(100, 23);
+            this.labelWindowSize.TabIndex = 47;
+            // 
+            // labelWebServerPort
+            // 
+            this.labelWebServerPort.Location = new System.Drawing.Point(0, 0);
+            this.labelWebServerPort.Name = "labelWebServerPort";
+            this.labelWebServerPort.Size = new System.Drawing.Size(100, 23);
+            this.labelWebServerPort.TabIndex = 46;
+            // 
+            // labelWorldObjectDensity
+            // 
+            this.labelWorldObjectDensity.Location = new System.Drawing.Point(0, 0);
+            this.labelWorldObjectDensity.Name = "labelWorldObjectDensity";
+            this.labelWorldObjectDensity.Size = new System.Drawing.Size(100, 23);
+            this.labelWorldObjectDensity.TabIndex = 0;
+            // 
+            // labelViewingVerticalFOV
+            // 
+            this.labelViewingVerticalFOV.Location = new System.Drawing.Point(0, 0);
+            this.labelViewingVerticalFOV.Name = "labelViewingVerticalFOV";
+            this.labelViewingVerticalFOV.Size = new System.Drawing.Size(100, 23);
+            this.labelViewingVerticalFOV.TabIndex = 46;
             // 
             // tabPageExperimental
             // 
@@ -718,21 +1028,14 @@
             this.tabPageExperimental.Controls.Add(this.checkCorrectQuestionableBrakingParams);
             this.tabPageExperimental.Controls.Add(this.label16);
             this.tabPageExperimental.Controls.Add(this.label9);
-            this.tabPageExperimental.Controls.Add(this.label21);
             this.tabPageExperimental.Controls.Add(this.AdhesionFactorChangeValueLabel);
             this.tabPageExperimental.Controls.Add(this.AdhesionFactorValueLabel);
-            this.tabPageExperimental.Controls.Add(this.labelLODBias);
             this.tabPageExperimental.Controls.Add(this.checkShapeWarnings);
-            this.tabPageExperimental.Controls.Add(this.trackLODBias);
             this.tabPageExperimental.Controls.Add(this.AdhesionLevelValue);
             this.tabPageExperimental.Controls.Add(this.AdhesionLevelLabel);
             this.tabPageExperimental.Controls.Add(this.trackAdhesionFactorChange);
             this.tabPageExperimental.Controls.Add(this.trackAdhesionFactor);
-            this.tabPageExperimental.Controls.Add(this.checkSignalLightGlow);
             this.tabPageExperimental.Controls.Add(this.checkUseMSTSEnv);
-            this.tabPageExperimental.Controls.Add(this.labelPerformanceTunerTarget);
-            this.tabPageExperimental.Controls.Add(this.numericPerformanceTunerTarget);
-            this.tabPageExperimental.Controls.Add(this.checkPerformanceTuner);
             this.tabPageExperimental.Controls.Add(this.label8);
             this.tabPageExperimental.Controls.Add(this.numericSuperElevationGauge);
             this.tabPageExperimental.Controls.Add(this.label7);
@@ -819,16 +1122,6 @@
             this.label9.TabIndex = 26;
             this.label9.Text = "Adhesion factor correction:";
             // 
-            // label21
-            // 
-            this.label21.AutoSize = true;
-            this.label21.Location = new System.Drawing.Point(6, 258);
-            this.label21.Margin = new System.Windows.Forms.Padding(3);
-            this.label21.Name = "label21";
-            this.label21.Size = new System.Drawing.Size(98, 13);
-            this.label21.TabIndex = 14;
-            this.label21.Text = "Level of detail bias:";
-            // 
             // AdhesionFactorChangeValueLabel
             // 
             this.AdhesionFactorChangeValueLabel.Location = new System.Drawing.Point(301, 309);
@@ -846,15 +1139,6 @@
             this.AdhesionFactorValueLabel.Size = new System.Drawing.Size(292, 13);
             this.AdhesionFactorValueLabel.TabIndex = 27;
             this.AdhesionFactorValueLabel.TextAlign = System.Drawing.ContentAlignment.TopRight;
-            // 
-            // labelLODBias
-            // 
-            this.labelLODBias.Location = new System.Drawing.Point(6, 258);
-            this.labelLODBias.Margin = new System.Windows.Forms.Padding(3);
-            this.labelLODBias.Name = "labelLODBias";
-            this.labelLODBias.Size = new System.Drawing.Size(292, 13);
-            this.labelLODBias.TabIndex = 15;
-            this.labelLODBias.TextAlign = System.Drawing.ContentAlignment.TopRight;
             // 
             // checkShapeWarnings
             // 
@@ -883,16 +1167,6 @@
             this.AdhesionLevelLabel.TabIndex = 33;
             this.AdhesionLevelLabel.Text = "Level:";
             // 
-            // checkSignalLightGlow
-            // 
-            this.checkSignalLightGlow.AutoSize = true;
-            this.checkSignalLightGlow.Location = new System.Drawing.Point(304, 51);
-            this.checkSignalLightGlow.Name = "checkSignalLightGlow";
-            this.checkSignalLightGlow.Size = new System.Drawing.Size(102, 17);
-            this.checkSignalLightGlow.TabIndex = 18;
-            this.checkSignalLightGlow.Text = "Signal light glow";
-            this.checkSignalLightGlow.UseVisualStyleBackColor = true;
-            // 
             // checkUseMSTSEnv
             // 
             this.checkUseMSTSEnv.AutoSize = true;
@@ -902,27 +1176,6 @@
             this.checkUseMSTSEnv.TabIndex = 25;
             this.checkUseMSTSEnv.Text = "MSTS environments";
             this.checkUseMSTSEnv.UseVisualStyleBackColor = true;
-            // 
-            // labelPerformanceTunerTarget
-            // 
-            this.labelPerformanceTunerTarget.AutoSize = true;
-            this.labelPerformanceTunerTarget.Location = new System.Drawing.Point(86, 144);
-            this.labelPerformanceTunerTarget.Margin = new System.Windows.Forms.Padding(3);
-            this.labelPerformanceTunerTarget.Name = "labelPerformanceTunerTarget";
-            this.labelPerformanceTunerTarget.Size = new System.Drawing.Size(88, 13);
-            this.labelPerformanceTunerTarget.TabIndex = 10;
-            this.labelPerformanceTunerTarget.Text = "Target frame rate";
-            // 
-            // checkPerformanceTuner
-            // 
-            this.checkPerformanceTuner.AutoSize = true;
-            this.checkPerformanceTuner.Location = new System.Drawing.Point(6, 120);
-            this.checkPerformanceTuner.Name = "checkPerformanceTuner";
-            this.checkPerformanceTuner.Size = new System.Drawing.Size(277, 17);
-            this.checkPerformanceTuner.TabIndex = 8;
-            this.checkPerformanceTuner.Text = "Automatically tune settings to keep performance level";
-            this.checkPerformanceTuner.UseVisualStyleBackColor = true;
-            this.checkPerformanceTuner.Click += new System.EventHandler(this.checkPerformanceTuner_Click);
             // 
             // label8
             // 
@@ -1004,26 +1257,201 @@
             this.ElevationText.TabIndex = 1;
             this.ElevationText.Text = "Super-elevation";
             // 
-            // tabPageUpdater
+            // labelLODBias
             // 
-            this.tabPageUpdater.Controls.Add(this.labelUpdateChannel);
-            this.tabPageUpdater.Location = new System.Drawing.Point(4, 22);
-            this.tabPageUpdater.Name = "tabPageUpdater";
-            this.tabPageUpdater.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPageUpdater.Size = new System.Drawing.Size(602, 402);
-            this.tabPageUpdater.TabIndex = 8;
-            this.tabPageUpdater.Text = "Updater";
-            this.tabPageUpdater.UseVisualStyleBackColor = true;
+            this.labelLODBias.Location = new System.Drawing.Point(336, 169);
+            this.labelLODBias.Margin = new System.Windows.Forms.Padding(3);
+            this.labelLODBias.Name = "labelLODBias";
+            this.labelLODBias.Size = new System.Drawing.Size(188, 18);
+            this.labelLODBias.TabIndex = 26;
+            this.labelLODBias.Text = "Level of detail bias:";
+            this.labelLODBias.MouseEnter += new System.EventHandler(this.HelpIcon_MouseEnter);
+            this.labelLODBias.MouseLeave += new System.EventHandler(this.HelpIcon_MouseLeave);
             // 
-            // labelUpdateChannel
+            // labelPerformanceTunerTarget
             // 
-            this.labelUpdateChannel.AutoSize = true;
-            this.labelUpdateChannel.Location = new System.Drawing.Point(6, 6);
-            this.labelUpdateChannel.Margin = new System.Windows.Forms.Padding(3);
-            this.labelUpdateChannel.Name = "labelUpdateChannel";
-            this.labelUpdateChannel.Size = new System.Drawing.Size(74, 13);
-            this.labelUpdateChannel.TabIndex = 0;
-            this.labelUpdateChannel.Text = "Update mode:";
+            this.labelPerformanceTunerTarget.AutoSize = true;
+            this.labelPerformanceTunerTarget.Location = new System.Drawing.Point(115, 354);
+            this.labelPerformanceTunerTarget.Margin = new System.Windows.Forms.Padding(3);
+            this.labelPerformanceTunerTarget.Name = "labelPerformanceTunerTarget";
+            this.labelPerformanceTunerTarget.Size = new System.Drawing.Size(88, 13);
+            this.labelPerformanceTunerTarget.TabIndex = 10;
+            this.labelPerformanceTunerTarget.Text = "Target frame rate";
+            // 
+            // checkPerformanceTuner
+            // 
+            this.checkPerformanceTuner.AutoSize = true;
+            this.checkPerformanceTuner.Location = new System.Drawing.Point(35, 330);
+            this.checkPerformanceTuner.Name = "checkPerformanceTuner";
+            this.checkPerformanceTuner.Size = new System.Drawing.Size(277, 17);
+            this.checkPerformanceTuner.TabIndex = 8;
+            this.checkPerformanceTuner.Text = "Automatically tune settings to keep performance level";
+            this.checkPerformanceTuner.UseVisualStyleBackColor = true;
+            this.checkPerformanceTuner.Click += new System.EventHandler(this.checkPerformanceTuner_Click);
+            // 
+            // tabPageSystem
+            // 
+            this.tabPageSystem.Controls.Add(this.labelPortNumber);
+            this.tabPageSystem.Controls.Add(this.numericWebServerPort);
+            this.tabPageSystem.Controls.Add(this.pbControlConfirmations);
+            this.tabPageSystem.Controls.Add(this.checkControlConfirmations);
+            this.tabPageSystem.Controls.Add(this.pbLanguage);
+            this.tabPageSystem.Controls.Add(this.labelLanguage);
+            this.tabPageSystem.Controls.Add(this.comboLanguage);
+            this.tabPageSystem.Controls.Add(this.comboWindowSize);
+            this.tabPageSystem.Controls.Add(this.label3);
+            this.tabPageSystem.Controls.Add(this.checkWindowGlass);
+            this.tabPageSystem.Controls.Add(this.pbPerformanceTuner);
+            this.tabPageSystem.Controls.Add(this.labelPerformanceTunerTarget);
+            this.tabPageSystem.Controls.Add(this.numericPerformanceTunerTarget);
+            this.tabPageSystem.Controls.Add(this.checkPerformanceTuner);
+            this.tabPageSystem.Controls.Add(this.pbWebServerPort);
+            this.tabPageSystem.Controls.Add(this.labelWebServerPort);
+            this.tabPageSystem.Controls.Add(this.pbWindowGlass);
+            this.tabPageSystem.Controls.Add(this.labelWindowSize);
+            this.tabPageSystem.Controls.Add(this.pbUpdateMode);
+            this.tabPageSystem.Controls.Add(this.labelUpdateMode);
+            this.tabPageSystem.Location = new System.Drawing.Point(4, 22);
+            this.tabPageSystem.Name = "tabPageSystem";
+            this.tabPageSystem.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPageSystem.Size = new System.Drawing.Size(602, 402);
+            this.tabPageSystem.TabIndex = 8;
+            this.tabPageSystem.Text = "System";
+            this.tabPageSystem.UseVisualStyleBackColor = true;
+            // 
+            // labelPortNumber
+            // 
+            this.labelPortNumber.AutoSize = true;
+            this.labelPortNumber.Location = new System.Drawing.Point(118, 300);
+            this.labelPortNumber.Name = "labelPortNumber";
+            this.labelPortNumber.Size = new System.Drawing.Size(197, 13);
+            this.labelPortNumber.TabIndex = 58;
+            this.labelPortNumber.Text = "Web server port                                      ";
+            // 
+            // numericWebServerPort
+            // 
+            this.numericWebServerPort.Location = new System.Drawing.Point(35, 298);
+            this.numericWebServerPort.Maximum = new decimal(new int[] {
+            65534,
+            0,
+            0,
+            0});
+            this.numericWebServerPort.Minimum = new decimal(new int[] {
+            1025,
+            0,
+            0,
+            0});
+            this.numericWebServerPort.Name = "numericWebServerPort";
+            this.numericWebServerPort.Size = new System.Drawing.Size(70, 20);
+            this.numericWebServerPort.TabIndex = 57;
+            this.numericWebServerPort.Value = new decimal(new int[] {
+            1025,
+            0,
+            0,
+            0});
+            // 
+            // pbControlConfirmations
+            // 
+            this.pbControlConfirmations.Image = global::ORTS.Properties.Resources.info_18;
+            this.pbControlConfirmations.Location = new System.Drawing.Point(11, 268);
+            this.pbControlConfirmations.Name = "pbControlConfirmations";
+            this.pbControlConfirmations.Size = new System.Drawing.Size(18, 18);
+            this.pbControlConfirmations.TabIndex = 56;
+            this.pbControlConfirmations.TabStop = false;
+            // 
+            // checkControlConfirmations
+            // 
+            this.checkControlConfirmations.AutoSize = true;
+            this.checkControlConfirmations.Location = new System.Drawing.Point(35, 269);
+            this.checkControlConfirmations.Name = "checkControlConfirmations";
+            this.checkControlConfirmations.Size = new System.Drawing.Size(285, 17);
+            this.checkControlConfirmations.TabIndex = 55;
+            this.checkControlConfirmations.Text = "Show control confirmations                                            ";
+            this.checkControlConfirmations.UseVisualStyleBackColor = true;
+            // 
+            // pbLanguage
+            // 
+            this.pbLanguage.Image = global::ORTS.Properties.Resources.info_18;
+            this.pbLanguage.Location = new System.Drawing.Point(11, 9);
+            this.pbLanguage.Name = "pbLanguage";
+            this.pbLanguage.Size = new System.Drawing.Size(18, 18);
+            this.pbLanguage.TabIndex = 54;
+            this.pbLanguage.TabStop = false;
+            // 
+            // labelLanguage
+            // 
+            this.labelLanguage.AutoSize = true;
+            this.labelLanguage.Location = new System.Drawing.Point(159, 12);
+            this.labelLanguage.Margin = new System.Windows.Forms.Padding(3);
+            this.labelLanguage.Name = "labelLanguage";
+            this.labelLanguage.Size = new System.Drawing.Size(130, 13);
+            this.labelLanguage.TabIndex = 53;
+            this.labelLanguage.Text = "Language                         ";
+            // 
+            // comboLanguage
+            // 
+            this.comboLanguage.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboLanguage.FormattingEnabled = true;
+            this.comboLanguage.Location = new System.Drawing.Point(35, 9);
+            this.comboLanguage.Name = "comboLanguage";
+            this.comboLanguage.Size = new System.Drawing.Size(121, 21);
+            this.comboLanguage.TabIndex = 52;
+            // 
+            // comboWindowSize
+            // 
+            this.comboWindowSize.FormattingEnabled = true;
+            this.comboWindowSize.Items.AddRange(new object[] {
+            "800x600",
+            "1024x768",
+            "1280x720",
+            "1280x800",
+            "1280x1024",
+            "1360x768",
+            "1366x768",
+            "1440x900",
+            "1536x864",
+            "1600x900",
+            "1680x1050",
+            "1920x1080",
+            "1920x1200",
+            "2560x1440"});
+            this.comboWindowSize.Location = new System.Drawing.Point(32, 190);
+            this.comboWindowSize.Name = "comboWindowSize";
+            this.comboWindowSize.Size = new System.Drawing.Size(121, 21);
+            this.comboWindowSize.TabIndex = 50;
+            this.comboWindowSize.SelectedIndexChanged += new System.EventHandler(this.comboWindowSize_SelectedIndexChanged);
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(159, 193);
+            this.label3.Margin = new System.Windows.Forms.Padding(3);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(225, 13);
+            this.label3.TabIndex = 51;
+            this.label3.Text = "Window size (select or type WIDTHxHEIGHT)";
+            this.label3.Click += new System.EventHandler(this.label3_Click);
+            // 
+            // checkWindowGlass
+            // 
+            this.checkWindowGlass.AutoSize = true;
+            this.checkWindowGlass.Location = new System.Drawing.Point(35, 235);
+            this.checkWindowGlass.Name = "checkWindowGlass";
+            this.checkWindowGlass.Size = new System.Drawing.Size(171, 17);
+            this.checkWindowGlass.TabIndex = 49;
+            this.checkWindowGlass.Text = "Use glass on in-game windows";
+            this.checkWindowGlass.UseVisualStyleBackColor = true;
+            // 
+            // labelUpdateMode
+            // 
+            this.labelUpdateMode.Location = new System.Drawing.Point(36, 53);
+            this.labelUpdateMode.Margin = new System.Windows.Forms.Padding(3);
+            this.labelUpdateMode.Name = "labelUpdateMode";
+            this.labelUpdateMode.Size = new System.Drawing.Size(285, 13);
+            this.labelUpdateMode.TabIndex = 0;
+            this.labelUpdateMode.Text = "Update mode:";
+            this.labelUpdateMode.MouseEnter += new System.EventHandler(this.HelpIcon_MouseEnter);
+            this.labelUpdateMode.MouseLeave += new System.EventHandler(this.HelpIcon_MouseLeave);
             // 
             // tabPageContent
             // 
@@ -1736,13 +2164,29 @@
             // 
             // tabPageVideo
             // 
+            this.tabPageVideo.Controls.Add(this.checkSignalLightGlow);
+            this.tabPageVideo.Controls.Add(this.pbViewingFOV);
+            this.tabPageVideo.Controls.Add(this.labelDefaultDetail);
+            this.tabPageVideo.Controls.Add(this.pbLODBias);
+            this.tabPageVideo.Controls.Add(this.pbWorldObjectDensity);
+            this.tabPageVideo.Controls.Add(this.pbAntiAliasing);
+            this.tabPageVideo.Controls.Add(this.pbVerticalSync);
+            this.tabPageVideo.Controls.Add(this.pbModelInstancing);
+            this.tabPageVideo.Controls.Add(this.pbDayAmbientLight);
+            this.tabPageVideo.Controls.Add(this.pbSignalLightGlow);
+            this.tabPageVideo.Controls.Add(this.pbDoubleWire);
+            this.tabPageVideo.Controls.Add(this.pbWire);
+            this.tabPageVideo.Controls.Add(this.pbShadowAllShapes);
+            this.tabPageVideo.Controls.Add(this.pbDynamicShadows);
+            this.tabPageVideo.Controls.Add(this.pbLODViewingExtension);
+            this.tabPageVideo.Controls.Add(this.pbDistantMountains);
+            this.tabPageVideo.Controls.Add(this.pbViewingDistance);
             this.tabPageVideo.Controls.Add(this.checkLODViewingExtension);
             this.tabPageVideo.Controls.Add(this.labelAntiAliasingValue);
             this.tabPageVideo.Controls.Add(this.labelAntiAliasing);
             this.tabPageVideo.Controls.Add(this.trackAntiAliasing);
             this.tabPageVideo.Controls.Add(this.checkShadowAllShapes);
             this.tabPageVideo.Controls.Add(this.checkDoubleWire);
-            this.tabPageVideo.Controls.Add(this.label15);
             this.tabPageVideo.Controls.Add(this.labelDayAmbientLight);
             this.tabPageVideo.Controls.Add(this.checkModelInstancing);
             this.tabPageVideo.Controls.Add(this.trackDayAmbientLight);
@@ -1750,18 +2194,19 @@
             this.tabPageVideo.Controls.Add(this.labelDistantMountainsViewingDistance);
             this.tabPageVideo.Controls.Add(this.numericDistantMountainsViewingDistance);
             this.tabPageVideo.Controls.Add(this.checkDistantMountains);
-            this.tabPageVideo.Controls.Add(this.label14);
+            this.tabPageVideo.Controls.Add(this.labelViewingDistance);
             this.tabPageVideo.Controls.Add(this.numericViewingDistance);
+            this.tabPageVideo.Controls.Add(this.labelLODBias);
+            this.tabPageVideo.Controls.Add(this.trackLODBias);
             this.tabPageVideo.Controls.Add(this.labelFOVHelp);
             this.tabPageVideo.Controls.Add(this.numericViewingFOV);
             this.tabPageVideo.Controls.Add(this.label10);
             this.tabPageVideo.Controls.Add(this.label1);
             this.tabPageVideo.Controls.Add(this.numericWorldObjectDensity);
-            this.tabPageVideo.Controls.Add(this.comboWindowSize);
-            this.tabPageVideo.Controls.Add(this.checkWindowGlass);
-            this.tabPageVideo.Controls.Add(this.label3);
             this.tabPageVideo.Controls.Add(this.checkDynamicShadows);
             this.tabPageVideo.Controls.Add(this.checkWire);
+            this.tabPageVideo.Controls.Add(this.labelAmbientDaylightBrightness);
+            this.tabPageVideo.Controls.Add(this.labelViewingVerticalFOV);
             this.tabPageVideo.Location = new System.Drawing.Point(4, 22);
             this.tabPageVideo.Name = "tabPageVideo";
             this.tabPageVideo.Padding = new System.Windows.Forms.Padding(3);
@@ -1770,13 +2215,23 @@
             this.tabPageVideo.Text = "Video";
             this.tabPageVideo.UseVisualStyleBackColor = true;
             // 
+            // checkSignalLightGlow
+            // 
+            this.checkSignalLightGlow.AutoSize = true;
+            this.checkSignalLightGlow.Location = new System.Drawing.Point(41, 266);
+            this.checkSignalLightGlow.Name = "checkSignalLightGlow";
+            this.checkSignalLightGlow.Size = new System.Drawing.Size(102, 17);
+            this.checkSignalLightGlow.TabIndex = 47;
+            this.checkSignalLightGlow.Text = "Signal light glow";
+            this.checkSignalLightGlow.UseVisualStyleBackColor = true;
+            // 
             // labelAntiAliasingValue
             // 
             this.labelAntiAliasingValue.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.labelAntiAliasingValue.Location = new System.Drawing.Point(376, 352);
+            this.labelAntiAliasingValue.Location = new System.Drawing.Point(436, 78);
             this.labelAntiAliasingValue.Margin = new System.Windows.Forms.Padding(3);
             this.labelAntiAliasingValue.Name = "labelAntiAliasingValue";
-            this.labelAntiAliasingValue.Size = new System.Drawing.Size(220, 13);
+            this.labelAntiAliasingValue.Size = new System.Drawing.Size(160, 13);
             this.labelAntiAliasingValue.TabIndex = 23;
             this.labelAntiAliasingValue.Text = "XXX";
             this.labelAntiAliasingValue.TextAlign = System.Drawing.ContentAlignment.TopRight;
@@ -1784,7 +2239,7 @@
             // labelAntiAliasing
             // 
             this.labelAntiAliasing.AutoSize = true;
-            this.labelAntiAliasing.Location = new System.Drawing.Point(304, 352);
+            this.labelAntiAliasing.Location = new System.Drawing.Point(343, 78);
             this.labelAntiAliasing.Margin = new System.Windows.Forms.Padding(3);
             this.labelAntiAliasing.Name = "labelAntiAliasing";
             this.labelAntiAliasing.Size = new System.Drawing.Size(66, 13);
@@ -1794,7 +2249,7 @@
             // checkShadowAllShapes
             // 
             this.checkShadowAllShapes.AutoSize = true;
-            this.checkShadowAllShapes.Location = new System.Drawing.Point(6, 29);
+            this.checkShadowAllShapes.Location = new System.Drawing.Point(41, 170);
             this.checkShadowAllShapes.Name = "checkShadowAllShapes";
             this.checkShadowAllShapes.Size = new System.Drawing.Size(130, 17);
             this.checkShadowAllShapes.TabIndex = 24;
@@ -1804,36 +2259,27 @@
             // checkDoubleWire
             // 
             this.checkDoubleWire.AutoSize = true;
-            this.checkDoubleWire.Location = new System.Drawing.Point(307, 29);
+            this.checkDoubleWire.Location = new System.Drawing.Point(41, 234);
             this.checkDoubleWire.Name = "checkDoubleWire";
             this.checkDoubleWire.Size = new System.Drawing.Size(135, 17);
             this.checkDoubleWire.TabIndex = 23;
             this.checkDoubleWire.Text = "Double overhead wires";
             this.checkDoubleWire.UseVisualStyleBackColor = true;
             // 
-            // label15
-            // 
-            this.label15.AutoSize = true;
-            this.label15.Location = new System.Drawing.Point(6, 352);
-            this.label15.Margin = new System.Windows.Forms.Padding(3);
-            this.label15.Name = "label15";
-            this.label15.Size = new System.Drawing.Size(138, 13);
-            this.label15.TabIndex = 20;
-            this.label15.Text = "Ambient daylight brightness:";
-            // 
             // labelDayAmbientLight
             // 
-            this.labelDayAmbientLight.Location = new System.Drawing.Point(6, 352);
+            this.labelDayAmbientLight.Location = new System.Drawing.Point(173, 297);
             this.labelDayAmbientLight.Margin = new System.Windows.Forms.Padding(3);
             this.labelDayAmbientLight.Name = "labelDayAmbientLight";
-            this.labelDayAmbientLight.Size = new System.Drawing.Size(292, 13);
+            this.labelDayAmbientLight.Size = new System.Drawing.Size(119, 18);
             this.labelDayAmbientLight.TabIndex = 22;
+            this.labelDayAmbientLight.Text = "YYY";
             this.labelDayAmbientLight.TextAlign = System.Drawing.ContentAlignment.TopRight;
             // 
             // checkModelInstancing
             // 
             this.checkModelInstancing.AutoSize = true;
-            this.checkModelInstancing.Location = new System.Drawing.Point(6, 75);
+            this.checkModelInstancing.Location = new System.Drawing.Point(346, 10);
             this.checkModelInstancing.Name = "checkModelInstancing";
             this.checkModelInstancing.Size = new System.Drawing.Size(106, 17);
             this.checkModelInstancing.TabIndex = 3;
@@ -1843,7 +2289,7 @@
             // checkVerticalSync
             // 
             this.checkVerticalSync.AutoSize = true;
-            this.checkVerticalSync.Location = new System.Drawing.Point(6, 98);
+            this.checkVerticalSync.Location = new System.Drawing.Point(346, 42);
             this.checkVerticalSync.Name = "checkVerticalSync";
             this.checkVerticalSync.Size = new System.Drawing.Size(86, 17);
             this.checkVerticalSync.TabIndex = 5;
@@ -1853,7 +2299,7 @@
             // labelDistantMountainsViewingDistance
             // 
             this.labelDistantMountainsViewingDistance.AutoSize = true;
-            this.labelDistantMountainsViewingDistance.Location = new System.Drawing.Point(86, 216);
+            this.labelDistantMountainsViewingDistance.Location = new System.Drawing.Point(129, 67);
             this.labelDistantMountainsViewingDistance.Margin = new System.Windows.Forms.Padding(3);
             this.labelDistantMountainsViewingDistance.Name = "labelDistantMountainsViewingDistance";
             this.labelDistantMountainsViewingDistance.Size = new System.Drawing.Size(110, 13);
@@ -1863,7 +2309,7 @@
             // checkDistantMountains
             // 
             this.checkDistantMountains.AutoSize = true;
-            this.checkDistantMountains.Location = new System.Drawing.Point(6, 191);
+            this.checkDistantMountains.Location = new System.Drawing.Point(41, 41);
             this.checkDistantMountains.Name = "checkDistantMountains";
             this.checkDistantMountains.Size = new System.Drawing.Size(110, 17);
             this.checkDistantMountains.TabIndex = 10;
@@ -1871,15 +2317,15 @@
             this.checkDistantMountains.UseVisualStyleBackColor = true;
             this.checkDistantMountains.Click += new System.EventHandler(this.checkDistantMountains_Click);
             // 
-            // label14
+            // labelViewingDistance
             // 
-            this.label14.AutoSize = true;
-            this.label14.Location = new System.Drawing.Point(66, 167);
-            this.label14.Margin = new System.Windows.Forms.Padding(3);
-            this.label14.Name = "label14";
-            this.label14.Size = new System.Drawing.Size(104, 13);
-            this.label14.TabIndex = 9;
-            this.label14.Text = "Viewing distance (m)";
+            this.labelViewingDistance.AutoSize = true;
+            this.labelViewingDistance.Location = new System.Drawing.Point(101, 11);
+            this.labelViewingDistance.Margin = new System.Windows.Forms.Padding(3);
+            this.labelViewingDistance.Name = "labelViewingDistance";
+            this.labelViewingDistance.Size = new System.Drawing.Size(104, 13);
+            this.labelViewingDistance.TabIndex = 9;
+            this.labelViewingDistance.Text = "Viewing distance (m)";
             // 
             // numericViewingDistance
             // 
@@ -1888,7 +2334,7 @@
             0,
             0,
             0});
-            this.numericViewingDistance.Location = new System.Drawing.Point(6, 165);
+            this.numericViewingDistance.Location = new System.Drawing.Point(41, 9);
             this.numericViewingDistance.Maximum = new decimal(new int[] {
             10000,
             0,
@@ -1911,7 +2357,7 @@
             // labelFOVHelp
             // 
             this.labelFOVHelp.AutoSize = true;
-            this.labelFOVHelp.Location = new System.Drawing.Point(304, 275);
+            this.labelFOVHelp.Location = new System.Drawing.Point(408, 253);
             this.labelFOVHelp.Margin = new System.Windows.Forms.Padding(3);
             this.labelFOVHelp.Name = "labelFOVHelp";
             this.labelFOVHelp.Size = new System.Drawing.Size(28, 13);
@@ -1920,7 +2366,7 @@
             // 
             // numericViewingFOV
             // 
-            this.numericViewingFOV.Location = new System.Drawing.Point(6, 273);
+            this.numericViewingFOV.Location = new System.Drawing.Point(346, 232);
             this.numericViewingFOV.Maximum = new decimal(new int[] {
             120,
             0,
@@ -1944,7 +2390,7 @@
             // label10
             // 
             this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(66, 275);
+            this.label10.Location = new System.Drawing.Point(406, 234);
             this.label10.Margin = new System.Windows.Forms.Padding(3);
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(105, 13);
@@ -1954,7 +2400,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(66, 301);
+            this.label1.Location = new System.Drawing.Point(408, 138);
             this.label1.Margin = new System.Windows.Forms.Padding(3);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(103, 13);
@@ -1963,7 +2409,7 @@
             // 
             // numericWorldObjectDensity
             // 
-            this.numericWorldObjectDensity.Location = new System.Drawing.Point(6, 299);
+            this.numericWorldObjectDensity.Location = new System.Drawing.Point(348, 136);
             this.numericWorldObjectDensity.Maximum = new decimal(new int[] {
             99,
             0,
@@ -1973,53 +2419,10 @@
             this.numericWorldObjectDensity.Size = new System.Drawing.Size(54, 20);
             this.numericWorldObjectDensity.TabIndex = 16;
             // 
-            // comboWindowSize
-            // 
-            this.comboWindowSize.FormattingEnabled = true;
-            this.comboWindowSize.Items.AddRange(new object[] {
-            "800x600",
-            "1024x768",
-            "1280x720",
-            "1280x800",
-            "1280x1024",
-            "1360x768",
-            "1366x768",
-            "1440x900",
-            "1536x864",
-            "1600x900",
-            "1680x1050",
-            "1920x1080",
-            "1920x1200",
-            "2560x1440"});
-            this.comboWindowSize.Location = new System.Drawing.Point(6, 325);
-            this.comboWindowSize.Name = "comboWindowSize";
-            this.comboWindowSize.Size = new System.Drawing.Size(121, 21);
-            this.comboWindowSize.TabIndex = 18;
-            // 
-            // checkWindowGlass
-            // 
-            this.checkWindowGlass.AutoSize = true;
-            this.checkWindowGlass.Location = new System.Drawing.Point(6, 52);
-            this.checkWindowGlass.Name = "checkWindowGlass";
-            this.checkWindowGlass.Size = new System.Drawing.Size(151, 17);
-            this.checkWindowGlass.TabIndex = 2;
-            this.checkWindowGlass.Text = "Glass on in-game windows";
-            this.checkWindowGlass.UseVisualStyleBackColor = true;
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(133, 328);
-            this.label3.Margin = new System.Windows.Forms.Padding(3);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(255, 13);
-            this.label3.TabIndex = 19;
-            this.label3.Text = "Window size (type WIDTHxHEIGHT for custom size)";
-            // 
             // checkDynamicShadows
             // 
             this.checkDynamicShadows.AutoSize = true;
-            this.checkDynamicShadows.Location = new System.Drawing.Point(6, 6);
+            this.checkDynamicShadows.Location = new System.Drawing.Point(41, 138);
             this.checkDynamicShadows.Name = "checkDynamicShadows";
             this.checkDynamicShadows.Size = new System.Drawing.Size(112, 17);
             this.checkDynamicShadows.TabIndex = 0;
@@ -2029,12 +2432,23 @@
             // checkWire
             // 
             this.checkWire.AutoSize = true;
-            this.checkWire.Location = new System.Drawing.Point(307, 6);
+            this.checkWire.Location = new System.Drawing.Point(41, 202);
             this.checkWire.Name = "checkWire";
             this.checkWire.Size = new System.Drawing.Size(95, 17);
             this.checkWire.TabIndex = 4;
             this.checkWire.Text = "Overhead wire";
             this.checkWire.UseVisualStyleBackColor = true;
+            // 
+            // labelAmbientDaylightBrightness
+            // 
+            this.labelAmbientDaylightBrightness.Location = new System.Drawing.Point(35, 297);
+            this.labelAmbientDaylightBrightness.Margin = new System.Windows.Forms.Padding(3);
+            this.labelAmbientDaylightBrightness.Name = "labelAmbientDaylightBrightness";
+            this.labelAmbientDaylightBrightness.Size = new System.Drawing.Size(232, 16);
+            this.labelAmbientDaylightBrightness.TabIndex = 20;
+            this.labelAmbientDaylightBrightness.Text = "Ambient daylight brightness:";
+            this.labelAmbientDaylightBrightness.MouseEnter += new System.EventHandler(this.HelpIcon_MouseEnter);
+            this.labelAmbientDaylightBrightness.MouseLeave += new System.EventHandler(this.HelpIcon_MouseLeave);
             // 
             // tabPageAudio
             // 
@@ -2144,23 +2558,16 @@
             this.tabPageGeneral.Controls.Add(this.pbEnableTcsScripts);
             this.tabPageGeneral.Controls.Add(this.pbOtherUnits);
             this.tabPageGeneral.Controls.Add(this.pbPressureUnit);
-            this.tabPageGeneral.Controls.Add(this.pbLanguage);
             this.tabPageGeneral.Controls.Add(this.pbBrakePipeChargingRate);
             this.tabPageGeneral.Controls.Add(this.pbGraduatedRelease);
             this.tabPageGeneral.Controls.Add(this.pbRetainers);
             this.tabPageGeneral.Controls.Add(this.pbAlerter);
-            this.tabPageGeneral.Controls.Add(this.pbControlConfirmations);
-            this.tabPageGeneral.Controls.Add(this.labelPortNumber);
-            this.tabPageGeneral.Controls.Add(this.numericWebServerPort);
             this.tabPageGeneral.Controls.Add(this.checkOverspeedMonitor);
             this.tabPageGeneral.Controls.Add(this.checkEnableTCSScripts);
             this.tabPageGeneral.Controls.Add(this.labelOtherUnits);
             this.tabPageGeneral.Controls.Add(this.labelPressureUnit);
             this.tabPageGeneral.Controls.Add(this.comboOtherUnits);
             this.tabPageGeneral.Controls.Add(this.comboPressureUnit);
-            this.tabPageGeneral.Controls.Add(this.labelLanguage);
-            this.tabPageGeneral.Controls.Add(this.comboLanguage);
-            this.tabPageGeneral.Controls.Add(this.checkControlConfirmations);
             this.tabPageGeneral.Controls.Add(this.checkAlerterExternal);
             this.tabPageGeneral.Controls.Add(this.numericBrakePipeChargingRate);
             this.tabPageGeneral.Controls.Add(this.checkRetainers);
@@ -2223,18 +2630,6 @@
             this.pbPressureUnit.MouseEnter += new System.EventHandler(this.HelpIcon_MouseEnter);
             this.pbPressureUnit.MouseLeave += new System.EventHandler(this.HelpIcon_MouseLeave);
             // 
-            // pbLanguage
-            // 
-            this.pbLanguage.Image = global::ORTS.Properties.Resources.info_18;
-            this.pbLanguage.Location = new System.Drawing.Point(6, 203);
-            this.pbLanguage.Name = "pbLanguage";
-            this.pbLanguage.Size = new System.Drawing.Size(18, 18);
-            this.pbLanguage.TabIndex = 25;
-            this.pbLanguage.TabStop = false;
-            this.pbLanguage.Click += new System.EventHandler(this.HelpIcon_Click);
-            this.pbLanguage.MouseEnter += new System.EventHandler(this.HelpIcon_MouseEnter);
-            this.pbLanguage.MouseLeave += new System.EventHandler(this.HelpIcon_MouseLeave);
-            // 
             // pbBrakePipeChargingRate
             // 
             this.pbBrakePipeChargingRate.Image = global::ORTS.Properties.Resources.info_18;
@@ -2282,49 +2677,6 @@
             this.pbAlerter.Click += new System.EventHandler(this.HelpIcon_Click);
             this.pbAlerter.MouseEnter += new System.EventHandler(this.HelpIcon_MouseEnter);
             this.pbAlerter.MouseLeave += new System.EventHandler(this.HelpIcon_MouseLeave);
-            // 
-            // pbControlConfirmations
-            // 
-            this.pbControlConfirmations.Image = global::ORTS.Properties.Resources.info_18;
-            this.pbControlConfirmations.Location = new System.Drawing.Point(6, 53);
-            this.pbControlConfirmations.Name = "pbControlConfirmations";
-            this.pbControlConfirmations.Size = new System.Drawing.Size(18, 18);
-            this.pbControlConfirmations.TabIndex = 19;
-            this.pbControlConfirmations.TabStop = false;
-            this.pbControlConfirmations.Click += new System.EventHandler(this.HelpIcon_Click);
-            this.pbControlConfirmations.MouseEnter += new System.EventHandler(this.HelpIcon_MouseEnter);
-            this.pbControlConfirmations.MouseLeave += new System.EventHandler(this.HelpIcon_MouseLeave);
-            // 
-            // labelPortNumber
-            // 
-            this.labelPortNumber.AutoSize = true;
-            this.labelPortNumber.Location = new System.Drawing.Point(117, 324);
-            this.labelPortNumber.Name = "labelPortNumber";
-            this.labelPortNumber.Size = new System.Drawing.Size(197, 13);
-            this.labelPortNumber.TabIndex = 17;
-            this.labelPortNumber.Text = "Web server port                                      ";
-            // 
-            // numericWebServerPort
-            // 
-            this.numericWebServerPort.Location = new System.Drawing.Point(34, 322);
-            this.numericWebServerPort.Maximum = new decimal(new int[] {
-            65534,
-            0,
-            0,
-            0});
-            this.numericWebServerPort.Minimum = new decimal(new int[] {
-            1025,
-            0,
-            0,
-            0});
-            this.numericWebServerPort.Name = "numericWebServerPort";
-            this.numericWebServerPort.Size = new System.Drawing.Size(70, 20);
-            this.numericWebServerPort.TabIndex = 16;
-            this.numericWebServerPort.Value = new decimal(new int[] {
-            1025,
-            0,
-            0,
-            0});
             // 
             // checkOverspeedMonitor
             // 
@@ -2393,39 +2745,6 @@
             this.comboPressureUnit.Name = "comboPressureUnit";
             this.comboPressureUnit.Size = new System.Drawing.Size(121, 21);
             this.comboPressureUnit.TabIndex = 11;
-            // 
-            // labelLanguage
-            // 
-            this.labelLanguage.AutoSize = true;
-            this.labelLanguage.Location = new System.Drawing.Point(156, 203);
-            this.labelLanguage.Margin = new System.Windows.Forms.Padding(3);
-            this.labelLanguage.Name = "labelLanguage";
-            this.labelLanguage.Size = new System.Drawing.Size(130, 13);
-            this.labelLanguage.TabIndex = 10;
-            this.labelLanguage.Text = "Language                         ";
-            this.labelLanguage.MouseEnter += new System.EventHandler(this.HelpIcon_MouseEnter);
-            this.labelLanguage.MouseLeave += new System.EventHandler(this.HelpIcon_MouseLeave);
-            // 
-            // comboLanguage
-            // 
-            this.comboLanguage.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboLanguage.FormattingEnabled = true;
-            this.comboLanguage.Location = new System.Drawing.Point(32, 200);
-            this.comboLanguage.Name = "comboLanguage";
-            this.comboLanguage.Size = new System.Drawing.Size(121, 21);
-            this.comboLanguage.TabIndex = 9;
-            // 
-            // checkControlConfirmations
-            // 
-            this.checkControlConfirmations.AutoSize = true;
-            this.checkControlConfirmations.Location = new System.Drawing.Point(32, 52);
-            this.checkControlConfirmations.Name = "checkControlConfirmations";
-            this.checkControlConfirmations.Size = new System.Drawing.Size(256, 17);
-            this.checkControlConfirmations.TabIndex = 4;
-            this.checkControlConfirmations.Text = "Control confirmations                                            ";
-            this.checkControlConfirmations.UseVisualStyleBackColor = true;
-            this.checkControlConfirmations.MouseEnter += new System.EventHandler(this.HelpIcon_MouseEnter);
-            this.checkControlConfirmations.MouseLeave += new System.EventHandler(this.HelpIcon_MouseLeave);
             // 
             // checkAlerterExternal
             // 
@@ -2523,7 +2842,7 @@
             this.tabOptions.Controls.Add(this.tabPageDataLogger);
             this.tabOptions.Controls.Add(this.tabPageEvaluate);
             this.tabOptions.Controls.Add(this.tabPageContent);
-            this.tabOptions.Controls.Add(this.tabPageUpdater);
+            this.tabOptions.Controls.Add(this.tabPageSystem);
             this.tabOptions.Controls.Add(this.tabPageExperimental);
             this.tabOptions.Controls.Add(this.tabPageORNYMG);
             this.tabOptions.Location = new System.Drawing.Point(13, 12);
@@ -2559,6 +2878,117 @@
             this.tabPageORNYMG.TabIndex = 11;
             this.tabPageORNYMG.Text = "ORNYMG Only";
             this.tabPageORNYMG.UseVisualStyleBackColor = true;
+            // 
+            // label25
+            // 
+            this.label25.AutoSize = true;
+            this.label25.Location = new System.Drawing.Point(75, 373);
+            this.label25.Margin = new System.Windows.Forms.Padding(3);
+            this.label25.Name = "label25";
+            this.label25.Size = new System.Drawing.Size(134, 13);
+            this.label25.TabIndex = 48;
+            this.label25.Text = "Precipitation box length (m)";
+            // 
+            // precipitationBoxLength
+            // 
+            this.precipitationBoxLength.Increment = new decimal(new int[] {
+            25,
+            0,
+            0,
+            0});
+            this.precipitationBoxLength.Location = new System.Drawing.Point(15, 371);
+            this.precipitationBoxLength.Maximum = new decimal(new int[] {
+            3000,
+            0,
+            0,
+            0});
+            this.precipitationBoxLength.Minimum = new decimal(new int[] {
+            500,
+            0,
+            0,
+            0});
+            this.precipitationBoxLength.Name = "precipitationBoxLength";
+            this.precipitationBoxLength.Size = new System.Drawing.Size(54, 20);
+            this.precipitationBoxLength.TabIndex = 47;
+            this.precipitationBoxLength.Value = new decimal(new int[] {
+            500,
+            0,
+            0,
+            0});
+            // 
+            // label24
+            // 
+            this.label24.AutoSize = true;
+            this.label24.Location = new System.Drawing.Point(75, 347);
+            this.label24.Margin = new System.Windows.Forms.Padding(3);
+            this.label24.Name = "label24";
+            this.label24.Size = new System.Drawing.Size(130, 13);
+            this.label24.TabIndex = 46;
+            this.label24.Text = "Precipitation box width (m)";
+            // 
+            // precipitationBoxWidth
+            // 
+            this.precipitationBoxWidth.Increment = new decimal(new int[] {
+            25,
+            0,
+            0,
+            0});
+            this.precipitationBoxWidth.Location = new System.Drawing.Point(15, 345);
+            this.precipitationBoxWidth.Maximum = new decimal(new int[] {
+            3000,
+            0,
+            0,
+            0});
+            this.precipitationBoxWidth.Minimum = new decimal(new int[] {
+            500,
+            0,
+            0,
+            0});
+            this.precipitationBoxWidth.Name = "precipitationBoxWidth";
+            this.precipitationBoxWidth.Size = new System.Drawing.Size(54, 20);
+            this.precipitationBoxWidth.TabIndex = 45;
+            this.precipitationBoxWidth.Value = new decimal(new int[] {
+            500,
+            0,
+            0,
+            0});
+            // 
+            // label23
+            // 
+            this.label23.AutoSize = true;
+            this.label23.Location = new System.Drawing.Point(75, 321);
+            this.label23.Margin = new System.Windows.Forms.Padding(3);
+            this.label23.Name = "label23";
+            this.label23.Size = new System.Drawing.Size(134, 13);
+            this.label23.TabIndex = 44;
+            this.label23.Text = "Precipitation box height (m)";
+            // 
+            // precipitationBoxHeight
+            // 
+            this.precipitationBoxHeight.Increment = new decimal(new int[] {
+            25,
+            0,
+            0,
+            0});
+            this.precipitationBoxHeight.Location = new System.Drawing.Point(15, 319);
+            this.precipitationBoxHeight.Maximum = new decimal(new int[] {
+            300,
+            0,
+            0,
+            0});
+            this.precipitationBoxHeight.Minimum = new decimal(new int[] {
+            100,
+            0,
+            0,
+            0});
+            this.precipitationBoxHeight.Name = "precipitationBoxHeight";
+            this.precipitationBoxHeight.Size = new System.Drawing.Size(54, 20);
+            this.precipitationBoxHeight.TabIndex = 43;
+            this.precipitationBoxHeight.Value = new decimal(new int[] {
+            100,
+            0,
+            0,
+            0});
             // 
             // pbEnableWebServer
             // 
@@ -2673,117 +3103,6 @@
             this.checkFastFullScreenAltTab.Text = "Fast full-screen alt-tab";
             this.checkFastFullScreenAltTab.UseVisualStyleBackColor = true;
             // 
-            // label25
-            // 
-            this.label25.AutoSize = true;
-            this.label25.Location = new System.Drawing.Point(75, 373);
-            this.label25.Margin = new System.Windows.Forms.Padding(3);
-            this.label25.Name = "label25";
-            this.label25.Size = new System.Drawing.Size(134, 13);
-            this.label25.TabIndex = 48;
-            this.label25.Text = "Precipitation box length (m)";
-            // 
-            // precipitationBoxLength
-            // 
-            this.precipitationBoxLength.Increment = new decimal(new int[] {
-            25,
-            0,
-            0,
-            0});
-            this.precipitationBoxLength.Location = new System.Drawing.Point(15, 371);
-            this.precipitationBoxLength.Maximum = new decimal(new int[] {
-            3000,
-            0,
-            0,
-            0});
-            this.precipitationBoxLength.Minimum = new decimal(new int[] {
-            500,
-            0,
-            0,
-            0});
-            this.precipitationBoxLength.Name = "precipitationBoxLength";
-            this.precipitationBoxLength.Size = new System.Drawing.Size(54, 20);
-            this.precipitationBoxLength.TabIndex = 47;
-            this.precipitationBoxLength.Value = new decimal(new int[] {
-            500,
-            0,
-            0,
-            0});
-            // 
-            // label24
-            // 
-            this.label24.AutoSize = true;
-            this.label24.Location = new System.Drawing.Point(75, 347);
-            this.label24.Margin = new System.Windows.Forms.Padding(3);
-            this.label24.Name = "label24";
-            this.label24.Size = new System.Drawing.Size(130, 13);
-            this.label24.TabIndex = 46;
-            this.label24.Text = "Precipitation box width (m)";
-            // 
-            // precipitationBoxWidth
-            // 
-            this.precipitationBoxWidth.Increment = new decimal(new int[] {
-            25,
-            0,
-            0,
-            0});
-            this.precipitationBoxWidth.Location = new System.Drawing.Point(15, 345);
-            this.precipitationBoxWidth.Maximum = new decimal(new int[] {
-            3000,
-            0,
-            0,
-            0});
-            this.precipitationBoxWidth.Minimum = new decimal(new int[] {
-            500,
-            0,
-            0,
-            0});
-            this.precipitationBoxWidth.Name = "precipitationBoxWidth";
-            this.precipitationBoxWidth.Size = new System.Drawing.Size(54, 20);
-            this.precipitationBoxWidth.TabIndex = 45;
-            this.precipitationBoxWidth.Value = new decimal(new int[] {
-            500,
-            0,
-            0,
-            0});
-            // 
-            // label23
-            // 
-            this.label23.AutoSize = true;
-            this.label23.Location = new System.Drawing.Point(75, 321);
-            this.label23.Margin = new System.Windows.Forms.Padding(3);
-            this.label23.Name = "label23";
-            this.label23.Size = new System.Drawing.Size(134, 13);
-            this.label23.TabIndex = 44;
-            this.label23.Text = "Precipitation box height (m)";
-            // 
-            // precipitationBoxHeight
-            // 
-            this.precipitationBoxHeight.Increment = new decimal(new int[] {
-            25,
-            0,
-            0,
-            0});
-            this.precipitationBoxHeight.Location = new System.Drawing.Point(15, 319);
-            this.precipitationBoxHeight.Maximum = new decimal(new int[] {
-            300,
-            0,
-            0,
-            0});
-            this.precipitationBoxHeight.Minimum = new decimal(new int[] {
-            100,
-            0,
-            0,
-            0});
-            this.precipitationBoxHeight.Name = "precipitationBoxHeight";
-            this.precipitationBoxHeight.Size = new System.Drawing.Size(54, 20);
-            this.precipitationBoxHeight.TabIndex = 43;
-            this.precipitationBoxHeight.Value = new decimal(new int[] {
-            100,
-            0,
-            0,
-            0});
-            // 
             // OptionsForm
             // 
             this.AcceptButton = this.buttonOK;
@@ -2803,12 +3122,31 @@
             this.Load += new System.EventHandler(this.OptionsForm_Load);
             ((System.ComponentModel.ISupportInitialize)(this.bindingSourceContent)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbLAA)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbViewingFOV)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbUpdateMode)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbWindowGlass)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbWebServerPort)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbPerformanceTuner)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbLODBias)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbWorldObjectDensity)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbAntiAliasing)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbVerticalSync)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbModelInstancing)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbDayAmbientLight)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbSignalLightGlow)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbDoubleWire)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbWire)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbShadowAllShapes)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbDynamicShadows)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbLODViewingExtension)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbDistantMountains)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbViewingDistance)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUseSuperElevation)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.trackLODBias)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericSuperElevationMinLen)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericPerformanceTunerTarget)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackAdhesionFactor)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackAdhesionFactorChange)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.trackLODBias)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericActRandomizationLevel)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericActWeatherRandomizationLevel)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericDistantMountainsViewingDistance)).EndInit();
@@ -2820,8 +3158,11 @@
             this.tabPageExperimental.ResumeLayout(false);
             this.tabPageExperimental.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericSuperElevationGauge)).EndInit();
-            this.tabPageUpdater.ResumeLayout(false);
-            this.tabPageUpdater.PerformLayout();
+            this.tabPageSystem.ResumeLayout(false);
+            this.tabPageSystem.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericWebServerPort)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbControlConfirmations)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbLanguage)).EndInit();
             this.tabPageContent.ResumeLayout(false);
             this.tabPageContent.PerformLayout();
             this.groupBoxContent.ResumeLayout(false);
@@ -2860,21 +3201,18 @@
             ((System.ComponentModel.ISupportInitialize)(this.pbEnableTcsScripts)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbOtherUnits)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbPressureUnit)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pbLanguage)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbBrakePipeChargingRate)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbGraduatedRelease)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbRetainers)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbAlerter)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pbControlConfirmations)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericWebServerPort)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericBrakePipeChargingRate)).EndInit();
             this.tabOptions.ResumeLayout(false);
             this.tabPageORNYMG.ResumeLayout(false);
             this.tabPageORNYMG.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pbEnableWebServer)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.precipitationBoxLength)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.precipitationBoxWidth)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.precipitationBoxHeight)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbEnableWebServer)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -2896,7 +3234,6 @@
         private System.Windows.Forms.CheckBox checkCorrectQuestionableBrakingParams;
         private System.Windows.Forms.Label label16;
         private System.Windows.Forms.Label label9;
-        private System.Windows.Forms.Label label21;
         private System.Windows.Forms.Label AdhesionFactorChangeValueLabel;
         private System.Windows.Forms.Label AdhesionFactorValueLabel;
         private System.Windows.Forms.Label labelLODBias;
@@ -2906,7 +3243,6 @@
         private System.Windows.Forms.Label AdhesionLevelLabel;
         private System.Windows.Forms.TrackBar trackAdhesionFactorChange;
         private System.Windows.Forms.TrackBar trackAdhesionFactor;
-        private System.Windows.Forms.CheckBox checkSignalLightGlow;
         private System.Windows.Forms.CheckBox checkUseMSTSEnv;
         private System.Windows.Forms.Label labelPerformanceTunerTarget;
         private System.Windows.Forms.NumericUpDown numericPerformanceTunerTarget;
@@ -2919,8 +3255,7 @@
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.NumericUpDown numericUseSuperElevation;
         private System.Windows.Forms.Label ElevationText;
-        private System.Windows.Forms.TabPage tabPageUpdater;
-        private System.Windows.Forms.Label labelUpdateChannel;
+        private System.Windows.Forms.TabPage tabPageSystem;
         private System.Windows.Forms.TabPage tabPageContent;
         private System.Windows.Forms.Label labelContent;
         private System.Windows.Forms.Button buttonContentDelete;
@@ -2990,7 +3325,7 @@
         private System.Windows.Forms.TrackBar trackAntiAliasing;
         private System.Windows.Forms.CheckBox checkShadowAllShapes;
         private System.Windows.Forms.CheckBox checkDoubleWire;
-        private System.Windows.Forms.Label label15;
+        private System.Windows.Forms.Label labelAmbientDaylightBrightness;
         private System.Windows.Forms.Label labelDayAmbientLight;
         private System.Windows.Forms.CheckBox checkModelInstancing;
         private System.Windows.Forms.TrackBar trackDayAmbientLight;
@@ -2998,16 +3333,13 @@
         private System.Windows.Forms.Label labelDistantMountainsViewingDistance;
         private System.Windows.Forms.NumericUpDown numericDistantMountainsViewingDistance;
         private System.Windows.Forms.CheckBox checkDistantMountains;
-        private System.Windows.Forms.Label label14;
+        private System.Windows.Forms.Label labelViewingDistance;
         private System.Windows.Forms.NumericUpDown numericViewingDistance;
         private System.Windows.Forms.Label labelFOVHelp;
         private System.Windows.Forms.NumericUpDown numericViewingFOV;
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.NumericUpDown numericWorldObjectDensity;
-        private System.Windows.Forms.ComboBox comboWindowSize;
-        private System.Windows.Forms.CheckBox checkWindowGlass;
-        private System.Windows.Forms.Label label3;
         private System.Windows.Forms.CheckBox checkDynamicShadows;
         private System.Windows.Forms.CheckBox checkWire;
         private System.Windows.Forms.TabPage tabPageAudio;
@@ -3022,23 +3354,16 @@
         private System.Windows.Forms.PictureBox pbEnableTcsScripts;
         private System.Windows.Forms.PictureBox pbOtherUnits;
         private System.Windows.Forms.PictureBox pbPressureUnit;
-        private System.Windows.Forms.PictureBox pbLanguage;
         private System.Windows.Forms.PictureBox pbBrakePipeChargingRate;
         private System.Windows.Forms.PictureBox pbGraduatedRelease;
         private System.Windows.Forms.PictureBox pbRetainers;
         private System.Windows.Forms.PictureBox pbAlerter;
-        private System.Windows.Forms.PictureBox pbControlConfirmations;
-        private System.Windows.Forms.Label labelPortNumber;
-        private System.Windows.Forms.NumericUpDown numericWebServerPort;
         private System.Windows.Forms.CheckBox checkOverspeedMonitor;
         private System.Windows.Forms.CheckBox checkEnableTCSScripts;
         private System.Windows.Forms.Label labelOtherUnits;
         private System.Windows.Forms.Label labelPressureUnit;
         private System.Windows.Forms.ComboBox comboOtherUnits;
         private System.Windows.Forms.ComboBox comboPressureUnit;
-        private System.Windows.Forms.Label labelLanguage;
-        private System.Windows.Forms.ComboBox comboLanguage;
-        private System.Windows.Forms.CheckBox checkControlConfirmations;
         private System.Windows.Forms.CheckBox checkAlerterExternal;
         private System.Windows.Forms.NumericUpDown numericBrakePipeChargingRate;
         private System.Windows.Forms.CheckBox checkRetainers;
@@ -3073,5 +3398,41 @@
         private System.Windows.Forms.NumericUpDown precipitationBoxWidth;
         private System.Windows.Forms.Label label23;
         private System.Windows.Forms.NumericUpDown precipitationBoxHeight;
+        private System.Windows.Forms.Label labelUpdateMode;
+        private System.Windows.Forms.Label labelWindowSize;
+        private System.Windows.Forms.Label labelWebServerPort;
+        private System.Windows.Forms.Label labelWorldObjectDensity;
+        private System.Windows.Forms.Label labelViewingVerticalFOV;
+        private System.Windows.Forms.PictureBox pbUpdateMode;
+        private System.Windows.Forms.PictureBox pbWindowGlass;
+        private System.Windows.Forms.PictureBox pbWebServerPort;
+        private System.Windows.Forms.PictureBox pbPerformanceTuner;
+        private System.Windows.Forms.PictureBox pbDayAmbientLight;
+        private System.Windows.Forms.PictureBox pbSignalLightGlow;
+        private System.Windows.Forms.PictureBox pbDoubleWire;
+        private System.Windows.Forms.PictureBox pbWire;
+        private System.Windows.Forms.PictureBox pbShadowAllShapes;
+        private System.Windows.Forms.PictureBox pbDynamicShadows;
+        private System.Windows.Forms.PictureBox pbLODViewingExtension;
+        private System.Windows.Forms.PictureBox pbDistantMountains;
+        private System.Windows.Forms.PictureBox pbViewingDistance;
+        private System.Windows.Forms.PictureBox pbLODBias;
+        private System.Windows.Forms.PictureBox pbWorldObjectDensity;
+        private System.Windows.Forms.PictureBox pbAntiAliasing;
+        private System.Windows.Forms.PictureBox pbVerticalSync;
+        private System.Windows.Forms.PictureBox pbModelInstancing;
+        private System.Windows.Forms.Label labelDefaultDetail;
+        private System.Windows.Forms.PictureBox pbViewingFOV;
+        private System.Windows.Forms.ComboBox comboWindowSize;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.CheckBox checkWindowGlass;
+        private System.Windows.Forms.CheckBox checkSignalLightGlow;
+        private System.Windows.Forms.Label labelPortNumber;
+        private System.Windows.Forms.NumericUpDown numericWebServerPort;
+        private System.Windows.Forms.PictureBox pbControlConfirmations;
+        private System.Windows.Forms.CheckBox checkControlConfirmations;
+        private System.Windows.Forms.PictureBox pbLanguage;
+        private System.Windows.Forms.Label labelLanguage;
+        private System.Windows.Forms.ComboBox comboLanguage;
     }
 }
