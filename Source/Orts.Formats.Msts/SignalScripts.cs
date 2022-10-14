@@ -983,6 +983,7 @@ namespace Orts.Formats.Msts
                 {
                     PartType = type;
                     PartParameter = value;
+                    if (Enum.IsDefined(typeof(MstsSignalFunction), value)) SignalFunction = new SignalFunction((MstsSignalFunction)value);
                 }
 
                 // <summary>
