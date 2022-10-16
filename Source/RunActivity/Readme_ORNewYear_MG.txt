@@ -1,5 +1,5 @@
-﻿Open Rails, NewYear version README - Rev.131
-September 28th, 2022
+﻿Open Rails, NewYear version README - Rev.132
+October 16th, 2022
 
 Please note that the installation and use of Open Rails software, even of its unofficial versions, is governed by the Open Rails End User License Agreement. 
 
@@ -11,9 +11,8 @@ INSTALLATION
 
 
 RELEASE NOTES
-This unofficial version has been derived from the latest official Testing release T1.4-722, plus the changes up to date to the master and release/1.5 branches.
-The menu option tabs have been partially reworked to be aligned to those of the official releases, with the exception of the Windowed checkbox, that remains in the main menu window.
-The ORNYMG Only and Raildriver tabs remain.
+This unofficial version has been derived from the latest official Testing release T1.4-745, plus the changes up to date to the release/1.5 branche.
+
 
 
 
@@ -54,8 +53,9 @@ This version includes some features not (yet) available in the Open Rails testin
 - Improvements in sky color and in other environment areas, by DR-Aeronautics
 - multiple preset viewpoints for 3D cabs, see http://www.elvastower.com/forums/index.php?/topic/36339-multiple-preset-viewpoints-for-3d-cabs/
 - fix crash when reinitializing EOTs on a carless train
-- NEW: fixed typo preventing Generic Item 2 keyboard command to work (fix present as PR for release/1.5)
-- NEW: removed keyboard commands to change the CC preset speed to a specific value, see http://www.elvastower.com/forums/index.php?/topic/36339-multiple-preset-viewpoints-for-3d-cabs/page__view__findpost__p__288687
+- fixed typo preventing Generic Item 2 keyboard command to work 
+- NEW: Fix brake initialization problems, by cesarbl (fix present as PR  #726 for release/1.5)
+- NEW:  Bug fix for https://bugs.launchpad.net/or/+bug/1992301 World becoming fully dark (fix present as PR  #728 for release/1.5)
 
 
 
