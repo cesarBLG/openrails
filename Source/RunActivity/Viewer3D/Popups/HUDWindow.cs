@@ -1468,6 +1468,7 @@ namespace Orts.Viewer3D.Popups
 
         void TextPageForceInfo(TableData table)
         {
+            TableSetLabelValueColumns(table, 0, 2);
             TextPageHeading(table, Viewer.Catalog.GetString("FORCE INFORMATION"));
 
             var train = Viewer.PlayerLocomotive.Train;
