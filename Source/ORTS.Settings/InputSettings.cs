@@ -448,7 +448,7 @@ namespace ORTS.Settings
             Commands[(int)UserCommand.ControlWaterScoop] = new UserCommandKeyInput(0x15);
             Commands[(int)UserCommand.ControlWiper] = new UserCommandKeyInput(0x2F);
 
-            // Jindrich
+            // Cruise Control
             Commands[(int)UserCommand.ControlSpeedRegulatorModeIncrease] = new UserCommandKeyInput(0x11, KeyModifiers.Shift);
             Commands[(int)UserCommand.ControlSpeedRegulatorModeDecrease] = new UserCommandKeyInput(0x1F, KeyModifiers.Shift);
             Commands[(int)UserCommand.ControlSpeedRegulatorMaxAccelerationIncrease] = new UserCommandKeyInput(0x20, KeyModifiers.Control | KeyModifiers.Shift);

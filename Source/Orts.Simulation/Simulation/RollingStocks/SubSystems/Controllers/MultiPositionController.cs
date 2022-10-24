@@ -31,7 +31,6 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Controllers
 
         public List<Position> PositionsList = new List<Position>();
 
-        public bool Equipped = false;
         public bool StateChanged = false;
 
         public ControllerPosition controllerPosition = new ControllerPosition();
@@ -39,18 +38,23 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Controllers
         protected float elapsedSecondsFromLastChange = 0;
         protected bool checkNeutral = false;
         protected bool noKeyPressed = true;
-        protected string currentPosition = "";
+        protected ControllerPosition currentPosition = ControllerPosition.Undefined;
         protected bool emergencyBrake = false;
         protected bool previousDriveModeWasAddPower = false;
         protected bool isBraking = false;
         protected bool needPowerUpAfterBrake = false;
         public bool CanControlTrainBrake = false;
-        protected bool initialized = false;
         protected bool movedForward = false;
         protected bool movedAft = false;
         protected bool haveCruiseControl = false;
         public int ControllerId = 0;
         public bool MouseInputActive = false;
+
+        protected const float MPCFullRangeIncreaseTimeS = 6.0f;
+        protected const float DynamicBrakeIncreaseStepPerSecond = 50f;
+        protected const float DynamicBrakeDecreaseStepPerSecond = 25f;
+        protected const float ThrottleIncreaseStepPerSecond = 15f;
+        protected const float ThrottleDecreaseStepPerSecond = 15f;
 
         public MultiPositionController(MSTSLocomotive locomotive)
         {
@@ -73,91 +77,66 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Controllers
 
         public void Save(BinaryWriter outf)
         {
-            outf.Write(this.checkNeutral);
-            outf.Write((int)this.controllerPosition);
-            outf.Write(this.currentPosition);
-            outf.Write(this.elapsedSecondsFromLastChange);
-            outf.Write(this.emergencyBrake);
-            outf.Write(this.Equipped);
-            outf.Write(this.isBraking);
-            outf.Write(this.noKeyPressed);
-            outf.Write(this.previousDriveModeWasAddPower);
-            outf.Write(this.StateChanged);
-            outf.Write(haveCruiseControl);
+            outf.Write(checkNeutral);
+            outf.Write((int)controllerPosition);
+            outf.Write((int)currentPosition);
+            outf.Write(elapsedSecondsFromLastChange);
+            outf.Write(emergencyBrake);
+            outf.Write(isBraking);
+            outf.Write(noKeyPressed);
+            outf.Write(previousDriveModeWasAddPower);
+            outf.Write(StateChanged);
         }
 
         public void Restore(BinaryReader inf)
         {
-            initialized = true;
             checkNeutral = inf.ReadBoolean();
-            int fControllerPosition = inf.ReadInt32();
-            controllerPosition = (ControllerPosition)fControllerPosition;
-            currentPosition = inf.ReadString();
+            controllerPosition = (ControllerPosition)inf.ReadInt32();
+            currentPosition = (ControllerPosition)inf.ReadInt32();
             elapsedSecondsFromLastChange = inf.ReadSingle();
             emergencyBrake = inf.ReadBoolean();
-            Equipped = inf.ReadBoolean();
             isBraking = inf.ReadBoolean();
             noKeyPressed = inf.ReadBoolean();
             previousDriveModeWasAddPower = inf.ReadBoolean();
             StateChanged = inf.ReadBoolean();
-            haveCruiseControl = inf.ReadBoolean();
         }
-        public void Parse(string lowercasetoken, STFReader stf)
+        public void Parse(STFReader stf)
         {
             stf.MustMatch("(");
-            while (!stf.EndOfBlock())
-            {
-                stf.ReadItem();
-                switch (stf.Tree.ToLower())
-                {
-                    case "engine(ortsmultipositioncontroller(positions":
-                        stf.MustMatch("(");
-                        while (!stf.EndOfBlock())
-                        {
-                            stf.ParseBlock(new STFReader.TokenProcessor[] {
+            stf.ParseBlock(new [] {
+                new STFReader.TokenProcessor("positions", () => {
+                    stf.MustMatch("(");
+                    stf.ParseBlock(new [] {
                         new STFReader.TokenProcessor("position", ()=>{
                             stf.MustMatch("(");
                             string positionType = stf.ReadString();
                             string positionFlag = stf.ReadString();
                             string positionName = stf.ReadString();
+                            stf.SkipRestOfBlock();
                             PositionsList.Add(new Position(positionType, positionFlag, positionName));
                         }),
                     });
-                        }
-                        break;
-                    case "engine(ortsmultipositioncontroller(controllerbinding":
-                        String binding = stf.ReadStringBlock("null").ToLower();
-                        switch (binding)
-                        {
-                            case "throttle":
-                                controllerBinding = ControllerBinding.Throttle;
-                                break;
-                            case "selectedspeed":
-                                controllerBinding = ControllerBinding.SelectedSpeed;
-                                break;
-                        }
-                        break;
-                    case "engine(ortsmultipositioncontroller(controllerid": ControllerId = stf.ReadIntBlock(0); break;
-                    case "engine(ortsmultipositioncontrollercancontroltrainbrake": CanControlTrainBrake = stf.ReadBoolBlock(false); break;
+                }),
+                new STFReader.TokenProcessor("controllerbinding", () => Enum.TryParse(stf.ReadStringBlock(null), true, out controllerBinding)),
+                new STFReader.TokenProcessor("controllerid", () => ControllerId = stf.ReadIntBlock(0)),
+                new STFReader.TokenProcessor("cancontroltrainbrake", () => CanControlTrainBrake = stf.ReadBoolBlock(false)),
+            });
+        }
+        public void Initialize()
+        {
+            if (Locomotive.CruiseControl != null)
+                haveCruiseControl = true;
+            foreach (Position pair in PositionsList)
+            {
+                if (pair.Flag == ControllerPositionFlag.Default)
+                {
+                    currentPosition = pair.Type;
+                    break;
                 }
             }
         }
         public void Update(float elapsedClockSeconds)
         {
-            if (!initialized)
-            {
-                if (Locomotive.CruiseControl != null)
-                    haveCruiseControl = true;
-                foreach (Position pair in PositionsList)
-                {
-                    if (pair.Flag.ToLower() == "default")
-                    {
-                        currentPosition = pair.Type;
-                        break;
-                    }
-                }
-                initialized = true;
-            }
             if (!Locomotive.IsPlayerTrain) return;
 
             if (haveCruiseControl)
@@ -168,7 +147,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Controllers
             {
                 if (emergencyBrake)
                 {
-                    Locomotive.TrainBrakeController.TCSEmergencyBraking = true;
+                    Locomotive.TrainBrakeController.EmergencyBrakingPushButton = true;
                     return;
                 }
             }
@@ -176,12 +155,10 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Controllers
             {
                 emergencyBrake = false;
             }
-/*            if (Locomotive.TrainBrakeController.TCSEmergencyBraking)
-                Locomotive.TrainBrakeController.TCSEmergencyBraking = false; */
             elapsedSecondsFromLastChange += elapsedClockSeconds;
-            // Simulator.Confirmer.MSG(currentPosition.ToString());
             if (checkNeutral)
             {
+                // Check every 200 ms if state of MPC has changed
                 if (elapsedSecondsFromLastChange > 0.2f)
                 {
                     CheckNeutralPosition();
@@ -205,7 +182,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Controllers
                     {
                         if (Locomotive.ThrottlePercent < 100)
                         {
-                            float step = (haveCruiseControl ? 100 / Locomotive.CruiseControl.ThrottleFullRangeIncreaseTimeSeconds : 100 / 6);
+                            float step = (haveCruiseControl ? ThrottleIncreaseStepPerSecond : 100 / MPCFullRangeIncreaseTimeS);
                             step *= elapsedClockSeconds;
                             Locomotive.SetThrottlePercent(Locomotive.ThrottlePercent + step);
                         }
@@ -217,7 +194,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Controllers
                     {
                         if (Locomotive.ThrottlePercent < 100)
                         {
-                            float step = (haveCruiseControl ? 100 / (Locomotive.CruiseControl.ThrottleFullRangeIncreaseTimeSeconds / 2) : 100 / 3);
+                            float step = (haveCruiseControl ? ThrottleIncreaseStepPerSecond * 2 : 200 / MPCFullRangeIncreaseTimeS);
                             step *= elapsedClockSeconds;
                             Locomotive.SetThrottlePercent(Locomotive.ThrottlePercent + step);
                         }
@@ -227,7 +204,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Controllers
                 {
                     if (Locomotive.ThrottlePercent > 0)
                     {
-                        float step = (haveCruiseControl ? 100 / Locomotive.CruiseControl.ThrottleFullRangeDecreaseTimeSeconds : 100 / 6);
+                        float step = (haveCruiseControl ? 100 / ThrottleDecreaseStepPerSecond : 100 / MPCFullRangeIncreaseTimeS);
                         step *= elapsedClockSeconds;
                         Locomotive.SetThrottlePercent(Locomotive.ThrottlePercent - step);
                     }
@@ -236,7 +213,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Controllers
                 {
                     if (Locomotive.ThrottlePercent > 0)
                     {
-                        float step = (haveCruiseControl ? 100 / (Locomotive.CruiseControl.ThrottleFullRangeDecreaseTimeSeconds / 2) : 100 / 3);
+                        float step = (haveCruiseControl ? 100 / ThrottleDecreaseStepPerSecond * 2 : 200 / MPCFullRangeIncreaseTimeS);
                         step *= elapsedClockSeconds;
                         Locomotive.SetThrottlePercent(Locomotive.ThrottlePercent - step);
                     }
@@ -245,11 +222,11 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Controllers
                 {
                     if (CanControlTrainBrake)
                     {
-                        if (Locomotive.TrainBrakeController.GetStatus().ToLower() == "apply")
+                        if (Locomotive.TrainBrakeController.TrainBrakeControllerState == ORTS.Scripting.Api.ControllerState.Apply)
                         {
                             Locomotive.StartTrainBrakeDecrease(null);
                         }
-                        if (Locomotive.TrainBrakeController.GetStatus().ToLower() == "neutral")
+                        if (Locomotive.TrainBrakeController.TrainBrakeControllerState == ORTS.Scripting.Api.ControllerState.Neutral)
                         {
                             Locomotive.StopTrainBrakeDecrease();
                         }
@@ -273,11 +250,11 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Controllers
                 {
                     if (CanControlTrainBrake)
                     {
-                        if (Locomotive.TrainBrakeController.GetStatus().ToLower() == "apply")
+                        if (Locomotive.TrainBrakeController.TrainBrakeControllerState == ORTS.Scripting.Api.ControllerState.Apply)
                         {
                             Locomotive.StartTrainBrakeDecrease(null);
                         }
-                        if (Locomotive.TrainBrakeController.GetStatus().ToLower() == "neutral")
+                        if (Locomotive.TrainBrakeController.TrainBrakeControllerState == ORTS.Scripting.Api.ControllerState.Neutral)
                         {
                             Locomotive.StopTrainBrakeDecrease();
                         }
@@ -285,18 +262,18 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Controllers
                     if (Locomotive.DynamicBrakePercent == -1) Locomotive.SetDynamicBrakePercent(0);
                     if (Locomotive.ThrottlePercent < 1 && Locomotive.DynamicBrakePercent < 100)
                     {
-                        Locomotive.SetDynamicBrakePercent(Locomotive.DynamicBrakePercent + 2f);
+                        Locomotive.SetDynamicBrakePercent(Locomotive.DynamicBrakePercent + DynamicBrakeIncreaseStepPerSecond * elapsedClockSeconds);
                     }
                 }
                 if (controllerPosition == ControllerPosition.DynamicBrakeIncreaseFast)
                 {
                     if (CanControlTrainBrake)
                     {
-                        if (Locomotive.TrainBrakeController.GetStatus().ToLower() == "apply")
+                        if (Locomotive.TrainBrakeController.TrainBrakeControllerState == ORTS.Scripting.Api.ControllerState.Apply)
                         {
                             Locomotive.StartTrainBrakeDecrease(null);
                         }
-                        if (Locomotive.TrainBrakeController.GetStatus().ToLower() == "neutral")
+                        if (Locomotive.TrainBrakeController.TrainBrakeControllerState == ORTS.Scripting.Api.ControllerState.Neutral)
                         {
                             Locomotive.StopTrainBrakeDecrease();
                         }
@@ -304,14 +281,14 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Controllers
                     if (Locomotive.DynamicBrakePercent == -1) Locomotive.SetDynamicBrakePercent(0);
                     if (Locomotive.ThrottlePercent < 1 && Locomotive.DynamicBrakePercent < 100)
                     {
-                        Locomotive.SetDynamicBrakePercent(Locomotive.DynamicBrakePercent + 2f);
+                        Locomotive.SetDynamicBrakePercent(Locomotive.DynamicBrakePercent + DynamicBrakeIncreaseStepPerSecond * elapsedClockSeconds);
                     }
                 }
                 if (controllerPosition == ControllerPosition.DynamicBrakeDecrease)
                 {
                     if (Locomotive.DynamicBrakePercent > 0)
                     {
-                        Locomotive.SetDynamicBrakePercent(Locomotive.DynamicBrakePercent - 1);
+                        Locomotive.SetDynamicBrakePercent(Locomotive.DynamicBrakePercent - DynamicBrakeDecreaseStepPerSecond * elapsedClockSeconds);
                     }
                 }
                 if (controllerPosition == ControllerPosition.Drive || controllerPosition == ControllerPosition.ThrottleHold)
@@ -322,16 +299,15 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Controllers
                     }
                     if (Locomotive.DynamicBrakePercent > 1)
                     {
-                        Locomotive.SetDynamicBrakePercent(Locomotive.DynamicBrakePercent - 1);
+                        Locomotive.SetDynamicBrakePercent(Locomotive.DynamicBrakePercent - DynamicBrakeDecreaseStepPerSecond * elapsedClockSeconds);
                     }
                 }
                 if (controllerPosition == ControllerPosition.TrainBrakeIncrease)
                 {
                     if (CanControlTrainBrake)
                     {
-                        if (Locomotive.TrainBrakeController.GetStatus().ToLower() != "apply")
+                        if (Locomotive.TrainBrakeController.TrainBrakeControllerState != ORTS.Scripting.Api.ControllerState.Apply)
                         {
-                            String test = Locomotive.TrainBrakeController.GetStatus().ToLower();
                             Locomotive.StartTrainBrakeIncrease(null);
                         }
                         else
@@ -344,9 +320,8 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Controllers
                 {
                     if (CanControlTrainBrake)
                     {
-                        if (Locomotive.TrainBrakeController.GetStatus().ToLower() != "release")
+                        if (Locomotive.TrainBrakeController.TrainBrakeControllerState != ORTS.Scripting.Api.ControllerState.Release)
                         {
-                            String boom = Locomotive.TrainBrakeController.GetStatus().ToString();
                             Locomotive.StartTrainBrakeDecrease(null);
                         }
                         else
@@ -357,9 +332,8 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Controllers
                 {
                     if (CanControlTrainBrake)
                     {
-                        if (Locomotive.TrainBrakeController.GetStatus().ToLower() != "release")
+                        if (Locomotive.TrainBrakeController.TrainBrakeControllerState != ORTS.Scripting.Api.ControllerState.Release)
                         {
-                            String boom = Locomotive.TrainBrakeController.GetStatus().ToString();
                             Locomotive.StartTrainBrakeDecrease(null);
                         }
                         else
@@ -375,7 +349,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Controllers
                 {
                     if (Locomotive.DynamicBrakePercent > 0)
                     {
-                        Locomotive.SetDynamicBrakePercent(Locomotive.DynamicBrakePercent - 0.2f);
+                        Locomotive.SetDynamicBrakePercent(Locomotive.DynamicBrakePercent - DynamicBrakeDecreaseStepPerSecond * elapsedClockSeconds);
                         if (Locomotive.DynamicBrakePercent < 2)
                         {
                             Locomotive.SetDynamicBrakePercent(0);
@@ -385,7 +359,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Controllers
                     else
                     {
                         if (Locomotive.ThrottlePercent < 100)
-                            Locomotive.SetThrottlePercent(Locomotive.ThrottlePercent + 0.2f);
+                            Locomotive.SetThrottlePercent(Locomotive.ThrottlePercent + ThrottleIncreaseStepPerSecond * elapsedClockSeconds);
                         if (Locomotive.ThrottlePercent > 100)
                             Locomotive.SetThrottlePercent(100);
                     }
@@ -394,7 +368,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Controllers
                 {
                     if (Locomotive.DynamicBrakePercent > 0)
                     {
-                        Locomotive.SetDynamicBrakePercent(Locomotive.DynamicBrakePercent - 1);
+                        Locomotive.SetDynamicBrakePercent(Locomotive.DynamicBrakePercent - DynamicBrakeDecreaseStepPerSecond * 2 * elapsedClockSeconds);
                         if (Locomotive.DynamicBrakePercent < 2)
                         {
                             Locomotive.SetDynamicBrakePercent(0);
@@ -404,7 +378,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Controllers
                     else
                     {
                         if (Locomotive.ThrottlePercent < 100)
-                            Locomotive.SetThrottlePercent(Locomotive.ThrottlePercent + 1);
+                            Locomotive.SetThrottlePercent(Locomotive.ThrottlePercent + ThrottleIncreaseStepPerSecond * 2 * elapsedClockSeconds);
                         if (Locomotive.ThrottlePercent > 100)
                             Locomotive.SetThrottlePercent(100);
                     }
@@ -414,7 +388,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Controllers
                 {
                     if (Locomotive.ThrottlePercent > 0)
                     {
-                        Locomotive.SetThrottlePercent(Locomotive.ThrottlePercent - 0.2f);
+                        Locomotive.SetThrottlePercent(Locomotive.ThrottlePercent - ThrottleDecreaseStepPerSecond * elapsedClockSeconds);
                         if (Locomotive.ThrottlePercent < 0)
                             Locomotive.ThrottlePercent = 0;
                     }
@@ -422,7 +396,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Controllers
                     {
                         if (Locomotive.DynamicBrakePercent < 100)
                         {
-                            Locomotive.SetDynamicBrakePercent(Locomotive.DynamicBrakePercent + 0.2f);
+                            Locomotive.SetDynamicBrakePercent(Locomotive.DynamicBrakePercent + DynamicBrakeIncreaseStepPerSecond * elapsedClockSeconds);
                         }
                         if (Locomotive.DynamicBrakePercent > 100)
                             Locomotive.SetDynamicBrakePercent(100);
@@ -432,7 +406,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Controllers
                 {
                     if (Locomotive.ThrottlePercent > 0)
                     {
-                        Locomotive.SetThrottlePercent(Locomotive.ThrottlePercent - 1);
+                        Locomotive.SetThrottlePercent(Locomotive.ThrottlePercent - ThrottleDecreaseStepPerSecond * 2 * elapsedClockSeconds);
                         if (Locomotive.ThrottlePercent < 0)
                             Locomotive.ThrottlePercent = 0;
                     }
@@ -440,7 +414,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Controllers
                     {
                         if (Locomotive.DynamicBrakePercent < 100)
                         {
-                            Locomotive.SetDynamicBrakePercent(Locomotive.DynamicBrakePercent + 1);
+                            Locomotive.SetDynamicBrakePercent(Locomotive.DynamicBrakePercent + DynamicBrakeIncreaseStepPerSecond * 2 * elapsedClockSeconds);
                         }
                         if (Locomotive.DynamicBrakePercent > 100)
                             Locomotive.SetDynamicBrakePercent(100);
@@ -449,7 +423,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Controllers
                 if (controllerPosition == ControllerPosition.SelectedSpeedIncrease)
                 {
                     if (Locomotive.CruiseControl.ForceRegulatorAutoWhenNonZeroSpeedSelectedAndThrottleAtZero &&
-                        Locomotive.CruiseControl.SelectedMaxAccelerationStep == 0 && Locomotive.CruiseControl.DisableCruiseControlOnThrottleAndZeroForceAndZeroSpeed &&
+                        Locomotive.CruiseControl.SelectedMaxAccelerationPercent == 0 && Locomotive.CruiseControl.DisableCruiseControlOnThrottleAndZeroForceAndZeroSpeed &&
                            Locomotive.ThrottleController.CurrentValue == 0 && Locomotive.DynamicBrakeController.CurrentValue == 0)
                     {
                         Locomotive.CruiseControl.SpeedRegMode = CruiseControl.SpeedRegulatorMode.Auto;
@@ -540,11 +514,11 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Controllers
                     Locomotive.CruiseControl.SpeedSelMode = CruiseControl.SpeedSelectorMode.Neutral;
                     if (CanControlTrainBrake)
                     {
-                        if (Locomotive.TrainBrakeController.GetStatus().ToLower() == "apply")
+                        if (Locomotive.TrainBrakeController.TrainBrakeControllerState == ORTS.Scripting.Api.ControllerState.Apply)
                         {
                             Locomotive.StartTrainBrakeDecrease(null);
                         }
-                        if (Locomotive.TrainBrakeController.GetStatus().ToLower() == "neutral")
+                        if (Locomotive.TrainBrakeController.TrainBrakeControllerState == ORTS.Scripting.Api.ControllerState.Neutral)
                         {
                             Locomotive.StopTrainBrakeDecrease();
                         }
@@ -563,11 +537,11 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Controllers
                     Locomotive.CruiseControl.SpeedSelMode = CruiseControl.SpeedSelectorMode.Neutral;
                     if (CanControlTrainBrake)
                     {
-                        if (Locomotive.TrainBrakeController.GetStatus().ToLower() == "apply")
+                        if (Locomotive.TrainBrakeController.TrainBrakeControllerState == ORTS.Scripting.Api.ControllerState.Apply)
                         {
                             Locomotive.StartTrainBrakeDecrease(null);
                         }
-                        if (Locomotive.TrainBrakeController.GetStatus().ToLower() == "neutral")
+                        if (Locomotive.TrainBrakeController.TrainBrakeControllerState == ORTS.Scripting.Api.ControllerState.Neutral)
                         {
                             Locomotive.StopTrainBrakeDecrease();
                         }
@@ -584,7 +558,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Controllers
                     Locomotive.CruiseControl.SpeedSelMode = CruiseControl.SpeedSelectorMode.Neutral;
                     if (CanControlTrainBrake)
                     {
-                        if (Locomotive.TrainBrakeController.GetStatus().ToLower() != "apply")
+                        if (Locomotive.TrainBrakeController.TrainBrakeControllerState != ORTS.Scripting.Api.ControllerState.Apply)
                         {
                             String test = Locomotive.TrainBrakeController.GetStatus().ToLower();
                             Locomotive.StartTrainBrakeIncrease(null);
@@ -625,11 +599,11 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Controllers
             if (movement == Movement.Forward) movedAft = false;
             if (movement == Movement.Neutral) movedForward = movedAft = false;
             messageDisplayed = false;
-            if (String.IsNullOrEmpty(currentPosition))
+            if (currentPosition == ControllerPosition.Undefined)
             {
                 foreach (Position pair in PositionsList)
                 {
-                    if (pair.Flag.ToLower() == "default")
+                    if (pair.Flag == ControllerPositionFlag.Default)
                     {
                         currentPosition = pair.Type;
                         break;
@@ -641,7 +615,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Controllers
                 noKeyPressed = false;
                 checkNeutral = false;
                 bool isFirst = true;
-                string previous = "";
+                ControllerPosition previous = ControllerPosition.Undefined;
                 foreach (Position pair in PositionsList)
                 {
                     if (pair.Type == currentPosition)
@@ -679,12 +653,12 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Controllers
                 {
                     if (pair.Type == currentPosition)
                     {
-                        if (pair.Flag.ToLower() == "springloadedbackwards" || pair.Flag.ToLower() == "springloadedforwards")
+                        if (pair.Flag == ControllerPositionFlag.SpringLoadedBackwards || pair.Flag == ControllerPositionFlag.SpringLoadedForwards)
                         {
                             checkNeutral = true;
                             elapsedSecondsFromLastChange = 0;
                         }
-                        if (pair.Flag.ToLower() == "springloadedbackwardsimmediately" || pair.Flag.ToLower() == "springloadedforwardsimmediately")
+                        if (pair.Flag == ControllerPositionFlag.SpringLoadedBackwardsImmediately || pair.Flag == ControllerPositionFlag.SpringLoadedForwardsImmediately)
                         {
                             if (!MouseInputActive)
                             {
@@ -706,11 +680,11 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Controllers
                 {
                     if (pair.Type == currentPosition)
                     {
-                        if (pair.Flag.ToLower() == "cruisecontrol.needincreaseafteranybrake")
+                        if (pair.Flag == ControllerPositionFlag.CCNeedIncreaseAfterAnyBrake)
                         {
                             needPowerUpAfterBrake = true;
                         }
-                        if (pair.Flag.ToLower() == "springloadedforwards" || pair.Flag.ToLower() == "springloadedbackwards")
+                        if (pair.Flag == ControllerPositionFlag.SpringLoadedForwards || pair.Flag == ControllerPositionFlag.SpringLoadedForwards)
                         {
                             if (elapsedSecondsFromLastChange > 0.2f)
                             {
@@ -721,119 +695,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Controllers
                     }
                 }
             }
-            switch (currentPosition)
-            {
-                case "ThrottleIncrease":
-                    {
-                        controllerPosition = ControllerPosition.ThrottleIncrease;
-                        break;
-                    }
-                case "ThrottleIncreaseFast":
-                    {
-                        controllerPosition = ControllerPosition.ThrottleIncreaseFast;
-                        break;
-                    }
-                case "ThrottleIncreaseOrDynamicBrakeDecrease":
-                    {
-                        controllerPosition = ControllerPosition.ThrottleIncreaseOrDynamicBrakeDecrease;
-                        break;
-                    }
-                case "ThrottleIncreaseOrDynamicBrakeDecreaseFast":
-                    {
-                        controllerPosition = ControllerPosition.ThrottleIncreaseOrDynamicBrakeDecreaseFast;
-                        break;
-                    }
-                case "DynamicBrakeIncreaseOrThrottleDecrease":
-                    {
-                        controllerPosition = ControllerPosition.DynamicBrakeIncreaseOrThrottleDecrease;
-                        break;
-                    }
-                case "DynamicBrakeIncreaseOrThrottleDecreaseFast":
-                    {
-                        controllerPosition = ControllerPosition.DynamicBrakeIncreaseOrThrottleDecreaseFast;
-                        break;
-                    }
-                case "ThrottleDecrease":
-                    {
-                        controllerPosition = ControllerPosition.ThrottleDecrease;
-                        break;
-                    }
-                case "ThrottleDecreaseFast":
-                    {
-                        controllerPosition = ControllerPosition.ThrottleDecreaseFast;
-                        break;
-                    }
-                case "Drive":
-                    {
-                        controllerPosition = ControllerPosition.Drive;
-                        break;
-                    }
-                case "ThrottleHold":
-                    {
-                        controllerPosition = ControllerPosition.ThrottleHold;
-                        break;
-                    }
-                case "Neutral":
-                    {
-                        controllerPosition = ControllerPosition.Neutral;
-                        break;
-                    }
-                case "KeepCurrent":
-                    {
-                        controllerPosition = ControllerPosition.KeepCurrent;
-                        break;
-                    }
-                case "DynamicBrakeHold":
-                    {
-                        controllerPosition = ControllerPosition.DynamicBrakeHold;
-                        break;
-                    }
-                case "DynamicBrakeIncrease":
-                    {
-                        controllerPosition = ControllerPosition.DynamicBrakeIncrease;
-                        break;
-                    }
-                case "DynamicBrakeIncreaseFast":
-                    {
-                        controllerPosition = ControllerPosition.DynamicBrakeIncreaseFast;
-                        break;
-                    }
-                case "DynamicBrakeDecrease":
-                    {
-                        controllerPosition = ControllerPosition.DynamicBrakeDecrease;
-                        break;
-                    }
-                case "TrainBrakeIncrease":
-                    {
-                        controllerPosition = ControllerPosition.TrainBrakeIncrease;
-                        break;
-                    }
-                case "TrainBrakeDecrease":
-                    {
-                        controllerPosition = ControllerPosition.TrainBrakeDecrease;
-                        break;
-                    }
-                case "EmergencyBrake":
-                    {
-                        controllerPosition = ControllerPosition.EmergencyBrake;
-                        break;
-                    }
-                case "SelectedSpeedIncrease":
-                    {
-                        controllerPosition = ControllerPosition.SelectedSpeedIncrease;
-                        break;
-                    }
-                case "SelectedSpeedDecrease":
-                    {
-                        controllerPosition = ControllerPosition.SelectedSpeedDecrease;
-                        break;
-                    }
-                case "SelectSpeedZero":
-                    {
-                        controllerPosition = ControllerPosition.SelectSpeedZero;
-                        break;
-                    }
-            }
+            controllerPosition = currentPosition;
             if (!messageDisplayed)
             {
                 string msg = GetPositionName(currentPosition);
@@ -846,7 +708,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Controllers
         protected void CheckNeutralPosition()
         {
             bool setNext = false;
-            String previous = "";
+            ControllerPosition previous = ControllerPosition.Undefined;
             foreach (Position pair in PositionsList)
             {
                 if (setNext)
@@ -857,11 +719,11 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Controllers
                 }
                 if (pair.Type == currentPosition)
                 {
-                    if (pair.Flag.ToLower() == "springloadedbackwards" || pair.Flag.ToLower() == "springloadedbackwardsimmediately")
+                    if (pair.Flag == ControllerPositionFlag.SpringLoadedBackwards || pair.Flag == ControllerPositionFlag.SpringLoadedBackwardsImmediately)
                     {
                         setNext = true;
                     }
-                    if (pair.Flag.ToLower() == "springloadedforwards" || pair.Flag.ToLower() == "springloadedforwardsimmediately")
+                    if (pair.Flag == ControllerPositionFlag.SpringLoadedForwards || pair.Flag == ControllerPositionFlag.SpringLoadedForwardsImmediately)
                     {
                         currentPosition = previous;
                         Locomotive.SignalEvent(Common.Event.MPCChangePosition);
@@ -872,12 +734,12 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Controllers
             }
         }
 
-        protected string GetPositionName(string type)
+        protected string GetPositionName(ControllerPosition type)
         {
             string ret = "";
             foreach (Position p in PositionsList)
             {
-                if (p.Type.ToLower() == type.ToLower())
+                if (p.Type == type)
                     ret = p.Name;
             }
             return ret;
@@ -887,7 +749,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Controllers
         {
             Locomotive.SetThrottlePercent(0);
             Locomotive.SetDynamicBrakePercent(100);
-            Locomotive.TrainBrakeController.TCSEmergencyBraking = true;
+            Locomotive.TrainBrakeController.EmergencyBrakingPushButton = true;
         }
         public enum Movement
         {
@@ -895,107 +757,116 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Controllers
             Neutral,
             Aft
         };
-        public enum ControllerPosition
-        {
-            Neutral,
-            Drive,
-            ThrottleIncrease,
-            ThrottleDecrease,
-            ThrottleIncreaseFast,
-            ThrottleDecreaseFast,
-            DynamicBrakeIncrease, DynamicBrakeDecrease,
-            DynamicBrakeIncreaseFast,
-            TrainBrakeIncrease,
-            TrainBrakeDecrease,
-            EmergencyBrake,
-            ThrottleHold,
-            DynamicBrakeHold,
-            ThrottleIncreaseOrDynamicBrakeDecreaseFast,
-            ThrottleIncreaseOrDynamicBrakeDecrease,
-            DynamicBrakeIncreaseOrThrottleDecreaseFast,
-            DynamicBrakeIncreaseOrThrottleDecrease,
-            KeepCurrent,
-            SelectedSpeedIncrease,
-            SelectedSpeedDecrease,
-            SelectSpeedZero
-        };
-
-        public enum ControllerBinding
-        {
-            Throttle,
-            SelectedSpeed
-        }
 
         public float GetDataOf(CabViewControl cvc)
         {
-            if (cvc.ControlId != ControllerId)
-                return 0;
             float data = 0;
-            switch (cvc.ControlType)
+            switch (controllerPosition)
             {
-                case CABViewControlTypes.ORTS_MULTI_POSITION_CONTROLLER:
-                    {
-                        switch (controllerPosition)
-                        {
-                            case ControllerPosition.ThrottleIncrease:
-                                data = 0;
-                                break;
-                            case ControllerPosition.Drive:
-                            case ControllerPosition.ThrottleHold:
-                                data = 1;
-                                break;
-                            case ControllerPosition.Neutral:
-                                data = 2;
-                                break;
-                            case ControllerPosition.DynamicBrakeIncrease:
-                                data = 3;
-                                break;
-                            case ControllerPosition.TrainBrakeIncrease:
-                                data = 4;
-                                break;
-                            case ControllerPosition.EmergencyBrake:
-                            case ControllerPosition.DynamicBrakeIncreaseFast:
-                                data = 5;
-                                break;
-                            case ControllerPosition.ThrottleIncreaseFast:
-                                data = 6;
-                                break;
-                            case ControllerPosition.ThrottleDecrease:
-                                data = 7;
-                                break;
-                            case ControllerPosition.ThrottleDecreaseFast:
-                                data = 8;
-                                break;
-                            case ControllerPosition.SelectedSpeedIncrease:
-                                data = 9;
-                                break;
-                            case ControllerPosition.SelectedSpeedDecrease:
-                                data = 10;
-                                break;
-                            case ControllerPosition.SelectSpeedZero:
-                                data = 11;
-                                break;
-                        }
-                        break;
-                    }
-                default:
+                case ControllerPosition.ThrottleIncrease:
                     data = 0;
+                    break;
+                case ControllerPosition.Drive:
+                case ControllerPosition.ThrottleHold:
+                    data = 1;
+                    break;
+                case ControllerPosition.Neutral:
+                    data = 2;
+                    break;
+                case ControllerPosition.DynamicBrakeIncrease:
+                    data = 3;
+                    break;
+                case ControllerPosition.TrainBrakeIncrease:
+                    data = 4;
+                    break;
+                case ControllerPosition.EmergencyBrake:
+                case ControllerPosition.DynamicBrakeIncreaseFast:
+                    data = 5;
+                    break;
+                case ControllerPosition.ThrottleIncreaseFast:
+                    data = 6;
+                    break;
+                case ControllerPosition.ThrottleDecrease:
+                    data = 7;
+                    break;
+                case ControllerPosition.ThrottleDecreaseFast:
+                    data = 8;
+                    break;
+                case ControllerPosition.SelectedSpeedIncrease:
+                    data = 9;
+                    break;
+                case ControllerPosition.SelectedSpeedDecrease:
+                    data = 10;
+                    break;
+                case ControllerPosition.SelectSpeedZero:
+                    data = 11;
                     break;
             }
             return data;
         }
 
-        public class Position
+        public struct Position
         {
-            public string Type { get; set; }
-            public string Flag { get; set; }
-            public string Name { get; set; }
+            public ControllerPosition Type;
+            public ControllerPositionFlag Flag;
+            public string Name;
             public Position(string positionType, string positionFlag, string name)
             {
-                Type = positionType;
-                Flag = positionFlag;
+                Enum.TryParse(positionType, true, out Type);
+                if (!Enum.TryParse(positionFlag, true, out Flag))
+                {
+                    switch(positionFlag.ToLower())
+                    {
+                        case "cruisecontrol.needincreaseafteranybrake":
+                            Flag = ControllerPositionFlag.CCNeedIncreaseAfterAnyBrake;
+                            break;
+
+                    }
+                }
                 Name = name;
             }
         }
+    }
+    public enum ControllerPosition
+    {
+        Undefined,
+        Neutral,
+        Drive,
+        ThrottleIncrease,
+        ThrottleDecrease,
+        ThrottleIncreaseFast,
+        ThrottleDecreaseFast,
+        DynamicBrakeIncrease, DynamicBrakeDecrease,
+        DynamicBrakeIncreaseFast,
+        TrainBrakeIncrease,
+        TrainBrakeDecrease,
+        EmergencyBrake,
+        ThrottleHold,
+        DynamicBrakeHold,
+        ThrottleIncreaseOrDynamicBrakeDecreaseFast,
+        ThrottleIncreaseOrDynamicBrakeDecrease,
+        DynamicBrakeIncreaseOrThrottleDecreaseFast,
+        DynamicBrakeIncreaseOrThrottleDecrease,
+        KeepCurrent,
+        SelectedSpeedIncrease,
+        SelectedSpeedDecrease,
+        SelectSpeedZero
+    };
+
+    public enum ControllerPositionFlag
+    {
+        Default,
+        Stable,
+        SpringLoadedForwards,
+        SpringLoadedForwardsImmediately,
+        SpringLoadedBackwards,
+        SpringLoadedBackwardsImmediately,
+        CCNeedIncreaseAfterAnyBrake
+    }
+
+    public enum ControllerBinding
+    {
+        Throttle,
+        SelectedSpeed
     }
 }
