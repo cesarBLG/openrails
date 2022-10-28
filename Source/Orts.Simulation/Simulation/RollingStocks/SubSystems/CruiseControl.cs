@@ -71,11 +71,11 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                 return selected;
             }
         }
-		public float SetSpeedKpH
+		public float SetSpeedKpHOrMpH
         {
             get
             {
-                return MpS.ToKpH(SetSpeedMpS);
+                return SpeedIsMph ? MpS.ToMpH(SetSpeedMpS) : MpS.ToKpH(SetSpeedMpS);
             }
         } 
         public int SelectedNumberOfAxles = 0;

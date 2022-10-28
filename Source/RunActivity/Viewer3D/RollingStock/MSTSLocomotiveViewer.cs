@@ -3049,7 +3049,7 @@ namespace Orts.Viewer3D.RollingStock
                         p = ChangedValue(0);
                         if (p == 1)
                         {
-                            Locomotive.CruiseControl.SetSpeed(Locomotive.CruiseControl.SetSpeedKpH + 5);
+                            Locomotive.CruiseControl.SetSpeed(Locomotive.CruiseControl.SetSpeedKpHOrMpH + 5);
                             Locomotive.CruiseControl.SpeedPlus5Pressed = true;
                         }
                         else if (p == 0) Locomotive.CruiseControl.SpeedPlus5Pressed = false;
@@ -3060,7 +3060,7 @@ namespace Orts.Viewer3D.RollingStock
                         p = ChangedValue(0);
                         if (p == 1)
                         {
-                            Locomotive.CruiseControl.SetSpeed(Locomotive.CruiseControl.SetSpeedKpH - 5);
+                            Locomotive.CruiseControl.SetSpeed(Locomotive.CruiseControl.SetSpeedKpHOrMpH- 5);
                             Locomotive.CruiseControl.SpeedMinus5Pressed = true;
                         }
                         else if (p == 0) Locomotive.CruiseControl.SpeedMinus5Pressed = false;
@@ -3071,7 +3071,7 @@ namespace Orts.Viewer3D.RollingStock
                         p = ChangedValue(0);
                         if (p == 1)
                         {
-                            Locomotive.CruiseControl.SetSpeed(Locomotive.CruiseControl.SetSpeedKpH + 1);
+                            Locomotive.CruiseControl.SetSpeed(Locomotive.CruiseControl.SetSpeedKpHOrMpH + 1);
                             Locomotive.CruiseControl.SpeedPlus1Pressed = true;
                         }
                         else if (p == 0) Locomotive.CruiseControl.SpeedPlus1Pressed = false;
@@ -3082,7 +3082,7 @@ namespace Orts.Viewer3D.RollingStock
                         p = ChangedValue(0);
                         if (p == 1)
                         {
-                            Locomotive.CruiseControl.SetSpeed(Locomotive.CruiseControl.SetSpeedKpH - 1);
+                            Locomotive.CruiseControl.SetSpeed(Locomotive.CruiseControl.SetSpeedKpHOrMpH - 1);
                             Locomotive.CruiseControl.SpeedMinus1Pressed = true;
                         }
                         else if (p == 0) Locomotive.CruiseControl.SpeedMinus1Pressed = false;
