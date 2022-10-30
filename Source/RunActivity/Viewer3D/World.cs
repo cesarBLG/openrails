@@ -17,6 +17,8 @@
 
 // This file is the responsibility of the 3D & Environment Team. 
 
+using System;
+using System.Diagnostics;
 using Microsoft.Xna.Framework;
 using Orts.Common;
 using ORTS.Common;
@@ -50,6 +52,7 @@ namespace Orts.Viewer3D
         int VisibleTileZ;
         long CameraTile;
         bool PerformanceTune;
+        bool MarkSweepError;
 
         [CallOnThread("Render")]
         public World(Viewer viewer, double gameTime)
@@ -102,25 +105,33 @@ namespace Orts.Viewer3D
             {
                 TileX = VisibleTileX;
                 TileZ = VisibleTileZ;
-                Viewer.ShapeManager.Mark();
-                Viewer.MaterialManager.Mark();
-                Viewer.TextureManager.Mark();
-                Viewer.SignalTypeDataManager.Mark();
-                if (Viewer.Settings.UseMSTSEnv)
-                    MSTSSky.Mark();
-                else
-                    Sky.Mark();
-                Precipitation.Mark();
-                Terrain.Mark();
-                Scenery.Mark();
-                Trains.Mark();
-                RoadCars.Mark();
-                Containers.Mark();
-                Viewer.Mark();
-                Viewer.ShapeManager.Sweep();
-                Viewer.MaterialManager.Sweep();
-                Viewer.TextureManager.Sweep();
-                Viewer.SignalTypeDataManager.Sweep();
+                try
+                {
+                    Viewer.ShapeManager.Mark();
+                    Viewer.MaterialManager.Mark();
+                    Viewer.TextureManager.Mark();
+                    Viewer.SignalTypeDataManager.Mark();
+                    if (Viewer.Settings.UseMSTSEnv)
+                        MSTSSky.Mark();
+                    else
+                        Sky.Mark();
+                    Precipitation.Mark();
+                    Terrain.Mark();
+                    Scenery.Mark();
+                    Trains.Mark();
+                    RoadCars.Mark();
+                    Containers.Mark();
+                    Viewer.Mark();
+                    Viewer.ShapeManager.Sweep();
+                    Viewer.MaterialManager.Sweep();
+                    Viewer.TextureManager.Sweep();
+                    Viewer.SignalTypeDataManager.Sweep();
+                }
+                catch (Exception error)
+                {
+                    if (!MarkSweepError) Trace.WriteLine(error);
+                    MarkSweepError = true;
+                }
             }
         }
 
