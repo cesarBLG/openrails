@@ -132,8 +132,6 @@ A list of the available .eng file CC parameters follows here below.
    "UseThrottleAsSpeedSelector", "if ControllerCruiseControlLogic is set to SpeedOnly, throttle when in Auto mode will change the maximum CC speed", "Boolean", "FALSE"
    "UseThrottleAsForceSelector", "if ControllerCruiseControlLogic is set to None, throttle when in Auto mode will change the maximum CC Force", "Boolean", "FALSE"
    "UseThrottleInCombinedControl", "Throttle is used as force selector or speed selector even if in combined control, to be used in conjunction of one of the two above parameters", "Boolean", "FALSE"
-   "DynamicBrakeIncreaseSpeed", "How fast the dynamic brake can increase (0.5 means 1% in 0.5sec)", "Float", "0.5"
-   "DynamicBrakeDecreaseSpeed", "Same for decreasing", "Float", "0.6"
    "ControllerCruiseControlLogic", "Can have values 'None', 'SpeedOnly', 'Full'", "Enum", "Full"
    "HasProportionalSpeedSelector", "Speed selector is performed by a lever ranging from 0 to max speed", "Boolean", "FALSE"
    "SpeedSelectorIsDiscrete", "Speed selected can have only values multiple of NominalSpeedStep, even if selection is through mouse", "Boolean", "FALSE"
@@ -143,8 +141,8 @@ A list of the available .eng file CC parameters follows here below.
    "UseTrainBrakeAndDynBrake", "CC uses train brake and dyn brake together", "Boolean", "FALSE"
    "SpeedDeltaToEnableTrainBrake", "This is the minimum speed delta between actual speed and desired speed for the CC to use also the train brake", "Float(speed)", "5m/s"
    "SpeedDeltaToEnableFullTrainBrake", "This is the minimum speed delta between actual speed and desired speed for the CC to use also the train brake with no reduced intensity", "Float(speed)", "10m/s"
-   "TrainBrakeMinPercentValue", "This is the minimum train brake percent used by the CC, this depends also from the value of the smooth notch in the Brake_Train block", "Float(percent)", "30"
-   "TrainBrakeMaxPercentValue", "As above for maximum value. It must be lower than the value of the subsequent notch, and not too high to avoid that the brake is not fully released timely", "Float(percent)", "85"
+   "TrainBrakeMinPercentValue", "This is the minimum train brake percent used by the CC. 0 means no braking, 100 means full service braking", "Float(percent)", "30"
+   "TrainBrakeMaxPercentValue", "As above for maximum value. It must not be too high to avoid that the brake is not fully released timely", "Float(percent)", "85"
    "ThrottleNeutralPosition", "The zero throttle position is neutral in auto mode, that is in such position the CC does not intervene", "Boolean", "FALSE"
    "MinimumSpeedForCCEffect", "Below this speed CC has no effect", "Float(speed)", "0"
    "StartInAutoMode", "Game starts with CC in Auto mode", "Boolean", "FALSE"
@@ -182,11 +180,9 @@ Train brake usage occurs when the delta between the actual train speed and
 the target speed is higher than parameter SpeedDeltaToEnableTrainBrake.
 Between this delta and SpeedDeltaToEnableFullTrainBrake the train brake is 
 set at TrainBrakeMinPercentValue. Above SpeedDeltaToEnableFullTrainBrake 
-the train brake is set to the maximum between a percentage of 
-TrainBrakeMaxPercentValue proportional to the max force percent set and 
-TrainBrakeMinPercentValue. 
-In other words, when the speed delta is high, train braking occurs with a 
-value that is proportional to the max force percent set; when train decelerates 
+the train brake is continuously adjusted to achieve a constant deceleration.
+In other words, when the speed delta is high, train braking is adjusted to
+obtain a constant deceleration when dynamic braking is not enough; when train decelerates 
 and delta reduces to SpeedDeltaToEnableFullTrainBrake the train brake is reduced to 
 TrainBrakeMinPercentValue. When train decelerates further and delta reduces to 
 SpeedDeltaToEnableTrainBrake the train brake is released. By adjusting these 
@@ -200,23 +196,8 @@ block within the .eng file follows here::
   	UseTrainBrakeAndDynBrake ( True ) comment (** CC uses train brake and dyn brake together **)
 		SpeedDeltaToEnableTrainBrake ( 15km/h ) comment (** This is the minimum speed delta between actual speed and desired speed for the CC to use also the train brake **)
 		SpeedDeltaToEnableFullTrainBrake ( 30km/h ) comment (** This is the minimum speed delta between actual speed and desired speed for the CC to use also the train brake with no reduced intensity **)		
-		TrainBrakeMinPercentValue ( 30 ) comment (** This is the minimum train brake percent used by the CC; this depends also from the value of the smooth notch in the Brake_Train block **)
-		TrainBrakeMaxPercentValue ( 60 ) comment (** As above for maximum value. It must be lower than the value of the subsequent notch, and not too high to avoid that the brake is not fully released  timely **)
-
-This is related to a brake controller defined as follows in the .eng file::
-
-  		Brake_Train ( 0 1 0.03 0.3
-			NumNotches ( 5 
-				Notch ( 0 0 TrainBrakesControllerReleaseStart ) 
-				Notch ( 0.3 1 TrainBrakesControllerGraduatedSelfLapLimitedHoldingStart ) 
-				Notch ( 0.85 0 TrainBrakesControllerSuppressionStart ) 
-				Notch ( 0.9 0 TrainBrakesControllerContinuousServiceStart ) 
-				Notch ( 0.95 0 TrainBrakesControllerEmergencyStart ) 
-			) 
-
-The continuous part of the controller is between second and third notch, that 
-is between 0.3 and 0.85. Therefore CC control of the train brake can occur 
-for percentages between 30 and 85.
+		TrainBrakeMinPercentValue ( 10 ) comment (** This is the minimum train brake percent used by the CC, where 0 means no braking and 100 full braking **)
+		TrainBrakeMaxPercentValue ( 60 ) comment (** As above for maximum value. It must not be too high to avoid that the brake is not fully released timely **)
 
 Multi Position Controller (MPC)
 -------------------------------
@@ -296,17 +277,17 @@ MPC is connected. Controllers linked may be either "Throttle" or
 The boolean parameter *CanControlTrainBrake*, which is false by 
 default, is optional.
 
+.. _cruisecontrol-cabviewcontrolstable:
+
 Cruise Control Cabview Controls
 ===============================
 
 The list of the available cabview controls may be found in the 
 table here below.
 
-.. _cruisecontrol-cabviewcontrolstable:
-
 .. csv-table:: Cabview Controls
    :header: "Control Name", "Description", "UoM", "Mouse activated"
-   :widths: 60, 40, 10, 10
+   :widths: 58, 38, 9, 9
 
    "ORTS_SELECTED_SPEED", "Used to display the selected speed, e.g. as a digital value", "km/h or MpH", 
    "ORTS_SELECTED_SPEED_DISPLAY", "As above, but displays the speed in km/h divided by 10", "km/h", 
@@ -318,48 +299,31 @@ table here below.
    "ORTS_NUMBER_OF_AXES_DISPLAY_TENS", "See above", "", 
    "ORTS_NUMBER_OF_AXES_DISPLAY_HUNDREDS", "See above", "", 
    "ORTS_TRAIN_LENGTH_METERS", "Displays the train length", "meters", 
-   "ORTS_REMAINING_TRAIN_LENGHT_SPEED_RESTRICTED", "When the restricted speed zone flag is activated, displays the remaining train lenght that hasn't yet arrived at the end of the restricted speed zone. Else shows 0", "meters", 
+   "ORTS_REMAINING_TRAIN_LENGHT_SPEED _RESTRICTED", "When the restricted speed zone flag is activated, displays the remaining train lenght that hasn't yet arrived at the end of the restricted speed zone. Else shows 0", "meters", 
    "ORTS_REMAINING_TRAIN_LENGTH_PERCENT", "When the restricted speed zone flag is activated, displays the remaining train lenght percent that hasn't yet arrived at the end of the restricted speed zone. Else shows 0", "", 
+   "ORTS_ACCELERATION_IN_TIME", "Value of AccelerationBits; some cabs can show 'Arrows' pointing up or down according to speed change", "", 
+ 
+
+.. csv-table:: Cabview Controls (continued)
+   :header: "Control Name", "Description", "UoM", "Mouse activated"
+   :widths: 58, 38, 9, 9
+
+
+   "ORTS_ODOMETER", "Displays the odometer value since last odometer reset", "meters or Km", 
+   "ORTS_FORCE_IN_PERCENT_THROTTLE_AN D_DYNAMIC_BRAKE", "Displays the actual throttle percent or the negated dynamic brake percent when in manual mode; displays the actual CC force percent or the negated dynamic brake percent when in auto mode", "",
+   "ORTS_MAXIMUM_FORCE", "Displays the preset maximum force of the locomotive", "Newton",
    "ORTS_MOTIVE_FORCE", "Displays the actual motive force of the locomotive", "Newton", 
    "ORTS_MOTIVE_FORCE_KILONEWTON", "Displays the actual tractive or electric braking force of the locomotive", "KN", 
-   "ORTS_MAXIMUM_FORCE", "Displays the preset maximum force of the locomotive", "Newton", 
-   "ORTS_FORCE_IN_PERCENT_THROTTLE_AND_DYNAMIC_BRAKE", "Displays the actual throttle percent or the negated dynamic brake percent when in manual mode; displays the actual CC force percent or the negated dynamic brake percent when in auto mode", "", 
    "ORTS_TRAIN_TYPE_PAX_OR_CARGO", "Displays whether the selected tran type is passenger or freight. Can be toggled with a keyboard command", "", 
    "ORTS_CONTROLLER_VOLTAGE", "Displays the controller volts as set by the CC (may vary from 0 to 100).. Controller volts  control the motive force of the locomotive", "", 
    "ORTS_AMPERS_BY_CONTROLLER_VOLTAGE", "Displays the current used for the motive force of the locomotive", "Amperes", 
-   "ORTS_ACCELERATION_IN_TIME", "Value of AccelerationBits; some cabs can show 'Arrows' pointing up or down according to speed change", "", 
-   "ORTS_ODOMETER", "Displays the odometer value since last odometer reset", "meters or Km", 
-   "ORTS_CC_SELECT_SPEED", "Sets speed to value of second ScaleRange parameter (KpH or MpH depending from eng parameter SpeedIsMpH)", "", "Y" 
+   "ORTS_CC_SELECTED_SPEED", "Sets speed to value of ORTSParameter1 (KpH or MpH depending from eng parameter SpeedIsMpH)", "", "Y" 
    "ORTS_NUMBER_OF_AXES_INCREASE", "Increases the number of axles of the train, when mouse pressed", "", "Y"
    "ORTS_NUMBER_OF_AXES_DECREASE", "Decreases the number of axles of the train, when mouse pressed", "", "Y"
    "ORTS_MULTI_POSITION_CONTROLLER", "Displays and sets the position of the MPC", "", "Y"
    "ORTS_CC_SPEED_0", "Displays and sets the selected speed at 0", "", "Y"
-   "ORTS_CC_SPEED_10", "Same as above, but with selected speed at 10 (KpH or MpH depending from eng parameter SpeedIsMpH)", "", "Y"
-   "ORTS_CC_SPEED_20", "As above, but speed as shown in control name", "", "Y"
-   "ORTS_CC_SPEED_30", "As above, but speed as shown in control name", "", "Y"
-   "ORTS_CC_SPEED_40", "As above, but speed as shown in control name", "", "Y"
-   "ORTS_CC_SPEED_50", "As above, but speed as shown in control name", "", "Y"
-   "ORTS_CC_SPEED_60", "As above, but speed as shown in control name", "", "Y"
-   "ORTS_CC_SPEED_70", "As above, but speed as shown in control name", "", "Y"
-   "ORTS_CC_SPEED_80", "As above, but speed as shown in control name", "", "Y"
-   "ORTS_CC_SPEED_90", "As above, but speed as shown in control name", "", "Y"
-   "ORTS_CC_SPEED_100", "As above, but speed as shown in control name", "", "Y"
-   "ORTS_CC_SPEED_110", "As above, but speed as shown in control name", "", "Y"
-   "ORTS_CC_SPEED_120", "As above, but speed as shown in control name", "", "Y"
-   "ORTS_CC_SPEED_130", "As above, but speed as shown in control name", "", "Y"
-   "ORTS_CC_SPEED_140", "As above, but speed as shown in control name", "", "Y"
-   "ORTS_CC_SPEED_150", "As above, but speed as shown in control name", "", "Y"
-   "ORTS_CC_SPEED_160", "As above, but speed as shown in control name", "", "Y"
-   "ORTS_CC_SPEED_170", "As above, but speed as shown in control name", "", "Y"
-   "ORTS_CC_SPEED_180", "As above, but speed as shown in control name", "", "Y"
-   "ORTS_CC_SPEED_190", "As above, but speed as shown in control name", "", "Y"
-   "ORTS_CC_SPEED_200", "As above, but speed as shown in control name", "", "Y"
-   "ORTS_CC_SPEED_PLUS5", "As above, but speed incremented by 5", "", "Y"
-   "ORTS_CC_SPEED_MINUS5", "As above, but speed decremented by 5", "", "Y"
-   "ORTS_CC_SPEED_PLUS1", "As above, but speed incremented by 1", "", "Y"
-   "ORTS_CC_SPEED_MINUS1", "As above, but speed decremented by 1", "", "Y"
+   "ORTS_CC_SPEED_DELTA", "Increases or decreases the selected speed by the value of ORTSParameter1 (KpH or MpH depending from eng parameter SpeedIsMpH)", "", "Y"
    "ORTS_SELECTED_SPEED_SELECTOR", "Speed selection done by independent lever ranging from 0 to max speed; UoM may be KpH or MpH.", "", "Y"
-
 
 Restricted Speed Zone
 ---------------------

@@ -100,8 +100,6 @@ namespace Orts.Simulation.RollingStocks.SubSystems
         public List<float> AccelerationTable = new List<float>();
         public enum SpeedRegulatorMode { Manual, Auto, Testing, AVV }
         public enum SpeedSelectorMode { Parking, Neutral, On, Start }
-        public float DynamicBrakeIncreaseSpeed = 0;
-        public float DynamicBrakeDecreaseSpeed = 0;
         public uint MinimumMetersToPass = 19;
         public float AccelerationRampMaxMpSSS = 0.7f;
         public float AccelerationDemandMpSS;
@@ -174,14 +172,10 @@ namespace Orts.Simulation.RollingStocks.SubSystems
         public bool WasForceReset = true;
 
 
-        public bool SelectingSpeedPressed = false;
+        public bool SelectedSpeedPressed = false;
         public bool EngineBrakePriority = false;
         public int AccelerationBits = 0;
-        public bool Speed0Pressed, Speed10Pressed, Speed20Pressed, Speed30Pressed, Speed40Pressed, Speed50Pressed
-            , Speed60Pressed, Speed70Pressed, Speed80Pressed, Speed90Pressed, Speed100Pressed
-            , Speed110Pressed, Speed120Pressed, Speed130Pressed, Speed140Pressed, Speed150Pressed
-            , Speed160Pressed, Speed170Pressed, Speed180Pressed, Speed190Pressed, Speed200Pressed, SpeedPlus5Pressed, SpeedMinus5Pressed
-            , SpeedPlus1Pressed, SpeedMinus1Pressed;
+        public bool Speed0Pressed, SpeedDeltaPressed;
 
         public CruiseControl(MSTSLocomotive locomotive)
         {
@@ -223,8 +217,6 @@ namespace Orts.Simulation.RollingStocks.SubSystems
             StartReducingSpeedDeltaDownwards = other.StartReducingSpeedDeltaDownwards;
             ForceStepsThrottleTable = other.ForceStepsThrottleTable;
             AccelerationTable = other.AccelerationTable;
-            DynamicBrakeIncreaseSpeed = other.DynamicBrakeIncreaseSpeed;
-            DynamicBrakeDecreaseSpeed = other.DynamicBrakeDecreaseSpeed;
             AccelerationRampMaxMpSSS = other.AccelerationRampMaxMpSSS;
             AccelerationRampMinMpSSS = other.AccelerationRampMinMpSSS;
             ResetForceAfterAnyBraking = other.ResetForceAfterAnyBraking;
@@ -352,8 +344,6 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                         }
                     case "usethrottleasspeedselector": UseThrottleAsSpeedSelector = stf.ReadBoolBlock(false); break;
                     case "usethrottleasforceselector": UseThrottleAsForceSelector = stf.ReadBoolBlock(false); break;
-                    case "dynamicbrakeincreasespeed": DynamicBrakeIncreaseSpeed = stf.ReadFloatBlock(STFReader.UNITS.Any, 0.5f); break;
-                    case "dynamicbrakedecreasespeed": DynamicBrakeDecreaseSpeed = stf.ReadFloatBlock(STFReader.UNITS.Any, 0.5f); break;
                     case "forceresetrequiredafterbraking": ForceResetRequiredAfterBraking = stf.ReadBoolBlock(false); break;
                     case "forceresetincludedynamicbrake": ForceResetIncludeDynamicBrake = stf.ReadBoolBlock(false); break;
                     case "zeroselectedspeedwhenpassingtothrottlemode": ZeroSelectedSpeedWhenPassingToThrottleMode = stf.ReadBoolBlock(false); break;
@@ -1484,132 +1474,17 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                         data = AccelerationBits;
                         break;
                     }
-                case CABViewControlTypes.ORTS_CC_SELECT_SPEED:
-                    data = SelectingSpeedPressed ? 1 : 0;
+                case CABViewControlTypes.ORTS_CC_SELECTED_SPEED:
+                    data = SelectedSpeedPressed ? 1 : 0;
                     break;
                 case CABViewControlTypes.ORTS_CC_SPEED_0:
                     {
                         data = Speed0Pressed ? 1 : 0;
                         break;
                     }
-                case CABViewControlTypes.ORTS_CC_SPEED_10:
+ 				case CABViewControlTypes.ORTS_CC_SPEED_DELTA:
                     {
-                        data = Speed10Pressed ? 1 : 0;
-                        break;
-                    }
-                case CABViewControlTypes.ORTS_CC_SPEED_20:
-                    {
-                        data = Speed20Pressed ? 1 : 0;
-                        break;
-                    }
-                case CABViewControlTypes.ORTS_CC_SPEED_30:
-                    {
-                        data = Speed30Pressed ? 1 : 0;
-                        break;
-                    }
-                case CABViewControlTypes.ORTS_CC_SPEED_40:
-                    {
-                        data = Speed40Pressed ? 1 : 0;
-                        break;
-                    }
-                case CABViewControlTypes.ORTS_CC_SPEED_50:
-                    {
-                        data = Speed50Pressed ? 1 : 0;
-                        break;
-                    }
-                case CABViewControlTypes.ORTS_CC_SPEED_60:
-                    {
-                        data = Speed60Pressed ? 1 : 0;
-                        break;
-                    }
-                case CABViewControlTypes.ORTS_CC_SPEED_70:
-                    {
-                        data = Speed70Pressed ? 1 : 0;
-                        break;
-                    }
-                case CABViewControlTypes.ORTS_CC_SPEED_80:
-                    {
-                        data = Speed80Pressed ? 1 : 0;
-                        break;
-                    }
-                case CABViewControlTypes.ORTS_CC_SPEED_90:
-                    {
-                        data = Speed90Pressed ? 1 : 0;
-                        break;
-                    }
-                case CABViewControlTypes.ORTS_CC_SPEED_100:
-                    {
-                        data = Speed100Pressed ? 1 : 0;
-                        break;
-                    }
-                case CABViewControlTypes.ORTS_CC_SPEED_110:
-                    {
-                        data = Speed110Pressed ? 1 : 0;
-                        break;
-                    }
-                case CABViewControlTypes.ORTS_CC_SPEED_120:
-                    {
-                        data = Speed120Pressed ? 1 : 0;
-                        break;
-                    }
-                case CABViewControlTypes.ORTS_CC_SPEED_130:
-                    {
-                        data = Speed130Pressed ? 1 : 0;
-                        break;
-                    }
-                case CABViewControlTypes.ORTS_CC_SPEED_140:
-                    {
-                        data = Speed140Pressed ? 1 : 0;
-                        break;
-                    }
-                case CABViewControlTypes.ORTS_CC_SPEED_150:
-                    {
-                        data = Speed150Pressed ? 1 : 0;
-                        break;
-                    }
-                case CABViewControlTypes.ORTS_CC_SPEED_160:
-                    {
-                        data = Speed160Pressed ? 1 : 0;
-                        break;
-                    }
-                case CABViewControlTypes.ORTS_CC_SPEED_170:
-                    {
-                        data = Speed170Pressed ? 1 : 0;
-                        break;
-                    }
-                case CABViewControlTypes.ORTS_CC_SPEED_180:
-                    {
-                        data = Speed180Pressed ? 1 : 0;
-                        break;
-                    }
-                case CABViewControlTypes.ORTS_CC_SPEED_190:
-                    {
-                        data = Speed190Pressed ? 1 : 0;
-                        break;
-                    }
-                case CABViewControlTypes.ORTS_CC_SPEED_200:
-                    {
-                        data = Speed200Pressed ? 1 : 0;
-                        break;
-                    }
-				case CABViewControlTypes.ORTS_CC_SPEED_PLUS5:
-                    {
-                        data = SpeedPlus5Pressed ? 1 : 0;
-                        break;
-                    }
-                case CABViewControlTypes.ORTS_CC_SPEED_MINUS5:
-                    {
-                        data = SpeedMinus5Pressed ? 1 : 0;
-                        break;
-                    }
-                case CABViewControlTypes.ORTS_CC_SPEED_PLUS1:
-                    {
-                        data = SpeedPlus1Pressed ? 1 : 0;
-                        break;
-                    }
-                case CABViewControlTypes.ORTS_CC_SPEED_MINUS1:
-                    {
-                        data = SpeedMinus1Pressed ? 1 : 0;
+                        data = SpeedDeltaPressed ? 1 : 0;
                         break;
                     }
                 default:
