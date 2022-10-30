@@ -448,6 +448,8 @@ namespace Orts.Formats.Msts
         public string ACEFile = "";
         public string Label = "";
         public int ControlId = 0;
+        public float Parameter1; // Generic parameter, individually interpreted by the controls using it
+
         public double UpdateTime;
         public float ElapsedTime;
         public float PreviousData;

@@ -2675,16 +2675,16 @@ namespace Orts.Viewer3D.RollingStock
                     break;
 
                 // Cruise Control
-                case CABViewControlTypes.ORTS_CC_SELECT_SPEED:
+                case CABViewControlTypes.ORTS_CC_SELECTED_SPEED:
                     if (Locomotive.CruiseControl == null)
                         break;
                     var p = ChangedValue(0);
                     if (p == 1)
                     {
-                        Locomotive.CruiseControl.SetSpeed((float)Control.MaxValue);
-                        Locomotive.CruiseControl.SelectingSpeedPressed = true;
+                        Locomotive.CruiseControl.SetSpeed((float)Control.Parameter1);
+                        Locomotive.CruiseControl.SelectedSpeedPressed = true;
                     }
-                    else if (p == 0) Locomotive.CruiseControl.SelectingSpeedPressed = false;
+                    else if (p == 0) Locomotive.CruiseControl.SelectedSpeedPressed = false;
                     break;
                 case CABViewControlTypes.ORTS_SELECTED_SPEED_REGULATOR_MODE:
                     p = ChangedValue(0);
