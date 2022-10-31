@@ -68,8 +68,9 @@ namespace Orts.Simulation.RollingStocks
     {
         public Pantographs Pantographs;
         public ScriptedPassengerCarPowerSupply PassengerCarPowerSupply => PowerSupply as ScriptedPassengerCarPowerSupply;
-        public bool DoorLeftOpen;
-        public bool DoorRightOpen;
+        public Doors Doors;        
+        public Door RightDoor => Doors.RightDoor;
+        public Door LeftDoor => Doors.LeftDoor;
         public bool MirrorOpen;
         public bool UnloadingPartsOpen;
         public bool WaitForAnimationReady; // delay counter to start loading/unliading is on;
@@ -344,6 +345,7 @@ namespace Orts.Simulation.RollingStocks
             : base(simulator, wagFilePath)
         {
             Pantographs = new Pantographs(this);
+            Doors = new Doors(this);
         }
 
         public void Load()
@@ -950,6 +952,7 @@ namespace Orts.Simulation.RollingStocks
         public override void Initialize()
         {
             Pantographs.Initialize();
+            Doors.Initialize();
             PassengerCarPowerSupply?.Initialize();
 
             base.Initialize();
@@ -1374,7 +1377,10 @@ namespace Orts.Simulation.RollingStocks
                 case "wagon(ortspantographs":
                     Pantographs.Parse(lowercasetoken, stf);
                     break;
-
+                case "wagon(ortsdoors(closingdelay":
+                case "wagon(ortsdoors(openingdelay":
+                    Doors.Parse(lowercasetoken, stf);
+                    break;
                 case "wagon(ortspowersupply":
                 case "wagon(ortspowerondelay":
                 case "wagon(ortsbattery(mode":
@@ -1546,6 +1552,7 @@ namespace Orts.Simulation.RollingStocks
             foreach (MSTSCoupling coupler in copy.Couplers)
                 Couplers.Add(coupler);
             Pantographs.Copy(copy.Pantographs);
+            Doors.Copy(copy.Doors);
             if (copy.FreightAnimations != null)
             {
                 FreightAnimations = new FreightAnimations(copy.FreightAnimations, this);
@@ -1688,6 +1695,7 @@ namespace Orts.Simulation.RollingStocks
             foreach (MSTSCoupling coupler in Couplers)
                 coupler.Save(outf);
             Pantographs.Save(outf);
+            Doors.Save(outf);
             PassengerCarPowerSupply?.Save(outf);
             if (FreightAnimations != null)
             {
@@ -1740,6 +1748,7 @@ namespace Orts.Simulation.RollingStocks
             MaxHandbrakeForceN = inf.ReadSingle();
             Couplers = ReadCouplersFromSave(inf).ToList();
             Pantographs.Restore(inf);
+            Doors.Restore(inf);
             PassengerCarPowerSupply?.Restore(inf);
             if (FreightAnimations != null)
             {
@@ -1911,6 +1920,8 @@ namespace Orts.Simulation.RollingStocks
             }
 
             Pantographs.Update(elapsedClockSeconds);
+
+            Doors.Update(elapsedClockSeconds);
 
             MSTSBrakeSystem.Update(elapsedClockSeconds);
 
@@ -3358,70 +3369,6 @@ namespace Orts.Simulation.RollingStocks
             }
 
             base.SignalEvent(evt, id);
-        }
-
-        public void ToggleDoorsLeft()
-        {
-            DoorLeftOpen = !DoorLeftOpen;
-            if (Simulator.PlayerLocomotive == this || Train.LeadLocomotive == this) // second part for remote trains
-            {//inform everyone else in the train
-                foreach (var car in Train.Cars)
-                {
-                    var mstsWagon = car as MSTSWagon;
-                    if (car != this && mstsWagon != null)
-                    {
-                        if (!car.Flipped ^ Flipped)
-                        {
-                            mstsWagon.DoorLeftOpen = DoorLeftOpen;
-                            mstsWagon.SignalEvent(DoorLeftOpen ? Event.DoorOpen : Event.DoorClose); // hook for sound trigger
-                        }
-                        else
-                        {
-                            mstsWagon.DoorRightOpen = DoorLeftOpen;
-                            mstsWagon.SignalEvent(DoorLeftOpen ? Event.DoorOpen : Event.DoorClose); // hook for sound trigger
-                        }
-                    }
-                }
-                if (DoorLeftOpen) SignalEvent(Event.DoorOpen); // hook for sound trigger
-                else SignalEvent(Event.DoorClose);
-                if (Simulator.PlayerLocomotive == this)
-                {
-                    if (!GetCabFlipped()) Simulator.Confirmer.Confirm(CabControl.DoorsLeft, DoorLeftOpen ? CabSetting.On : CabSetting.Off);
-                    else Simulator.Confirmer.Confirm(CabControl.DoorsRight, DoorLeftOpen ? CabSetting.On : CabSetting.Off);
-                }
-            }
-        }
-
-        public void ToggleDoorsRight()
-        {
-            DoorRightOpen = !DoorRightOpen;
-            if (Simulator.PlayerLocomotive == this || Train.LeadLocomotive == this) // second part for remote trains
-            { //inform everyone else in the train
-                foreach (TrainCar car in Train.Cars)
-                {
-                    var mstsWagon = car as MSTSWagon;
-                    if (car != this && mstsWagon != null)
-                    {
-                        if (!car.Flipped ^ Flipped)
-                        {
-                            mstsWagon.DoorRightOpen = DoorRightOpen;
-                            mstsWagon.SignalEvent(DoorRightOpen ? Event.DoorOpen : Event.DoorClose); // hook for sound trigger
-                        }
-                        else
-                        {
-                            mstsWagon.DoorLeftOpen = DoorRightOpen;
-                            mstsWagon.SignalEvent(DoorRightOpen ? Event.DoorOpen : Event.DoorClose); // hook for sound trigger
-                        }
-                    }
-                }
-                if (DoorRightOpen) SignalEvent(Event.DoorOpen); // hook for sound trigger
-                else SignalEvent(Event.DoorClose);
-                if (Simulator.PlayerLocomotive == this)
-                {
-                    if (!GetCabFlipped()) Simulator.Confirmer.Confirm(CabControl.DoorsRight, DoorRightOpen ? CabSetting.On : CabSetting.Off);
-                    else Simulator.Confirmer.Confirm(CabControl.DoorsLeft, DoorRightOpen ? CabSetting.On : CabSetting.Off);
-                }
-            }
         }
 
         public void ToggleMirrors()

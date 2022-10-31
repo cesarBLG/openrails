@@ -19,7 +19,7 @@ using System;
 using System.IO;
 using ORTS.Common;
 using Orts.Common;
-using Orts.Simulation.RollingStocks;
+using Orts.Simulation.RollingStocks.SubSystems;
 using ORTS.Scripting.Api.ETCS;
 
 namespace ORTS.Scripting.Api
@@ -226,6 +226,10 @@ namespace ORTS.Scripting.Api
         /// </summary>
         public Func<bool> ArePantographsDown;
         /// <summary>
+        /// Get doors state
+        /// </summary>
+        public Func<DoorSide, DoorState> CurrentDoorState;
+        /// <summary>
         /// Returns throttle percent
         /// </summary>
         public Func<float> ThrottlePercent;
@@ -396,6 +400,16 @@ namespace ORTS.Scripting.Api
         /// Set horn on (true) or off (false).
         /// </summary>
         public Action<bool> SetHorn;
+        /// <summary>
+        /// Open or close doors
+        /// DoorSide: side for which doors will be opened or closed
+        /// bool: true for closing order, false for opening order
+        /// </summary>
+        public Action<DoorSide, bool> SetDoors;
+        /// <summary>
+        /// Lock doors so they cannot be opened
+        /// </summary>
+        public Action<DoorSide, bool> LockDoors;
         /// <summary>
         /// Trigger Alert1 sound event
         /// </summary>
@@ -681,6 +695,22 @@ namespace ORTS.Scripting.Api
         /// Traction cut-off relay has been opened.
         /// </summary>
         TractionCutOffRelayOpen,
+        /// <summary>
+        /// Left doors have been opened.
+        /// </summary>
+        LeftDoorsOpen,
+        /// <summary>
+        /// Left doors have been closed.
+        /// </summary>
+        LeftDoorsClosed,
+        /// <summary>
+        /// Right doors have been opened.
+        /// </summary>
+        RightDoorsOpen,
+        /// <summary>
+        /// Right doors have been closed.
+        /// </summary>
+        RightDoorsClosed
     }
 
     /// <summary>

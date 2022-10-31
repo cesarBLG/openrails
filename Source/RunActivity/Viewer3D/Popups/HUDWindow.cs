@@ -1,4 +1,4 @@
-﻿// COPYRIGHT 2011, 2012, 2013 by the Open Rails project.
+// COPYRIGHT 2011, 2012, 2013 by the Open Rails project.
 //
 // This file is part of Open Rails.
 //
@@ -23,6 +23,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Orts.Simulation.AIs;
 using Orts.Simulation.Physics;
 using Orts.Simulation.RollingStocks;
+using Orts.Simulation.RollingStocks.SubSystems;
 using Orts.Simulation.RollingStocks.SubSystems.Brakes;
 using Orts.Simulation.RollingStocks.SubSystems.Brakes.MSTS;
 using Orts.Simulation.RollingStocks.SubSystems.PowerSupplies;
@@ -529,14 +530,17 @@ namespace Orts.Viewer3D.Popups
                     TableAddLine(table, Viewer.Catalog.GetString("Sander on") + "???");
             }
 
-            if ((Viewer.PlayerLocomotive as MSTSWagon).DoorLeftOpen || (Viewer.PlayerLocomotive as MSTSWagon).DoorRightOpen)
+                bool flipped = (Viewer.PlayerLocomotive as MSTSLocomotive).GetCabFlipped() ^ (Viewer.PlayerLocomotive as MSTSLocomotive).Flipped;
+            var doorLeftOpen = Viewer.PlayerLocomotive.Train.DoorState(flipped ? DoorSide.Right : DoorSide.Left) != DoorState.Closed;
+            var doorRightOpen = Viewer.PlayerLocomotive.Train.DoorState(flipped ? DoorSide.Left : DoorSide.Right) != DoorState.Closed;
+            if (doorLeftOpen || doorRightOpen)
             {
                 var color = Math.Abs(Viewer.PlayerLocomotive.SpeedMpS) > 0.1f ? "!!!" : "???";
                 var status = "";
-                if ((Viewer.PlayerLocomotive as MSTSWagon).DoorLeftOpen)
-                    status += Viewer.Catalog.GetString((Viewer.PlayerLocomotive as MSTSLocomotive).GetCabFlipped() ? "Right" : "Left");
-                if ((Viewer.PlayerLocomotive as MSTSWagon).DoorRightOpen)
-                    status += string.Format(status == "" ? "{0}" : " {0}", Viewer.Catalog.GetString((Viewer.PlayerLocomotive as MSTSLocomotive).GetCabFlipped() ? "Left" : "Right"));
+                if (doorLeftOpen)
+                    status += Viewer.Catalog.GetString("Left");
+                if (doorRightOpen)
+                    status += string.Format(status == "" ? "{0}" : " {0}", Viewer.Catalog.GetString("Right"));
                 status += color;
 
                 TableAddLabelValue(table, Viewer.Catalog.GetString("Doors open") + color, status);
@@ -871,13 +875,13 @@ namespace Orts.Viewer3D.Popups
                     if (hudWindowColumnsActualPage > 0)
                     {
                         //Nav arrows. Don't use DrawScrollArrows() function with locomotive info.
-                        //◄ \u25C0 - ► \u25B6 - ↔ \u2194
+                        //? \u25C0 - ? \u25B6 - ? \u2194
                         if (stringStatus.Count > 1 && stringStatus.Count <= hudWindowColumnsActualPage)
-                            TableAddLines(table, hudWindowColumnsActualPage > 1 ? "◄" + stringStatus[(stringStatus.Count < hudWindowColumnsActualPage ? stringStatus.Count - 1 : hudWindowColumnsActualPage - 1)] : stringStatus[hudWindowColumnsActualPage - 1]);
+                            TableAddLines(table, hudWindowColumnsActualPage > 1 ? "?" + stringStatus[(stringStatus.Count < hudWindowColumnsActualPage ? stringStatus.Count - 1 : hudWindowColumnsActualPage - 1)] : stringStatus[hudWindowColumnsActualPage - 1]);
                         else if (stringStatus.Count > 1 && hudWindowColumnsActualPage == 1)
-                            TableAddLines(table, hudWindowColumnsActualPage > 0 ? "►" + stringStatus[hudWindowColumnsActualPage - 1] : stringStatus[hudWindowColumnsActualPage - 1]);
+                            TableAddLines(table, hudWindowColumnsActualPage > 0 ? "?" + stringStatus[hudWindowColumnsActualPage - 1] : stringStatus[hudWindowColumnsActualPage - 1]);
                         else if (stringStatus.Count > 1 && hudWindowColumnsActualPage > 1 && stringStatus.Count >= hudWindowColumnsActualPage)
-                            TableAddLines(table, hudWindowColumnsActualPage > 0 ? "↔" + stringStatus[hudWindowColumnsActualPage - 1] : stringStatus[hudWindowColumnsActualPage - 1]);
+                            TableAddLines(table, hudWindowColumnsActualPage > 0 ? "?" + stringStatus[hudWindowColumnsActualPage - 1] : stringStatus[hudWindowColumnsActualPage - 1]);
                         else
                         {
                             if (stringStatus.Count > 0)
@@ -1406,11 +1410,11 @@ namespace Orts.Viewer3D.Popups
                     {
                         if (stringStatus.Count > 1 && stringStatus.Count <= hudWindowColumnsActualPage)
                         {
-                            arrow = arrow + "◄";// \u25C0
+                            arrow = arrow + "?";// \u25C0
                         }
                         else if (stringStatus.Count > 1 && hudWindowColumnsActualPage == 1)
                         {
-                            arrow = arrow + "►";// \u25B6
+                            arrow = arrow + "?";// \u25B6
                         }
 
                         if (i > 0 && i % nLinesShow == 0)
@@ -1783,22 +1787,22 @@ namespace Orts.Viewer3D.Popups
 
                         if (stringStatus.Count > 1 && stringStatus.Count <= hudWindowColumnsActualPage)
                         {
-                            arrow = "◄";// \u25C0
+                            arrow = "?";// \u25C0
                             TableSetCell(table, 2, hudWindowColumnsActualPage > 1 ? stringStatus[(stringStatus.Count < hudWindowColumnsActualPage ? stringStatus.Count - 1 : hudWindowColumnsActualPage - 1)] + EndText : stringStatus[hudWindowColumnsActualPage - 1] + EndText);
                         }
                         else if (stringStatus.Count > 1 && hudWindowColumnsActualPage == 1)
                         {
-                            arrow = "►";// \u25B6
+                            arrow = "?";// \u25B6
                             TableSetCell(table, 2, hudWindowColumnsActualPage > 0 ? stringStatus[hudWindowColumnsActualPage - 1] + EndText : stringStatus[hudWindowColumnsActualPage - 1] + EndText);
                         }
                         else if (stringStatus.Count > 1 && hudWindowColumnsActualPage > 1 && stringStatus.Count >= hudWindowColumnsActualPage)
                         {
-                            arrow = "↔";// \u2194
+                            arrow = "?";// \u2194
                             TableSetCell(table, 2, hudWindowColumnsActualPage > 0 ? stringStatus[hudWindowColumnsActualPage - 1] + EndText : stringStatus[hudWindowColumnsActualPage - 1] + EndText);
                         }
                         else if (stringStatus.Count == 1 && hudWindowColumnsActualPage == 1 && stringStatus.Count >= hudWindowColumnsActualPage)
                         {
-                            arrow = "◄";// \u25C0
+                            arrow = "?";// \u25C0
                             TableSetCell(table, 2, statusDispatcher[i][PathHeaderColumn]);
                         }
                         else
@@ -2288,13 +2292,13 @@ namespace Orts.Viewer3D.Popups
 
                 TextColNumber(statusConsist[i], 0, IsSteamLocomotive);
                 if (hudWindowColumnsActualPage > 0)
-                {//◄ \u25C0 - ► \u25B6 - ↔ \u2194
+                {//? \u25C0 - ? \u25B6 - ? \u2194
                     if (stringStatus.Count > 1 && stringStatus.Count <= hudWindowColumnsActualPage)
-                        TableAddLines(table, hudWindowColumnsActualPage > 1 ? "◀" + stringStatus[(stringStatus.Count < hudWindowColumnsActualPage ? stringStatus.Count - 1 : hudWindowColumnsActualPage - 1)] : stringStatus[hudWindowColumnsActualPage - 1]);
+                        TableAddLines(table, hudWindowColumnsActualPage > 1 ? "?" + stringStatus[(stringStatus.Count < hudWindowColumnsActualPage ? stringStatus.Count - 1 : hudWindowColumnsActualPage - 1)] : stringStatus[hudWindowColumnsActualPage - 1]);
                     else if (stringStatus.Count > 1 && hudWindowColumnsActualPage == 1)
-                        TableAddLines(table, hudWindowColumnsActualPage > 0 ? "▶" + stringStatus[hudWindowColumnsActualPage - 1] : stringStatus[hudWindowColumnsActualPage - 1]);
+                        TableAddLines(table, hudWindowColumnsActualPage > 0 ? "?" + stringStatus[hudWindowColumnsActualPage - 1] : stringStatus[hudWindowColumnsActualPage - 1]);
                     else if (stringStatus.Count > 1 && hudWindowColumnsActualPage > 1 && stringStatus.Count >= hudWindowColumnsActualPage)
-                        TableAddLines(table, hudWindowColumnsActualPage > 0 ? "↔" + stringStatus[hudWindowColumnsActualPage - 1] : stringStatus[hudWindowColumnsActualPage - 1]);
+                        TableAddLines(table, hudWindowColumnsActualPage > 0 ? "?" + stringStatus[hudWindowColumnsActualPage - 1] : stringStatus[hudWindowColumnsActualPage - 1]);
                     else
                     {
                         TableAddLines(table, (stringStatus.Count > 0 ? stringStatus[0] : statusConsist[i]));
