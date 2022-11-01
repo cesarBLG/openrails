@@ -1,4 +1,4 @@
-// COPYRIGHT 2009, 2010, 2011, 2012, 2013 by the Open Rails project.
+﻿// COPYRIGHT 2009, 2010, 2011, 2012, 2013 by the Open Rails project.
 // 
 // This file is part of Open Rails.
 // 
@@ -188,6 +188,7 @@ namespace Orts.Simulation.RollingStocks
                     break;
                 case "engine(ortsdieselengines":
                 case "engine(gearboxnumberofgears":
+                case "engine(ortsreversegearboxindication":
                 case "engine(gearboxdirectdrivegear":
                 case "engine(ortsmainclutchtype":
                 case "engine(ortsgearboxtype":
@@ -853,7 +854,7 @@ namespace Orts.Simulation.RollingStocks
             {
                 case CABViewControlTypes.GEARS:
                     if (DieselEngines.HasGearBox)
-                        data = DieselEngines[0].GearBox.CurrentGearIndex + 1;
+                        data = DieselEngines[0].GearBox.GearIndication;
                     break;
 
                 case CABViewControlTypes.FUEL_GAUGE:
@@ -939,7 +940,7 @@ namespace Orts.Simulation.RollingStocks
                 Simulator.Catalog.GetParticularString("Engine", GetStringAttribute.GetPrettyName(DieselEngines[0].State)));
             if (DieselEngines.HasGearBox)
                 status.AppendFormat("{0} = {1}\n", Simulator.Catalog.GetString("Gear"),
-                DieselEngines[0].GearBox.CurrentGearIndex < 0 ? Simulator.Catalog.GetParticularString("Gear", "N") : (DieselEngines[0].GearBox.CurrentGearIndex + 1).ToString());
+                DieselEngines[0].GearBox.CurrentGearIndex < 0 ? Simulator.Catalog.GetParticularString("Gear", "N") : (DieselEngines[0].GearBox.GearIndication).ToString());
             status.AppendLine();
             status.AppendFormat("{0} = {1}\n",
                 Simulator.Catalog.GetString("Battery switch"),
@@ -966,7 +967,7 @@ namespace Orts.Simulation.RollingStocks
 
             if (DieselEngines.HasGearBox && DieselTransmissionType == DieselTransmissionTypes.Mechanic)
             {//, Simulator.Catalog.GetString("Gear")
-                status.AppendFormat("{0}", DieselEngines[0].GearBox.CurrentGearIndex < 0 ? Simulator.Catalog.GetString("N") : (DieselEngines[0].GearBox.CurrentGearIndex + 1).ToString());
+                status.AppendFormat("{0}-{1}",  DieselEngines[0].GearBox.CurrentGearIndex < 0 ? Simulator.Catalog.GetString("N") : (DieselEngines[0].GearBox.GearIndication).ToString(), DieselEngines[0].GearBox.GearBoxType);
             }
 
             status.AppendFormat("\t{0}\t{1}\t\n",
