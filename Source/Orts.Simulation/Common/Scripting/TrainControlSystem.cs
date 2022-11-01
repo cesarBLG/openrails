@@ -19,6 +19,7 @@ using System;
 using System.IO;
 using ORTS.Common;
 using Orts.Common;
+using Orts.Simulation.RollingStocks;
 using Orts.Simulation.RollingStocks.SubSystems;
 using ORTS.Scripting.Api.ETCS;
 

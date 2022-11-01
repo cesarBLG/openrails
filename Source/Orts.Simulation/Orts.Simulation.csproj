@@ -163,6 +163,7 @@
     <Compile Include="Simulation\RollingStocks\SubSystems\Controllers\MSTSNotchController.cs" />
     <Compile Include="Simulation\RollingStocks\SubSystems\Controllers\MultiPositionController.cs" />
     <Compile Include="Simulation\RollingStocks\SubSystems\CruiseControl.cs" />
+    <Compile Include="Simulation\RollingStocks\SubSystems\Door.cs" />
     <Compile Include="Simulation\RollingStocks\SubSystems\FreightAnimations.cs" />
     <Compile Include="Simulation\RollingStocks\SubSystems\PowerSupplies\ControlCarPowerSupply.cs" />
     <Compile Include="Simulation\RollingStocks\SubSystems\PowerSupplies\ElectricTrainSupplySwitch.cs" />
