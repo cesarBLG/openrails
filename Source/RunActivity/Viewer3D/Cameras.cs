@@ -1562,7 +1562,7 @@ namespace Orts.Viewer3D
 
     public class InsideThreeDimCamera : NonTrackingCamera
     {
-        public override float NearPlane { get { return 0.1f; } }
+        public override float NearPlane { get { return 0.25f; } }
 
         public InsideThreeDimCamera(Viewer viewer)
             : base(viewer)
