@@ -177,7 +177,7 @@ float4 PSSky(VERTEX_OUTPUT In) : COLOR
 	skyColor *= SkyColor.y;
 	
 	// Stars (power function keeps stars hidden until after sunset)
-// if-statement handles astronomical/final stage of twilight
+	// if-statement handles astronomical/final stage of twilight
 	if (LightVector.y < -0.2)
 		{
 		skyColor = lerp(starColor, skyColor, LightVector.y*6.6+2.22);
