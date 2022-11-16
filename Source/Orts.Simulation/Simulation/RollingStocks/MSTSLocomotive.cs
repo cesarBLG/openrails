@@ -5517,6 +5517,11 @@ public List<CabView> CabViewList = new List<CabView>();
                     }
 
                 case CABViewControlTypes.THROTTLE:
+                    {
+                        if (CruiseControl.SkipThrottleDisplay) break;
+                        data = GetThrottleHandleValue(Train.TrainType == Train.TRAINTYPE.AI_PLAYERHOSTING ? ThrottlePercent / 100f : LocalThrottlePercent / 100f);
+                        break;
+                    }
                 case CABViewControlTypes.THROTTLE_DISPLAY:
                 case CABViewControlTypes.CPH_DISPLAY:
                     {

@@ -2088,12 +2088,7 @@ namespace Orts.Viewer3D.RollingStock
                 case CABViewControlTypes.SMALL_EJECTOR:
                 case CABViewControlTypes.ORTS_LARGE_EJECTOR:
                 case CABViewControlTypes.FIREHOLE:
-                    index = PercentToIndex(data);
-                    break;
                 case CABViewControlTypes.THROTTLE:
-
-                    index = PercentToIndex(Locomotive.GetThrottleHandleValue(data));
-                    break;
                 case CABViewControlTypes.THROTTLE_DISPLAY:
                     index = PercentToIndex(data);
                     break;
