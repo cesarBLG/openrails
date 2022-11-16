@@ -408,14 +408,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
             
             ComputeNumberOfAxles();
             if (StartReducingSpeedDeltaDownwards == 0) StartReducingSpeedDeltaDownwards = StartReducingSpeedDelta;
-            if (StartInAutoMode) SpeedRegMode = SpeedRegulatorMode.Auto;
-            if (SpeedRegMode == SpeedRegulatorMode.Auto &&
-                Locomotive.TrainBrakeController.TrainBrakeControllerState != ControllerState.Release &&
-                Locomotive.TrainBrakeController.TrainBrakeControllerState != ControllerState.Neutral &&
-                Locomotive.TrainBrakeController.TrainBrakeControllerState != ControllerState.FullQuickRelease &&
-                !UseTrainBrakeAndDynBrake)
-                TrainBrakePriority = true;
-                
+            if (StartInAutoMode) SpeedRegMode = SpeedRegulatorMode.Auto;             
         }
 
         private void ComputeNumberOfAxles()
