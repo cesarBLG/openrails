@@ -1,4 +1,4 @@
-﻿Open Rails, NewYear version README - Rev.133
+﻿Open Rails, NewYear version README - Rev.134
 November 2nd, 2022
 
 Please note that the installation and use of Open Rails software, even of its unofficial versions, is governed by the Open Rails End User License Agreement. 
@@ -11,8 +11,8 @@ INSTALLATION
 
 
 RELEASE NOTES
-This unofficial version has been derived from the latest official Testing release T1.4-772 (which includes changes introduced in the 1.5-rc3 version), 
-plus the later changes in the master branch, plus some of the features already present in the Unstable release.
+This unofficial version has been derived from the latest official Testing release T1.5-111, 
+plus some of the features already present in the Unstable release.
 
 
 
@@ -54,9 +54,8 @@ This version includes some features not (yet) available in the Open Rails testin
 - Improvements in sky color and in other environment areas, by DR-Aeronautics
 - multiple preset viewpoints for 3D cabs, see http://www.elvastower.com/forums/index.php?/topic/36339-multiple-preset-viewpoints-for-3d-cabs/
 - fix crash when reinitializing EOTs on a carless train
-- NEW: features which are present in Unstable release but not yet in the publicly available testing release:
-  - reworking and improvement of Cruise Control by cesarBLG, Paolo and myself (approved PR #713)
-  - correct bug  https://bugs.launchpad.net/or/+bug/1984049 , plus additional features related to geared engines by steamer_ctn (merged PR #677)
+- features which are present in Unstable release but not yet in the publicly available testing release:
+  - Cruise Control (PR #713)
   - extended door functionality, by cesarBLG (PR #706)
   - Fixed battery switch sound being repeated, by Serana (PR #733)
   - Fixed battery switch timer not working properly, by Serana (PR #734)  
@@ -64,6 +63,12 @@ This version includes some features not (yet) available in the Open Rails testin
   - allow unlimited number of TCS cabview controls, by cesarBLG (PR #717)
   - brake controller scripts refactoring and improvements for mouse control, by Serana (PR #738)
   - fixed brake controller script not being loaded in timetable mode, by Serana (PR #741)
+- NEW: Cruise control: replaced a couple.eng parameters, see  http://www.elvastower.com/forums/index.php?/topic/33841-cruise-control/page__view__findpost__p__290608
+- NEW: Cruise control: supported manual/auto/manual mode switch also with throttle not at 0
+- NEW: Fixed and improved cabview control conditions related to power supply state (PR#744 by Serana, already present in Unstable release)
+
+Info about content of the various PR to the Unstable release can be found here
+https://github.com/openrails/openrails/pulls
 
 
 The Monogame related code intentionally coincides only partly with the code of the OR official testing version.
