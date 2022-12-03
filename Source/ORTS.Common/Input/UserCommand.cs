@@ -225,6 +225,8 @@
         [GetString("Control AI Fire Reset")] ControlAIFireReset,
         [GetString("Control Battery")] ControlBattery,
         [GetString("Control PowerKey")] ControlPowerKey,
+
+        // Cruise Control
         [GetString("Control Speed Regulator Mode Increase")] ControlSpeedRegulatorModeIncrease,
         [GetString("Control Speed Regulator Mode Descrease")] ControlSpeedRegulatorModeDecrease,
         [GetString("Control Selected Speed Increase")] ControlSpeedRegulatorSelectedSpeedIncrease,

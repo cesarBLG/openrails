@@ -220,6 +220,7 @@ namespace Orts.Formats.Msts
         ORTS_TCS,
         ORTS_ETCS,
 
+        // Cruise Control
         ORTS_SELECTED_SPEED,
         ORTS_SELECTED_SPEED_DISPLAY,
         ORTS_SELECTED_SPEED_MODE,

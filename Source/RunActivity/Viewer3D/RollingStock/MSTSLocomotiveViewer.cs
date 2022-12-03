@@ -2801,7 +2801,6 @@ namespace Orts.Viewer3D.RollingStock
                     ButtonState = buttonState;
                     break;
                 case CABViewControlTypes.ORTS_EOT_EMERGENCY_BRAKE:
-                    p = ChangedValue(0);
                     if (ChangedValue(0) == 1)
                     {
                         if (Locomotive.Train?.EOT != null)

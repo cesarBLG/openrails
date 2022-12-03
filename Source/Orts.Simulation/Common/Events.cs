@@ -271,7 +271,6 @@ namespace Orts.Common
 
         MPCChangePosition,
 
-
     }
 
     public static class Events
@@ -544,7 +543,6 @@ namespace Orts.Common
                         case 304: return Event.CruiseControlAlert1;
 
                         case 310: return Event.MPCChangePosition;
-
 
                         default: return 0;
                     }
