@@ -292,11 +292,19 @@ namespace Orts.Formats.Msts
         Tutorial = 3,
     }
 
+    public enum LoadState
+    {
+        Empty,
+        Random,
+        Loaded,
+    }
+
     public struct LoadData
     {
         public string Name;
         public string Folder;
         public LoadPosition LoadPosition;
+        public LoadState LoadState;
     }
 
     /// <summary>
@@ -1674,8 +1682,15 @@ namespace Orts.Formats.Msts
                     loadData.Folder = stf.ReadString();
                     var positionString = stf.ReadString();
                     Enum.TryParse(positionString, out loadData.LoadPosition);
-                    LoadDataList.Add(loadData);
-                    stf.MustMatch(")");
+                    var state = stf.ReadString();
+                    if (state != ")")
+                    {
+                        Enum.TryParse(state, out loadData.LoadState);
+                        LoadDataList.Add(loadData);
+                        stf.MustMatch(")");
+                    }
+                    else
+                        LoadDataList.Add(loadData);
                 }),
             });
         }
