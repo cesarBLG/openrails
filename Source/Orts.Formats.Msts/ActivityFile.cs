@@ -292,13 +292,6 @@ namespace Orts.Formats.Msts
         Tutorial = 3,
     }
 
-    public enum LoadState
-    {
-        Empty,
-        Random,
-        Loaded,
-    }
-
     public struct LoadData
     {
         public string Name;

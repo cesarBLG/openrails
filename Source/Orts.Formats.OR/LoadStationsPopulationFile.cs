@@ -24,6 +24,7 @@ using System.IO;
 using Microsoft.Xna.Framework;
 using Orts.Formats.Msts;
 using Orts.Parsers.OR;
+using ORTS.Common;
 
 namespace Orts.Formats.OR
 {

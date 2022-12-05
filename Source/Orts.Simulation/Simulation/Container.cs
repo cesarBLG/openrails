@@ -75,8 +75,8 @@ namespace Orts.Simulation
         public bool Flipped = false;
         public static float Length20ftM = 6.095f;
         public static float Length40ftM = 12.19f;
-        public static float[] DefaultEmptyMassKG = { 0, 2000, 2500, 3000, 3500, 4000, 4500, 5000 };
-        public static float[] DefaultMaxMassWhenLoadedKG = { 0, 12000, 12500, 13000, 13500, 14000, 14500, 15000 };
+        public static float[] DefaultEmptyMassKG = { 0, 2150, 3750, 3890, 4500, 4700, 4900, 5040 };
+        public static float[] DefaultMaxMassWhenLoadedKG = { 0, 29000, 30500, 30500, 30500, 30500, 30500, 30500 };
         public WorldPosition WorldPosition = new WorldPosition();  // current position of the container
         public float RealRelativeYOffset = 0;
         public float RealRelativeZOffset = 0;
