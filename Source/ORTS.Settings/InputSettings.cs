@@ -349,6 +349,8 @@ namespace ORTS.Settings
             Commands[(int)UserCommand.ControlAlerter] = new UserCommandKeyInput(0x2C);
             Commands[(int)UserCommand.ControlBackwards] = new UserCommandKeyInput(0x1F);
             Commands[(int)UserCommand.ControlBailOff] = new UserCommandKeyInput(0x35);
+            Commands[(int)UserCommand.ControlBrakeQuickRelease] = new UserCommandKeyInput(0x35, KeyModifiers.Control);
+            Commands[(int)UserCommand.ControlBrakeOvercharge] = new UserCommandKeyInput(0x35, KeyModifiers.Control | KeyModifiers.Shift);
             Commands[(int)UserCommand.ControlBattery] = new UserCommandKeyInput(0x30, KeyModifiers.Control);
             Commands[(int)UserCommand.ControlBatterySwitchClose] = new UserCommandKeyInput(0x52);
             Commands[(int)UserCommand.ControlBatterySwitchOpen] = new UserCommandKeyInput(0x52, KeyModifiers.Control);
