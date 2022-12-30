@@ -43,42 +43,42 @@ namespace ORTS.Scripting.Api
         /// <summary>
         /// True if the driver has asked for an emergency braking (push button)
         /// </summary>
-        protected bool EmergencyBrakingPushButton() => Host.EmergencyBrakingPushButton;
+        public bool EmergencyBrakingPushButton() => Host.EmergencyBrakingPushButton;
 
         /// <summary>
         /// True if the TCS has asked for an emergency braking
         /// </summary>
-        protected bool TCSEmergencyBraking() => Host.TCSEmergencyBraking;
+        public bool TCSEmergencyBraking() => Host.TCSEmergencyBraking;
 
         /// <summary>
         /// True if the TCS has asked for a full service braking
         /// </summary>
-        protected bool TCSFullServiceBraking() => Host.TCSFullServiceBraking;
+        public bool TCSFullServiceBraking() => Host.TCSFullServiceBraking;
 
         /// <summary>
         /// True if the driver has pressed the Quick Release button
         /// </summary>
-        protected bool QuickReleaseButtonPressed() => Host.QuickReleaseButtonPressed;
+        public bool QuickReleaseButtonPressed() => Host.QuickReleaseButtonPressed;
 
         /// <summary>
         /// True if the driver has pressed the Overcharge button
         /// </summary>
-        protected bool OverchargeButtonPressed() => Host.OverchargeButtonPressed;
+        public bool OverchargeButtonPressed() => Host.OverchargeButtonPressed;
 
         /// <summary>
         /// True if low voltage power supply is switched on.
         /// </summary>
-        protected bool IsLowVoltagePowerSupplyOn() => LocomotivePowerSupply.LowVoltagePowerSupplyOn;
+        public bool IsLowVoltagePowerSupplyOn() => LocomotivePowerSupply.LowVoltagePowerSupplyOn;
 
         /// <summary>
         /// True if cab power supply is switched on.
         /// </summary>
-        protected bool IsCabPowerSupplyOn() => LocomotivePowerSupply.CabPowerSupplyOn;
+        public bool IsCabPowerSupplyOn() => LocomotivePowerSupply.CabPowerSupplyOn;
 
         /// <summary>
         /// Main reservoir pressure
         /// </summary>
-        protected float MainReservoirPressureBar()
+        public float MainReservoirPressureBar()
         {
             if (Locomotive.Train != null)
                 return Bar.FromPSI(Locomotive.MainResPressurePSI);
@@ -89,62 +89,62 @@ namespace ORTS.Scripting.Api
         /// <summary>
         /// Maximum pressure in the brake pipes and the equalizing reservoir
         /// </summary>
-        protected float MaxPressureBar() => Bar.FromPSI(Host.MaxPressurePSI);
+        public float MaxPressureBar() => Bar.FromPSI(Host.MaxPressurePSI);
 
         /// <summary>
         /// Maximum pressure in the brake pipes when they are overcharged
         /// </summary>
-        protected float MaxOverchargePressureBar() => Bar.FromPSI(Host.MaxOverchargePressurePSI);
+        public float MaxOverchargePressureBar() => Bar.FromPSI(Host.MaxOverchargePressurePSI);
 
         /// <summary>
         /// Release rate of the equalizing reservoir
         /// </summary>
-        protected float ReleaseRateBarpS() => BarpS.FromPSIpS(Host.ReleaseRatePSIpS);
+        public float ReleaseRateBarpS() => BarpS.FromPSIpS(Host.ReleaseRatePSIpS);
 
         /// <summary>
         /// Quick release rate of the equalizing reservoir
         /// </summary>
-        protected float QuickReleaseRateBarpS() => BarpS.FromPSIpS(Host.QuickReleaseRatePSIpS);
+        public float QuickReleaseRateBarpS() => BarpS.FromPSIpS(Host.QuickReleaseRatePSIpS);
 
         /// <summary>
         /// Pressure decrease rate of equalizing reservoir when eliminating overcharge
         /// </summary>
-        protected float OverchargeEliminationRateBarpS() => BarpS.FromPSIpS(Host.OverchargeEliminationRatePSIpS);
+        public float OverchargeEliminationRateBarpS() => BarpS.FromPSIpS(Host.OverchargeEliminationRatePSIpS);
 
         /// <summary>
         /// Slow application rate of the equalizing reservoir
         /// </summary>
-        protected float SlowApplicationRateBarpS() => BarpS.FromPSIpS(Host.SlowApplicationRatePSIpS);
+        public float SlowApplicationRateBarpS() => BarpS.FromPSIpS(Host.SlowApplicationRatePSIpS);
 
         /// <summary>
         /// Apply rate of the equalizing reservoir
         /// </summary>
-        protected float ApplyRateBarpS() => BarpS.FromPSIpS(Host.ApplyRatePSIpS);
+        public float ApplyRateBarpS() => BarpS.FromPSIpS(Host.ApplyRatePSIpS);
 
         /// <summary>
         /// Emergency rate of the equalizing reservoir
         /// </summary>
-        protected float EmergencyRateBarpS() => BarpS.FromPSIpS(Host.EmergencyRatePSIpS);
+        public float EmergencyRateBarpS() => BarpS.FromPSIpS(Host.EmergencyRatePSIpS);
 
         /// <summary>
         /// Depressure needed in order to obtain the full service braking
         /// </summary>
-        protected float FullServReductionBar() => Bar.FromPSI(Host.FullServReductionPSI);
+        public float FullServReductionBar() => Bar.FromPSI(Host.FullServReductionPSI);
 
         /// <summary>
         /// Release rate of the equalizing reservoir
         /// </summary>
-        protected float MinReductionBar() => Bar.FromPSI(Host.MinReductionPSI);
+        public float MinReductionBar() => Bar.FromPSI(Host.MinReductionPSI);
         
         /// <summary>
         /// Current value of the brake controller
         /// </summary>
-        protected float CurrentValue() => Host.CurrentValue;
+        public float CurrentValue() => Host.CurrentValue;
 
         /// <summary>
         /// Intermediate value of the brake controller
         /// </summary>
-        protected float IntermediateValue
+        public float IntermediateValue
         {
             get
             {
@@ -159,32 +159,37 @@ namespace ORTS.Scripting.Api
         /// <summary>
         /// Minimum value of the brake controller
         /// </summary>
-        protected float MinimumValue() => Host.MinimumValue;
+        public float MinimumValue() => Host.MinimumValue;
 
         /// <summary>
         /// Maximum value of the brake controller
         /// </summary>
-        protected float MaximumValue() => Host.MaximumValue;
+        public float MaximumValue() => Host.MaximumValue;
 
         /// <summary>
         /// Step size of the brake controller
         /// </summary>
-        protected float StepSize() => Host.StepSize;
+        public float StepSize() => Host.StepSize;
 
         /// <summary>
         /// State of the brake pressure (1 = increasing, -1 = decreasing)
         /// </summary>
-        protected float UpdateValue() => Host.UpdateValue;
+        public float UpdateValue() => Host.UpdateValue;
 
         /// <summary>
         /// Gives the list of notches
         /// </summary>
-        protected List<MSTSNotch> Notches() => Host.Notches;
+        public List<MSTSNotch> Notches() => Host.Notches;
+
+        /// <summary>
+        /// Fraction of train brake demanded by cruise control
+        /// </summary>
+        public float CruiseControlBrakeDemand() => Locomotive.CruiseControl != null ? Locomotive.CruiseControl.TrainBrakePercent/100 : 0;
 
         /// <summary>
         /// Current notch of the brake controller
         /// </summary>
-        protected int CurrentNotch
+        public int CurrentNotch
         {
             get
             {
@@ -197,14 +202,9 @@ namespace ORTS.Scripting.Api
         }
 
         /// <summary>
-        /// Fraction of train brake demanded by cruise control
-        /// </summary>
-        public float CruiseControlBrakeDemand() => Locomotive.CruiseControl != null ? Locomotive.CruiseControl.TrainBrakePercent / 100 : 0;
-
-        /// <summary>
         /// Sets the current value of the brake controller lever
         /// </summary>
-        protected void SetCurrentValue(float value)
+        public void SetCurrentValue(float value)
         {
             Host.CurrentValue = value;
         }
@@ -212,7 +212,7 @@ namespace ORTS.Scripting.Api
         /// <summary>
         /// Sets the state of the brake pressure (1 = increasing, -1 = decreasing)
         /// </summary>
-        protected void SetUpdateValue(float value)
+        public void SetUpdateValue(float value)
         {
             Host.UpdateValue = value;
         }
@@ -220,7 +220,7 @@ namespace ORTS.Scripting.Api
         /// <summary>
         /// Sets the dynamic brake intervention value
         /// </summary>
-        protected void SetDynamicBrakeIntervention(float value)
+        public void SetDynamicBrakeIntervention(float value)
         {
             // TODO: Set dynamic brake intervention instead of controller position
             // There are some issues that need to be identified and fixed before setting the intervention directly
