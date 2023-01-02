@@ -1,5 +1,5 @@
-﻿Open Rails, NewYear version README - Rev.135
-December 7th, 2022
+﻿Open Rails, NewYear version README - Rev.16
+January 2nd, 2023
 
 Please note that the installation and use of Open Rails software, even of its unofficial versions, is governed by the Open Rails End User License Agreement. 
 
@@ -11,8 +11,8 @@ INSTALLATION
 
 
 RELEASE NOTES
-This unofficial version has been derived from the latest official Testing release T1.5-143,
-plus some of the features already present in the Unstable release.
+This unofficial version has been derived from the latest official Testing release T1.5.1-155,
+plus some of the features already present in the Unstable release or as Pull Request in the official Openrails github repository.
 
 
 
@@ -53,16 +53,16 @@ This version includes some features not (yet) available in the Open Rails testin
 - Improvements in sky color and in other environment areas, by DR-Aeronautics
 - multiple preset viewpoints for 3D cabs, see http://www.elvastower.com/forums/index.php?/topic/36339-multiple-preset-viewpoints-for-3d-cabs/
 - fix crash when reinitializing EOTs on a carless train
-- features which are present in Unstable release but not yet in the publicly available testing release:
+- keyboard commands for Overcharge and Quick Release, by cesarBLG
+- features which are present in Unstable release or on Github but not yet in the publicly available testing release:
   - extended door functionality, by cesarBLG (PR #706)
   - added new parameter for battery switch, by Serana (PR #735)
   - allow unlimited number of TCS cabview controls, by cesarBLG (PR #717)
-  - brake controller scripts refactoring and improvements for mouse control, by Serana (PR #738)
-  - fixed brake controller script not being loaded in timetable mode, by Serana (PR #741)
-  - Fixed and improved cabview control conditions related to power supply state (PR#744 by Serana, already present in Unstable release)
-  - NEW: restore Explore in Activity mode if it was last running mode, by mbm-OR (should be availabe on December 10th in the Testing release)
-  - NEW: Container management: management of container weight, see http://www.elvastower.com/forums/index.php?/topic/36162-container-management/page__view__findpost__p__291153
-- NEW: keyboard commands for Overcharge and Quick Release, by cesarBLG
+  - Fixed and improved cabview control conditions related to power supply state (PR#744 by Serana)
+  - Container management: management of container weight, see http://www.elvastower.com/forums/index.php?/topic/36162-container-management/page__view__findpost__p__29115
+  - NEW: PR #757 - Unify Raildriver code implementation, by cesarBLG; includes management of external devices different from Raildriver, plus two minor RD  code fixes
+  - NEW:  Extends CabControls for user input, by cjakeman (PR #753) 
+
 
 Info about content of the various PR to the Unstable release can be found here
 https://github.com/openrails/openrails/pulls
