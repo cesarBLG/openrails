@@ -1,4 +1,4 @@
-// COPYRIGHT 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017 by the Open Rails project.
+﻿// COPYRIGHT 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017 by the Open Rails project.
 //
 // This file is part of Open Rails.
 //
@@ -257,8 +257,6 @@ namespace Orts.Viewer3D
         public int poscounter = 1; // counter for print position info
 
         public Camera SuspendedCamera { get; private set; }
-
-//        UserInputRailDriver RailDriver;
 
         public static double DbfEvalAutoPilotTimeS = 0;//Debrief eval
         public static double DbfEvalIniAutoPilotTimeS = 0;//Debrief eval  
@@ -1618,6 +1616,8 @@ namespace Orts.Viewer3D
                 }
             }
 
+            UserInput.Handled();
+
             MouseState currentMouseState = Mouse.GetState();
 
             if (currentMouseState.X != originalMouseState.X ||
@@ -1749,7 +1749,6 @@ namespace Orts.Viewer3D
         internal void Terminate()
         {
             InfoDisplay.Terminate();
-            UserInput.RDState.Shutdown();
         }
 
         private int trainCount;

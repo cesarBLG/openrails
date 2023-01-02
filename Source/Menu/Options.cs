@@ -198,7 +198,7 @@ namespace ORTS
             // Keyboard tab
             InitializeKeyboardSettings();
 
-            //RailDriver tab
+            // Raildriver Tab
             InitializeRailDriverSettings();
 
             // DataLogger tab

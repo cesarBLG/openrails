@@ -48,8 +48,8 @@ namespace Orts.Viewer3D
         static MouseState LastMouseState;
         public static int MouseSpeedX;
         public static int MouseSpeedY;
-
-        public static UserInputRailDriver RDState;
+        public static RailDriverState RDState;
+        public static ExternalDeviceState WebDeviceState = new ExternalDeviceState();
 
         static InputSettings InputSettings;
 
@@ -58,7 +58,7 @@ namespace Orts.Viewer3D
 
         public static void Initialize(Game game)
         {
-            RDState = new UserInputRailDriver(game);
+            RDState = new RailDriverState(game);
         }
 
         public static void Update(Game game)
@@ -136,6 +136,12 @@ namespace Orts.Viewer3D
             if ((GetAsyncKeyState(Keys.PrintScreen) & 0x8000) != 0)
                 keys.Add(Keys.PrintScreen);
             return keys.ToArray();
+        }
+
+        public static void Handled()
+        {
+            RDState?.Handled();
+            WebDeviceState?.Handled();
         }
 
         public static bool IsPressed(UserCommand command)

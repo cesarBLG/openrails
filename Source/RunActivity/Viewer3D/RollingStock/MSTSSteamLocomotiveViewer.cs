@@ -1,4 +1,4 @@
-﻿// COPYRIGHT 2009, 2010, 2011, 2012, 2013, 2014 by the Open Rails project.
+// COPYRIGHT 2009, 2010, 2011, 2012, 2013, 2014 by the Open Rails project.
 // 
 // This file is part of Open Rails.
 // 
@@ -183,9 +183,6 @@ namespace Orts.Viewer3D.RollingStock
 
             // Keeping separated, since it is not a real engine control. (Probably wrong classification?)
             if (UserInput.IsPressed(UserCommand.ControlAIFireReset)) new AIFireResetCommand(Viewer.Log);
-
-            if (UserInput.RDState != null && UserInput.RDState.Active)
-                SteamLocomotive.SetCutoffPercent(UserInput.RDState.DirectionPercent);
 
             base.HandleUserInput(elapsedTime);
 

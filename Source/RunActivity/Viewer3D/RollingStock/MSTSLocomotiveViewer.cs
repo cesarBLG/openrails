@@ -178,7 +178,7 @@ namespace Orts.Viewer3D.RollingStock
             UserInputCommands.Add(UserCommand.ControlWiper, new Action[] { Noop, () => new WipersCommand(Viewer.Log, !Locomotive.Wiper) });
             UserInputCommands.Add(UserCommand.ControlHorn, new Action[] { () => new HornCommand(Viewer.Log, false), () => new HornCommand(Viewer.Log, true) });
             UserInputCommands.Add(UserCommand.ControlBell, new Action[] { () => new BellCommand(Viewer.Log, false), () => new BellCommand(Viewer.Log, true) });
-            UserInputCommands.Add(UserCommand.ControlBellToggle, new Action[] { Noop, () => new BellCommand(Viewer.Log, !Locomotive.Bell) });
+            UserInputCommands.Add(UserCommand.ControlBellToggle, new Action[] { Noop, () => new BellCommand(Viewer.Log, !Locomotive.ManualBell) });
             UserInputCommands.Add(UserCommand.ControlAlerter, new Action[] { () => new AlerterCommand(Viewer.Log, false), () => new AlerterCommand(Viewer.Log, true) });
             UserInputCommands.Add(UserCommand.ControlHeadlightIncrease, new Action[] { Noop, () => new HeadlightCommand(Viewer.Log, true) });
             UserInputCommands.Add(UserCommand.ControlHeadlightDecrease, new Action[] { Noop, () => new HeadlightCommand(Viewer.Log, false) });
@@ -238,50 +238,72 @@ namespace Orts.Viewer3D.RollingStock
             if (UserInput.IsPressed(UserCommand.DebugResetWheelSlip)) { Locomotive.Train.SignalEvent(Event._ResetWheelSlip); }
             if (UserInput.IsPressed(UserCommand.DebugToggleAdvancedAdhesion)) { Locomotive.Train.SignalEvent(Event._ResetWheelSlip); Locomotive.Simulator.UseAdvancedAdhesion = !Locomotive.Simulator.UseAdvancedAdhesion; }
 
-            if (UserInput.RDState != null)
+            ExternalDeviceState[] externalDevices = {UserInput.RDState, UserInput.WebDeviceState};
+            foreach (var external in externalDevices)
             {
-                if (UserInput.RDState.BailOff)
+                if (external == null) continue;
+                // Handle other cabcontrols
+                foreach (var kvp in external.CabControls)
                 {
-                    Locomotive.SetBailOff(true);
-                }
-                if (UserInput.RDState.Active)
-                {
-                    if (UserInput.RDState.Changed)
-                    {
-                        Locomotive.AlerterReset();
-                        UserInput.RDState.Handled();
-                    }
 
-                    Locomotive.SetThrottlePercentWithSound(UserInput.RDState.ThrottlePercent);
-                    Locomotive.SetTrainBrakePercent(UserInput.RDState.TrainBrakePercent);
-                    Locomotive.SetEngineBrakePercent(UserInput.RDState.EngineBrakePercent);
-                    //    Locomotive.SetBrakemanBrakePercent(UserInput.RDState.BrakemanBrakePercent); // For Raildriver control not complete for this value?
-                    if (Locomotive.CombinedControlType != MSTSLocomotive.CombinedControl.ThrottleAir)
-                        Locomotive.SetDynamicBrakePercentWithSound(UserInput.RDState.DynamicBrakePercent);
-                    if (UserInput.RDState.DirectionPercent > 50)
-                        Locomotive.SetDirection(Direction.Forward);
-                    else if (UserInput.RDState.DirectionPercent < -50)
-                        Locomotive.SetDirection(Direction.Reverse);
-                    else
-                        Locomotive.SetDirection(Direction.N);
-                    if (UserInput.RDState.Emergency)
-                        new EmergencyPushButtonCommand(Viewer.Log, true);
-                    else
-                        new EmergencyPushButtonCommand(Viewer.Log, false);
-                    if (UserInput.RDState.Wipers == 1 && Locomotive.Wiper)
-                        Locomotive.SignalEvent(Event.WiperOff);
-                    if (UserInput.RDState.Wipers != 1 && !Locomotive.Wiper)
-                        Locomotive.SignalEvent(Event.WiperOn);
-                    // changing Headlight more than one step at a time doesn't work for some reason
-                    if (Locomotive.Headlight < UserInput.RDState.Lights - 1)
+                    if (_CabRenderer == null) break;
+                    if (!kvp.Value.Changed) continue;
+                    float val = kvp.Value.Value;
+                    switch (kvp.Key.Item1.Type)
                     {
-                        Locomotive.Headlight++;
-                        Locomotive.SignalEvent(Event.LightSwitchToggle);
-                    }
-                    if (Locomotive.Headlight > UserInput.RDState.Lights - 1)
-                    {
-                        Locomotive.Headlight--;
-                        Locomotive.SignalEvent(Event.LightSwitchToggle);
+                        // Some cab controls need specific handling for better results
+                        case CABViewControlTypes.THROTTLE:
+                            Locomotive.SetThrottlePercentWithSound(val * 100);
+                            break;
+                        case CABViewControlTypes.DIRECTION:
+                            if (Locomotive is MSTSSteamLocomotive steam)
+                            {
+                                steam.SetCutoffPercent(val * 100);
+                            }
+                            else if (val > 0.5f)
+                                Locomotive.SetDirection(Direction.Forward);
+                            else if (val < -0.5f)
+                                Locomotive.SetDirection(Direction.Reverse);
+                            else
+                                Locomotive.SetDirection(Direction.N);
+                            break;
+                        case CABViewControlTypes.TRAIN_BRAKE:
+                            Locomotive.SetTrainBrakePercent(val * 100);
+                            break;
+                        case CABViewControlTypes.DYNAMIC_BRAKE:
+                            if (Locomotive.CombinedControlType != MSTSLocomotive.CombinedControl.ThrottleAir)
+                                Locomotive.SetDynamicBrakePercentWithSound(val * 100);
+                            break;
+                        case CABViewControlTypes.ENGINE_BRAKE:
+                            Locomotive.SetEngineBrakePercent(val * 100);
+                            break;
+                        case CABViewControlTypes.FRONT_HLIGHT:
+                            // changing Headlight more than one step at a time doesn't work for some reason
+                            if (Locomotive.Headlight < val - 1)
+                            {
+                                Locomotive.Headlight++;
+                                Locomotive.SignalEvent(Event.LightSwitchToggle);
+                            }
+                            if (Locomotive.Headlight > val - 1)
+                            {
+                                Locomotive.Headlight--;
+                                Locomotive.SignalEvent(Event.LightSwitchToggle);
+                            }
+                            break;
+                        case CABViewControlTypes.ORTS_SELECTED_SPEED_SELECTOR:
+                            Locomotive.CruiseControl.SelectedSpeedMpS = val;
+                            break;
+                        // Other controls can hopefully be controlled faking mouse input
+                        // TODO: refactor HandleUserInput() 
+                        default:
+                            if (_CabRenderer.ControlMap.TryGetValue(kvp.Key, out var renderer) && renderer is CabViewDiscreteRenderer discrete)
+                            {
+                                var oldChanged = discrete.ChangedValue;
+                                discrete.ChangedValue = (oldval) => val;
+                                discrete.HandleUserInput();
+                                discrete.ChangedValue = oldChanged;
+                            }
+                            break;
                     }
                 }
             }
@@ -1153,7 +1175,7 @@ namespace Orts.Viewer3D.RollingStock
         private bool _isNightTexture;
         private bool HasCabLightDirectory = false;
         public Dictionary<(CabViewControlType, int), CabViewControlRenderer> ControlMap;
-        public string[] ActiveScreen = {"default", "default", "default", "default", "default", "default", "default", "default"};
+        public string[] ActiveScreen = { "default", "default", "default", "default", "default", "default", "default", "default" };
 
         [CallOnThread("Loader")]
         public CabRenderer(Viewer viewer, MSTSLocomotive car)
@@ -1998,7 +2020,7 @@ namespace Orts.Viewer3D.RollingStock
         /// <summary>
         /// Function calculating response value for mouse events (movement, left-click), determined by configured style.
         /// </summary>
-        readonly Func<float, float> ChangedValue;
+        public Func<float, float> ChangedValue;
 
         public CabViewDiscreteRenderer(Viewer viewer, MSTSLocomotive locomotive, CVCWithFrames control, CabShader shader)
             : base(viewer, locomotive, control, shader)
@@ -2594,7 +2616,7 @@ namespace Orts.Viewer3D.RollingStock
                     ButtonState = buttonState;
                     break;
 
-                    // Train Control System controls
+                // Train Control System controls
                 case CABViewControlTypes.ORTS_TCS:
                     int commandIndex = Control.ControlType.Id - 1;
                     Locomotive.TrainControlSystem.TCSCommandButtonDown.TryGetValue(commandIndex, out bool currentValue);
