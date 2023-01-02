@@ -17,6 +17,11 @@
 
 using System;
 using System.Diagnostics;
+using System.IO;
+using Microsoft.Win32;
+using Orts.Formats.Msts;
+using Orts.Parsers.Msts;
+using Orts.Simulation.RollingStocks;
 using Orts.Viewer3D.Processes;
 using ORTS.Common;
 using ORTS.Common.Input;
@@ -25,39 +30,26 @@ using ORTS.Settings;
 namespace Orts.Viewer3D
 {
     /// <summary>
-    /// Class to get data from RailDriver and translate it into something useful for UserInput
+    /// Process RailDriver data sent to UserInput class
     /// </summary>
-    public class UserInputRailDriver
+    public class RailDriverState : ExternalDeviceState
     {
-        private byte[] readBuffer;
-        private byte[] readBufferHistory;
-
-        private const byte EnableRailDriverCommand = 14;
-        private const byte EmergencyStopCommandUp = 36;
-        private const byte EmergencyStopCommandDown = 37;
-
         private readonly RailDriverDevice railDriverInstance;
         private static RailDriverSettings settings;
 
-        public float DirectionPercent;      // -100 (reverse) to 100 (forward)
-        public float ThrottlePercent;       // 0 to 100
-        public float DynamicBrakePercent;   // 0 to 100 if active otherwise less than 0
-        public float TrainBrakePercent;     // 0 (release) to 100 (CS), does not include emergency
-        public float EngineBrakePercent;    // 0 to 100
-        public bool BailOff;                // true when bail off pressed
-        public bool Emergency;              // true when train brake handle in emergency or E-stop button pressed
-        public int Wipers;                  // wiper rotary, 1 off, 2 slow, 3 full
-        public int Lights;                  // lights rotary, 1 off, 2 dim, 3 full
-
+        // calibration values, defaults for the developer's RailDriver
         private readonly (byte, byte, byte) reverser, dynamicBrake, wipers, headlight;
         private readonly (byte, byte) throttle, autoBrake, independentBrake, emergencyBrake, bailoffDisengaged, bailoffEngaged;
         private readonly bool fullRangeThrottle;
+        private byte[] readBuffer;
+        public ExternalDeviceCabControl Direction = new ExternalDeviceCabControl();      // -100 (reverse) to 100 (forward)
+        public ExternalDeviceCabControl Throttle = new ExternalDeviceCabControl();       // 0 to 100
+        public ExternalDeviceCabControl DynamicBrake = new ExternalDeviceCabControl();   // 0 to 100 if active otherwise less than 0
+        public ExternalDeviceCabControl TrainBrake = new ExternalDeviceCabControl();     // 0 (release) to 100 (CS), does not include emergency
+        public ExternalDeviceCabControl EngineBrake = new ExternalDeviceCabControl();    // 0 to 100
+        public ExternalDeviceCabControl Lights = new ExternalDeviceCabControl();                  // lights rotary, 1 off, 2 dim, 3 full
 
-        /// <summary>
-        /// Tries to find a RailDriver and initialize it
-        /// </summary>
-        /// <param name="basePath"></param>
-        public UserInputRailDriver(Game game)
+        public RailDriverState(Game game)
         {
             try
             {
@@ -122,9 +114,14 @@ namespace Orts.Viewer3D
                     bailoffEngaged = UpdateCutOff(bailoffEngaged, cutOff);
 
                     readBuffer = railDriverInstance.GetReadBuffer();
-                    readBufferHistory = railDriverInstance.GetReadBuffer();
 
                     railDriverInstance.SetLeds(RailDriverDisplaySign.Hyphen, RailDriverDisplaySign.Hyphen, RailDriverDisplaySign.Hyphen);
+
+                    for (int i=0; i<settings.UserCommands.Length; i++)
+                    {
+                        byte command = settings.UserCommands[i];
+                        if (command != 0 && command != byte.MaxValue) Commands.Add((UserCommand)i, new RailDriverButton(command));
+                    }
                 }
             }
             catch (Exception error)
@@ -132,51 +129,48 @@ namespace Orts.Viewer3D
                 railDriverInstance = null;
                 Trace.WriteLine(error);
             }
+            
+            Commands[UserCommand.ControlBailOff] = new ExternalDeviceButton();
+            Commands[UserCommand.ControlWiper] = new ExternalDeviceButton();
 
+            CabControls[(new CabViewControlType(CABViewControlTypes.DIRECTION), -1)] = Direction;
+            CabControls[(new CabViewControlType(CABViewControlTypes.THROTTLE), -1)] = Throttle;
+            CabControls[(new CabViewControlType(CABViewControlTypes.TRAIN_BRAKE), -1)] = TrainBrake;
+            CabControls[(new CabViewControlType(CABViewControlTypes.ENGINE_BRAKE), -1)] = EngineBrake;
+            CabControls[(new CabViewControlType(CABViewControlTypes.DYNAMIC_BRAKE), -1)] = DynamicBrake;
+            CabControls[(new CabViewControlType(CABViewControlTypes.FRONT_HLIGHT), -1)] = Lights;
         }
-
         public void Update()
         {
-            (readBufferHistory, readBuffer) = (readBuffer, readBufferHistory);
-            if (railDriverInstance.Enabled && 0 == railDriverInstance.ReadCurrentData(ref readBuffer))
+            if (railDriverInstance != null && railDriverInstance.Enabled && 0 == railDriverInstance.ReadCurrentData(ref readBuffer))
             {
                 if (Active)
                 {
-                    DirectionPercent = Percentage(readBuffer[1], reverser);
-                    ThrottlePercent = Percentage(readBuffer[2], throttle);
+                    Direction.Value = Percentage(readBuffer[1], reverser) / 100;
+                    Throttle.Value = Percentage(readBuffer[2], throttle) / 100;
                     if (!fullRangeThrottle)
-                        DynamicBrakePercent = Percentage(readBuffer[2], dynamicBrake);
-                    TrainBrakePercent = Percentage(readBuffer[3], autoBrake);
-                    EngineBrakePercent = Percentage(readBuffer[4], independentBrake);
-                    float a = .01f * EngineBrakePercent;
+                        DynamicBrake.Value = Percentage(readBuffer[2], dynamicBrake) / 100;
+                    float trainBrake = Percentage(readBuffer[3], autoBrake) / 100;
+                    if (trainBrake >= 1 && Percentage(readBuffer[3], emergencyBrake) > 50)
+                        TrainBrake.Value = 2;
+                    else
+                        TrainBrake.Value = trainBrake;
+                    EngineBrake.Value = Percentage(readBuffer[4], independentBrake) / 100;
+                    float a = EngineBrake.Value;
                     float calOff = (1 - a) * bailoffDisengaged.Item1 + a * bailoffDisengaged.Item2;
                     float calOn = (1 - a) * bailoffEngaged.Item1 + a * bailoffEngaged.Item2;
-                    BailOff = Percentage(readBuffer[5], calOff, calOn) > 80;
-
-                    if (TrainBrakePercent >= 100)
-                        Emergency = Percentage(readBuffer[3], emergencyBrake) > 50;
-
-                    Wipers = (int)(.01 * Percentage(readBuffer[6], wipers) + 2.5);
-                    Lights = (int)(.01 * Percentage(readBuffer[7], headlight) + 2.5);
-
-                    if (IsPressed(EmergencyStopCommandUp) || IsPressed(EmergencyStopCommandDown))
-                        Emergency = true;
-                    // check for alerter reset
-                    if (readBuffer?.Length >= 8 && readBufferHistory?.Length >= 8)
+                    Commands[UserCommand.ControlBailOff].IsDown = Percentage(readBuffer[5], calOff, calOn) > 50;
+                    Commands[UserCommand.ControlWiper].IsDown = (int)(.01 * Percentage(readBuffer[6], wipers) + 2.5) != 1;
+                    Lights.Value = (int)(.01 * Percentage(readBuffer[7], headlight) + 2.5);
+                    foreach (var button in Commands.Values)
                     {
-                        for (int i = 1; i <= 5; i++)
-                        {
-                            if (Math.Abs(readBuffer[i] - readBufferHistory[i]) > 1)
-                            {
-                                Changed = true;
-                                break;
-                            }
-                        }
+                        if (button is RailDriverButton rd) rd.Update(readBuffer);
                     }
+
                 }
+                (Commands[UserCommand.GameExternalCabController] as RailDriverButton).Update(readBuffer);
             }
         }
-
         public void Activate()
         {
             if (railDriverInstance.Enabled)
@@ -192,12 +186,6 @@ namespace Orts.Viewer3D
                     railDriverInstance.SetLeds(RailDriverDisplaySign.Hyphen, RailDriverDisplaySign.Hyphen, RailDriverDisplaySign.Hyphen);
                 }
             }
-        }
-
-
-        public void Handled()
-        {
-            Changed = false;
         }
 
         private static float Percentage(float x, float x0, float x100)
@@ -264,8 +252,6 @@ namespace Orts.Viewer3D
 
         public bool Active { get; private set; }
 
-        public bool Changed { get; private set; }
-
         /// <summary>
         /// Updates speed display on RailDriver LED
         /// </summary>
@@ -284,69 +270,21 @@ namespace Orts.Viewer3D
                 railDriverInstance?.Shutdown();
             }
         }
-
-        private bool ButtonCurrentlyDown(byte command)
-        {
-            return (readBuffer[8 + command / 8] & (1 << (command % 8))) == (1 << (command % 8));
-        }
-
-        private bool ButtonPreviouslyDown(byte command)
-        {
-            return (readBufferHistory[8 + command / 8] & (1 << (command % 8))) == (1 << (command % 8));
-        }
-
-        private bool IsPressed(byte command)
-        {
-            return (ButtonCurrentlyDown(command) && !ButtonPreviouslyDown(command));
-        }
-
-        private bool IsReleased(byte command)
-        {
-            return (!ButtonCurrentlyDown(command)) && ButtonPreviouslyDown(command);
-        }
-
-        public bool IsPressed(UserCommand command)
-        {
-            if (!(Active || (railDriverInstance.Enabled && command == UserCommand.GameExternalCabController)))
-                return false;
-            byte raildriverCommand = settings.UserCommands[(int)command];
-            if (raildriverCommand == byte.MaxValue)
-                return false;
-            if (command == UserCommand.GamePauseMenu || raildriverCommand != 0)
-                return 
-                    command == UserCommand.ControlHorn ? (IsPressed(raildriverCommand) || IsPressed((byte)(raildriverCommand + 1))) :
-                    IsPressed(raildriverCommand);
-            else
-                return false;
-        }
-
-        public bool IsReleased(UserCommand command)
-        {
-            if (!Active)
-                return false;
-            byte raildriverCommand = settings.UserCommands[(int)command];
-            if (raildriverCommand == byte.MaxValue)
-                return false;
-            if (command == UserCommand.GamePauseMenu || raildriverCommand != 0)
-                return 
-                    command == UserCommand.ControlHorn ? (IsReleased(raildriverCommand) || IsReleased((byte)(raildriverCommand + 1))) :
-                IsReleased(raildriverCommand);
-            else
-                return false;
-        }
-
-        public bool IsDown(UserCommand command)
-        {
-            if (!Active)
-                return false;
-            byte raildriverCommand = settings.UserCommands[(int)command];
-            if (raildriverCommand == byte.MaxValue)
-                return false;
-            if (command == UserCommand.GamePauseMenu || raildriverCommand != 0)
-                return ButtonCurrentlyDown(raildriverCommand);
-            else
-                return false;
-        }
-
     }
+
+    public class RailDriverButton : ExternalDeviceButton
+    {
+        int Index;
+        byte Mask;
+        public RailDriverButton(byte command)
+        {
+            Index = 8 + command / 8;
+            Mask = (byte)(1 << (command % 8));
+        }
+        public void Update(byte[] data)
+        {
+            IsDown = (data[Index] & Mask) != 0;
+        }
+    }
+
 }
