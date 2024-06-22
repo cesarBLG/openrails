@@ -28,6 +28,7 @@ using Orts.Simulation.RollingStocks;
 using Orts.Simulation.RollingStocks.SubSystems.PowerSupplies;
 using Orts.Simulation.RollingStocks.SubSystems;
 using Orts.Simulation.RollingStocks.SubSystems.Brakes;
+using Orts.Simulation.RollingStocks.SubSystems.PowerSupplies;
 using Orts.Simulation.Signalling;
 using Orts.Simulation.Timetables;
 using ORTS.Common;
