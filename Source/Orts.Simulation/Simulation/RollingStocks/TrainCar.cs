@@ -426,6 +426,30 @@ namespace Orts.Simulation.RollingStocks
         }
 
         public float LocalThrottlePercent;
+        public float MaxThrottlePercent
+        {
+            get
+            {
+                float percent = 100;
+                if (RemoteControlGroup == 0 && Train != null && Train.LeadLocomotive is MSTSLocomotive locomotive)
+                {
+                    if (!locomotive.TrainControlSystem.TractionAuthorization)
+                    {
+                        percent = 0;
+                    }
+                    else if (percent > locomotive.TrainControlSystem.MaxThrottlePercent)
+                    {
+                        percent = Math.Max(locomotive.TrainControlSystem.MaxThrottlePercent, 0);
+                    }
+                }
+                if (this is MSTSLocomotive loco)
+                {
+                    if (percent > 100 - loco.LocomotivePowerSupply.ThrottleReductionPercent) percent = 100 - loco.LocomotivePowerSupply.ThrottleReductionPercent;
+                    if (percent > loco.LocomotivePowerSupply.MaxThrottlePercent) percent = loco.LocomotivePowerSupply.MaxThrottlePercent / 100;
+                }
+                return percent;
+            }
+        }
         // represents the MU line travelling through the train.  Uncontrolled locos respond to these commands.
         public float ThrottlePercent
         {
@@ -435,18 +459,6 @@ namespace Orts.Simulation.RollingStocks
                 if (RemoteControlGroup == 0 && Train != null)
                 {
                     percent = Train.MUThrottlePercent;
-                    if (Train.LeadLocomotive is MSTSLocomotive locomotive)
-                    {
-                        if (!locomotive.TrainControlSystem.TractionAuthorization
-                            || percent <= 0)
-                        {
-                            percent = 0;
-                        }
-                        else if (percent > locomotive.TrainControlSystem.MaxThrottlePercent)
-                        {
-                            percent = Math.Max(locomotive.TrainControlSystem.MaxThrottlePercent, 0);
-                        }
-                    }
                 }
                 else if (RemoteControlGroup == 1 && Train != null)
                 {
@@ -458,10 +470,9 @@ namespace Orts.Simulation.RollingStocks
                 }
                 if (this is MSTSLocomotive loco)
                 {
-                    if (loco.LocomotivePowerSupply.ThrottleReductionPercent > 0) percent *= 1-loco.LocomotivePowerSupply.ThrottleReductionPercent/100;
-                    if (loco.LocomotivePowerSupply.MaxThrottlePercent < percent) percent = Math.Max(loco.LocomotivePowerSupply.MaxThrottlePercent, 0);
+                    if (loco.LocomotivePowerSupply.ThrottleReductionPercent > 0) percent *= 1 - loco.LocomotivePowerSupply.ThrottleReductionPercent / 100;
                 }
-                return percent;
+                return Math.Min(percent, MaxThrottlePercent);
             }
             set
             {
@@ -576,6 +587,7 @@ namespace Orts.Simulation.RollingStocks
         public float GravityForceN;  // Newtons  - signed relative to direction of car.
         public float CurveForceN;   // Resistive force due to curve, in Newtons
         public float WindForceN;  // Resistive force due to wind
+        public float TractionForceN = 0f;
         public float DynamicBrakeForceN = 0f; // Raw dynamic brake force for diesel and electric locomotives
 
         // Derailment variables
@@ -2264,6 +2276,8 @@ namespace Orts.Simulation.RollingStocks
             outf.Write(UiD);
             outf.Write(CarID);
             BrakeSystem.Save(outf);
+            outf.Write(TractionForceN);
+            outf.Write(DynamicBrakeForceN);
             outf.Write(MotiveForceN);
             outf.Write(FrictionForceN);
             outf.Write(SpeedMpS);
@@ -2286,6 +2300,8 @@ namespace Orts.Simulation.RollingStocks
             UiD = inf.ReadInt32();
             CarID = inf.ReadString();
             BrakeSystem.Restore(inf);
+            TractionForceN = inf.ReadSingle();
+            DynamicBrakeForceN = inf.ReadSingle();
             MotiveForceN = inf.ReadSingle();
             FrictionForceN = inf.ReadSingle();
             SpeedMpS = inf.ReadSingle();
