@@ -156,8 +156,6 @@ namespace Orts.Simulation.RollingStocks
         public bool OnLineCabRadio;
         public string OnLineCabRadioURL;
 
-        public float ZeroSpeedAdhesionBase;
-
         public float FilteredBrakePipeFlowM3pS;
         public IIRFilter AFMFilter;
 
@@ -531,7 +529,7 @@ namespace Orts.Simulation.RollingStocks
             MilepostUnitsMetric = Simulator.TRK.Tr_RouteFile.MilepostUnitsMetric;
             BrakeCutsPowerAtBrakeCylinderPressurePSI = 4.0f;
 
-            LocomotiveAxles.Add(new Axle());
+            LocomotiveAxles.Add(new Axle(this));
             AdhesionFilter = new IIRFilter(IIRFilter.FilterTypes.Butterworth, 1, IIRFilter.HzToRad(1f), 0.001f);
             AFMFilter = new IIRFilter(IIRFilter.FilterTypes.Butterworth, 1, IIRFilter.HzToRad(0.1f), 1.0f);
 
@@ -2158,9 +2156,6 @@ namespace Orts.Simulation.RollingStocks
                 UpdateCarSteamHeat(elapsedClockSeconds);
             }
 
-            if (!AdvancedAdhesionModel)  // Advanced adhesion model turned off.
-               AbsWheelSpeedMpS = AbsSpeedMpS;
-
             // Cruise Control
             CruiseControl?.Update(elapsedClockSeconds);
 
@@ -2214,7 +2209,7 @@ namespace Orts.Simulation.RollingStocks
                     }
 
                     AntiSlip = true; // Always set AI trains to AntiSlip
-                    SimpleAdhesion();   // Simple adhesion model used for AI trains
+                    SimpleAdhesion(elapsedClockSeconds);   // Simple adhesion model used for AI trains
                     AdvancedAdhesionModel = false;
                     WheelSpeedMpS = Flipped ? -AbsSpeedMpS : AbsSpeedMpS;            //make the wheels go round
                     break;
@@ -2245,13 +2240,13 @@ namespace Orts.Simulation.RollingStocks
                     // SimpleControlPhysics and if locomotive is a control car advanced adhesion will be "disabled".
                     if (Simulator.UseAdvancedAdhesion && !Simulator.Settings.SimpleControlPhysics && EngineType != EngineTypes.Control) 
                     {
-                        AdvancedAdhesion(elapsedClockSeconds); // Use advanced adhesion model
                         AdvancedAdhesionModel = true;  // Set flag to advise advanced adhesion model is in use
+                        AdvancedAdhesion(elapsedClockSeconds); // Use advanced adhesion model
                     }
                     else
                     {
-                        SimpleAdhesion();  // Use simple adhesion model
                         AdvancedAdhesionModel = false; // Set flag to advise simple adhesion model is in use
+                        SimpleAdhesion(elapsedClockSeconds);  // Use simple adhesion model
                     }
 
                     UpdateTrackSander(elapsedClockSeconds);
@@ -2634,7 +2629,14 @@ namespace Orts.Simulation.RollingStocks
             {
                 TractionForceN = 0f;
             }
-            TractiveForceN = TractionForceN;
+            if (MaxForceN > 0 && MaxContinuousForceN > 0 && PowerReduction < 1)
+            {
+                TractionForceN *= 1 - (MaxForceN - MaxContinuousForceN) / (MaxForceN * MaxContinuousForceN) * AverageForceN * (1 - PowerReduction);
+                float w = (ContinuousForceTimeFactor - elapsedClockSeconds) / ContinuousForceTimeFactor;
+                if (w < 0)
+                    w = 0;
+                AverageForceN = w * AverageForceN + (1 - w) * TractionForceN;
+            }
         }
         public float GetAvailableDynamicBrakeForceN(float d)
         {
@@ -2685,7 +2687,6 @@ namespace Orts.Simulation.RollingStocks
             {
                 DynamicBrakeForceN = 0; // Set dynamic brake force to zero if in Notch 0 position
             }
-            TractiveForceN -= (SpeedMpS > 0 ? 1 : SpeedMpS < 0 ? -1 : Direction == Direction.Reverse ? -1 : 1) * DynamicBrakeForceN;
         }
 
         /// <summary>
@@ -2714,7 +2715,7 @@ namespace Orts.Simulation.RollingStocks
             }
             else
             {
-                if (WheelSlip && AdvancedAdhesionModel)
+                if (WheelSlip)
                 {
                     AbsTractionSpeedMpS = AbsWheelSpeedMpS;
                 }
@@ -2723,44 +2724,13 @@ namespace Orts.Simulation.RollingStocks
                     AbsTractionSpeedMpS = AbsSpeedMpS;
                 }
             }
+
             UpdateTractionForce(elapsedClockSeconds);
-
-            if (MaxForceN > 0 && MaxContinuousForceN > 0 && PowerReduction < 1)
-            {
-                TractiveForceN *= 1 - (MaxForceN - MaxContinuousForceN) / (MaxForceN * MaxContinuousForceN) * AverageForceN * (1 - PowerReduction);
-                float w = (ContinuousForceTimeFactor - elapsedClockSeconds) / ContinuousForceTimeFactor;
-                if (w < 0)
-                    w = 0;
-                AverageForceN = w * AverageForceN + (1 - w) * TractiveForceN;
-            }
-
+            TractiveForceN = TractionForceN;
             ApplyDirectionToTractiveForce(ref TractiveForceN, 0);
 
             UpdateDynamicBrakeForce(elapsedClockSeconds);
-
-            if (Simulator.UseAdvancedAdhesion && !Simulator.Settings.SimpleControlPhysics)
-            {
-                UpdateAxleDriveForce();
-            }
-        }
-
-        protected virtual void UpdateAxleDriveForce()
-        {
-            foreach (var axle in LocomotiveAxles)
-            {
-                if (axle.DriveType == AxleDriveType.ForceDriven)
-                {
-                    axle.DriveForceN = TractiveForceN / LocomotiveAxles.Count;
-                    if (SlipControlSystem == SlipControlType.Full)
-                    {
-                        // Simple slip control
-                        // Motive force is reduced to the maximum adhesive force
-                        // In wheelslip situations, motive force is set to zero
-                        axle.DriveForceN = Math.Sign(axle.DriveForceN) * Math.Min(axle.MaximumPolachWheelAdhesion * axle.AxleWeightN, Math.Abs(axle.DriveForceN));
-                        if (axle.IsWheelSlip) axle.DriveForceN = 0;
-                    }
-                }
-            }
+            TractiveForceN -= (SpeedMpS > 0 ? 1 : SpeedMpS < 0 ? -1 : Direction == Direction.Reverse ? -1 : 1) * DynamicBrakeForceN;
         }
 
         /// <summary>
@@ -3109,15 +3079,8 @@ namespace Orts.Simulation.RollingStocks
             base.Update(elapsedClockSeconds);
         }
 
-        /// <summary>
-        /// Adjusts the MotiveForce to account for adhesion limits
-        /// If UseAdvancedAdhesion is true, dynamic adhesion model is computed
-        /// If UseAdvancedAdhesion is false, the basic force limits are calculated the same way MSTS calculates them, but
-        /// the weather handling is different and Curtius-Kniffler curves are considered as a static limit
-        /// </summary>
-        public virtual void AdvancedAdhesion(float elapsedClockSeconds)
+        protected void UpdateAxles(float elapsedClockSeconds)
         {
-
             if (LocoNumDrvAxles <= 0)
             {
                 WheelSpeedMpS = AbsSpeedMpS;
@@ -3132,7 +3095,6 @@ namespace Orts.Simulation.RollingStocks
                 axle.WheelDistanceGaugeM = TrackGaugeM;
                 axle.CurrentCurveRadiusM = CurrentCurveRadiusM;
                 axle.BogieRigidWheelBaseM = RigidWheelBaseM;
-                axle.CurtiusKnifflerZeroSpeed = ZeroSpeedAdhesionBase;
             }
 
             LocomotiveAxles.Update(elapsedClockSeconds);
@@ -3149,80 +3111,20 @@ namespace Orts.Simulation.RollingStocks
 
             WheelSpeedMpS = (float)LocomotiveAxles[0].AxleSpeedMpS;
         }
-
-        public void SimpleAdhesion()
+        /// <summary>
+        /// Adjusts the MotiveForce to account for adhesion limits
+        /// If UseAdvancedAdhesion is true, dynamic adhesion model is computed
+        /// If UseAdvancedAdhesion is false, the basic force limits are calculated the same way MSTS calculates them, but
+        /// the weather handling is different and Curtius-Kniffler curves are considered as a static limit
+        /// </summary>
+        public virtual void AdvancedAdhesion(float elapsedClockSeconds)
         {
-            MotiveForceN = TractiveForceN;
-            // Check if the following few lines are required???
-            if (LocoNumDrvAxles <= 0)
-            {
-                WheelSpeedMpS = AbsSpeedMpS;
-                return;
-            }
-            
-            if (LocoNumDrvAxles <= 0)
-                return;
+            UpdateAxles(elapsedClockSeconds);
+        }
 
-            //Curtius-Kniffler computation
-            // Set to a high level of adhesion to ensure that locomotive rarely slips in dry mode
-            float uMax = 1.3f * (7.5f / (AbsSpeedMpS + 44.0f) + 0.161f); // Curtius - Kniffler equation
- 
-            float max0 = DrvWheelWeightKg * 9.81f * uMax;  //Ahesion limit in [N]
-            float max1;
-            float SandingFrictionFactor = 1;
-
-            if (Simulator.WeatherType == WeatherType.Rain || Simulator.WeatherType == WeatherType.Snow)
-            {
-                if (Train.SlipperySpotDistanceM < 0)
-                {
-                    Train.SlipperySpotLengthM = 10 + 40 * (float)Simulator.Random.NextDouble();
-                    Train.SlipperySpotDistanceM = Train.SlipperySpotLengthM + 2000 * (float)Simulator.Random.NextDouble();
-                }
-                if (Train.SlipperySpotDistanceM < Train.SlipperySpotLengthM)
-                    max0 *= 0.8f;
-                if (Simulator.WeatherType == WeatherType.Rain)
-                    max0 *= 0.8f;
-                else
-                    max0 *= 0.7f;
-            }
-            //float max1 = (Sander ? .95f : Adhesion2) * max0;  //Not used this way
-            max1 = MaxForceN;
-            //add sander
-            if (Sander && AbsSpeedMpS < SanderSpeedOfMpS && CurrentTrackSandBoxCapacityM3 > 0.0 && MainResPressurePSI > 80.0)
-            {
-                switch (Simulator.WeatherType)
-                {
-                    case WeatherType.Clear: SandingFrictionFactor = 1.2f; break;
-                    case WeatherType.Rain: SandingFrictionFactor = 1.8f; break;
-                    case WeatherType.Snow: SandingFrictionFactor = 2.5f; break;
-                }
-                if (SanderSpeedEffectUpToMpS > 0.0f) // Reduce sander effectiveness if max effective speed is defined
-                {
-                    SandingFrictionFactor *= (1.0f - 0.5f / SanderSpeedEffectUpToMpS * AbsSpeedMpS);
-                }
-                max0 *= Math.Max(SandingFrictionFactor, 1.0f); // Prevent sand from harming adhesion above max effective speed
-            }
-
-            max1 = max0;
-
-            WheelSlip = false;
-
-            if (MotiveForceN > max1)
-            {
-                WheelSlip = true;
-                if (AntiSlip)
-                    MotiveForceN = max1;
-                else
-                    MotiveForceN = Adhesion1 * max0;        //Lowers the adhesion limit to 20% of its full
-            }
-            else if (MotiveForceN < -max1)
-            {
-                WheelSlip = true;
-                if (AntiSlip)
-                    MotiveForceN = -max1;
-                else
-                    MotiveForceN = -Adhesion1 * max0;       //Lowers the adhesion limit to 20% of its full
-            }
+        public void SimpleAdhesion(float elapsedClockSeconds)
+        {
+            UpdateAxles(elapsedClockSeconds); // Simple adhesion is now handled in the Axle module, together with advanced adhesion
         }
 
         /// <summary>
@@ -3514,7 +3416,7 @@ namespace Orts.Simulation.RollingStocks
             Train.LocomotiveCoefficientFriction = MathHelper.Clamp(Train.LocomotiveCoefficientFriction, 0.05f, 0.8f); // Ensure friction coefficient never exceeds a "reasonable" value
 
             float ZeroBaseuMax = (Curtius_KnifflerA / (Curtius_KnifflerB) + Curtius_KnifflerC); // Base Curtius - Kniffler equation - u = 0.33, all other values are scaled off this formula
-            ZeroSpeedAdhesionBase = ZeroBaseuMax * BaseFrictionCoefficientFactor * AdhesionMultiplier;
+            ZeroBaseuMax *= BaseFrictionCoefficientFactor * AdhesionMultiplier;
 
             // Set adhesion conditions for diesel, electric or steam geared locomotives
             if (elapsedClockSeconds > 0)
@@ -5346,11 +5248,7 @@ namespace Orts.Simulation.RollingStocks
             {
                 case CABViewControlTypes.SPEEDOMETER:
                     {
-                        //data = SpeedMpS;
-                        if (AdvancedAdhesionModel)
-                            data = WheelSpeedMpS;
-                        else
-                            data = SpeedMpS;
+                        data = WheelSpeedMpS;
 
                         if (cvc.Units == CABViewControlUnits.KM_PER_HOUR)
                             data *= 3.6f;

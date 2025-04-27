@@ -6553,7 +6553,6 @@ public readonly SmoothedData StackSteamVelocityMpS = new SmoothedData(2);
                 if (Simulator.UseAdvancedAdhesion && !Simulator.Settings.SimpleControlPhysics)
                 {
                     SteamEngines[i].AttachedAxle.DriveForceN = SteamEngines[i].RealTractiveForceN;
-                    UpdateAxleDriveForce();
 
                     SteamEngines[i].DisplayTractiveForceN = SteamEngines[i].AverageTractiveForceN;
                     DisplayTractiveForceN += SteamEngines[i].AverageTractiveForceN;
@@ -6724,12 +6723,6 @@ public readonly SmoothedData StackSteamVelocityMpS = new SmoothedData(2);
         }
 
 
-        protected override void UpdateAxleDriveForce()
-        {
-            // No updates are done to Axle Drive Force in steam locomotives, unless a future slip control device is added.
-        }
-
-
         public override void AdvancedAdhesion(float elapsedClockSeconds)
         { 
 
@@ -6805,7 +6798,6 @@ public readonly SmoothedData StackSteamVelocityMpS = new SmoothedData(2);
                 axle.WheelDistanceGaugeM = TrackGaugeM;
                 axle.CurrentCurveRadiusM = CurrentCurveRadiusM;
                 axle.BogieRigidWheelBaseM = RigidWheelBaseM;
-                axle.CurtiusKnifflerZeroSpeed = ZeroSpeedAdhesionBase;
                 
             }
             
