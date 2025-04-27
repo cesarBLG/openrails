@@ -502,6 +502,7 @@ namespace Orts.Simulation.RollingStocks
         }
         public TractionMotorTypes TractionMotorType = TractionMotorTypes.DC;
         public List<ElectricMotor> TractionMotors = new List<ElectricMotor>();
+        public ElectricMotorController MotorController;
 
         public ILocomotivePowerSupply LocomotivePowerSupply => PowerSupply as ILocomotivePowerSupply;
         public ScriptedTrainControlSystem TrainControlSystem;
@@ -2594,7 +2595,7 @@ namespace Orts.Simulation.RollingStocks
             if (forceN * AbsSpeedMpS > powerW) forceN = powerW / AbsSpeedMpS;
             return forceN;
         }
-        protected virtual void UpdateTractionForce(float elapsedClockSeconds)
+        public virtual void UpdateTractionForce(float elapsedClockSeconds)
         {
             float t = ThrottlePercent / 100;
 
@@ -2652,7 +2653,7 @@ namespace Orts.Simulation.RollingStocks
             }
             return forceN;
         }
-        protected virtual void UpdateDynamicBrakeForce(float elapsedClockSeconds)
+        public void UpdateDynamicBrakeForce(float elapsedClockSeconds)
         {
             if (ThrottlePercent <= 0 && TractionForceN <= 0 && LocomotivePowerSupply.DynamicBrakeAvailable && Direction != Direction.N && DynamicBrakePercent >= 0)
             {
@@ -2724,13 +2725,19 @@ namespace Orts.Simulation.RollingStocks
                     AbsTractionSpeedMpS = AbsSpeedMpS;
                 }
             }
+            if (MotorController != null)
+            {
 
-            UpdateTractionForce(elapsedClockSeconds);
-            TractiveForceN = TractionForceN;
-            ApplyDirectionToTractiveForce(ref TractiveForceN, 0);
+            }
+            else
+            {
+                UpdateTractionForce(elapsedClockSeconds);
+                TractiveForceN = TractionForceN;
+                ApplyDirectionToTractiveForce(ref TractiveForceN, 0);
 
-            UpdateDynamicBrakeForce(elapsedClockSeconds);
-            TractiveForceN -= (SpeedMpS > 0 ? 1 : SpeedMpS < 0 ? -1 : Direction == Direction.Reverse ? -1 : 1) * DynamicBrakeForceN;
+                UpdateDynamicBrakeForce(elapsedClockSeconds);
+                TractiveForceN -= (SpeedMpS > 0 ? 1 : SpeedMpS < 0 ? -1 : Direction == Direction.Reverse ? -1 : 1) * DynamicBrakeForceN;
+            }
         }
 
         /// <summary>

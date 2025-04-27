@@ -32,7 +32,6 @@ namespace Orts.Simulation.RollingStocks.SubSystems.PowerTransmissions
                 return armatureResistanceOhms * (235.0f + temperatureK) / (235.0f + 20.0f);
             }
         }
-        public float ArmatureInductanceH { set; get; }
 
         float fieldResistanceOhms;
         public float FieldResistanceOhms
@@ -48,13 +47,9 @@ namespace Orts.Simulation.RollingStocks.SubSystems.PowerTransmissions
         }
         public float FieldInductance { set; get; }
 
-        public bool Compensated { set; get; }
+        public float ArmatureCurrentA { get; private set; }
 
-        float armatureCurrentA;
-        public float ArmatureCurrentA { get { return armatureCurrentA; } }
-
-        float fieldCurrentA;
-        public float FieldCurrentA { get { return fieldCurrentA; } }
+        public float FieldCurrentA { get; private set; }
 
 
         public float TerminalVoltageV { set; get; }
@@ -63,70 +58,26 @@ namespace Orts.Simulation.RollingStocks.SubSystems.PowerTransmissions
         {
             get
             {
-                return armatureCurrentA * ArmatureResistanceOhms + BackEMFvoltageV;
+                return ArmatureCurrentA * ArmatureResistanceOhms + BackEMFvoltageV;
             }
         }
 
         public float StartingResistorOhms { set; get; }
-        public float AdditionalResistanceOhms { set; get; }
-
-        float shuntResistorOhms;
-        public float ShuntResistorOhms
-        {
-            set
-            {
-                if (value == 0.0f)
-                {
-                    shuntRatio = 0.0f;
-                    shuntResistorOhms = 0.0f;
-                }
-                else
-                    shuntResistorOhms = value;
-            }
-            get
-            {
-                if (shuntResistorOhms == 0.0f)
-                    return float.PositiveInfinity;
-                else
-                    return shuntResistorOhms;
-            }
-        }
-
-        float shuntRatio;
-        public float ShuntPercent
-        {
-            set
-            {
-                shuntRatio = value / 100.0f;
-            }
-            get
-            {
-                if (shuntResistorOhms == 0.0f)
-                    return shuntRatio * 100.0f;
-                else
-                    return 1.0f - shuntResistorOhms / (FieldResistanceOhms + shuntResistorOhms);
-            }
-        }
+        public float ShuntPercent;
         public float BackEMFvoltageV { get; private set; }
 
-        public float MotorConstant { set; get; }
-
-        float fieldWb;
+        float FieldWb;
 
         public float NominalRevolutionsRad;
         public float NominalVoltageV;
         public float NominalCurrentA;
 
-        public float UpdateField()
+        public void UpdateField()
         {
-            float temp = 0.0f;
-            temp = (NominalVoltageV - (ArmatureResistanceOhms + FieldResistanceOhms) * NominalCurrentA) / (NominalRevolutionsRad);
-            if (fieldCurrentA <= NominalCurrentA)
-                fieldWb = temp * fieldCurrentA / NominalCurrentA;
-            else
-                fieldWb = temp;
-            temp *= (1.0f - shuntRatio);
-            return temp;
+            FieldWb = (NominalVoltageV - (ArmatureResistanceOhms + FieldResistanceOhms) * NominalCurrentA) / NominalRevolutionsRad;
+            if (FieldCurrentA <= NominalCurrentA)
+                FieldWb *= FieldCurrentA / NominalCurrentA;
+            FieldWb *= 1.0f - ShuntPercent / 100;
         }
 
         public SeriesMotor(float nomCurrentA, float nomVoltageV, float nomRevolutionsRad, Axle axle, MSTSLocomotive locomotive) : base(axle, locomotive)
@@ -138,37 +89,33 @@ namespace Orts.Simulation.RollingStocks.SubSystems.PowerTransmissions
 
         public override double GetDevelopedTorqueNm(double revolutionsRad)
         {
-            BackEMFvoltageV = (float)revolutionsRad * fieldWb;
-            return fieldWb * armatureCurrentA/* - (frictionTorqueNm * revolutionsRad / NominalRevolutionsRad * revolutionsRad / NominalRevolutionsRad)*/;
+            return FieldWb * ArmatureCurrentA/* - (frictionTorqueNm * revolutionsRad / NominalRevolutionsRad * revolutionsRad / NominalRevolutionsRad)*/;
         }
 
         public override void Update(float timeSpan)
         {
-            if (shuntResistorOhms == 0.0f)
-                armatureCurrentA = fieldCurrentA / (1.0f - shuntRatio);
-            else
-                armatureCurrentA = (FieldResistanceOhms + ShuntResistorOhms) / ShuntResistorOhms * fieldCurrentA;
-            if ((BackEMFvoltageV * fieldCurrentA) >= 0.0f)
+            float revolutionsRad = (float)AxleConnected.AxleSpeedMpS * AxleConnected.TransmissionRatio / AxleConnected.WheelRadiusM;
+            BackEMFvoltageV = revolutionsRad * FieldWb;
+            ArmatureCurrentA = FieldCurrentA / (1.0f - ShuntPercent / 100);
+            if ((BackEMFvoltageV * FieldCurrentA) >= 0.0f)
             {
-                fieldCurrentA += timeSpan / FieldInductance *
+                FieldCurrentA += timeSpan / FieldInductance *
                     (TerminalVoltageV
                         - BackEMFvoltageV
-                        - ArmatureResistanceOhms * armatureCurrentA
-                        - FieldResistanceOhms * (1.0f - shuntRatio) * fieldCurrentA
-                        - ArmatureCurrentA * StartingResistorOhms
-                        - ArmatureCurrentA * AdditionalResistanceOhms
+                        - ArmatureCurrentA * (ArmatureResistanceOhms + StartingResistorOhms)
+                        - FieldCurrentA * FieldResistanceOhms * (1.0f - ShuntPercent / 100)
                     //- ((fieldCurrentA == 0.0) ? 0.0 : 2.0)            //voltage drop on brushes
                     );
             }
             else
             {
-                fieldCurrentA = 0.0f;
+                FieldCurrentA = 0.0f;
             }          
 
             UpdateField();
 
-            powerLossesW = ArmatureResistanceOhms * armatureCurrentA * armatureCurrentA +
-                           FieldResistanceOhms * fieldCurrentA * fieldCurrentA;
+            powerLossesW = ArmatureResistanceOhms * ArmatureCurrentA * ArmatureCurrentA +
+                           FieldResistanceOhms * FieldCurrentA * FieldCurrentA;
 
             //temperatureK += timeSpan * ThermalCoeffJ_m2sC * SurfaceM / (SpecificHeatCapacityJ_kg_C * WeightKg)
             //    * ((powerLossesW - CoolingPowerKW) / (SpecificHeatCapacityJ_kg_C * WeightKg) - temperatureK);
@@ -177,9 +124,9 @@ namespace Orts.Simulation.RollingStocks.SubSystems.PowerTransmissions
         }
         public override void Initialize()
         {
-            fieldCurrentA = 0.0f;
-            armatureCurrentA = 0.0f;
-            fieldWb = 0.0f;
+            FieldCurrentA = 0.0f;
+            ArmatureCurrentA = 0.0f;
+            FieldWb = 0.0f;
             base.Initialize();
         }
     }

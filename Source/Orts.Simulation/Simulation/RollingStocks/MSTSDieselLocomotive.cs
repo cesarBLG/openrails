@@ -695,7 +695,7 @@ namespace Orts.Simulation.RollingStocks
             if (forceN * AbsTractionSpeedMpS > powerW) forceN = powerW / AbsTractionSpeedMpS;
             return forceN;
         }
-        protected override void UpdateTractionForce(float elapsedClockSeconds)
+        public override void UpdateTractionForce(float elapsedClockSeconds)
         {
             if (DieselEngines.HasGearBox && (TractiveForceCurves == null || DieselTransmissionType == MSTSDieselLocomotive.DieselTransmissionTypes.Mechanic))
             {
