@@ -155,6 +155,8 @@ namespace ORTS.Common.Input
         [GetString("Control Brakeman Brake Decrease")] ControlBrakemanBrakeDecrease,
         [GetString("Control Dynamic Brake Increase")] ControlDynamicBrakeIncrease,
         [GetString("Control Dynamic Brake Decrease")] ControlDynamicBrakeDecrease,
+        [GetString("Control Field Weakening Increase")] ControlFieldWeakeningIncrease,
+        [GetString("Control Field Weakening Decrease")] ControlFieldWeakeningDecrease,
         [GetString("Control Bail Off")] ControlBailOff,
         [GetString("Control Brake Quick Release")] ControlBrakeQuickRelease,
         [GetString("Control Brake Overcharge")] ControlBrakeOvercharge,

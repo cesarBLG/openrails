@@ -40,6 +40,7 @@ using ORTS.Common.Input;
 using ORTS.Scripting.Api;
 using Event = Orts.Common.Event;
 using Orts.Simulation.RollingStocks.SubSystems.PowerSupplies;
+using Orts.Simulation.RollingStocks.SubSystems.PowerTransmissions;
 
 namespace Orts.Viewer3D.RollingStock
 {
@@ -160,6 +161,8 @@ namespace Orts.Viewer3D.RollingStock
             UserInputCommands.Add(UserCommand.ControlBrakemanBrakeDecrease, new Action[] { () => Locomotive.StopBrakemanBrakeDecrease(), () => Locomotive.StartBrakemanBrakeDecrease(null) });
             UserInputCommands.Add(UserCommand.ControlDynamicBrakeIncrease, new Action[] { () => Locomotive.StopDynamicBrakeIncrease(), () => Locomotive.StartDynamicBrakeIncrease(null) });
             UserInputCommands.Add(UserCommand.ControlDynamicBrakeDecrease, new Action[] { () => Locomotive.StopDynamicBrakeDecrease(), () => Locomotive.StartDynamicBrakeDecrease(null) });
+            UserInputCommands.Add(UserCommand.ControlFieldWeakeningIncrease, new Action[] { () => (Locomotive.MotorController as RheostaticMotorController)?.StopFieldWeakeningIncrease(), () => (Locomotive.MotorController as RheostaticMotorController)?.StartFieldWeakeningIncrease(null) });
+            UserInputCommands.Add(UserCommand.ControlFieldWeakeningDecrease, new Action[] { () => (Locomotive.MotorController as RheostaticMotorController)?.StopFieldWeakeningDecrease(), () => (Locomotive.MotorController as RheostaticMotorController)?.StartFieldWeakeningDecrease(null) });
             UserInputCommands.Add(UserCommand.ControlSteamHeatIncrease, new Action[] { () => Locomotive.StopSteamHeatIncrease(), () => Locomotive.StartSteamHeatIncrease(null) });
             UserInputCommands.Add(UserCommand.ControlSteamHeatDecrease, new Action[] { () => Locomotive.StopSteamHeatDecrease(), () => Locomotive.StartSteamHeatDecrease(null) });
             UserInputCommands.Add(UserCommand.ControlBailOff, new Action[] { () => new BailOffCommand(Viewer.Log, false), () => new BailOffCommand(Viewer.Log, true) });

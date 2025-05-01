@@ -382,6 +382,8 @@ namespace ORTS.Settings
             Commands[(int)UserCommand.ControlWindowRight] = new UserCommandKeyInput(0x10, KeyModifiers.Control | KeyModifiers.Shift);
             Commands[(int)UserCommand.ControlDynamicBrakeDecrease] = new UserCommandKeyInput(0x33);
             Commands[(int)UserCommand.ControlDynamicBrakeIncrease] = new UserCommandKeyInput(0x34);
+            Commands[(int)UserCommand.ControlFieldWeakeningDecrease] = new UserCommandKeyInput(0x12, KeyModifiers.Shift);
+            Commands[(int)UserCommand.ControlFieldWeakeningIncrease] = new UserCommandKeyInput(0x12);
             Commands[(int)UserCommand.ControlElectricTrainSupply] = new UserCommandKeyInput(0x30, KeyModifiers.Alt);
             Commands[(int)UserCommand.ControlEmergencyPushButton] = new UserCommandKeyInput(0x0E);
             Commands[(int)UserCommand.ControlEOTEmergencyBrake] = new UserCommandKeyInput(0x0E, KeyModifiers.Control);

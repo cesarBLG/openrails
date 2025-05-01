@@ -46,6 +46,7 @@ namespace Orts.Simulation
       , CircuitBreakerClosingOrder
       , CircuitBreakerOpeningOrder
       , CircuitBreakerClosingAuthorization
+      , FieldWeakening
         // Diesel Power
       , PlayerDiesel
       , HelperDiesel
@@ -199,6 +200,7 @@ namespace Orts.Simulation
                 , new string [] { GetString("Circuit breaker"), GetString("open"), null, GetString("close") }
                 , new string [] { GetString("Circuit breaker"), GetString("close"), null, GetString("open") }
                 , new string [] { GetString("Circuit breaker closing authorization"), GetString("remove"), null, GetString("give") }
+                , new string [] { GetString("Field weakening"), null, null, null, GetString("decrease"), GetString("increase"), null } 
                 // Diesel power
                 , new string [] { GetString("Player Diesel Power"), GetString("off"), null, GetString("on"), null, null, GetString("locked. Close throttle then re-try.") }
                 , new string [] { GetString("Helper Diesel Power"), GetString("off"), null, GetString("on") }

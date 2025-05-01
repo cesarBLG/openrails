@@ -3499,22 +3499,7 @@ public readonly SmoothedData StackSteamVelocityMpS = new SmoothedData(2);
                 variable[i] = 0;
 
                 // Variable is proportional to angular speed, value of 10 means 1 rotation/second.
-                // If wheel is not slipping then use normal wheel speed, this reduces oscillations in variable1 which causes issues with sounds.
-
-                if (((Train.TrainType == Train.TRAINTYPE.PLAYER && !Train.Autopilot) || Train.TrainType == Train.TRAINTYPE.AI_PLAYERDRIVEN) && (Simulator.UseAdvancedAdhesion && !Simulator.Settings.SimpleControlPhysics))
-                {
-                        variable[i] = Math.Abs((float)SteamEngines[i].AttachedAxle.AxleSpeedMpS / SteamEngines[i].AttachedAxle.WheelRadiusM / MathHelper.Pi * 5);
-                }
-                else 
-                // Axle code is not executed if it is an AI train, on Autopilot, or Simple adhesion or simple physics is selected. Hence must use wheelspeed in these instances
-                {
-                    if (WheelSlip)
-                        variable[i] = Math.Abs(WheelSpeedSlipMpS / SteamEngines[0].AttachedAxle.WheelRadiusM / MathHelper.Pi * 5);
-                    else
-                    {
-                        variable[i] = Math.Abs(WheelSpeedMpS / SteamEngines[0].AttachedAxle.WheelRadiusM / MathHelper.Pi * 5);
-                    }
-                }
+                variable[i] = Math.Abs((float)SteamEngines[i].AttachedAxle.AxleSpeedMpS / SteamEngines[i].AttachedAxle.WheelRadiusM / MathHelper.Pi * 5);
 
                 variable[i] = ThrottlePercent == 0 ? 0 : variable[i];
 
@@ -6522,11 +6507,6 @@ public readonly SmoothedData StackSteamVelocityMpS = new SmoothedData(2);
         {
             float locomotivethrottle = ThrottlePercent / 100;
             TractiveForceN = 0; // reset tractiveforceN in preparation to calculating a new value
-            if (!Simulator.UseAdvancedAdhesion && Simulator.Settings.SimpleControlPhysics)
-            {
-                // Simple adhesion
-                MotiveForceN = 0;
-            }
             IndicatedHorsePowerHP = 0;
             PistonSpeedFtpMin = 0;
             MaxPowerW = 0;
@@ -6550,21 +6530,9 @@ public readonly SmoothedData StackSteamVelocityMpS = new SmoothedData(2);
 
                 TractiveForceN += SteamEngines[i].RealTractiveForceN;
 
-                if (Simulator.UseAdvancedAdhesion && !Simulator.Settings.SimpleControlPhysics)
-                {
-                    SteamEngines[i].AttachedAxle.DriveForceN = SteamEngines[i].RealTractiveForceN;
-
-                    SteamEngines[i].DisplayTractiveForceN = SteamEngines[i].AverageTractiveForceN;
-                    DisplayTractiveForceN += SteamEngines[i].AverageTractiveForceN;
-
-                }
-                else // Simple adhesion
-                {
-                    SteamEngines[i].DisplayTractiveForceN = SteamEngines[i].RealTractiveForceN;
-                    MotiveForceN += SteamEngines[i].RealTractiveForceN;
-                    DisplayTractiveForceN += SteamEngines[i].RealTractiveForceN;
-
-                }
+                SteamEngines[i].AttachedAxle.DriveForceN = SteamEngines[i].RealTractiveForceN;
+                SteamEngines[i].DisplayTractiveForceN = SteamEngines[i].AverageTractiveForceN;
+                DisplayTractiveForceN += SteamEngines[i].AverageTractiveForceN;
 
                 // Set Max Power equal to max IHP
                 MaxPowerW += W.FromHp(SteamEngines[i].MaxIndicatedHorsePowerHP);
@@ -6723,7 +6691,7 @@ public readonly SmoothedData StackSteamVelocityMpS = new SmoothedData(2);
         }
 
 
-        public override void AdvancedAdhesion(float elapsedClockSeconds)
+        protected override void UpdateAxles(float elapsedClockSeconds)
         { 
 
             foreach (var axle in LocomotiveAxles)

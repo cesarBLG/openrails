@@ -41,6 +41,10 @@ namespace Orts.Simulation.RollingStocks.SubSystems.PowerTransmissions
         protected float ThrottlePercent => Locomotive.ThrottlePercent;
         protected float DynamicBrakePercent => Locomotive.DynamicBrakePercent;
         protected Axles LocomotiveAxles => Locomotive.LocomotiveAxles;
+        public ElectricMotorController(MSTSLocomotive locomotive)
+        {
+            Locomotive = locomotive;
+        }
 
         public virtual void Parse(string lowercasetoken, STFReader stf)
         {
@@ -69,6 +73,10 @@ namespace Orts.Simulation.RollingStocks.SubSystems.PowerTransmissions
     }
     public class DefaultMotorController : ElectricMotorController
     {
+        public DefaultMotorController(MSTSLocomotive locomotive) : base(locomotive)
+        {
+
+        }
         public override void Update(float elapsedClockSeconds)
         {
             base.Update(elapsedClockSeconds);
@@ -79,24 +87,12 @@ namespace Orts.Simulation.RollingStocks.SubSystems.PowerTransmissions
             Locomotive.UpdateDynamicBrakeForce(elapsedClockSeconds);
             Locomotive.TractiveForceN -= (Locomotive.SpeedMpS > 0 ? 1 : Locomotive.SpeedMpS < 0 ? -1 : Locomotive.Direction == Direction.Reverse ? -1 : 1) * Locomotive.DynamicBrakeForceN;
 
-            foreach (var axle in LocomotiveAxles)
+            foreach (var motor in Locomotive.TractionMotors)
             {
-                // This class only handles chopper DC motors (currently driving the axles via force) and AC motors
-                if (axle.DriveType == AxleDriveType.ForceDriven)
+                float targetForceN = Locomotive.TractiveForceN / Locomotive.TractionMotors.Count;
+                var axle = motor.AxleConnected;
+                if (motor is InductionMotor ac)
                 {
-                    axle.DriveForceN = Locomotive.TractiveForceN / LocomotiveAxles.Count;
-                    if (Locomotive.SlipControlSystem == SlipControlType.Full)
-                    {
-                        // Simple slip control
-                        // Motive force is reduced to the maximum adhesive force
-                        // In wheelslip situations, motive force is set to zero
-                        axle.DriveForceN = Math.Sign(axle.DriveForceN) * Math.Min(axle.MaximumWheelAdhesion * axle.AxleWeightN, Math.Abs(axle.DriveForceN));
-                        if (axle.IsWheelSlip) axle.DriveForceN = 0;
-                    }
-                }
-                else if (axle.Motor is InductionMotor ac)
-                {
-                    float targetForceN = Locomotive.TractiveForceN / LocomotiveAxles.Count;
                     ac.TargetForceN = targetForceN;
                     float linToAngFactor = axle.TransmissionRatio / axle.WheelRadiusM;
                     if (Locomotive.SlipControlSystem == SlipControlType.Full)
@@ -108,6 +104,18 @@ namespace Orts.Simulation.RollingStocks.SubSystems.PowerTransmissions
                     {
                         if (targetForceN > 0) ac.DriveSpeedRadpS = Locomotive.MaxSpeedMpS * linToAngFactor + ac.OptimalAsyncSpeedRadpS;
                         else if (targetForceN < 0) ac.DriveSpeedRadpS = -Locomotive.MaxSpeedMpS * linToAngFactor - ac.OptimalAsyncSpeedRadpS;
+                    }
+                }
+                else if (motor is SimpleMotor dc)
+                {
+                    dc.TargetForceN = targetForceN;
+                    if (Locomotive.SlipControlSystem == SlipControlType.Full)
+                    {
+                        // Simple slip control
+                        // Motive force is reduced to the maximum adhesive force
+                        // In wheelslip situations, motive force is set to zero
+                        dc.TargetForceN = Math.Sign(dc.TargetForceN) * Math.Min(axle.MaximumWheelAdhesion * axle.AxleWeightN, Math.Abs(dc.TargetForceN));
+                        if (axle.IsWheelSlip) dc.TargetForceN = 0;
                     }
                 }
             }

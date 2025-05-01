@@ -599,6 +599,12 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Controllers
             return Notches.Count == 0 ? null : Notches[CurrentNotch];
         }
 
+        public MSTSNotch GetNotchByIndex(int index)
+        {
+            if (index < 0 || index >= Notches.Count) return null;
+            return Notches[index];
+        }
+
         protected void SetCurrentNotch(ControllerState type)
         {
             for (int i = 0; i < Notches.Count; i++)
